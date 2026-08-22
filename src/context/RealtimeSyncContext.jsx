@@ -501,6 +501,24 @@ export function RealtimeSyncProvider({ children }) {
     stopHardwareGpsTracking();
   };
 
+  const updateBookingPrice = (newPrice) => {
+    if (!activeBooking) return;
+    
+    // Recalculate advancePaid and balanceDue based on new price
+    const method = activeBooking.paymentMethod || 'cod';
+    const advancePaid = method === 'cod' ? Math.round(newPrice * 0.3) : newPrice;
+    const balanceDue = Math.round(newPrice - advancePaid);
+    
+    const updated = { 
+      ...activeBooking, 
+      estimatedPrice: newPrice,
+      advancePaid,
+      balanceDue
+    };
+    setActiveBooking(updated);
+    broadcast('BOOKING_PRICE_BARGAINED', updated);
+  };
+
   // Broadcast driver online status
   const broadcastDriverDuty = (driverInfo) => {
     if (driverInfo.status === 'online' && driverInfo.lat && driverInfo.lng) {
@@ -558,6 +576,7 @@ export function RealtimeSyncProvider({ children }) {
         rejectBooking,
         updateBookingStatus,
         cancelBooking,
+        updateBookingPrice,
         broadcastDriverDuty,
         submitDriverKycRealtime,
         approveApplication,

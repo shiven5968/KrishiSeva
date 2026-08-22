@@ -20,7 +20,8 @@ import {
   Compass,
   Radio,
   Wifi,
-  Search
+  Search,
+  Coins
 } from 'lucide-react';
 
 export default function FarmerLiveTracking() {
@@ -31,6 +32,7 @@ export default function FarmerLiveTracking() {
     routeWaypoints, 
     cancelBooking,
     updateBookingStatus,
+    updateBookingPrice,
     isHardwareGpsActive,
     hardwareGpsTelemetry
   } = useRealtimeSync();
@@ -40,6 +42,16 @@ export default function FarmerLiveTracking() {
 
   // Cancellation Reason Modal State
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+
+  // Bargain states
+  const [bargainPriceInput, setBargainPriceInput] = useState('');
+  const [isBargainSuccess, setIsBargainSuccess] = useState(false);
+
+  useEffect(() => {
+    if (activeBooking && activeBooking.estimatedPrice) {
+      setBargainPriceInput(String(activeBooking.estimatedPrice));
+    }
+  }, [activeBooking?.id]);
 
   useEffect(() => {
     let interval = null;
@@ -303,6 +315,53 @@ export default function FarmerLiveTracking() {
                      </div>
                    </>
                  )}
+              </div>
+
+              {/* Bargaining / Counter-Offer Section */}
+              <div className="bg-stone-950/80 rounded-2xl p-4 border border-stone-850 space-y-3 animate-fade-in">
+                <div className="flex items-center gap-1.5 text-xs text-emerald-400 font-extrabold uppercase tracking-wider">
+                  <Coins className="w-3.5 h-3.5" />
+                  <span>{lang === 'hi' ? 'किराया मोल-भाव (Bargain Price)' : 'Want to Bargain?'}</span>
+                </div>
+                <p className="text-[10px] text-stone-400 leading-normal">
+                  {lang === 'hi'
+                    ? 'अपना नया प्रस्तावित किराया दर्ज करें। आस-पास के ऑपरेटरों को आपका ऑफर तुरंत दिखेगा।'
+                    : 'Enter your proposed fare. Nearby operators will see your counter-offer immediately.'}
+                </p>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 font-bold text-xs">₹</span>
+                    <input
+                      type="number"
+                      value={bargainPriceInput}
+                      onChange={(e) => {
+                        setBargainPriceInput(e.target.value);
+                        setIsBargainSuccess(false);
+                      }}
+                      placeholder={activeBooking.estimatedPrice}
+                      className="w-full pl-7 pr-3 py-2 bg-stone-900 border border-stone-700 rounded-xl text-xs font-black text-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const val = Number(bargainPriceInput);
+                      if (val > 0) {
+                        updateBookingPrice(val);
+                        setIsBargainSuccess(true);
+                        setTimeout(() => setIsBargainSuccess(false), 3000);
+                      }
+                    }}
+                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-stone-950 text-xs font-black rounded-xl shadow-lg shadow-emerald-600/10 transition active:scale-95 shrink-0"
+                  >
+                    {lang === 'hi' ? 'ऑफर भेजें' : 'Send Offer'}
+                  </button>
+                </div>
+                {isBargainSuccess && (
+                  <p className="text-[10px] text-emerald-400 font-black text-center animate-pulse">
+                    {lang === 'hi' ? '✓ नया काउंटर-ऑफर भेजा गया!' : '✓ Counter-offer sent successfully!'}
+                  </p>
+                )}
               </div>
 
               {/* Cancel Request Button (Opens Reason Modal) */}

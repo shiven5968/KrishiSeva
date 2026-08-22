@@ -243,13 +243,13 @@ export default function LiveMap({
         const distLabel = `~${distFromFarm} km`;
 
         const marker = L.marker([drv.lat || (center.lat + 0.008), drv.lng || (center.lng + 0.007)], {
-          icon: createCustomIcon(iconEmoji, `${drv.name.split(' ')[0]} (${distLabel})`, color, false)
+          icon: createCustomIcon(iconEmoji, `${drv.vehicleNumber || 'Vehicle'} (${distLabel})`, color, false)
         }).addTo(newLayerGroup);
 
         marker.bindPopup(`
           <div style="font-family: inherit; padding: 2px;">
             <b style="color: #0f172a; font-size: 12px;">${drv.modelName || 'Mahindra 575 DI'}</b><br/>
-            <span style="font-size: 11px; color: #475569;">${drv.name} • ⭐ ${drv.rating || 4.9}</span><br/>
+            <span style="font-size: 11px; color: #475569;">${drv.vehicleNumber || 'UP-32-KR-7744'} • ⭐ ${drv.rating || 4.9}</span><br/>
             <span style="font-weight: 700; color: #059669; font-size: 11px;">📍 ${distLabel} away • Ready for Dispatch</span>
           </div>
         `);
