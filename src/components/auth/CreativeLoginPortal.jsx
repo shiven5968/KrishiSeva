@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
-import { sendRealSmsToPhone, sendAadhaarEkycSms } from '../../utils/smsGateway';
+import { sendRealSmsToPhone, sendAadhaarEkycSms, sendRealWhatsAppOtp } from '../../utils/smsGateway';
 import { verifyAgriStackFarmer, REGISTERED_AGRISTACK_RECORDS } from '../../services/bhulekhLandService';
 import { audioHelper } from '../../utils/audioHelper';
 import { 
@@ -80,6 +80,93 @@ export default function CreativeLoginPortal() {
   const [isVerifyingAgriStack, setIsVerifyingAgriStack] = useState(false);
   const [agriStackResult, setAgriStackResult] = useState(null);
 
+  // Gateway Configuration Modal States
+  const [showGatewayModal, setShowGatewayModal] = useState(false);
+  const [waProvider, setWaProvider] = useState(() => {
+    if (localStorage.getItem('krishi_ultramsg_config')) return 'ultramsg';
+    if (localStorage.getItem('krishi_greenapi_config')) return 'greenapi';
+    return 'none';
+  });
+  const [waUltramsgInstance, setWaUltramsgInstance] = useState(() => {
+    try {
+      const cfg = JSON.parse(localStorage.getItem('krishi_ultramsg_config') || '{}');
+      return cfg.instanceId || '';
+    } catch { return ''; }
+  });
+  const [waUltramsgToken, setWaUltramsgToken] = useState(() => {
+    try {
+      const cfg = JSON.parse(localStorage.getItem('krishi_ultramsg_config') || '{}');
+      return cfg.token || '';
+    } catch { return ''; }
+  });
+  const [waGreenapiInstance, setWaGreenapiInstance] = useState(() => {
+    try {
+      const cfg = JSON.parse(localStorage.getItem('krishi_greenapi_config') || '{}');
+      return cfg.instanceId || '';
+    } catch { return ''; }
+  });
+  const [waGreenapiToken, setWaGreenapiToken] = useState(() => {
+    try {
+      const cfg = JSON.parse(localStorage.getItem('krishi_greenapi_config') || '{}');
+      return cfg.token || '';
+    } catch { return ''; }
+  });
+
+  const [smsProvider, setSmsProvider] = useState(() => {
+    if (localStorage.getItem('krishi_fast2sms_api_key')) return 'fast2sms';
+    if (localStorage.getItem('krishi_twilio_config')) return 'twilio';
+    return 'none';
+  });
+  const [fast2smsKey, setFast2smsKey] = useState(() => localStorage.getItem('krishi_fast2sms_api_key') || '');
+  const [twilioSid, setTwilioSid] = useState(() => {
+    try {
+      const cfg = JSON.parse(localStorage.getItem('krishi_twilio_config') || '{}');
+      return cfg.accountSid || '';
+    } catch { return ''; }
+  });
+  const [twilioToken, setTwilioToken] = useState(() => {
+    try {
+      const cfg = JSON.parse(localStorage.getItem('krishi_twilio_config') || '{}');
+      return cfg.authToken || '';
+    } catch { return ''; }
+  });
+  const [twilioFrom, setTwilioFrom] = useState(() => {
+    try {
+      const cfg = JSON.parse(localStorage.getItem('krishi_twilio_config') || '{}');
+      return cfg.fromNumber || '';
+    } catch { return ''; }
+  });
+
+  const handleSaveGatewayConfig = (e) => {
+    e.preventDefault();
+
+    // 1. Save WhatsApp config
+    if (waProvider === 'ultramsg') {
+      localStorage.setItem('krishi_ultramsg_config', JSON.stringify({ instanceId: waUltramsgInstance, token: waUltramsgToken }));
+      localStorage.removeItem('krishi_greenapi_config');
+    } else if (waProvider === 'greenapi') {
+      localStorage.setItem('krishi_greenapi_config', JSON.stringify({ instanceId: waGreenapiInstance, token: waGreenapiToken }));
+      localStorage.removeItem('krishi_ultramsg_config');
+    } else {
+      localStorage.removeItem('krishi_ultramsg_config');
+      localStorage.removeItem('krishi_greenapi_config');
+    }
+
+    // 2. Save SMS config
+    if (smsProvider === 'fast2sms') {
+      localStorage.setItem('krishi_fast2sms_api_key', fast2smsKey);
+      localStorage.removeItem('krishi_twilio_config');
+    } else if (smsProvider === 'twilio') {
+      localStorage.setItem('krishi_twilio_config', JSON.stringify({ accountSid: twilioSid, authToken: twilioToken, fromNumber: twilioFrom }));
+      localStorage.removeItem('krishi_fast2sms_api_key');
+    } else {
+      localStorage.removeItem('krishi_fast2sms_api_key');
+      localStorage.removeItem('krishi_twilio_config');
+    }
+
+    setShowGatewayModal(false);
+  };
+
   // Timer countdown for App login OTP resend
   useEffect(() => {
     let interval = null;
@@ -103,9 +190,16 @@ export default function CreativeLoginPortal() {
   }, [aadhaarStep, aadhaarResendTimer]);
 
   // WhatsApp OTP auto-trigger
-  const triggerWhatsAppOtp = (phoneNumber, code) => {
+  const triggerWhatsAppOtp = async (phoneNumber, code) => {
+    // 1. Try automated background sending if a gateway is configured (UltraMsg / Green-API)
+    const result = await sendRealWhatsAppOtp(phoneNumber, code, lang);
+    if (result.success) {
+      console.log(`Success: OTP sent silently via ${result.provider}`);
+      return;
+    }
+
+    // 2. Fallback to opening wa.me link for manual sending if no automated gateway is set up
     const cleanNumber = phoneNumber.replace(/\D/g, '').slice(-10);
-    
     const messageText = lang === 'hi' ?
 `🚜 *कृषि सेवा (KrishiSeva)* 🌾
 
@@ -135,8 +229,6 @@ Your Field, Our Power — On-demand farm machinery dispatched in 1 click!`;
     } catch (e) {
       console.log('WhatsApp auto-open popup intercepted:', e);
     }
-
-    return whatsappUrl;
   };
 
   const handleSendOtp = async (e) => {
@@ -343,6 +435,15 @@ Your Field, Our Power — On-demand farm machinery dispatched in 1 click!`;
 
         {/* Right Top Header Navigation */}
         <div className="flex items-center gap-2.5">
+          <button
+            onClick={() => setShowGatewayModal(true)}
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-stone-800/80 bg-stone-900/50 hover:bg-stone-800/80 text-stone-400 hover:text-white text-xs font-bold transition-all duration-200 backdrop-blur-md hover:border-stone-700"
+            title="Configure OTP Gateways"
+          >
+            <Settings className="w-3.5 h-3.5 text-blue-400" />
+            <span>{lang === 'hi' ? 'गेटवे सेटअप' : 'Gateway Config'}</span>
+          </button>
+
           <a
             href="#admin"
             className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-stone-800/80 bg-stone-900/50 hover:bg-stone-800/80 text-stone-400 hover:text-white text-xs font-bold transition-all duration-200 backdrop-blur-md hover:border-stone-700"
@@ -986,6 +1087,226 @@ Your Field, Our Power — On-demand farm machinery dispatched in 1 click!`;
         </div>
       </footer>
 
+      {/* ═══════════ GATEWAY CONFIGURATION MODAL ═══════════ */}
+      {showGatewayModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
+          <div className="relative w-full max-w-lg bg-stone-900 border border-stone-800 rounded-3xl p-6 sm:p-8 shadow-2xl text-stone-200 space-y-6 my-8">
+            <button
+              onClick={() => setShowGatewayModal(false)}
+              className="absolute top-4 right-4 p-2 text-stone-400 hover:text-white hover:bg-stone-800 rounded-full transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div>
+              <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                <Settings className="w-5 h-5 text-blue-400" />
+                <span>{lang === 'hi' ? 'ओटीपी गेटवे कॉन्फ़िगरेशन' : 'OTP Gateway Configuration'}</span>
+              </h3>
+              <p className="text-xs text-stone-400 mt-1">
+                {lang === 'hi'
+                  ? 'अपना पर्सनल व्हाट्सएप या एसएमएस गेटवे सेट करें ताकि उपयोगकर्ताओं को आपकी आईडी से सीधा ओटीपी प्राप्त हो सके।'
+                  : 'Configure your personal WhatsApp or SMS gateways to send real-time OTP notifications to your users.'}
+              </p>
+            </div>
+
+            <form onSubmit={handleSaveGatewayConfig} className="space-y-6">
+              {/* WhatsApp Gateway Section */}
+              <div className="space-y-3 p-4 rounded-2xl bg-stone-950/40 border border-stone-800/60">
+                <h4 className="text-sm font-bold text-emerald-400 flex items-center gap-1.5">
+                  <MessageSquare className="w-4 h-4" />
+                  <span>{lang === 'hi' ? 'व्हाट्सएप गेटवे (स्वचालन)' : 'WhatsApp Gateway (Auto-Send)'}</span>
+                </h4>
+
+                <div className="space-y-2">
+                  <label className="block text-xs text-stone-400 font-medium">
+                    {lang === 'hi' ? 'गेटवे प्रदाता' : 'Gateway Provider'}
+                  </label>
+                  <select
+                    value={waProvider}
+                    onChange={(e) => setWaProvider(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-stone-900 border border-stone-800 text-stone-200 text-sm focus:border-emerald-500 focus:outline-none transition-colors"
+                  >
+                    <option value="none">{lang === 'hi' ? 'कोई नहीं (मैन्युअल व्हाट्सएप रीडायरेक्ट)' : 'None (Manual WhatsApp Redirect)'}</option>
+                    <option value="ultramsg">UltraMsg (Free Trial / Scan QR Code)</option>
+                    <option value="greenapi">Green-API (Free Trial / Scan QR Code)</option>
+                  </select>
+                </div>
+
+                {waProvider === 'ultramsg' && (
+                  <div className="space-y-3 pt-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs text-stone-400 mb-1">Instance ID</label>
+                        <input
+                          type="text"
+                          value={waUltramsgInstance}
+                          onChange={(e) => setWaUltramsgInstance(e.target.value)}
+                          placeholder="e.g. instance12345"
+                          className="w-full px-3.5 py-2 rounded-xl bg-stone-900 border border-stone-800 text-stone-200 text-sm focus:border-emerald-500 focus:outline-none"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-stone-400 mb-1">Token</label>
+                        <input
+                          type="password"
+                          value={waUltramsgToken}
+                          onChange={(e) => setWaUltramsgToken(e.target.value)}
+                          placeholder="API Token"
+                          className="w-full px-3.5 py-2 rounded-xl bg-stone-900 border border-stone-800 text-stone-200 text-sm focus:border-emerald-500 focus:outline-none"
+                          required
+                        />
+                      </div>
+                    </div>
+                    <div className="p-3 rounded-xl bg-blue-950/30 border border-blue-900/30 text-[11px] text-blue-300 leading-relaxed">
+                      <strong>How to Setup UltraMsg:</strong>
+                      <ol className="list-decimal pl-4 mt-1 space-y-1">
+                        <li>Register a free account on <a href="https://ultramsg.com" target="_blank" rel="noreferrer" className="underline font-bold">ultramsg.com</a></li>
+                        <li>Scan the QR code shown on their dashboard with your WhatsApp app (Linked Devices).</li>
+                        <li>Copy and paste your <strong>Instance ID</strong> and <strong>Token</strong> here.</li>
+                      </ol>
+                    </div>
+                  </div>
+                )}
+
+                {waProvider === 'greenapi' && (
+                  <div className="space-y-3 pt-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs text-stone-400 mb-1">idInstance</label>
+                        <input
+                          type="text"
+                          value={waGreenapiInstance}
+                          onChange={(e) => setWaGreenapiInstance(e.target.value)}
+                          placeholder="e.g. 11018XXXXX"
+                          className="w-full px-3.5 py-2 rounded-xl bg-stone-900 border border-stone-800 text-stone-200 text-sm focus:border-emerald-500 focus:outline-none"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-stone-400 mb-1">apiTokenInstance</label>
+                        <input
+                          type="password"
+                          value={waGreenapiToken}
+                          onChange={(e) => setWaGreenapiToken(e.target.value)}
+                          placeholder="Api Token Instance"
+                          className="w-full px-3.5 py-2 rounded-xl bg-stone-900 border border-stone-800 text-stone-200 text-sm focus:border-emerald-500 focus:outline-none"
+                          required
+                        />
+                      </div>
+                    </div>
+                    <div className="p-3 rounded-xl bg-blue-950/30 border border-blue-900/30 text-[11px] text-blue-300 leading-relaxed">
+                      <strong>How to Setup Green-API:</strong>
+                      <ol className="list-decimal pl-4 mt-1 space-y-1">
+                        <li>Register a free account on <a href="https://green-api.com" target="_blank" rel="noreferrer" className="underline font-bold">green-api.com</a></li>
+                        <li>Create a free instance, then scan the QR code to link your WhatsApp.</li>
+                        <li>Copy and paste your <strong>idInstance</strong> and <strong>apiTokenInstance</strong> here.</li>
+                      </ol>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* SMS Gateway Section */}
+              <div className="space-y-3 p-4 rounded-2xl bg-stone-950/40 border border-stone-800/60">
+                <h4 className="text-sm font-bold text-amber-400 flex items-center gap-1.5">
+                  <Smartphone className="w-4 h-4" />
+                  <span>{lang === 'hi' ? 'एसएमएस गेटवे (मोबाईल नेटवर्क)' : 'SMS Gateway (Carrier Network)'}</span>
+                </h4>
+
+                <div className="space-y-2">
+                  <label className="block text-xs text-stone-400 font-medium">
+                    {lang === 'hi' ? 'एसएमएस प्रदाता' : 'SMS Provider'}
+                  </label>
+                  <select
+                    value={smsProvider}
+                    onChange={(e) => setSmsProvider(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-stone-900 border border-stone-800 text-stone-200 text-sm focus:border-emerald-500 focus:outline-none transition-colors"
+                  >
+                    <option value="none">{lang === 'hi' ? 'कोई नहीं (मुफ़्त टेक्स्टबेल्ट परीक्षण)' : 'None (Free Textbelt Fallback)'}</option>
+                    <option value="fast2sms">Fast2SMS (OTP Route - India Only)</option>
+                    <option value="twilio">Twilio SMS (Global)</option>
+                  </select>
+                </div>
+
+                {smsProvider === 'fast2sms' && (
+                  <div className="space-y-3 pt-2">
+                    <div>
+                      <label className="block text-xs text-stone-400 mb-1">Fast2SMS API Key</label>
+                      <input
+                        type="password"
+                        value={fast2smsKey}
+                        onChange={(e) => setFast2smsKey(e.target.value)}
+                        placeholder="Paste your Fast2SMS Authorization Key"
+                        className="w-full px-3.5 py-2 rounded-xl bg-stone-900 border border-stone-800 text-stone-200 text-sm focus:border-emerald-500 focus:outline-none"
+                        required
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {smsProvider === 'twilio' && (
+                  <div className="space-y-3 pt-2">
+                    <div className="space-y-2">
+                      <label className="block text-xs text-stone-400">Account SID</label>
+                      <input
+                        type="text"
+                        value={twilioSid}
+                        onChange={(e) => setTwilioSid(e.target.value)}
+                        placeholder="Twilio Account SID"
+                        className="w-full px-3.5 py-2 rounded-xl bg-stone-900 border border-stone-800 text-stone-200 text-sm focus:border-emerald-500 focus:outline-none"
+                        required
+                      />
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs text-stone-400 mb-1">Auth Token</label>
+                        <input
+                          type="password"
+                          value={twilioToken}
+                          onChange={(e) => setTwilioToken(e.target.value)}
+                          placeholder="Twilio Auth Token"
+                          className="w-full px-3.5 py-2 rounded-xl bg-stone-900 border border-stone-800 text-stone-200 text-sm focus:border-emerald-500 focus:outline-none"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-stone-400 mb-1">Sender Number</label>
+                        <input
+                          type="text"
+                          value={twilioFrom}
+                          onChange={(e) => setTwilioFrom(e.target.value)}
+                          placeholder="e.g. +1234567890"
+                          className="w-full px-3.5 py-2 rounded-xl bg-stone-900 border border-stone-800 text-stone-200 text-sm focus:border-emerald-500 focus:outline-none"
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowGatewayModal(false)}
+                  className="px-5 py-2.5 rounded-xl border border-stone-800 hover:bg-stone-800 text-stone-400 hover:text-white text-xs font-bold transition-all duration-200"
+                >
+                  {lang === 'hi' ? 'रद्द करें' : 'Cancel'}
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 text-xs font-black shadow-lg shadow-emerald-500/10 transition-all duration-200"
+                >
+                  {lang === 'hi' ? 'सेटिंग्स सहेजें' : 'Save Configurations'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

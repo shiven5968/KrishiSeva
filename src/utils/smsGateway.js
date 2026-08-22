@@ -103,3 +103,80 @@ export async function sendAadhaarEkycSms(phoneNumber, aadhaarOtp, maskedAadhaar)
 
   return { success: true, message };
 }
+
+// Send real automated WhatsApp message using UltraMsg or Green-API
+export async function sendRealWhatsAppOtp(phoneNumber, otpCode, lang = 'en') {
+  const cleanNumber = phoneNumber.replace(/\D/g, '').slice(-10);
+
+  const messageText = lang === 'hi' ?
+`🚜 *कृषि सेवा (KrishiSeva)* 🌾
+
+नमस्ते!
+आपका कृषि सेवा सत्यापन ओटीपी है: *${otpCode}*
+
+⚡ 5 मिनट के लिए मान्य।
+🔒 कृपया यह सुरक्षा कोड किसी के साथ साझा न करें।
+
+खेत आपका, तकनीक हमारी — 1-क्लिक में मशीन खेत पर तैयार!`
+:
+`🚜 *KrishiSeva* 🌾
+
+Hello!
+Your KrishiSeva verification OTP is: *${otpCode}*
+
+⚡ Valid for 5 minutes.
+🔒 Please do not share this security code with anyone.
+
+Your Field, Our Power — On-demand farm machinery dispatched in 1 click!`;
+
+  // Check for UltraMsg config
+  const ultramsgConfigStr = localStorage.getItem('krishi_ultramsg_config');
+  if (ultramsgConfigStr) {
+    try {
+      const { instanceId, token } = JSON.parse(ultramsgConfigStr);
+      if (instanceId && token) {
+        const response = await fetch(`https://api.ultramsg.com/${instanceId}/messages/chat`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: new URLSearchParams({
+            token: token,
+            to: `+91${cleanNumber}`,
+            body: messageText
+          })
+        });
+        const data = await response.json();
+        return { success: data.sent === "true" || data.success === true || !!data.id, provider: 'UltraMsg', data };
+      }
+    } catch (err) {
+      console.warn('UltraMsg gateway error:', err);
+    }
+  }
+
+  // Check for Green-API config
+  const greenapiConfigStr = localStorage.getItem('krishi_greenapi_config');
+  if (greenapiConfigStr) {
+    try {
+      const { instanceId, token } = JSON.parse(greenapiConfigStr);
+      if (instanceId && token) {
+        const response = await fetch(`https://api.green-api.com/waInstance${instanceId}/sendMessage/${token}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            chatId: `91${cleanNumber}@c.us`,
+            message: messageText
+          })
+        });
+        const data = await response.json();
+        return { success: !!data.idMessage, provider: 'Green-API', data };
+      }
+    } catch (err) {
+      console.warn('Green-API gateway error:', err);
+    }
+  }
+
+  return { success: false, error: 'No automated WhatsApp Gateway configured' };
+}
