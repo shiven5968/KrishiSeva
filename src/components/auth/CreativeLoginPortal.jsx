@@ -529,14 +529,7 @@ export default function CreativeLoginPortal() {
 
         {/* Right Top Header Navigation */}
         <div className="flex items-center gap-2.5">
-          <button
-            onClick={() => setShowGatewayModal(true)}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-stone-800/80 bg-stone-900/50 hover:bg-stone-800/80 text-stone-400 hover:text-white text-xs font-bold transition-all duration-200 backdrop-blur-md hover:border-stone-700"
-            title="Configure OTP Gateways"
-          >
-            <Settings className="w-3.5 h-3.5 text-blue-400" />
-            <span>{lang === 'hi' ? 'गेटवे सेटअप' : 'Gateway Config'}</span>
-          </button>
+
 
           <a
             href="#admin"
