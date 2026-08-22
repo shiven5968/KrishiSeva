@@ -699,17 +699,7 @@ export default function CreativeLoginPortal() {
                     </p>
                   </div>
 
-                  {/* Small Standalone Auto-Fill Option */}
-                  <div className="flex justify-end">
-                    <button
-                      type="button"
-                      onClick={() => setOtp(activeOtpCode)}
-                      className="text-[11px] font-bold text-stone-400 hover:text-emerald-400 transition-all duration-200 flex items-center gap-1 bg-stone-950/80 hover:bg-emerald-950/40 px-2.5 py-1 rounded-xl border border-stone-800 hover:border-emerald-700/50 shadow-sm active:scale-95"
-                    >
-                      <Sparkles className="w-3 h-3 text-emerald-400" />
-                      <span>{lang === 'hi' ? 'स्वतः भरें' : 'Auto-Fill'}</span>
-                    </button>
-                  </div>
+
 
                   {error && (
                     <div className="p-3 rounded-2xl bg-red-950/80 border border-red-800/60 text-red-300 text-xs font-bold text-center animate-fade-in">
