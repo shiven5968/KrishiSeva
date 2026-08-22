@@ -40,7 +40,8 @@ import {
   Minus,
   Edit3,
   LandPlot,
-  Ruler
+  Ruler,
+  ShieldCheck
 } from 'lucide-react';
 
 export default function FarmerBookingView({ onOpenAuthModal }) {
@@ -63,6 +64,12 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
   const [scheduledTimeSlot, setScheduledTimeSlot] = useState('morning');
   const [specialNotes, setSpecialNotes] = useState('');
   const [scheduledSuccessData, setScheduledSuccessData] = useState(null);
+
+  // Payment Flow States
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [paymentStep, setPaymentStep] = useState('select'); // 'select' | 'upi'
+  const [paymentMethod, setPaymentMethod] = useState('cod'); // 'cod' | 'online'
+  const [pendingBookingData, setPendingBookingData] = useState(null);
 
   // Selected Machine Category (default 'tractor')
   const [selectedCategoryId, setSelectedCategoryId] = useState('tractor');
@@ -238,9 +245,10 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
       return;
     }
 
+    let payload = {};
     if (bookingTimingMode === 'schedule') {
       const selectedSlotObj = timeSlotOptions.find(s => s.id === scheduledTimeSlot) || timeSlotOptions[0];
-      const newPreBooking = addPreBooking({
+      payload = {
         farmerName: currentUser.name,
         farmerPhone: currentUser.phone,
         landName: selectedLand?.name || (lang === 'hi' ? 'मुख्य खेत' : 'Main Farm'),
@@ -253,29 +261,52 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
         timeSlot: lang === 'hi' ? selectedSlotObj.labelHi : selectedSlotObj.labelEn,
         estimatedPrice: fareResult.total,
         specialNotes: specialNotes
-      });
-
-      setScheduledSuccessData(newPreBooking);
-      return;
+      };
+    } else {
+      payload = {
+        farmerName: currentUser.name,
+        farmerPhone: currentUser.phone,
+        farmerLocation: {
+          lat: selectedLand?.lat || DEFAULT_FARM_LOCATION.lat,
+          lng: selectedLand?.lng || DEFAULT_FARM_LOCATION.lng,
+          address: selectedLand?.address || DEFAULT_FARM_LOCATION.address
+        },
+        machineryType: selectedCategoryId,
+        attachment: currentAttachment,
+        landName: selectedLand?.name,
+        landSize: selectedCategoryId === 'truck' ? effectiveDistanceKm : quantityInput,
+        sizeUnit: selectedCategoryId === 'truck' ? 'km' : selectedUnit,
+        dropLocation: selectedCategoryId === 'truck' ? currentDropLocation.name : null,
+        estimatedPrice: fareResult.total,
+        estimatedETA: lang === 'hi' ? '35-60 मिनट' : '35-60 Mins'
+      };
     }
 
-    createBookingRequest({
-      farmerName: currentUser.name,
-      farmerPhone: currentUser.phone,
-      farmerLocation: {
-        lat: selectedLand?.lat || DEFAULT_FARM_LOCATION.lat,
-        lng: selectedLand?.lng || DEFAULT_FARM_LOCATION.lng,
-        address: selectedLand?.address || DEFAULT_FARM_LOCATION.address
-      },
-      machineryType: selectedCategoryId,
-      attachment: currentAttachment,
-      landName: selectedLand?.name,
-      landSize: selectedCategoryId === 'truck' ? effectiveDistanceKm : quantityInput,
-      sizeUnit: selectedCategoryId === 'truck' ? 'km' : selectedUnit,
-      dropLocation: selectedCategoryId === 'truck' ? currentDropLocation.name : null,
-      estimatedPrice: fareResult.total,
-      estimatedETA: lang === 'hi' ? '35-60 मिनट' : '35-60 Mins'
-    });
+    setPendingBookingData(payload);
+    setIsPaymentModalOpen(true);
+    setPaymentStep('select');
+    setPaymentMethod('cod');
+  };
+
+  const handleExecuteBookingWithPayment = (method, paidAmount) => {
+    if (!pendingBookingData) return;
+
+    const finalPayload = {
+      ...pendingBookingData,
+      paymentMethod: method,
+      advancePaid: Math.round(paidAmount),
+      balanceDue: Math.round(pendingBookingData.estimatedPrice - paidAmount)
+    };
+
+    if (bookingTimingMode === 'schedule') {
+      const newPreBooking = addPreBooking(finalPayload);
+      setScheduledSuccessData(newPreBooking);
+    } else {
+      createBookingRequest(finalPayload);
+    }
+
+    setIsPaymentModalOpen(false);
+    setPendingBookingData(null);
   };
 
   return (
@@ -915,10 +946,26 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
                 <span className="text-stone-500">{lang === 'hi' ? 'मात्रा व आकार:' : 'Quantity & Size:'}</span>
                 <b className="text-stone-900">{scheduledSuccessData.landSize} {scheduledSuccessData.sizeUnit?.toUpperCase()}</b>
               </div>
-              <div className="flex justify-between items-center pt-2 border-t border-stone-200 font-black">
-                <span className="text-stone-700">{lang === 'hi' ? 'अनुमानित किराया:' : 'Estimated Price:'}</span>
-                <span className="text-base text-emerald-700">₹{scheduledSuccessData.estimatedPrice}</span>
+              <div className="flex justify-between items-center pt-2 border-t border-stone-200">
+                <span className="text-stone-500 font-bold">{lang === 'hi' ? 'कुल किराया:' : 'Total Price:'}</span>
+                <span className="text-sm font-bold text-stone-700">₹{scheduledSuccessData.estimatedPrice}</span>
               </div>
+              {scheduledSuccessData.paymentMethod && (
+                <>
+                  <div className="flex justify-between items-center text-[11px]">
+                    <span className="text-stone-500">{lang === 'hi' ? 'भुगतान विधि:' : 'Payment Method:'}</span>
+                    <b className="text-stone-800 uppercase">{scheduledSuccessData.paymentMethod === 'cod' ? 'COD (30% Advance)' : 'Online (100% Paid)'}</b>
+                  </div>
+                  <div className="flex justify-between items-center text-[11px]">
+                    <span className="text-stone-500">{lang === 'hi' ? 'अग्रिम भुगतान:' : 'Paid Advance:'}</span>
+                    <b className="text-emerald-700">₹{scheduledSuccessData.advancePaid}</b>
+                  </div>
+                  <div className="flex justify-between items-center pt-1.5 border-t border-dashed border-stone-200 font-black text-sm">
+                    <span className="text-stone-700">{lang === 'hi' ? 'शेष देय राशि:' : 'Balance Due:'}</span>
+                    <span className="text-amber-700">₹{scheduledSuccessData.balanceDue}</span>
+                  </div>
+                </>
+              )}
             </div>
 
             <button
@@ -942,6 +989,213 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
         isOpen={isPreBookingsModalOpen}
         onClose={() => setIsPreBookingsModalOpen(false)}
       />
+
+      {/* PAYMENT METHOD MODAL */}
+      {isPaymentModalOpen && pendingBookingData && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-stone-950/80 backdrop-blur-md animate-fade-in">
+          <div className="bg-white text-stone-900 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-stone-200 relative space-y-6">
+            
+            {/* Header */}
+            <div className="text-center space-y-1">
+              <h3 className="text-xl font-black text-stone-900">
+                {lang === 'hi' ? 'भुगतान विधि चुनें' : 'Choose Payment Method'}
+              </h3>
+              <p className="text-xs text-stone-500 font-medium">
+                {lang === 'hi' ? 'बुकिंग की पुष्टि करने के लिए भुगतान विकल्प चुनें' : 'Select a payment option to confirm your booking'}
+              </p>
+            </div>
+
+            {paymentStep === 'select' ? (
+              <div className="space-y-4">
+                {/* Order Summary */}
+                <div className="p-4 rounded-2xl bg-stone-50 border border-stone-100 flex justify-between items-center">
+                  <div>
+                    <p className="text-[10px] text-stone-400 font-black uppercase tracking-wider">
+                      {lang === 'hi' ? 'कुल राशि' : 'Total Amount'}
+                    </p>
+                    <p className="text-lg font-black text-stone-800">
+                      ₹{pendingBookingData.estimatedPrice}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[10px] text-stone-400 font-black uppercase tracking-wider">
+                      {lang === 'hi' ? 'मशीन प्रकार' : 'Machinery'}
+                    </p>
+                    <p className="text-xs font-bold text-stone-600 capitalize">
+                      {pendingBookingData.machineryType === 'truck' ? 'Trolley' : pendingBookingData.machineryType}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Option 1: COD with 30% Advance */}
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod('cod')}
+                  className={`w-full text-left p-4 rounded-2xl border-2 transition-all duration-200 ${
+                    paymentMethod === 'cod'
+                      ? 'border-emerald-500 bg-emerald-50/50 shadow-md shadow-emerald-500/5'
+                      : 'border-stone-200 hover:border-stone-300 bg-white'
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 ${
+                      paymentMethod === 'cod' ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-stone-300'
+                    }`}>
+                      {paymentMethod === 'cod' && <div className="w-2 h-2 rounded-full bg-white" />}
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-extrabold text-sm text-stone-900">
+                          {lang === 'hi' ? 'कैश ऑन डिलीवरी (COD)' : 'Cash on Delivery (COD)'}
+                        </span>
+                        <span className="text-[10px] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">
+                          30% {lang === 'hi' ? 'अग्रिम' : 'Advance'}
+                        </span>
+                      </div>
+                      <p className="text-xs text-stone-500 leading-normal">
+                        {lang === 'hi'
+                          ? `बुकिंग के लिए अभी ₹${Math.round(pendingBookingData.estimatedPrice * 0.3)} का ऑनलाइन भुगतान करें। बाकी ₹${Math.round(pendingBookingData.estimatedPrice * 0.7)} काम के बाद चालक को नकद दें।`
+                          : `Pay ₹${Math.round(pendingBookingData.estimatedPrice * 0.3)} (30% booking advance) online now. Pay the remaining ₹${Math.round(pendingBookingData.estimatedPrice * 0.7)} in cash after work.`}
+                      </p>
+                    </div>
+                  </div>
+                </button>
+
+                {/* Option 2: 100% Online Payment */}
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod('online')}
+                  className={`w-full text-left p-4 rounded-2xl border-2 transition-all duration-200 ${
+                    paymentMethod === 'online'
+                      ? 'border-emerald-500 bg-emerald-50/50 shadow-md shadow-emerald-500/5'
+                      : 'border-stone-200 hover:border-stone-300 bg-white'
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 ${
+                      paymentMethod === 'online' ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-stone-300'
+                    }`}>
+                      {paymentMethod === 'online' && <div className="w-2 h-2 rounded-full bg-white" />}
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-extrabold text-sm text-stone-900">
+                          {lang === 'hi' ? 'पूर्ण ऑनलाइन भुगतान' : 'Pay Full Amount Online'}
+                        </span>
+                        <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+                          100% {lang === 'hi' ? 'सुरक्षित' : 'Secure'}
+                        </span>
+                      </div>
+                      <p className="text-xs text-stone-500 leading-normal">
+                        {lang === 'hi'
+                          ? `अभी पूरा ₹${pendingBookingData.estimatedPrice} भुगतान करें। काम पूरा होने पर कोई अतिरिक्त शुल्क नहीं देना होगा।`
+                          : `Pay the full amount of ₹${pendingBookingData.estimatedPrice} now. No cash hassle after work is completed.`}
+                      </p>
+                    </div>
+                  </div>
+                </button>
+
+                {/* CTA Buttons */}
+                <div className="flex gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => { setIsPaymentModalOpen(false); setPendingBookingData(null); }}
+                    className="w-1/3 py-3 rounded-xl border border-stone-200 text-stone-600 text-sm font-bold hover:bg-stone-50 transition"
+                  >
+                    {lang === 'hi' ? 'रद्द करें' : 'Cancel'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPaymentStep('upi')}
+                    className="w-2/3 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-black shadow-lg shadow-emerald-600/10 transition flex items-center justify-center gap-1.5"
+                  >
+                    <span>{lang === 'hi' ? 'भुगतान के लिए आगे बढ़ें' : 'Proceed to Pay'}</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              /* Simulated UPI QR Screen */
+              <div className="space-y-5">
+                <div className="p-4 rounded-2xl bg-stone-50 border border-stone-100 space-y-4 text-center">
+                  <div>
+                    <span className="text-[10px] font-black text-stone-400 uppercase tracking-widest block">
+                      {lang === 'hi' ? 'भुगतान की जाने वाली राशि' : 'Amount to Pay'}
+                    </span>
+                    <span className="text-3xl font-black text-emerald-600">
+                      ₹{paymentMethod === 'cod' ? Math.round(pendingBookingData.estimatedPrice * 0.3) : pendingBookingData.estimatedPrice}
+                    </span>
+                    {paymentMethod === 'cod' && (
+                      <span className="text-[10px] text-stone-400 block mt-0.5">
+                        (30% {lang === 'hi' ? 'बुकिंग अग्रिम' : 'Booking Advance'})
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Simulated QR Code */}
+                  <div className="w-40 h-40 bg-white border border-stone-200 rounded-2xl mx-auto flex items-center justify-center p-2 shadow-sm relative group">
+                    <img 
+                      src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=krishiseva@ybl%26pn=KrishiSeva%26am=${paymentMethod === 'cod' ? Math.round(pendingBookingData.estimatedPrice * 0.3) : pendingBookingData.estimatedPrice}%26cu=INR`} 
+                      alt="UPI Payment QR Code" 
+                      className="w-full h-full object-contain"
+                    />
+                    <div className="absolute inset-0 bg-stone-900/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <span className="bg-white/95 px-2 py-1 rounded text-[10px] font-bold text-stone-700 shadow-sm">Scan with BHIM/UPI</span>
+                    </div>
+                  </div>
+
+                  <p className="text-[10px] text-stone-400 font-medium">
+                    {lang === 'hi'
+                      ? 'इस क्यूआर कोड को अपने यूपीआई ऐप (PhonePe, GPay, Paytm) से स्कैन करें या नीचे दी गई किसी विधि का चयन करें।'
+                      : 'Scan this QR code using any UPI app (PhonePe, GPay, Paytm) or select a method below.'}
+                  </p>
+                </div>
+
+                {/* Popular App Icons / Buttons */}
+                <div className="grid grid-cols-3 gap-2">
+                  {['Google Pay', 'PhonePe', 'Paytm'].map((app, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => handleExecuteBookingWithPayment(
+                        paymentMethod,
+                        paymentMethod === 'cod' ? Math.round(pendingBookingData.estimatedPrice * 0.3) : pendingBookingData.estimatedPrice
+                      )}
+                      className="py-2.5 rounded-xl border border-stone-200 hover:border-emerald-500 bg-white hover:bg-emerald-50/20 text-center transition shadow-sm active:scale-95"
+                    >
+                      <span className="text-[11px] font-extrabold text-stone-700">{app}</span>
+                    </button>
+                  ))}
+                </div>
+
+                {/* Confirm Action Button */}
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setPaymentStep('select')}
+                    className="w-1/3 py-3.5 rounded-xl border border-stone-200 text-stone-600 text-sm font-bold hover:bg-stone-50 transition"
+                  >
+                    {lang === 'hi' ? 'पीछे जाएँ' : 'Back'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleExecuteBookingWithPayment(
+                      paymentMethod,
+                      paymentMethod === 'cod' ? Math.round(pendingBookingData.estimatedPrice * 0.3) : pendingBookingData.estimatedPrice
+                    )}
+                    className="w-2/3 py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-stone-950 text-sm font-black shadow-xl shadow-emerald-500/10 flex items-center justify-center gap-1.5 transition"
+                  >
+                    <ShieldCheck className="w-4 h-4 text-stone-950" />
+                    <span>
+                      {lang === 'hi' ? 'मैंने भुगतान कर दिया है' : 'I Have Paid & Confirm'}
+                    </span>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
     </div>
   );

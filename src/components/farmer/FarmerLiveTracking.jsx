@@ -283,10 +283,26 @@ export default function FarmerLiveTracking() {
                   <span className="text-stone-400 font-medium">{lang === 'hi' ? 'खेत का आकार:' : 'Farm Size:'}</span>
                   <span className="font-bold text-white">{activeBooking.landSize} {activeBooking.sizeUnit}</span>
                 </div>
-                <div className="flex justify-between items-center pt-2 border-t border-stone-800">
-                  <span className="text-stone-300 font-bold">{lang === 'hi' ? 'अनुमानित किराया:' : 'Estimated Fare:'}</span>
-                  <span className="text-2xl font-black text-amber-300">₹{activeBooking.estimatedPrice}</span>
-                </div>
+                 <div className="flex justify-between items-center pt-2 border-t border-stone-800">
+                   <span className="text-stone-300 font-bold">{lang === 'hi' ? 'अनुमानित किराया:' : 'Estimated Fare:'}</span>
+                   <span className="text-xl font-black text-amber-300">₹{activeBooking.estimatedPrice}</span>
+                 </div>
+                 {activeBooking.paymentMethod && (
+                   <>
+                     <div className="flex justify-between items-center">
+                       <span className="text-stone-400 font-medium">{lang === 'hi' ? 'भुगतान विधि:' : 'Payment Method:'}</span>
+                       <span className="font-bold text-white uppercase">{activeBooking.paymentMethod === 'cod' ? 'COD' : 'Online'}</span>
+                     </div>
+                     <div className="flex justify-between items-center">
+                       <span className="text-stone-400 font-medium">{lang === 'hi' ? 'अग्रिम भुगतान:' : 'Paid Advance:'}</span>
+                       <span className="font-bold text-emerald-400">₹{activeBooking.advancePaid || 0}</span>
+                     </div>
+                     <div className="flex justify-between items-center">
+                       <span className="text-stone-400 font-medium">{lang === 'hi' ? 'शेष देय राशि:' : 'Balance Due:'}</span>
+                       <span className="font-bold text-amber-400">₹{activeBooking.balanceDue || 0}</span>
+                     </div>
+                   </>
+                 )}
               </div>
 
               {/* Cancel Request Button (Opens Reason Modal) */}
@@ -344,10 +360,26 @@ export default function FarmerLiveTracking() {
                   <span className="text-stone-400 font-medium">{lang === 'hi' ? 'खेत का दायरा:' : 'Farm Size:'}</span>
                   <span className="font-bold text-white">{activeBooking.landSize} {activeBooking.sizeUnit}</span>
                 </div>
-                <div className="flex justify-between items-center pt-2 border-t border-stone-800">
-                  <span className="text-stone-300 font-bold">{lang === 'hi' ? 'कुल नियत किराया:' : 'Total Fixed Fare:'}</span>
-                  <span className="text-2xl font-black text-emerald-400">₹{activeBooking.estimatedPrice}</span>
-                </div>
+                 <div className="flex justify-between items-center pt-2 border-t border-stone-800">
+                   <span className="text-stone-300 font-bold">{lang === 'hi' ? 'कुल नियत किराया:' : 'Total Fixed Fare:'}</span>
+                   <span className="text-2xl font-black text-emerald-400">₹{activeBooking.estimatedPrice}</span>
+                 </div>
+                 {activeBooking.paymentMethod && (
+                   <>
+                     <div className="flex justify-between items-center">
+                       <span className="text-stone-400 font-medium">{lang === 'hi' ? 'भुगतान विधि:' : 'Payment Method:'}</span>
+                       <span className="font-bold text-white uppercase">{activeBooking.paymentMethod === 'cod' ? 'COD' : 'Online'}</span>
+                     </div>
+                     <div className="flex justify-between items-center">
+                       <span className="text-stone-400 font-medium">{lang === 'hi' ? 'अग्रिम भुगतान:' : 'Paid Advance:'}</span>
+                       <span className="font-bold text-emerald-400">₹{activeBooking.advancePaid || 0}</span>
+                     </div>
+                     <div className="flex justify-between items-center">
+                       <span className="text-stone-400 font-medium">{lang === 'hi' ? 'शेष देय राशि:' : 'Balance Due:'}</span>
+                       <span className="font-bold text-amber-400">₹{activeBooking.balanceDue || 0}</span>
+                     </div>
+                   </>
+                 )}
               </div>
 
               {/* Action Buttons: Call Driver & Cancel */}
