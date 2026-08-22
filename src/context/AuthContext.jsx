@@ -219,8 +219,8 @@ export function AuthProvider({ children }) {
             rating: existingUser.rating ?? 5.0,
             dlImage: 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=600&auto=format&fit=crop&q=80',
             plateImage: 'https://images.unsplash.com/photo-1592417817098-8f3d6910985c?w=600&auto=format&fit=crop&q=80',
-            lat: 26.8540,
-            lng: 80.9520
+            lat: 26.9240,
+            lng: 80.7130
           });
         }
 
@@ -289,8 +289,8 @@ export function AuthProvider({ children }) {
         dlImage: '',
         plateImage: '',
         rejectionReason: '',
-        lat: 26.8540,
-        lng: 80.9520
+        lat: 26.9240,
+        lng: 80.7130
       });
     }
 

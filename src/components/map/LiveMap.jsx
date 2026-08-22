@@ -211,7 +211,7 @@ export default function LiveMap({
       // Draw Khet (Farmland Polygon boundary)
       const khetPolygonCoords = (farmerLocation.polygonCoords && farmerLocation.polygonCoords.length >= 3)
         ? farmerLocation.polygonCoords
-        : generateFarmPlotPolygon(farmerLocation.lat, farmerLocation.lng);
+        : generateFarmPlotPolygon(farmerLocation.lat, farmerLocation.lng, farmerLocation.bigha || farmerLocation.areaBigha || 3.0);
 
       L.polygon(khetPolygonCoords, {
         color: '#10b981',

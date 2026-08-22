@@ -39,8 +39,8 @@ const MOCK_BHULEKH_DATABASE = [
     khataNumber: '00184',
     ulpin: 'UP-LKO-MLH-142-01',
     soilType: 'Alluvial Loam (दोमट मिट्टी)',
-    lat: 26.8485,
-    lng: 80.9495
+    lat: 26.9168,
+    lng: 80.7075
   },
   {
     khasra: '74',
@@ -54,8 +54,8 @@ const MOCK_BHULEKH_DATABASE = [
     khataNumber: '00092',
     ulpin: 'UP-LKO-MLH-074-04',
     soilType: 'Clay Soil (चिकनी मिट्टी)',
-    lat: 26.8467,
-    lng: 80.9462
+    lat: 26.9135,
+    lng: 80.7020
   }
 ];
 
@@ -157,8 +157,8 @@ export const REGISTERED_AGRISTACK_RECORDS = {
         bigha: 3.0,
         hectare: 0.76,
         soilType: 'Alluvial Loam (दोमट मिट्टी)',
-        lat: 26.8485,
-        lng: 80.9495,
+        lat: 26.9168,
+        lng: 80.7075,
         isVerified: true
       },
       {
@@ -171,8 +171,8 @@ export const REGISTERED_AGRISTACK_RECORDS = {
         bigha: 4.5,
         hectare: 1.14,
         soilType: 'Clay Loam (चिकनी दोमट)',
-        lat: 26.8467,
-        lng: 80.9462,
+        lat: 26.9135,
+        lng: 80.7020,
         isVerified: true
       }
     ]

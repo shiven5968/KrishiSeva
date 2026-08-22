@@ -2,8 +2,8 @@
 
 // Default fallback coordinates: fertile agricultural zone near Lucknow / Punjab / MP
 export const DEFAULT_FARM_LOCATION = {
-  lat: 26.8467,
-  lng: 80.9462,
+  lat: 26.9168,
+  lng: 80.7075,
   address: 'Khet #14, Gram Panchayat Rampur, Block Malihabad',
   areaName: 'Rampur Khet'
 };
@@ -169,12 +169,23 @@ export function generateNearbyDrivers(centerLat, centerLng) {
 }
 
 // Generate Khet (Farm Plot) polygon coordinates for visual agriculture boundary
-export function generateFarmPlotPolygon(centerLat, centerLng) {
-  const delta = 0.0035;
+export function generateFarmPlotPolygon(centerLat, centerLng, bighas = 3.0) {
+  // 1 Bigha = 2500 sq meters.
+  // Area = bighas * 2500.
+  // Side length = sqrt(Area). For 3 Bighas, side is ~86m.
+  // 1 degree latitude ~ 111,000m.
+  const areaM2 = bighas * 2500;
+  const sideMeters = Math.sqrt(areaM2);
+  const deltaLat = (sideMeters / 111000) / 2;
+  const deltaLng = (sideMeters / (111000 * 0.89)) / 2; // Cosine offset for Lucknow latitude
+
+  const dLat = isNaN(deltaLat) ? 0.0006 : Math.max(0.0003, deltaLat);
+  const dLng = isNaN(deltaLng) ? 0.0007 : Math.max(0.00035, deltaLng);
+
   return [
-    [centerLat + delta, centerLng - delta * 1.3],
-    [centerLat + delta * 1.1, centerLng + delta * 1.1],
-    [centerLat - delta * 0.9, centerLng + delta * 1.4],
-    [centerLat - delta * 1.2, centerLng - delta * 0.8]
+    [centerLat + dLat, centerLng - dLng * 1.1],
+    [centerLat + dLat * 1.05, centerLng + dLng * 1.05],
+    [centerLat - dLat * 0.95, centerLng + dLng * 1.15],
+    [centerLat - dLat * 1.1, centerLng - dLng * 0.95]
   ];
 }
