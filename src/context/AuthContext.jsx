@@ -299,7 +299,14 @@ export function AuthProvider({ children }) {
       try {
         const existingSaved = localStorage.getItem('krishi_saved_lands');
         const parsedLands = existingSaved ? JSON.parse(existingSaved) : [];
-        const combined = [...extraData.linkedLands, ...parsedLands.filter(l => !extraData.linkedLands.some(nl => nl.id === l.id))];
+        
+        // Map the lands to associate them with the newly registered user
+        const mappedNewLands = extraData.linkedLands.map(l => ({
+          ...l,
+          userPhone: userPhone
+        }));
+
+        const combined = [...mappedNewLands, ...parsedLands.filter(l => !mappedNewLands.some(nl => nl.id === l.id))];
         localStorage.setItem('krishi_saved_lands', JSON.stringify(combined));
       } catch (err) {
         console.warn('Error saving linked lands:', err);

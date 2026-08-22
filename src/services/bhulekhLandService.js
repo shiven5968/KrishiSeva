@@ -261,7 +261,7 @@ export async function verifyAgriStackFarmer(aadhaarOrFarmerId, farmerName = '') 
       registrySource: 'AgriStack - Digital India Farmer Registry (UPFR)',
       farmerProfile: {
         ...registeredRecord,
-        kisanCardName: farmerName.trim() || registeredRecord.kisanCardName
+        kisanCardName: farmerName.trim() || 'डेमो किसान (Demo Farmer)'
       }
     };
   }
