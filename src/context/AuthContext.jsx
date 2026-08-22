@@ -294,6 +294,7 @@ export function AuthProvider({ children }) {
       farmerId: extraData.farmerId || null,
       aadhaarMasked: extraData.aadhaarMasked || null,
       totalLandBigha: extraData.totalLandBigha || null,
+      linkedLands: extraData.linkedLands || [],
       createdAt: new Date().toISOString()
     };
 

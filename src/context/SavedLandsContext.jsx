@@ -85,6 +85,32 @@ export function SavedLandsProvider({ children }) {
     localStorage.setItem('krishi_saved_lands', JSON.stringify(allLands));
   }, [allLands]);
 
+  // Auto-import verified lands from AgriStack on login/registration
+  useEffect(() => {
+    if (currentUser && currentUser.isAgriStackVerified && currentUser.linkedLands && currentUser.linkedLands.length > 0) {
+      const userHasLands = allLands.some(land => land.userPhone === currentUser.phone);
+      if (!userHasLands) {
+        const newLands = currentUser.linkedLands.map(l => ({
+          id: l.id || `land_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          userPhone: currentUser.phone,
+          name: l.name || 'खेत (My Field)',
+          bigha: Number(l.bigha) || 1,
+          cropType: l.cropType || 'Wheat / गेहूँ',
+          address: `${l.village || 'Gram'}, ${l.tehsil || 'Tehsil'}`,
+          lat: Number(l.lat) || DEFAULT_FARM_LOCATION.lat,
+          lng: Number(l.lng) || DEFAULT_FARM_LOCATION.lng,
+          soilType: l.soilType || 'Alluvial Loam (दोमट मिट्टी)',
+          icon: '🌾',
+          isGovtVerified: true,
+          khasraNumber: l.khasraNumber || null,
+          areaHectare: l.hectare ? Number(l.hectare) : null,
+          ulpin: l.ulpin || `UP-LKO-${l.khasraNumber}-01`
+        }));
+        setAllLands(prev => [...newLands, ...prev]);
+      }
+    }
+  }, [currentUser, allLands]);
+
   // Compute lands belonging to the currently logged in farmer
   const savedLands = allLands.filter(land => land.userPhone === activePhone);
 
