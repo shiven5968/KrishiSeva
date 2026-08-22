@@ -96,7 +96,7 @@ export default function FarmerLiveTracking() {
         return {
           title: lang === 'hi' ? 'आस-पास के ड्राइवरों की खोज जारी...' : 'Looking for Nearest Drivers...',
           subtitle: lang === 'hi' ? 'आपके खेत से 5 किमी के दायरे में उपलब्ध सभी सत्यापित ट्रैक्टर मालिकों को अनुरोध भेजा जा रहा है।' : 'Broadcasting request to verified machinery operators within 5 km of your field.',
-          badgeColor: 'bg-amber-950/80 text-amber-300 border-amber-800'
+          badgeColor: 'bg-stone-900/90 text-white border-stone-800 shadow-emerald-950/10'
         };
       case 'accepted':
         return {
@@ -141,7 +141,7 @@ export default function FarmerLiveTracking() {
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 rounded-2xl bg-stone-900 text-emerald-400 flex items-center justify-center text-3xl shadow-inner border border-stone-700">
             {isSearching ? (
-              <Radio className="w-7 h-7 text-amber-400 animate-pulse" />
+              <Radio className="w-7 h-7 text-emerald-400 animate-pulse" />
             ) : activeBooking.status === 'completed' ? (
               '🎉'
             ) : (
@@ -154,7 +154,7 @@ export default function FarmerLiveTracking() {
                 {statusInfo.title}
               </h2>
               {isSearching && (
-                <span className="w-3 h-3 rounded-full bg-amber-400 animate-ping"></span>
+                <span className="w-3 h-3 rounded-full bg-emerald-400 animate-ping"></span>
               )}
               {activeBooking.status === 'accepted' && (
                 <span className="w-3 h-3 rounded-full bg-emerald-400 animate-ping"></span>
@@ -183,8 +183,8 @@ export default function FarmerLiveTracking() {
 
         {/* Searching Timer Pill (When Searching) */}
         {isSearching && (
-          <div className="flex items-center gap-2 bg-stone-900/90 px-4 py-2 rounded-2xl border border-amber-700/60 text-xs font-black text-amber-300">
-            <Clock className="w-4 h-4 text-amber-400 animate-spin" />
+          <div className="flex items-center gap-2 bg-stone-900/90 px-4 py-2 rounded-2xl border border-stone-800 text-xs font-black text-emerald-400 shadow-lg shadow-black/10">
+            <Clock className="w-4 h-4 text-emerald-400 animate-spin" />
             <span>Searching: {searchSeconds}s</span>
           </div>
         )}
@@ -208,7 +208,7 @@ export default function FarmerLiveTracking() {
               <div className="flex items-center gap-2">
                 <span className={`text-xs font-black px-3.5 py-1.5 rounded-full shadow-sm border ${
                   isSearching 
-                    ? 'bg-amber-950 text-amber-300 border-amber-700 animate-pulse'
+                    ? 'bg-stone-950 text-emerald-400 border-stone-800 animate-pulse'
                     : 'bg-emerald-950 text-emerald-300 border-emerald-700'
                 }`}>
                   {isSearching 
@@ -240,20 +240,20 @@ export default function FarmerLiveTracking() {
           
           {/* 1. SEARCHING STATE: Radar Animation & Machinery Request Info */}
           {isSearching && (
-            <div className="bg-stone-900/90 rounded-3xl p-6 border border-amber-600/40 shadow-2xl space-y-6 text-white animate-fade-in">
+            <div className="bg-stone-900/90 rounded-3xl p-6 border border-stone-850 shadow-2xl space-y-6 text-white animate-fade-in">
               
               {/* Radar Pulse Box */}
-              <div className="p-6 rounded-2xl bg-amber-950/30 border border-amber-800/60 text-center space-y-3 relative overflow-hidden">
+              <div className="p-6 rounded-2xl bg-stone-950/40 border border-stone-850 text-center space-y-3 relative overflow-hidden">
                 <div className="relative w-20 h-20 mx-auto flex items-center justify-center">
-                  <div className="absolute inset-0 rounded-full bg-amber-500/20 animate-ping"></div>
-                  <div className="absolute inset-2 rounded-full bg-amber-500/30 animate-pulse"></div>
-                  <div className="w-12 h-12 rounded-full bg-amber-500 text-stone-950 font-black flex items-center justify-center text-xl shadow-lg shadow-amber-500/40 relative z-10">
+                  <div className="absolute inset-0 rounded-full bg-emerald-500/10 animate-ping"></div>
+                  <div className="absolute inset-2 rounded-full bg-emerald-500/15 animate-pulse"></div>
+                  <div className="w-12 h-12 rounded-full bg-emerald-500 text-stone-950 font-black flex items-center justify-center text-xl shadow-lg shadow-emerald-500/30 relative z-10">
                     🚜
                   </div>
                 </div>
 
                 <div>
-                  <h4 className="font-black text-base text-amber-300">
+                  <h4 className="font-black text-base text-emerald-400">
                     {lang === 'hi' ? 'मशीनरी खोजी जा रही है...' : 'Matching with Nearest Driver'}
                   </h4>
                   <p className="text-xs text-stone-400 mt-1 font-medium">
@@ -263,9 +263,9 @@ export default function FarmerLiveTracking() {
 
                 {/* Progress signal bars */}
                 <div className="flex justify-center gap-1.5 pt-2">
-                  <span className="w-2 h-2 rounded-full bg-amber-400 animate-bounce"></span>
-                  <span className="w-2 h-2 rounded-full bg-amber-400 animate-bounce [animation-delay:0.2s]"></span>
-                  <span className="w-2 h-2 rounded-full bg-amber-400 animate-bounce [animation-delay:0.4s]"></span>
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-bounce"></span>
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-bounce [animation-delay:0.2s]"></span>
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-bounce [animation-delay:0.4s]"></span>
                 </div>
               </div>
 
