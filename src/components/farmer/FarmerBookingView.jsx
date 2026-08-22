@@ -1146,26 +1146,9 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
 
                   <p className="text-[10px] text-stone-400 font-medium">
                     {lang === 'hi'
-                      ? 'इस क्यूआर कोड को अपने यूपीआई ऐप (PhonePe, GPay, Paytm) से स्कैन करें या नीचे दी गई किसी विधि का चयन करें।'
-                      : 'Scan this QR code using any UPI app (PhonePe, GPay, Paytm) or select a method below.'}
+                      ? 'भुगतान करने के लिए किसी भी यूपीआई ऐप (PhonePe, GPay, Paytm) का उपयोग करके इस क्यूआर कोड को स्कैन करें।'
+                      : 'Scan this QR code using any UPI app (PhonePe, GPay, Paytm) to make the payment.'}
                   </p>
-                </div>
-
-                {/* Popular App Icons / Buttons */}
-                <div className="grid grid-cols-3 gap-2">
-                  {['Google Pay', 'PhonePe', 'Paytm'].map((app, idx) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => handleExecuteBookingWithPayment(
-                        paymentMethod,
-                        paymentMethod === 'cod' ? Math.round(pendingBookingData.estimatedPrice * 0.3) : pendingBookingData.estimatedPrice
-                      )}
-                      className="py-2.5 rounded-xl border border-stone-200 hover:border-emerald-500 bg-white hover:bg-emerald-50/20 text-center transition shadow-sm active:scale-95"
-                    >
-                      <span className="text-[11px] font-extrabold text-stone-700">{app}</span>
-                    </button>
-                  ))}
                 </div>
 
                 {/* Confirm Action Button */}
