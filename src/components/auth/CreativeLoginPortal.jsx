@@ -597,7 +597,6 @@ export default function CreativeLoginPortal() {
             {/* ── Feature Pills ── */}
             <div className="animate-fade-in-up stagger-4 flex flex-wrap gap-2 justify-center lg:justify-start max-w-lg mx-auto lg:mx-0">
               {[
-                { icon: <Zap className="w-3 h-3" />, text: lang === 'hi' ? '35 मिनट डिस्पैच' : '35 min Dispatch', color: 'text-emerald-400 bg-emerald-950/50 border-emerald-800/50' },
                 { icon: <ShieldCheck className="w-3 h-3" />, text: lang === 'hi' ? '100% KYC फ्लीट' : '100% KYC Fleet', color: 'text-amber-400 bg-amber-950/50 border-amber-800/50' },
                 { icon: <LandPlot className="w-3 h-3" />, text: 'AgriStack', color: 'text-blue-400 bg-blue-950/50 border-blue-800/50' },
               ].map((f, i) => (
