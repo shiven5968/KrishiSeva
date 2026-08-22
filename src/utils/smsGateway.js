@@ -280,28 +280,40 @@ Your KrishiSeva verification OTP is: *${otpCode}*
 Your Field, Our Power — On-demand farm machinery dispatched in 1 click!`;
 
   // Check for UltraMsg config
+  let ultramsgInstance = '';
+  let ultramsgToken = '';
   const ultramsgConfigStr = localStorage.getItem('krishi_ultramsg_config');
+
   if (ultramsgConfigStr) {
     try {
       const { instanceId, token } = JSON.parse(ultramsgConfigStr);
-      if (instanceId && token) {
-        const response = await fetch(`https://api.ultramsg.com/${instanceId}/messages/chat`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          },
-          body: new URLSearchParams({
-            token: token,
-            to: `+91${cleanNumber}`,
-            body: messageText
-          })
-        });
-        const data = await response.json();
-        if (data.sent === "true" || data.success === true || !!data.id) {
-          return { success: true, provider: 'UltraMsg', status: 'Sent', data };
-        } else {
-          return { success: false, provider: 'UltraMsg', status: 'Failed', error: 'UltraMsg failed to send' };
-        }
+      ultramsgInstance = instanceId;
+      ultramsgToken = token;
+    } catch (e) {}
+  } else {
+    // Default fallback to user's newly connected business instance
+    ultramsgInstance = 'instance189242';
+    ultramsgToken = '93rhhy7fj9ea2k81';
+  }
+
+  if (ultramsgInstance && ultramsgToken) {
+    try {
+      const response = await fetch(`https://api.ultramsg.com/${ultramsgInstance}/messages/chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+          token: ultramsgToken,
+          to: `+91${cleanNumber}`,
+          body: messageText
+        })
+      });
+      const data = await response.json();
+      if (data.sent === "true" || data.success === true || !!data.id) {
+        return { success: true, provider: 'UltraMsg', status: 'Sent', data };
+      } else {
+        return { success: false, provider: 'UltraMsg', status: 'Failed', error: 'UltraMsg failed to send' };
       }
     } catch (err) {
       console.warn('UltraMsg gateway error:', err);
