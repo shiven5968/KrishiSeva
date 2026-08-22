@@ -58,7 +58,27 @@ export function SavedLandsProvider({ children }) {
 
   const [allLands, setAllLands] = useState(() => {
     const saved = localStorage.getItem('krishi_saved_lands');
-    return saved ? JSON.parse(saved) : INITIAL_SAVED_LANDS;
+    let lands = saved ? JSON.parse(saved) : INITIAL_SAVED_LANDS;
+    
+    // Migrator: If any land still points to the old city center (downtown Lucknow),
+    // map it to the corresponding rural Malihabad coordinate.
+    lands = lands.map(land => {
+      // Old Land 1: 26.8485, 80.9495 -> New: 26.9168, 80.7075
+      if (Math.abs(land.lat - 26.8485) < 0.005 && Math.abs(land.lng - 80.9495) < 0.005) {
+        return { ...land, lat: 26.9168, lng: 80.7075 };
+      }
+      // Old Land 2: 26.8467, 80.9462 -> New: 26.9135, 80.7020
+      if (Math.abs(land.lat - 26.8467) < 0.005 && Math.abs(land.lng - 80.9462) < 0.005) {
+        return { ...land, lat: 26.9135, lng: 80.7020 };
+      }
+      // Old Land 3: 26.8420, 80.9410 -> New: 26.9080, 80.6960
+      if (Math.abs(land.lat - 26.8420) < 0.005 && Math.abs(land.lng - 80.9410) < 0.005) {
+        return { ...land, lat: 26.9080, lng: 80.6960 };
+      }
+      return land;
+    });
+
+    return lands;
   });
 
   useEffect(() => {

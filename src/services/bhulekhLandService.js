@@ -121,8 +121,8 @@ export async function fetchBhulekhLandRecord({ district, tehsil, village, khasra
         fasliYear: '1430-1435',
         ulpin: `UP-LKO-${cleanKhasra}-01`,
         soilType: 'Alluvial Loam (दोमट मिट्टी)',
-        lat: 26.8485 + ((numSeed % 10) * 0.001),
-        lng: 80.9495 + ((numSeed % 10) * 0.001)
+        lat: 26.9168 + ((numSeed % 10) * 0.001),
+        lng: 80.7075 + ((numSeed % 10) * 0.001)
       }
     };
   }
