@@ -1,0 +1,262 @@
+import React, { useMemo, useState } from 'react';
+import { useLanguage } from '../../context/LanguageContext';
+import { useRealtimeSync } from '../../context/RealtimeSyncContext';
+import { useAuth } from '../../context/AuthContext';
+import { calculateDistanceKm } from '../../utils/geoUtils';
+import LiveMap from '../map/LiveMap';
+import CancelReasonModal from '../common/CancelReasonModal';
+import { 
+  Navigation, 
+  MapPin, 
+  Phone, 
+  CheckCircle2, 
+  Clock, 
+  IndianRupee, 
+  Layers, 
+  ShieldCheck,
+  Sparkles,
+  ArrowRight,
+  Gauge,
+  Radio,
+  Crosshair,
+  XCircle
+} from 'lucide-react';
+
+export default function DriverNavigation() {
+  const { lang, t } = useLanguage();
+  const { driverProfile } = useAuth();
+  const { 
+    activeBooking, 
+    driverCurrentPos, 
+    routeWaypoints, 
+    updateBookingStatus,
+    cancelBooking,
+    isHardwareGpsActive,
+    hardwareGpsTelemetry,
+    startHardwareGpsTracking,
+    stopHardwareGpsTracking
+  } = useRealtimeSync();
+
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+
+  if (!activeBooking) return null;
+
+  const isEnRoute = activeBooking.status === 'accepted';
+  const hasArrived = activeBooking.status === 'arrived';
+  const isWorking = activeBooking.status === 'in_progress';
+
+  // Handle Driver Cancellation with Reason
+  const handleDriverCancel = (reason) => {
+    cancelBooking(reason, 'driver', driverProfile?.fullName || 'ड्राइवर (Driver)');
+    setIsCancelModalOpen(false);
+  };
+
+  // Dynamic Distance from driver to farmer khet
+  const remainingDistanceKm = useMemo(() => {
+    if (!driverCurrentPos || !activeBooking.farmerLocation) return 1.2;
+    return calculateDistanceKm(
+      driverCurrentPos.lat,
+      driverCurrentPos.lng,
+      activeBooking.farmerLocation.lat,
+      activeBooking.farmerLocation.lng
+    );
+  }, [driverCurrentPos, activeBooking.farmerLocation]);
+
+  const currentSpeed = useMemo(() => {
+    if (!isEnRoute) return 0;
+    if (isHardwareGpsActive && hardwareGpsTelemetry.speed) return hardwareGpsTelemetry.speed;
+    return 22 + (Math.round(Math.sin(Date.now() / 3000) * 2) + 1);
+  }, [isEnRoute, isHardwareGpsActive, hardwareGpsTelemetry.speed]);
+
+  const liveEtaMins = useMemo(() => {
+    if (hasArrived) return 0;
+    const speed = currentSpeed || 22;
+    return Math.max(1, Math.round((remainingDistanceKm / speed) * 60));
+  }, [remainingDistanceKm, hasArrived, currentSpeed]);
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      
+      {/* Top Banner: Turn-by-Turn Navigation Header */}
+      <div className="bg-stone-900 text-white rounded-3xl p-6 shadow-2xl border border-stone-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-600/30 shrink-0">
+            <Navigation className="w-8 h-8 animate-pulse" />
+          </div>
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-black uppercase tracking-wider text-blue-400 bg-blue-950 px-2.5 py-0.5 rounded-full border border-blue-800">
+                {isEnRoute ? (lang === 'hi' ? 'खेत का लाइव मार्ग' : 'Navigating to Field') : hasArrived ? (lang === 'hi' ? 'खेत पर पहुंच गए' : 'At Field') : (lang === 'hi' ? 'खेत में कार्य जारी' : 'Work in Progress')}
+              </span>
+              <span className="text-xs text-stone-300 font-bold flex items-center gap-1">
+                <Gauge className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Speed: {currentSpeed} km/h • Remaining: ~{remainingDistanceKm} km</span>
+              </span>
+            </div>
+            <h2 className="text-xl font-black text-white mt-1">
+              {activeBooking.farmerLocation?.address || 'Khet #14, Rampur, Malihabad'}
+            </h2>
+          </div>
+        </div>
+
+        {/* Action Controls: Live Hardware GPS broadcast + Call Farmer */}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => {
+              if (isHardwareGpsActive) {
+                stopHardwareGpsTracking();
+              } else {
+                startHardwareGpsTracking('driver');
+              }
+            }}
+            className={`px-4 py-3.5 rounded-2xl font-black text-xs flex items-center gap-2 transition shadow-lg active:scale-95 ${
+              isHardwareGpsActive
+                ? 'bg-blue-600 text-white ring-2 ring-blue-400 shadow-blue-600/40 animate-pulse'
+                : 'bg-stone-800 hover:bg-stone-700 text-stone-300 border border-stone-700'
+            }`}
+            title="Broadcast Real Physical Device GPS to Farmer"
+          >
+            <Radio className="w-4 h-4 text-blue-300" />
+            <span>{isHardwareGpsActive ? '📡 Real Device GPS Active' : '📍 Enable Real Hardware GPS'}</span>
+          </button>
+
+          <a
+            href={`tel:${activeBooking.farmerPhone}`}
+            className="px-5 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 font-black text-xs flex items-center gap-2 text-stone-950 shadow-xl shadow-emerald-950 whitespace-nowrap transition active:scale-95"
+          >
+            <Phone className="w-4 h-4 text-stone-950" />
+            <span>{t('callFarmer')}</span>
+          </a>
+        </div>
+
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        {/* Left: Turn-by-Turn Full Navigation Map */}
+        <div className="lg:col-span-8 space-y-4">
+          <div className="bg-stone-900 rounded-3xl p-5 border border-stone-800 shadow-2xl space-y-3">
+            
+            <div className="flex items-center justify-between text-white">
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-blue-500 animate-ping"></span>
+                <h3 className="font-extrabold text-sm sm:text-base">
+                  {lang === 'hi' ? 'चालक लाइव नेविगेशन (Live Turn-by-Turn GPS)' : 'Driver Field Navigation Radar'}
+                </h3>
+              </div>
+              <span className="text-xs font-black text-emerald-400">
+                ETA: {hasArrived ? 'Arrived 📍' : `${liveEtaMins} Mins (~${remainingDistanceKm} km)`}
+              </span>
+            </div>
+
+            <LiveMap
+              farmerLocation={activeBooking.farmerLocation}
+              driverPos={driverCurrentPos}
+              routeWaypoints={routeWaypoints}
+              activeVehicleType={activeBooking.machineryType}
+              showNearbyDrivers={false}
+              bookingStatus={activeBooking.status}
+              isDriverView={true}
+              className="h-[460px] w-full rounded-2xl"
+            />
+          </div>
+        </div>
+
+        {/* Right: Driver Action Steps */}
+        <div className="lg:col-span-4 space-y-6">
+          
+          <div className="bg-stone-900 rounded-3xl p-6 border border-stone-800 shadow-2xl space-y-5 text-white">
+            
+            <h4 className="font-black text-xs uppercase tracking-wider text-stone-400">
+              {lang === 'hi' ? 'कार्य विवरण व भुगतान' : 'Job Details & Payout'}
+            </h4>
+
+            {/* Payout Summary */}
+            <div className="p-4 rounded-2xl bg-emerald-950/80 border border-emerald-800 space-y-1">
+              <span className="text-xs text-emerald-400 font-bold uppercase">
+                {lang === 'hi' ? 'नियत भुगतान राशि' : 'Guaranteed Payout'}
+              </span>
+              <p className="text-3xl font-black text-emerald-300">
+                ₹{activeBooking.estimatedPrice}
+              </p>
+              <p className="text-[11px] text-stone-300 font-semibold">
+                {activeBooking.landSize} {activeBooking.sizeUnit} • {t(activeBooking.attachment?.nameKey)}
+              </p>
+            </div>
+
+            {/* Real GPS Diagnostics */}
+            <div className="p-3.5 rounded-2xl bg-stone-950 border border-stone-800 text-xs text-stone-400 space-y-1">
+              <div className="flex justify-between">
+                <span>Real Hardware GPS:</span>
+                <b className={isHardwareGpsActive ? 'text-emerald-400' : 'text-stone-500'}>
+                  {isHardwareGpsActive ? 'Active (Streaming)' : 'Standard Radar'}
+                </b>
+              </div>
+              <div className="flex justify-between">
+                <span>Driver Lat/Lng:</span>
+                <span className="font-mono text-[11px] text-stone-300">
+                  {driverCurrentPos ? `${driverCurrentPos.lat.toFixed(5)}, ${driverCurrentPos.lng.toFixed(5)}` : '--'}
+                </span>
+              </div>
+            </div>
+
+            {/* Step 1: Arrived at Field */}
+            {isEnRoute && (
+              <button
+                onClick={() => updateBookingStatus('arrived')}
+                className="w-full py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-stone-950 font-black text-sm shadow-xl shadow-emerald-950 transition flex items-center justify-center gap-2 active:scale-98"
+              >
+                <MapPin className="w-5 h-5" />
+                <span>{lang === 'hi' ? 'खेत पर पहुंच गए (Mark Arrived)' : 'Mark Arrived at Farm'}</span>
+              </button>
+            )}
+
+            {/* Step 2: Start Field Work */}
+            {hasArrived && (
+              <button
+                onClick={() => updateBookingStatus('in_progress')}
+                className="w-full py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-black text-sm shadow-xl shadow-blue-950 transition flex items-center justify-center gap-2 active:scale-98"
+              >
+                <Clock className="w-5 h-5" />
+                <span>{lang === 'hi' ? 'खेत में जुताई/कटाई शुरू करें' : 'Start Tilling Field Work'}</span>
+              </button>
+            )}
+
+            {/* Step 3: Complete Field Work */}
+            {isWorking && (
+              <button
+                onClick={() => updateBookingStatus('completed')}
+                className="w-full py-4 rounded-2xl bg-green-500 hover:bg-green-400 text-stone-950 font-black text-base shadow-xl shadow-green-950 transition flex items-center justify-center gap-2 active:scale-98"
+              >
+                <CheckCircle2 className="w-5 h-5" />
+                <span>{lang === 'hi' ? 'कार्य संपन्न व बिल बनाएं' : 'Complete Job & Generate Bill'}</span>
+              </button>
+            )}
+
+            {/* Abort / Cancel Booking with Reason Button */}
+            <button
+              onClick={() => setIsCancelModalOpen(true)}
+              className="w-full py-3 rounded-2xl border border-red-500/40 text-red-400 hover:bg-red-950/40 font-bold text-xs flex items-center justify-center gap-1.5 transition active:scale-98"
+            >
+              <XCircle className="w-4 h-4" />
+              <span>{lang === 'hi' ? 'बुकिंग रद्द करें (कारण सहित)' : 'Cancel Booking (with Reason)'}</span>
+            </button>
+
+          </div>
+        </div>
+
+      </div>
+
+      {/* Driver Cancel Reason Modal */}
+      <CancelReasonModal
+        isOpen={isCancelModalOpen}
+        onClose={() => setIsCancelModalOpen(false)}
+        onConfirmCancel={handleDriverCancel}
+        role="driver"
+        partnerName={activeBooking.farmerName || 'किसान (Farmer)'}
+      />
+
+    </div>
+  );
+}
