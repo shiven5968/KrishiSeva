@@ -108,6 +108,156 @@ export async function sendAadhaarEkycSms(phoneNumber, aadhaarOtp, maskedAadhaar)
 export async function sendRealWhatsAppOtp(phoneNumber, otpCode, lang = 'en') {
   const cleanNumber = phoneNumber.replace(/\D/g, '').slice(-10);
 
+  // 1. Meta WhatsApp Cloud API integration
+  const metaConfigStr = localStorage.getItem('krishi_meta_config');
+  if (metaConfigStr) {
+    try {
+      const { phoneId, accessToken, templateName } = JSON.parse(metaConfigStr);
+      if (phoneId && accessToken) {
+        const response = await fetch(`https://graph.facebook.com/v19.0/${phoneId}/messages`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            messaging_product: "whatsapp",
+            recipient_type: "individual",
+            to: `91${cleanNumber}`,
+            type: "template",
+            template: {
+              name: templateName || "krishiseva_otp",
+              language: { code: lang === 'hi' ? 'hi' : 'en_US' },
+              components: [
+                {
+                  type: "body",
+                  parameters: [{ type: "text", text: otpCode }]
+                }
+              ]
+            }
+          })
+        });
+        const data = await response.json();
+        if (response.ok && data.messages && data.messages.length > 0) {
+          return { success: true, provider: 'Meta Cloud API', status: 'Sent', data };
+        } else {
+          return { success: false, provider: 'Meta Cloud API', status: 'Failed', error: data.error?.message || 'Meta Cloud API rejected the request' };
+        }
+      }
+    } catch (err) {
+      console.warn('Meta Cloud API error:', err);
+      return { success: false, provider: 'Meta Cloud API', status: 'Failed', error: err.message };
+    }
+  }
+
+  // 2. Twilio WhatsApp API integration
+  const twilioWaConfigStr = localStorage.getItem('krishi_twiliowa_config');
+  if (twilioWaConfigStr) {
+    try {
+      const { accountSid, authToken, fromNumber } = JSON.parse(twilioWaConfigStr);
+      if (accountSid && authToken && fromNumber) {
+        const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
+        const formData = new URLSearchParams();
+        formData.append('To', `whatsapp:+91${cleanNumber}`);
+        formData.append('From', `whatsapp:${fromNumber}`);
+        // Message matches the required utility template:
+        // "Your KrishiSeva verification code is {{1}}. Valid for 5 minutes. Do not share this code with anyone."
+        formData.append('Body', `Your KrishiSeva verification code is ${otpCode}. Valid for 5 minutes. Do not share this code with anyone.`);
+
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Basic ' + btoa(`${accountSid}:${authToken}`),
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: formData
+        });
+        const data = await response.json();
+        if (response.ok) {
+          return { success: true, provider: 'Twilio WhatsApp', status: 'Sent', data };
+        } else {
+          return { success: false, provider: 'Twilio WhatsApp', status: 'Failed', error: data.message || 'Twilio rejected the request' };
+        }
+      }
+    } catch (err) {
+      console.warn('Twilio WhatsApp error:', err);
+      return { success: false, provider: 'Twilio WhatsApp', status: 'Failed', error: err.message };
+    }
+  }
+
+  // 3. Wati API integration
+  const watiConfigStr = localStorage.getItem('krishi_wati_config');
+  if (watiConfigStr) {
+    try {
+      const { apiEndpoint, accessToken, templateName } = JSON.parse(watiConfigStr);
+      if (apiEndpoint && accessToken) {
+        const response = await fetch(`${apiEndpoint.replace(/\/$/, '')}/api/v1/sendTemplateMessage`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            template_name: templateName || "krishiseva_otp",
+            broadcast_name: "krishiseva_otp_broadcast",
+            receivers: [
+              {
+                whatsappNumber: `91${cleanNumber}`,
+                customParams: [{ name: "1", value: otpCode }]
+              }
+            ]
+          })
+        });
+        const data = await response.json();
+        if (response.ok && (data.result === true || data.status === 'success' || data.success === true)) {
+          return { success: true, provider: 'Wati', status: 'Sent', data };
+        } else {
+          return { success: false, provider: 'Wati', status: 'Failed', error: data.errors || data.message || 'Wati rejected the request' };
+        }
+      }
+    } catch (err) {
+      console.warn('Wati API error:', err);
+      return { success: false, provider: 'Wati', status: 'Failed', error: err.message };
+    }
+  }
+
+  // 4. Interakt API integration
+  const interaktConfigStr = localStorage.getItem('krishi_interakt_config');
+  if (interaktConfigStr) {
+    try {
+      const { apiKey, templateName } = JSON.parse(interaktConfigStr);
+      if (apiKey) {
+        const response = await fetch('https://api.interakt.ai/v1/public/message/', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Basic ${btoa(apiKey + ':')}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            countryCode: "+91",
+            phoneNumber: cleanNumber,
+            type: "Template",
+            template: {
+              name: templateName || "krishiseva_otp",
+              languageCode: lang === 'hi' ? 'hi' : 'en',
+              bodyValues: [otpCode]
+            }
+          })
+        });
+        const data = await response.json();
+        if (response.ok && (data.result === true || data.success === true || data.id)) {
+          return { success: true, provider: 'Interakt', status: 'Sent', data };
+        } else {
+          return { success: false, provider: 'Interakt', status: 'Failed', error: data.message || 'Interakt rejected the request' };
+        }
+      }
+    } catch (err) {
+      console.warn('Interakt API error:', err);
+      return { success: false, provider: 'Interakt', status: 'Failed', error: err.message };
+    }
+  }
+
+  // Legacy Providers (UltraMsg and Green-API) - retained for backward compatibility
   const messageText = lang === 'hi' ?
 `🚜 *कृषि सेवा (KrishiSeva)* 🌾
 
@@ -147,7 +297,11 @@ Your Field, Our Power — On-demand farm machinery dispatched in 1 click!`;
           })
         });
         const data = await response.json();
-        return { success: data.sent === "true" || data.success === true || !!data.id, provider: 'UltraMsg', data };
+        if (data.sent === "true" || data.success === true || !!data.id) {
+          return { success: true, provider: 'UltraMsg', status: 'Sent', data };
+        } else {
+          return { success: false, provider: 'UltraMsg', status: 'Failed', error: 'UltraMsg failed to send' };
+        }
       }
     } catch (err) {
       console.warn('UltraMsg gateway error:', err);
@@ -171,12 +325,16 @@ Your Field, Our Power — On-demand farm machinery dispatched in 1 click!`;
           })
         });
         const data = await response.json();
-        return { success: !!data.idMessage, provider: 'Green-API', data };
+        if (data.idMessage) {
+          return { success: true, provider: 'Green-API', status: 'Sent', data };
+        } else {
+          return { success: false, provider: 'Green-API', status: 'Failed', error: 'Green-API failed to send' };
+        }
       }
     } catch (err) {
       console.warn('Green-API gateway error:', err);
     }
   }
 
-  return { success: false, error: 'No automated WhatsApp Gateway configured' };
+  return { success: false, error: 'No automated WhatsApp Gateway configured', status: 'Failed' };
 }

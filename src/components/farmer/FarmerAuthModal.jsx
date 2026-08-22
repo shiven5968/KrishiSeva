@@ -21,19 +21,23 @@ export default function FarmerAuthModal({ isOpen, onClose }) {
       return;
     }
     setError('');
-    const code = requestOtp(phone);
-    setOtp(code); // Pre-fill for convenience in demo
-    setStep('otp');
+    const result = requestOtp(phone);
+    if (result.success) {
+      setOtp(result.code); // Pre-fill for convenience in demo
+      setStep('otp');
+    } else {
+      setError(result.error);
+    }
   };
 
   const handleVerifyOtp = (e) => {
     e.preventDefault();
-    const success = verifyOtp(phone, otp);
-    if (success) {
+    const result = verifyOtp(phone, otp);
+    if (result.success) {
       setError('');
       onClose();
     } else {
-      setError(lang === 'hi' ? 'गलत ओटीपी। कृपया पुनः प्रयास करें' : 'Invalid OTP. Try entering 1234 or the generated code.');
+      setError(result.error || (lang === 'hi' ? 'गलत ओटीपी। कृपया पुनः प्रयास करें' : 'Invalid OTP. Try entering 123456 or the generated code.'));
     }
   };
 
@@ -108,11 +112,11 @@ export default function FarmerAuthModal({ isOpen, onClose }) {
               <div className="mb-3 p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
                   <KeyRound className="w-4 h-4 text-emerald-600" />
-                  <span>Demo OTP: <b>{generatedOtp || '1234'}</b></span>
+                  <span>Demo OTP: <b>{generatedOtp || '123456'}</b></span>
                 </div>
                 <button
                   type="button"
-                  onClick={() => setOtp(generatedOtp || '1234')}
+                  onClick={() => setOtp(generatedOtp || '123456')}
                   className="px-2 py-0.5 rounded-md bg-emerald-600 text-white text-[11px] font-bold"
                 >
                   Auto Fill
@@ -121,10 +125,10 @@ export default function FarmerAuthModal({ isOpen, onClose }) {
 
               <input
                 type="text"
-                maxLength="4"
+                maxLength="6"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-                placeholder="4-digit OTP"
+                placeholder="6-digit OTP"
                 className="w-full py-3.5 text-center tracking-[0.5em] rounded-xl border-2 border-stone-300 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 font-black text-stone-900 text-2xl outline-none transition"
                 required
               />

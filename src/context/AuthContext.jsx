@@ -123,7 +123,8 @@ export function AuthProvider({ children }) {
   });
 
   // OTP State
-  const [generatedOtp, setGeneratedOtp] = useState('1234');
+  const [generatedOtp, setGeneratedOtp] = useState('123456');
+  const [otpExpiresAt, setOtpExpiresAt] = useState(0);
   const [pendingAuthPhone, setPendingAuthPhone] = useState('');
   const [isNewUserRoleSelectionRequired, setIsNewUserRoleSelectionRequired] = useState(false);
 
@@ -177,16 +178,58 @@ export function AuthProvider({ children }) {
 
   // Request OTP
   const requestOtp = (phone) => {
-    const otp = Math.floor(1000 + Math.random() * 9000).toString();
+    // 15-minute rate limit (max 3 requests)
+    const rateLimitKey = `krishi_otp_rate_limit_${phone}`;
+    const now = Date.now();
+    let limitData = { requestTimestamps: [] };
+    try {
+      const saved = localStorage.getItem(rateLimitKey);
+      if (saved) {
+        limitData = JSON.parse(saved);
+      }
+    } catch (e) {}
+
+    // Clean up timestamps older than 15 minutes
+    const fifteenMinsAgo = now - 15 * 60 * 1000;
+    limitData.requestTimestamps = (limitData.requestTimestamps || []).filter(ts => ts > fifteenMinsAgo);
+
+    const lang = localStorage.getItem('krishi_lang') || 'hi';
+
+    if (limitData.requestTimestamps.length >= 3) {
+      const oldestActive = limitData.requestTimestamps[0];
+      const timeRemainingMs = (oldestActive + 15 * 60 * 1000) - now;
+      const minutesRemaining = Math.ceil(timeRemainingMs / (60 * 1000));
+      
+      const errorMsg = lang === 'hi' 
+        ? `ओटीपी सीमा पार हो गई है। कृपया ${minutesRemaining} मिनट बाद पुनः प्रयास करें।`
+        : `Rate limit exceeded. Maximum 3 requests per 15 mins. Try again in ${minutesRemaining} minutes.`;
+      
+      return { success: false, error: errorMsg };
+    }
+
+    // Add current timestamp to rate limiter list
+    limitData.requestTimestamps.push(now);
+    localStorage.setItem(rateLimitKey, JSON.stringify(limitData));
+
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
     setGeneratedOtp(otp);
+    setOtpExpiresAt(now + 5 * 60 * 1000); // 5 minutes expiration
     setPendingAuthPhone(phone);
     audioHelper.playOtpChime();
-    return otp;
+    return { success: true, code: otp };
   };
 
   // Verify OTP
-  const verifyOtp = (phone, otp) => {
-    if (otp === generatedOtp || otp === '1234' || otp === '9999') {
+  const verifyOtp = (phone, otpVal) => {
+    const lang = localStorage.getItem('krishi_lang') || 'hi';
+
+    // Expiration check
+    if (Date.now() > otpExpiresAt) {
+      return { success: false, error: lang === 'hi' ? 'ओटीपी की समय सीमा समाप्त हो गई है।' : 'OTP Expired' };
+    }
+
+    if (otpVal === generatedOtp || otpVal === '123456' || otpVal === '999999') {
       const existingUser = usersDb[phone];
 
       if (existingUser) {
@@ -233,7 +276,7 @@ export function AuthProvider({ children }) {
         return { success: true, isNewUser: true };
       }
     }
-    return { success: false, error: 'Invalid OTP code' };
+    return { success: false, error: lang === 'hi' ? 'गलत ओटीपी कोड।' : 'Invalid OTP' };
   };
 
   // Complete New User Registration & Persist to usersDb

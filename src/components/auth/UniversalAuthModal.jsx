@@ -41,9 +41,13 @@ export default function UniversalAuthModal({ isOpen, onClose }) {
       return;
     }
     setError('');
-    const code = requestOtp(phone);
-    setOtp(code);
-    setStep('otp');
+    const result = requestOtp(phone);
+    if (result.success) {
+      setOtp(result.code);
+      setStep('otp');
+    } else {
+      setError(result.error);
+    }
   };
 
   const handleVerifyOtp = (e) => {
@@ -58,7 +62,7 @@ export default function UniversalAuthModal({ isOpen, onClose }) {
         onClose();
       }
     } else {
-      setError(lang === 'hi' ? 'गलत ओटीपी। 1234 या जनरेटेड कोड दर्ज करें।' : 'Invalid OTP code. Try entering 1234.');
+      setError(result.error || (lang === 'hi' ? 'गलत ओटीपी।' : 'Invalid OTP.'));
     }
   };
 
@@ -190,7 +194,7 @@ export default function UniversalAuthModal({ isOpen, onClose }) {
                 {lang === 'hi' ? 'ओटीपी सत्यापन' : 'Verify OTP Code'}
               </h3>
               <p className="text-stone-500 text-xs sm:text-sm font-medium">
-                {lang === 'hi' ? `मोबाइल +91 ${phone} पर भेजा गया कोड दर्ज करें` : `Enter the 4-digit code sent to +91 ${phone}`}
+                {lang === 'hi' ? `मोबाइल +91 ${phone} पर भेजा गया कोड दर्ज करें` : `Enter the 6-digit code sent to +91 ${phone}`}
               </p>
             </div>
 
@@ -198,11 +202,11 @@ export default function UniversalAuthModal({ isOpen, onClose }) {
             <div className="p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center justify-between">
               <div className="flex items-center gap-1.5">
                 <Sparkles className="w-4 h-4 text-emerald-600" />
-                <span>Simulated OTP: <b>{generatedOtp || '1234'}</b></span>
+                <span>Simulated OTP: <b>{generatedOtp || '123456'}</b></span>
               </div>
               <button
                 type="button"
-                onClick={() => setOtp(generatedOtp || '1234')}
+                onClick={() => setOtp(generatedOtp || '123456')}
                 className="px-2.5 py-1 rounded-lg bg-emerald-600 text-white text-[11px] font-bold shadow-sm"
               >
                 Auto-Fill
@@ -219,10 +223,10 @@ export default function UniversalAuthModal({ isOpen, onClose }) {
               <div>
                 <input
                   type="text"
-                  maxLength="4"
+                  maxLength="6"
                   value={otp}
                   onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-                  placeholder="••••"
+                  placeholder="••••••"
                   className="w-full py-4 text-center tracking-[0.6em] rounded-2xl border-2 border-stone-300 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 font-black text-stone-900 text-3xl outline-none transition"
                   required
                 />

@@ -83,10 +83,90 @@ export default function CreativeLoginPortal() {
   // Gateway Configuration Modal States
   const [showGatewayModal, setShowGatewayModal] = useState(false);
   const [waProvider, setWaProvider] = useState(() => {
+    if (localStorage.getItem('krishi_meta_config')) return 'meta';
+    if (localStorage.getItem('krishi_twiliowa_config')) return 'twiliowa';
+    if (localStorage.getItem('krishi_wati_config')) return 'wati';
+    if (localStorage.getItem('krishi_interakt_config')) return 'interakt';
     if (localStorage.getItem('krishi_ultramsg_config')) return 'ultramsg';
     if (localStorage.getItem('krishi_greenapi_config')) return 'greenapi';
     return 'none';
   });
+
+  // Meta Cloud API
+  const [waMetaPhoneId, setWaMetaPhoneId] = useState(() => {
+    try {
+      const cfg = JSON.parse(localStorage.getItem('krishi_meta_config') || '{}');
+      return cfg.phoneId || '';
+    } catch { return ''; }
+  });
+  const [waMetaToken, setWaMetaToken] = useState(() => {
+    try {
+      const cfg = JSON.parse(localStorage.getItem('krishi_meta_config') || '{}');
+      return cfg.accessToken || '';
+    } catch { return ''; }
+  });
+  const [waMetaTemplate, setWaMetaTemplate] = useState(() => {
+    try {
+      const cfg = JSON.parse(localStorage.getItem('krishi_meta_config') || '{}');
+      return cfg.templateName || '';
+    } catch { return ''; }
+  });
+
+  // Twilio WhatsApp
+  const [waTwilioSid, setWaTwilioSid] = useState(() => {
+    try {
+      const cfg = JSON.parse(localStorage.getItem('krishi_twiliowa_config') || '{}');
+      return cfg.accountSid || '';
+    } catch { return ''; }
+  });
+  const [waTwilioToken, setWaTwilioToken] = useState(() => {
+    try {
+      const cfg = JSON.parse(localStorage.getItem('krishi_twiliowa_config') || '{}');
+      return cfg.authToken || '';
+    } catch { return ''; }
+  });
+  const [waTwilioFrom, setWaTwilioFrom] = useState(() => {
+    try {
+      const cfg = JSON.parse(localStorage.getItem('krishi_twiliowa_config') || '{}');
+      return cfg.fromNumber || '';
+    } catch { return ''; }
+  });
+
+  // Wati
+  const [waWatiEndpoint, setWaWatiEndpoint] = useState(() => {
+    try {
+      const cfg = JSON.parse(localStorage.getItem('krishi_wati_config') || '{}');
+      return cfg.apiEndpoint || '';
+    } catch { return ''; }
+  });
+  const [waWatiToken, setWaWatiToken] = useState(() => {
+    try {
+      const cfg = JSON.parse(localStorage.getItem('krishi_wati_config') || '{}');
+      return cfg.accessToken || '';
+    } catch { return ''; }
+  });
+  const [waWatiTemplate, setWaWatiTemplate] = useState(() => {
+    try {
+      const cfg = JSON.parse(localStorage.getItem('krishi_wati_config') || '{}');
+      return cfg.templateName || '';
+    } catch { return ''; }
+  });
+
+  // Interakt
+  const [waInteraktKey, setWaInteraktKey] = useState(() => {
+    try {
+      const cfg = JSON.parse(localStorage.getItem('krishi_interakt_config') || '{}');
+      return cfg.apiKey || '';
+    } catch { return ''; }
+  });
+  const [waInteraktTemplate, setWaInteraktTemplate] = useState(() => {
+    try {
+      const cfg = JSON.parse(localStorage.getItem('krishi_interakt_config') || '{}');
+      return cfg.templateName || '';
+    } catch { return ''; }
+  });
+
+  // UltraMsg & Green-API
   const [waUltramsgInstance, setWaUltramsgInstance] = useState(() => {
     try {
       const cfg = JSON.parse(localStorage.getItem('krishi_ultramsg_config') || '{}');
@@ -111,6 +191,11 @@ export default function CreativeLoginPortal() {
       return cfg.token || '';
     } catch { return ''; }
   });
+
+  // SMS Fallback and Delivery status states
+  const [waDeliveryFailed, setWaDeliveryFailed] = useState(false);
+  const [waProviderUsed, setWaProviderUsed] = useState('');
+  const [smsFallbackSent, setSmsFallbackSent] = useState(false);
 
   const [smsProvider, setSmsProvider] = useState(() => {
     if (localStorage.getItem('krishi_fast2sms_api_key')) return 'fast2sms';
@@ -140,16 +225,27 @@ export default function CreativeLoginPortal() {
   const handleSaveGatewayConfig = (e) => {
     e.preventDefault();
 
+    // Clean up all first
+    localStorage.removeItem('krishi_meta_config');
+    localStorage.removeItem('krishi_twiliowa_config');
+    localStorage.removeItem('krishi_wati_config');
+    localStorage.removeItem('krishi_interakt_config');
+    localStorage.removeItem('krishi_ultramsg_config');
+    localStorage.removeItem('krishi_greenapi_config');
+
     // 1. Save WhatsApp config
-    if (waProvider === 'ultramsg') {
+    if (waProvider === 'meta') {
+      localStorage.setItem('krishi_meta_config', JSON.stringify({ phoneId: waMetaPhoneId, accessToken: waMetaToken, templateName: waMetaTemplate }));
+    } else if (waProvider === 'twiliowa') {
+      localStorage.setItem('krishi_twiliowa_config', JSON.stringify({ accountSid: waTwilioSid, authToken: waTwilioToken, fromNumber: waTwilioFrom }));
+    } else if (waProvider === 'wati') {
+      localStorage.setItem('krishi_wati_config', JSON.stringify({ apiEndpoint: waWatiEndpoint, accessToken: waWatiToken, templateName: waWatiTemplate }));
+    } else if (waProvider === 'interakt') {
+      localStorage.setItem('krishi_interakt_config', JSON.stringify({ apiKey: waInteraktKey, templateName: waInteraktTemplate }));
+    } else if (waProvider === 'ultramsg') {
       localStorage.setItem('krishi_ultramsg_config', JSON.stringify({ instanceId: waUltramsgInstance, token: waUltramsgToken }));
-      localStorage.removeItem('krishi_greenapi_config');
     } else if (waProvider === 'greenapi') {
       localStorage.setItem('krishi_greenapi_config', JSON.stringify({ instanceId: waGreenapiInstance, token: waGreenapiToken }));
-      localStorage.removeItem('krishi_ultramsg_config');
-    } else {
-      localStorage.removeItem('krishi_ultramsg_config');
-      localStorage.removeItem('krishi_greenapi_config');
     }
 
     // 2. Save SMS config
@@ -191,43 +287,17 @@ export default function CreativeLoginPortal() {
 
   // WhatsApp OTP auto-trigger
   const triggerWhatsAppOtp = async (phoneNumber, code) => {
-    // 1. Try automated background sending if a gateway is configured (UltraMsg / Green-API)
+    setWaDeliveryFailed(false);
+    setWaProviderUsed('');
     const result = await sendRealWhatsAppOtp(phoneNumber, code, lang);
     if (result.success) {
       console.log(`Success: OTP sent silently via ${result.provider}`);
-      return;
-    }
-
-    // 2. Fallback to opening wa.me link for manual sending if no automated gateway is set up
-    const cleanNumber = phoneNumber.replace(/\D/g, '').slice(-10);
-    const messageText = lang === 'hi' ?
-`🚜 *कृषि सेवा (KrishiSeva)* 🌾
-
-नमस्ते!
-आपका कृषि सेवा सत्यापन ओटीपी है: *${code}*
-
-⚡ 5 मिनट के लिए मान्य।
-🔒 कृपया यह सुरक्षा कोड किसी के साथ साझा न करें।
-
-खेत आपका, तकनीक हमारी — 1-क्लिक में मशीन खेत पर तैयार!`
-:
-`🚜 *KrishiSeva* 🌾
-
-Hello!
-Your KrishiSeva verification OTP is: *${code}*
-
-⚡ Valid for 5 minutes.
-🔒 Please do not share this security code with anyone.
-
-Your Field, Our Power — On-demand farm machinery dispatched in 1 click!`;
-
-    const encodedMessage = encodeURIComponent(messageText);
-    const whatsappUrl = `https://wa.me/91${cleanNumber}?text=${encodedMessage}`;
-    
-    try {
-      window.open(whatsappUrl, '_blank');
-    } catch (e) {
-      console.log('WhatsApp auto-open popup intercepted:', e);
+      setWaProviderUsed(result.provider);
+      setWaDeliveryFailed(false);
+    } else {
+      console.warn(`WhatsApp delivery failed: ${result.error || 'No gateway configured'}`);
+      setWaDeliveryFailed(true);
+      setWaProviderUsed(result.provider || 'None');
     }
   };
 
@@ -238,23 +308,47 @@ Your Field, Our Power — On-demand farm machinery dispatched in 1 click!`;
       return;
     }
     setError('');
-    const code = requestOtp(phone);
+    
+    const result = requestOtp(phone);
+    if (!result.success) {
+      setError(result.error);
+      return;
+    }
+
+    const code = result.code;
     setActiveOtpCode(code);
-    setResendTimer(30);
+    setResendTimer(60);
     setStep('otp');
 
-    // Trigger WhatsApp & SMS delivery
+    // Trigger WhatsApp delivery (SMS is only triggered via fallback)
     triggerWhatsAppOtp(phone, code);
-    sendRealSmsToPhone(phone, code);
   };
 
   const handleResendOtp = () => {
     if (resendTimer > 0) return;
-    const code = requestOtp(phone);
+    setError('');
+
+    const result = requestOtp(phone);
+    if (!result.success) {
+      setError(result.error);
+      return;
+    }
+
+    const code = result.code;
     setActiveOtpCode(code);
-    setResendTimer(30);
+    setResendTimer(60);
     triggerWhatsAppOtp(phone, code);
-    sendRealSmsToPhone(phone, code);
+  };
+
+  const handleSendSmsFallback = async () => {
+    setError('');
+    const result = await sendRealSmsToPhone(phone, activeOtpCode);
+    if (result.success) {
+      setSmsFallbackSent(true);
+      setTimeout(() => setSmsFallbackSent(false), 5000);
+    } else {
+      setError(lang === 'hi' ? 'एसएमएस भेजना विफल रहा।' : 'Failed to send SMS fallback.');
+    }
   };
 
   const handleVerifyOtp = (e) => {
@@ -275,7 +369,7 @@ Your Field, Our Power — On-demand farm machinery dispatched in 1 click!`;
         }
       }
     } else {
-      setError(lang === 'hi' ? 'गलत ओटीपी कोड। कृपया सही 4-अंकीय कोड या 1234 दर्ज करें।' : 'Incorrect OTP. Enter the 4-digit code or 1234.');
+      setError(result.error || (lang === 'hi' ? 'गलत ओटीपी कोड।' : 'Invalid OTP.'));
     }
   };
 
@@ -577,7 +671,7 @@ Your Field, Our Power — On-demand farm machinery dispatched in 1 click!`;
                       type="submit"
                       className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-stone-950 font-black text-base shadow-xl shadow-emerald-500/10 hover:shadow-emerald-500/20 transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98] hover:translate-y-[-1px]"
                     >
-                      <span>{lang === 'hi' ? 'ओटीपी भेजें' : 'Send OTP'}</span>
+                      <span>{lang === 'hi' ? 'व्हाट्सएप पर ओटीपी भेजें' : 'Send OTP on WhatsApp'}</span>
                       <ArrowRight className="w-5 h-5 text-stone-950" />
                     </button>
                   </form>
@@ -598,7 +692,7 @@ Your Field, Our Power — On-demand farm machinery dispatched in 1 click!`;
                       <MessageSquare className="w-7 h-7 text-emerald-400" />
                     </div>
                     <h3 className="text-2xl font-black text-white tracking-tight">
-                      {lang === 'hi' ? '4-अंकीय ओटीपी दर्ज करें' : 'Enter 4-Digit OTP'}
+                      {lang === 'hi' ? '6-अंकीय ओटीपी दर्ज करें' : 'Enter 6-Digit OTP'}
                     </h3>
                     <p className="text-stone-400 text-xs font-medium">
                       {lang === 'hi' ? `मोबाइल +91 ${phone} पर भेजा गया कोड` : `Verification code sent to +91 ${phone}`}
@@ -623,14 +717,33 @@ Your Field, Our Power — On-demand farm machinery dispatched in 1 click!`;
                     </div>
                   )}
 
+                  {waDeliveryFailed && (
+                    <div className="p-3 rounded-2xl bg-amber-950/40 border border-amber-900/30 text-amber-300 text-xs font-semibold text-center leading-relaxed animate-fade-in">
+                      {lang === 'hi' ? 'व्हाट्सएप पर ओटीपी भेजना विफल रहा। ' : 'WhatsApp OTP delivery failed. '}
+                      <button
+                        type="button"
+                        onClick={handleSendSmsFallback}
+                        className="font-black underline hover:text-amber-200 transition-colors ml-1"
+                      >
+                        {lang === 'hi' ? 'सामान्य एसएमएस द्वारा प्राप्त करें' : 'Send via Regular SMS'}
+                      </button>
+                    </div>
+                  )}
+
+                  {smsFallbackSent && (
+                    <div className="p-3 rounded-2xl bg-emerald-950/40 border border-emerald-900/30 text-emerald-300 text-xs font-bold text-center animate-fade-in">
+                      {lang === 'hi' ? 'एसएमएस सफलतापूर्वक भेज दिया गया है!' : 'SMS fallback sent successfully!'}
+                    </div>
+                  )}
+
                   <form onSubmit={handleVerifyOtp} className="space-y-4">
                     <div>
                       <input
                         type="text"
-                        maxLength="4"
+                        maxLength="6"
                         value={otp}
                         onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-                        placeholder="••••"
+                        placeholder="••••••"
                         className="w-full py-4 text-center tracking-[0.6em] rounded-2xl border border-stone-700/80 bg-stone-950/80 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 font-black text-emerald-400 text-3xl outline-none transition-all duration-200"
                         required
                         autoFocus
@@ -664,7 +777,7 @@ Your Field, Our Power — On-demand farm machinery dispatched in 1 click!`;
                     <div className="flex gap-2 pt-1">
                       <button
                         type="button"
-                        onClick={() => { setStep('phone'); setOtp(''); setError(''); }}
+                        onClick={() => { setStep('phone'); setOtp(''); setError(''); setWaDeliveryFailed(false); }}
                         className="w-1/3 py-4 rounded-2xl border border-stone-700/80 text-stone-300 font-bold text-xs hover:bg-stone-800/80 hover:border-stone-600 transition-all duration-200"
                       >
                         {lang === 'hi' ? 'नंबर बदलें' : 'Change Number'}
@@ -1127,11 +1240,190 @@ Your Field, Our Power — On-demand farm machinery dispatched in 1 click!`;
                     onChange={(e) => setWaProvider(e.target.value)}
                     className="w-full px-3.5 py-2.5 rounded-xl bg-stone-900 border border-stone-800 text-stone-200 text-sm focus:border-emerald-500 focus:outline-none transition-colors"
                   >
-                    <option value="none">{lang === 'hi' ? 'कोई नहीं (मैन्युअल व्हाट्सएप रीडायरेक्ट)' : 'None (Manual WhatsApp Redirect)'}</option>
-                    <option value="ultramsg">UltraMsg (Free Trial / Scan QR Code)</option>
-                    <option value="greenapi">Green-API (Free Trial / Scan QR Code)</option>
+                    <option value="none">{lang === 'hi' ? 'कोई नहीं (सिर्फ सिमुलेशन / लोकल मॉक)' : 'None (Simulation / Local Mock)'}</option>
+                    <option value="meta">Meta WhatsApp Cloud API (Official Business)</option>
+                    <option value="twiliowa">Twilio WhatsApp API (Enterprise Broadcast)</option>
+                    <option value="wati">Wati WhatsApp API (Official Partner)</option>
+                    <option value="interakt">Interakt WhatsApp API (Official Partner)</option>
+                    <option value="ultramsg">UltraMsg (Personal Number Scan QR)</option>
+                    <option value="greenapi">Green-API (Personal Number Scan QR)</option>
                   </select>
                 </div>
+
+                {waProvider === 'meta' && (
+                  <div className="space-y-3 pt-2 animate-fade-in">
+                    <div className="space-y-2">
+                      <label className="block text-xs text-stone-400">Phone Number ID</label>
+                      <input
+                        type="text"
+                        value={waMetaPhoneId}
+                        onChange={(e) => setWaMetaPhoneId(e.target.value)}
+                        placeholder="e.g. 10928374829302"
+                        className="w-full px-3.5 py-2 rounded-xl bg-stone-900 border border-stone-800 text-stone-200 text-sm focus:border-emerald-500 focus:outline-none"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="block text-xs text-stone-400">System User Access Token (Permanent)</label>
+                      <input
+                        type="password"
+                        value={waMetaToken}
+                        onChange={(e) => setWaMetaToken(e.target.value)}
+                        placeholder="EAAGz..."
+                        className="w-full px-3.5 py-2 rounded-xl bg-stone-900 border border-stone-800 text-stone-200 text-sm focus:border-emerald-500 focus:outline-none"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="block text-xs text-stone-400">Approved Template Name</label>
+                      <input
+                        type="text"
+                        value={waMetaTemplate}
+                        onChange={(e) => setWaMetaTemplate(e.target.value)}
+                        placeholder="e.g. krishiseva_otp"
+                        className="w-full px-3.5 py-2 rounded-xl bg-stone-900 border border-stone-800 text-stone-200 text-sm focus:border-emerald-500 focus:outline-none"
+                        required
+                      />
+                    </div>
+                    <div className="p-3 rounded-xl bg-blue-950/30 border border-blue-900/30 text-[11px] text-blue-300 leading-relaxed">
+                      <strong>How to Setup Meta Cloud API:</strong>
+                      <ol className="list-decimal pl-4 mt-1 space-y-1">
+                        <li>Set up a Meta Developer App and add WhatsApp product.</li>
+                        <li>Get your <strong>Phone Number ID</strong> and generate a permanent <strong>Access Token</strong> in Business Manager.</li>
+                        <li>Register an approved utility OTP template with body: <em>"Your KrishiSeva verification code is {"{{1}}"}. Valid for 5 minutes. Do not share this code with anyone."</em></li>
+                      </ol>
+                    </div>
+                  </div>
+                )}
+
+                {waProvider === 'twiliowa' && (
+                  <div className="space-y-3 pt-2 animate-fade-in">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs text-stone-400 mb-1">Account SID</label>
+                        <input
+                          type="text"
+                          value={waTwilioSid}
+                          onChange={(e) => setWaTwilioSid(e.target.value)}
+                          placeholder="AC..."
+                          className="w-full px-3.5 py-2 rounded-xl bg-stone-900 border border-stone-800 text-stone-200 text-sm focus:border-emerald-500 focus:outline-none"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-stone-400 mb-1">Auth Token</label>
+                        <input
+                          type="password"
+                          value={waTwilioToken}
+                          onChange={(e) => setWaTwilioToken(e.target.value)}
+                          placeholder="Twilio Token"
+                          className="w-full px-3.5 py-2 rounded-xl bg-stone-900 border border-stone-800 text-stone-200 text-sm focus:border-emerald-500 focus:outline-none"
+                          required
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-stone-400 mb-1">Twilio WhatsApp Sender Number</label>
+                      <input
+                        type="text"
+                        value={waTwilioFrom}
+                        onChange={(e) => setWaTwilioFrom(e.target.value)}
+                        placeholder="e.g. +14155238886 (or Sandbox number)"
+                        className="w-full px-3.5 py-2 rounded-xl bg-stone-900 border border-stone-800 text-stone-200 text-sm focus:border-emerald-500 focus:outline-none"
+                        required
+                      />
+                    </div>
+                    <div className="p-3 rounded-xl bg-blue-950/30 border border-blue-900/30 text-[11px] text-blue-300 leading-relaxed">
+                      <strong>How to Setup Twilio WhatsApp:</strong>
+                      <ol className="list-decimal pl-4 mt-1 space-y-1">
+                        <li>Enable WhatsApp in your Twilio Console.</li>
+                        <li>Join the Twilio Sandbox or configure your own business number.</li>
+                        <li>Copy paste your Twilio <strong>Account SID</strong>, <strong>Auth Token</strong>, and <strong>Sender Number</strong> here.</li>
+                      </ol>
+                    </div>
+                  </div>
+                )}
+
+                {waProvider === 'wati' && (
+                  <div className="space-y-3 pt-2 animate-fade-in">
+                    <div className="space-y-2">
+                      <label className="block text-xs text-stone-400">API Endpoint URL</label>
+                      <input
+                        type="url"
+                        value={waWatiEndpoint}
+                        onChange={(e) => setWaWatiEndpoint(e.target.value)}
+                        placeholder="https://live-xxx.wati.io"
+                        className="w-full px-3.5 py-2 rounded-xl bg-stone-900 border border-stone-800 text-stone-200 text-sm focus:border-emerald-500 focus:outline-none"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="block text-xs text-stone-400">Access Token / API Key</label>
+                      <input
+                        type="password"
+                        value={waWatiToken}
+                        onChange={(e) => setWaWatiToken(e.target.value)}
+                        placeholder="Wati Auth Token"
+                        className="w-full px-3.5 py-2 rounded-xl bg-stone-900 border border-stone-800 text-stone-200 text-sm focus:border-emerald-500 focus:outline-none"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="block text-xs text-stone-400">Approved Template Name</label>
+                      <input
+                        type="text"
+                        value={waWatiTemplate}
+                        onChange={(e) => setWaWatiTemplate(e.target.value)}
+                        placeholder="e.g. krishiseva_otp"
+                        className="w-full px-3.5 py-2 rounded-xl bg-stone-900 border border-stone-800 text-stone-200 text-sm focus:border-emerald-500 focus:outline-none"
+                        required
+                      />
+                    </div>
+                    <div className="p-3 rounded-xl bg-blue-950/30 border border-blue-900/30 text-[11px] text-blue-300 leading-relaxed">
+                      <strong>How to Setup Wati API:</strong>
+                      <ol className="list-decimal pl-4 mt-1 space-y-1">
+                        <li>Go to Wati Dashboard &rarr; API Integration.</li>
+                        <li>Copy your API Endpoint and Access Token and paste them here.</li>
+                        <li>Submit your template name for approval in the Wati portal.</li>
+                      </ol>
+                    </div>
+                  </div>
+                )}
+
+                {waProvider === 'interakt' && (
+                  <div className="space-y-3 pt-2 animate-fade-in">
+                    <div className="space-y-2">
+                      <label className="block text-xs text-stone-400">Interakt Write API Key</label>
+                      <input
+                        type="password"
+                        value={waInteraktKey}
+                        onChange={(e) => setWaInteraktKey(e.target.value)}
+                        placeholder="API Key"
+                        className="w-full px-3.5 py-2 rounded-xl bg-stone-900 border border-stone-800 text-stone-200 text-sm focus:border-emerald-500 focus:outline-none"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="block text-xs text-stone-400">Approved Template Name</label>
+                      <input
+                        type="text"
+                        value={waInteraktTemplate}
+                        onChange={(e) => setWaInteraktTemplate(e.target.value)}
+                        placeholder="e.g. krishiseva_otp"
+                        className="w-full px-3.5 py-2 rounded-xl bg-stone-900 border border-stone-800 text-stone-200 text-sm focus:border-emerald-500 focus:outline-none"
+                        required
+                      />
+                    </div>
+                    <div className="p-3 rounded-xl bg-blue-950/30 border border-blue-900/30 text-[11px] text-blue-300 leading-relaxed">
+                      <strong>How to Setup Interakt:</strong>
+                      <ol className="list-decimal pl-4 mt-1 space-y-1">
+                        <li>Login to Interakt and go to Settings &rarr; Developer API.</li>
+                        <li>Copy the API Key and paste here.</li>
+                        <li>Ensure your approved template name is matches.</li>
+                      </ol>
+                    </div>
+                  </div>
+                )}
 
                 {waProvider === 'ultramsg' && (
                   <div className="space-y-3 pt-2">
