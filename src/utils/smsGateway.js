@@ -5,18 +5,40 @@ export const SMS_PROVIDERS = {
   ULTRAMSG: 'ultramsg',
   META_WHATSAPP: 'meta',
   TWILIO_WHATSAPP: 'twiliowa',
-  WATI: 'wati',
   FAST2SMS: 'fast2sms',
   TWILIO_SMS: 'twilio'
 };
 
 // ─────────────────────────────────────────────────────────────
-// 1. WhatsApp API Dispatch via UltraMsg (Primary Gateway)
+// Phone Number Sanitization & Formatting Helper
+// ─────────────────────────────────────────────────────────────
+export function formatIndianPhoneNumber(rawPhone) {
+  let cleaned = String(rawPhone || '').replace(/\D/g, '');
+  if (cleaned.startsWith('91') && cleaned.length === 12) {
+    cleaned = cleaned.slice(2);
+  } else if (cleaned.startsWith('0') && cleaned.length === 11) {
+    cleaned = cleaned.slice(1);
+  }
+  return cleaned.slice(-10);
+}
+
+// ─────────────────────────────────────────────────────────────
+// 1. Dynamic WhatsApp OTP Dispatch via UltraMsg
 // ─────────────────────────────────────────────────────────────
 export async function sendRealWhatsAppOtp(phoneNumber, otpCode, lang = 'en') {
-  const cleanNumber = phoneNumber.replace(/\D/g, '').slice(-10);
+  // 1. Sanitize & clean input phone number
+  const cleanNumber = formatIndianPhoneNumber(phoneNumber);
 
-  // Exact configured message template
+  if (!cleanNumber || cleanNumber.length !== 10) {
+    console.error(`[UltraMsg Gateway] Invalid 10-digit phone number provided: "${phoneNumber}"`);
+    return { success: false, error: 'Please enter a valid 10-digit mobile number' };
+  }
+
+  // 2. Dynamic Recipient Binding (+91XXXXXXXXXX)
+  const formattedPhoneNumber = `+91${cleanNumber}`;
+  console.log(`[UltraMsg Gateway] Sending OTP ${otpCode} dynamically to recipient: ${formattedPhoneNumber}`);
+
+  // 3. Message Template Body
   const messageText = lang === 'hi' ?
 `🚜 *कृषि सेवा (KrishiSeva)* 🌾
 
@@ -30,149 +52,66 @@ export async function sendRealWhatsAppOtp(phoneNumber, otpCode, lang = 'en') {
 :
 `Your KrishiSeva verification code is ${otpCode}. Valid for 5 minutes. Do not share this code.`;
 
-  // ──── 1. PRIMARY: UltraMsg WhatsApp Gateway (instance189242) ────
-  let ultramsgInstance = 'instance189242';
-  let ultramsgToken = '93rhhy7fj9ea2k81';
+  // 4. UltraMsg Endpoint & Dynamic Payload
+  const instanceId = 'instance189242';
+  const token = '93rhhy7fj9ea2k81';
 
-  const ultramsgConfigStr = localStorage.getItem('krishi_ultramsg_config');
-  if (ultramsgConfigStr) {
-    try {
-      const parsed = JSON.parse(ultramsgConfigStr);
-      if (parsed.instanceId) ultramsgInstance = parsed.instanceId;
-      if (parsed.token) ultramsgToken = parsed.token;
-    } catch (e) {}
-  }
+  try {
+    const response = await fetch(`https://api.ultramsg.com/${instanceId}/messages/chat`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: new URLSearchParams({
+        token: token,
+        to: formattedPhoneNumber, // Dynamically bound from user input
+        body: messageText,
+        priority: '10'
+      })
+    });
 
-  if (ultramsgInstance && ultramsgToken) {
-    try {
-      const response = await fetch(`https://api.ultramsg.com/${ultramsgInstance}/messages/chat`, {
+    const data = await response.json();
+    console.log(`[UltraMsg Gateway] Delivery response for ${formattedPhoneNumber}:`, data);
+
+    const isUnauthenticated = data.message && (
+      data.message.toLowerCase().includes('not authenticated') ||
+      data.message.toLowerCase().includes('not connected') ||
+      data.message.toLowerCase().includes('qr')
+    );
+
+    if ((data.sent === "true" || data.success === true || !!data.id) && !isUnauthenticated) {
+      // Auto-flush unsent queue immediately to prevent hold-ups
+      fetch(`https://api.ultramsg.com/${instanceId}/messages/resendByStatus`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: new URLSearchParams({
-          token: ultramsgToken,
-          to: `+91${cleanNumber}`,
-          body: messageText,
-          priority: '10'
-        })
-      });
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ token: token, status: 'unsent' })
+      }).catch(() => {});
 
-      const data = await response.json();
-      const isUnauthenticated = data.message && (
-        data.message.toLowerCase().includes('not authenticated') ||
-        data.message.toLowerCase().includes('not connected') ||
-        data.message.toLowerCase().includes('qr')
-      );
-
-      if ((data.sent === "true" || data.success === true || !!data.id) && !isUnauthenticated) {
-        // Auto-flush unsent queue immediately
-        fetch(`https://api.ultramsg.com/${ultramsgInstance}/messages/resendByStatus`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams({ token: ultramsgToken, status: 'unsent' })
-        }).catch(() => {});
-
-        return { 
-          success: true, 
-          provider: 'UltraMsg WhatsApp API', 
-          status: 'Sent', 
-          messageId: data.id, 
-          data 
-        };
-      } else {
-        const errorMsg = isUnauthenticated 
-          ? 'UltraMsg WhatsApp instance is not authenticated yet. Please scan QR on UltraMsg.' 
-          : (data.message || data.error || 'UltraMsg failed to send message');
-        return { success: false, provider: 'UltraMsg', status: 'Failed', error: errorMsg, data };
-      }
-    } catch (err) {
-      console.warn('UltraMsg gateway error:', err);
+      return { 
+        success: true, 
+        provider: 'UltraMsg WhatsApp API', 
+        status: 'Sent', 
+        recipient: formattedPhoneNumber,
+        messageId: data.id, 
+        data 
+      };
+    } else {
+      const errorMsg = isUnauthenticated 
+        ? 'UltraMsg WhatsApp instance is not paired yet. Please scan QR on UltraMsg.' 
+        : (data.message || data.error || 'UltraMsg failed to deliver message');
+      return { success: false, provider: 'UltraMsg', status: 'Failed', recipient: formattedPhoneNumber, error: errorMsg, data };
     }
+  } catch (err) {
+    console.error(`[UltraMsg Gateway] Network error dispatching to ${formattedPhoneNumber}:`, err);
+    return { success: false, provider: 'UltraMsg', status: 'Failed', recipient: formattedPhoneNumber, error: err.message };
   }
-
-  // ──── 2. Secondary: Meta WhatsApp Cloud API ────
-  const metaConfigStr = localStorage.getItem('krishi_meta_config');
-  if (metaConfigStr) {
-    try {
-      const { phoneId, accessToken, templateName } = JSON.parse(metaConfigStr);
-      if (phoneId && accessToken) {
-        const response = await fetch(`https://graph.facebook.com/v19.0/${phoneId}/messages`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            messaging_product: "whatsapp",
-            recipient_type: "individual",
-            to: `91${cleanNumber}`,
-            type: "template",
-            template: {
-              name: templateName || "krishiseva_otp",
-              language: { code: lang === 'hi' ? 'hi' : 'en_US' },
-              components: [
-                {
-                  type: "body",
-                  parameters: [{ type: "text", text: otpCode }]
-                }
-              ]
-            }
-          })
-        });
-        const data = await response.json();
-        if (response.ok && data.messages && data.messages.length > 0) {
-          return { success: true, provider: 'Meta WhatsApp Cloud API', status: 'Sent', data };
-        }
-      }
-    } catch (err) {
-      console.warn('Meta WhatsApp Cloud API error:', err);
-    }
-  }
-
-  // ──── 3. Tertiary: Twilio WhatsApp API ────
-  const twilioWaConfigStr = localStorage.getItem('krishi_twiliowa_config');
-  if (twilioWaConfigStr) {
-    try {
-      const { accountSid, authToken, fromNumber } = JSON.parse(twilioWaConfigStr);
-      if (accountSid && authToken) {
-        const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
-        const formData = new URLSearchParams();
-        formData.append('To', `whatsapp:+91${cleanNumber}`);
-        formData.append('From', fromNumber.startsWith('whatsapp:') ? fromNumber : `whatsapp:${fromNumber}`);
-        formData.append('Body', messageText);
-
-        const response = await fetch(url, {
-          method: 'POST',
-          headers: {
-            'Authorization': 'Basic ' + btoa(`${accountSid}:${authToken}`),
-            'Content-Type': 'application/x-www-form-urlencoded'
-          },
-          body: formData
-        });
-        const data = await response.json();
-        if (response.ok && data.sid) {
-          return { success: true, provider: 'Twilio WhatsApp', status: 'Sent', data };
-        }
-      }
-    } catch (err) {
-      console.warn('Twilio WhatsApp error:', err);
-    }
-  }
-
-  return { 
-    success: false, 
-    error: 'WhatsApp Gateway failed to deliver message.', 
-    status: 'Failed' 
-  };
 }
 
 // ─────────────────────────────────────────────────────────────
-// 2. Regular SMS Gateway Fallback (Fast2SMS / Twilio SMS)
+// 2. Regular Carrier SMS Fallback (Fast2SMS / Twilio)
 // ─────────────────────────────────────────────────────────────
 export async function sendRealSmsToPhone(phoneNumber, otpCode) {
-  const cleanNumber = phoneNumber.replace(/\D/g, '').slice(-10);
-
+  const cleanNumber = formatIndianPhoneNumber(phoneNumber);
   const fast2smsKey = localStorage.getItem('krishi_fast2sms_api_key');
   const twilioConfig = localStorage.getItem('krishi_twilio_config');
 
@@ -204,7 +143,7 @@ export async function sendRealSmsToPhone(phoneNumber, otpCode) {
       const formData = new URLSearchParams();
       formData.append('To', `+91${cleanNumber}`);
       formData.append('From', fromNumber);
-      formData.append('Body', `Your KrishiSeva verification OTP is ${otpCode}. Valid for 5 minutes.`);
+      formData.append('Body', `Your KrishiSeva verification code is ${otpCode}. Valid for 5 minutes. Do not share this code.`);
 
       const response = await fetch(url, {
         method: 'POST',
@@ -242,7 +181,7 @@ export async function sendRealSmsToPhone(phoneNumber, otpCode) {
 // 3. Aadhaar e-KYC Notification
 // ─────────────────────────────────────────────────────────────
 export async function sendAadhaarEkycSms(phoneNumber, aadhaarOtp, maskedAadhaar) {
-  const cleanNumber = phoneNumber.replace(/\D/g, '').slice(-10);
+  const cleanNumber = formatIndianPhoneNumber(phoneNumber);
   sendRealWhatsAppOtp(cleanNumber, aadhaarOtp).catch(() => {});
   sendRealSmsToPhone(cleanNumber, aadhaarOtp).catch(() => {});
   return { success: true };

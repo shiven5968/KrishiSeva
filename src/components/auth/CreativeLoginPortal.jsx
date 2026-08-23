@@ -49,6 +49,7 @@ export default function CreativeLoginPortal() {
   const [activeOtpCode, setActiveOtpCode] = useState('');
   const [waDeliveryFailed, setWaDeliveryFailed] = useState(false);
   const [smsFallbackSent, setSmsFallbackSent] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
 
   // Profile Setup States
   const [userName, setUserName] = useState('');
@@ -165,6 +166,9 @@ export default function CreativeLoginPortal() {
     setWaDeliveryFailed(false);
     setOtp('');
 
+    setToastMessage(lang === 'hi' ? `ओटीपी +91 ${cleanPhone} पर भेज दिया गया है` : `OTP sent to +91 ${cleanPhone}`);
+    setTimeout(() => setToastMessage(''), 6000);
+
     // Dispatch WhatsApp Message via API
     try {
       const waResult = await sendRealWhatsAppOtp(cleanPhone, code, lang);
@@ -196,6 +200,9 @@ export default function CreativeLoginPortal() {
     setActiveOtpCode(code);
     setResendTimer(60);
     setWaDeliveryFailed(false);
+
+    setToastMessage(lang === 'hi' ? `नया ओटीपी +91 ${cleanPhone} पर भेज दिया गया है` : `New OTP sent to +91 ${cleanPhone}`);
+    setTimeout(() => setToastMessage(''), 6000);
 
     try {
       const waResult = await sendRealWhatsAppOtp(cleanPhone, code, lang);
@@ -603,6 +610,13 @@ export default function CreativeLoginPortal() {
                       {lang === 'hi' ? `व्हाट्सएप (+91 ${phone}) पर भेजा गया सुरक्षा कोड` : `Verification code sent to WhatsApp (+91 ${phone})`}
                     </p>
                   </div>
+
+                  {toastMessage && (
+                    <div className="p-3.5 rounded-2xl bg-emerald-950/90 border border-emerald-500/60 text-emerald-300 text-xs font-bold text-center flex items-center justify-center gap-2 animate-fade-in shadow-lg shadow-emerald-950/50">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                      <span>{toastMessage}</span>
+                    </div>
+                  )}
 
                   {error && (
                     <div className="p-3 rounded-2xl bg-red-950/80 border border-red-800/60 text-red-300 text-xs font-bold text-center animate-fade-in">
