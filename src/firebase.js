@@ -1,5 +1,5 @@
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { initializeApp, getApps, getApp } from "firebase/app";
+import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAKA0aYELgi7U4lNy8qPdsKU4Id6pYCiSM",
@@ -9,5 +9,6 @@ const firebaseConfig = {
   messagingSenderId: "99454088088"
 };
 
-export const app = initializeApp(firebaseConfig);
+export const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 export const auth = getAuth(app);
+export { RecaptchaVerifier, signInWithPhoneNumber };

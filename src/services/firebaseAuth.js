@@ -1,12 +1,17 @@
 // Firebase Phone Authentication Service for KrishiSeva
-import { auth, app } from '../firebase';
-import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
+import { auth, app, RecaptchaVerifier, signInWithPhoneNumber } from '../firebase';
 
-export { auth, app, RecaptchaVerifier, signInWithPhoneNumber };
+export { auth, app };
 
 // Configure invisible RecaptchaVerifier attached to recaptcha-container
 export function getRecaptchaVerifier(containerId = 'recaptcha-container') {
   if (typeof window === 'undefined') return null;
+
+  // Verify DOM container exists
+  const container = document.getElementById(containerId);
+  if (!container) {
+    console.warn(`[Firebase Auth] #${containerId} not found in DOM, falling back to body.`);
+  }
 
   if (window.recaptchaVerifier) {
     try {
@@ -44,7 +49,9 @@ export async function sendFirebasePhoneOtp(phoneNumber, containerId = 'recaptcha
     window.confirmationResult = confirmationResult;
     return { success: true, confirmationResult, phone: formattedPhone };
   } catch (error) {
-    console.error('[Firebase Auth] Dispatch Error:', error);
+    console.error('[Firebase Auth] Detailed Dispatch Error:', error);
+    
+    // Clear verifier on failure so next attempt gets fresh instance
     if (window.recaptchaVerifier) {
       try {
         window.recaptchaVerifier.clear();
@@ -52,25 +59,34 @@ export async function sendFirebasePhoneOtp(phoneNumber, containerId = 'recaptcha
       } catch (e) {}
     }
 
-    let friendlyError = error.message;
-    if (error.code === 'auth/invalid-phone-number') {
-      friendlyError = 'Invalid mobile number format.';
-    } else if (error.code === 'auth/too-many-requests') {
-      friendlyError = 'Too many requests. Please wait a few moments before trying again.';
-    } else if (error.code === 'auth/captcha-check-failed') {
-      friendlyError = 'Google reCAPTCHA verification failed. Please try again.';
-    } else if (error.code === 'auth/operation-not-allowed') {
-      friendlyError = 'Phone Auth is not enabled in Firebase Console. Please verify Phone Provider is enabled.';
+    const errorCode = error?.code || 'auth/unknown';
+    let detailedMsg = `[${errorCode}]: ${error.message}`;
+
+    if (errorCode === 'auth/unauthorized-domain') {
+      detailedMsg = `[auth/unauthorized-domain]: This domain (${window.location.hostname}) is not authorized in Firebase Console. Go to Firebase Console -> Authentication -> Settings -> Authorized Domains -> Add '${window.location.hostname}'.`;
+    } else if (errorCode === 'auth/invalid-phone-number') {
+      detailedMsg = `[auth/invalid-phone-number]: Invalid phone number format (+91${cleanNumber}).`;
+    } else if (errorCode === 'auth/too-many-requests') {
+      detailedMsg = `[auth/too-many-requests]: SMS quota limit or too many attempts. Please try again later.`;
+    } else if (errorCode === 'auth/captcha-check-failed') {
+      detailedMsg = `[auth/captcha-check-failed]: Google reCAPTCHA verification failed. Please try again.`;
+    } else if (errorCode === 'auth/operation-not-allowed') {
+      detailedMsg = `[auth/operation-not-allowed]: Phone Provider is not enabled in Firebase Console. Please enable Phone Auth in Firebase Console -> Authentication -> Sign-in method.`;
     }
 
-    return { success: false, error: friendlyError, rawError: error };
+    return { 
+      success: false, 
+      error: detailedMsg, 
+      code: errorCode, 
+      rawError: error 
+    };
   }
 }
 
 // Verify 6-digit OTP using confirmationResult.confirm(otpCode)
 export async function verifyFirebaseOtp(otpCode) {
   if (!window.confirmationResult) {
-    return { success: false, error: 'OTP session expired. Please request a new code.' };
+    return { success: false, error: '[auth/session-expired]: OTP session expired. Please request a new code.' };
   }
 
   try {
@@ -79,12 +95,14 @@ export async function verifyFirebaseOtp(otpCode) {
     return { success: true, user };
   } catch (error) {
     console.error('[Firebase Auth] Verification Error:', error);
-    let friendlyError = 'Invalid OTP code. Please try again.';
-    if (error.code === 'auth/invalid-verification-code') {
-      friendlyError = 'Incorrect OTP. Please enter the 6-digit code received on your phone.';
-    } else if (error.code === 'auth/code-expired') {
-      friendlyError = 'OTP has expired. Please click "Resend OTP".';
+    const errorCode = error?.code || 'auth/unknown';
+    let friendlyError = `[${errorCode}]: ${error.message}`;
+
+    if (errorCode === 'auth/invalid-verification-code') {
+      friendlyError = '[auth/invalid-verification-code]: Incorrect OTP code. Please enter the 6-digit code received on your phone.';
+    } else if (errorCode === 'auth/code-expired') {
+      friendlyError = '[auth/code-expired]: OTP has expired. Please click "Resend OTP".';
     }
-    return { success: false, error: friendlyError, rawError: error };
+    return { success: false, error: friendlyError, code: errorCode, rawError: error };
   }
 }
