@@ -519,7 +519,14 @@ export default function CreativeLoginPortal() {
 
         {/* Right Top Header Navigation */}
         <div className="flex items-center gap-2.5">
-
+          <button
+            onClick={() => setShowGatewayModal(true)}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-emerald-800/80 bg-emerald-950/50 hover:bg-emerald-900/80 text-emerald-300 hover:text-white text-xs font-bold transition-all duration-200 backdrop-blur-md hover:border-emerald-600 shadow-sm"
+            title="Configure WhatsApp & SMS Gateway"
+          >
+            <Settings className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="hidden sm:inline">{lang === 'hi' ? 'व्हाट्सएप गेटवे' : 'WhatsApp Gateway'}</span>
+          </button>
 
           <a
             href="#admin"
