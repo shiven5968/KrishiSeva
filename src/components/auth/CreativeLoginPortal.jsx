@@ -485,18 +485,24 @@ export default function CreativeLoginPortal() {
   return (
     <div className="min-h-screen bg-stone-950 text-stone-100 flex flex-col relative overflow-hidden selection:bg-emerald-500 selection:text-stone-950 font-sans">
       
-      {/* ───── Rich Animated Background ───── */}
-      <div className="absolute inset-0 pointer-events-none">
-        {/* Main radial glow */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(16,185,129,0.18),transparent)]" />
-        {/* Left orb */}
-        <div className="absolute top-1/4 -left-32 w-80 h-80 bg-emerald-500/10 rounded-full blur-[100px] animate-float-slow" />
-        {/* Right orb */}
-        <div className="absolute bottom-1/4 -right-32 w-80 h-80 bg-teal-400/8 rounded-full blur-[100px] animate-float-delayed" />
-        {/* Bottom warm glow */}
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-48 bg-amber-500/5 rounded-full blur-[80px]" />
-        {/* Grid pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(to_right,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:64px_64px]" />
+      {/* ───── Cinematic Hero Background Video ───── */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+          poster="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=1920&q=80"
+        >
+          <source src="https://videos.pexels.com/video-files/2421545/2421545-hd_1920_1080_30fps.mp4" type="video/mp4" />
+        </video>
+        {/* Dark cinematic overlay for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-stone-950/80 via-stone-950/70 to-stone-950/90" />
+        {/* Emerald accent glow on top */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(16,185,129,0.12),transparent)]" />
+        {/* Subtle grid pattern overlay */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(to_right,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:64px_64px]" />
       </div>
 
       {/* ───── Floating Decorative Emojis ───── */}

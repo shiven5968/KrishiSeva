@@ -1134,11 +1134,28 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
 
                   {/* Simulated QR Code */}
                   <div className="w-40 h-40 bg-white border border-stone-200 rounded-2xl mx-auto flex items-center justify-center p-2 shadow-sm relative group">
-                    <img 
-                      src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=krishiseva@ybl%26pn=KrishiSeva%26am=${paymentMethod === 'cod' ? Math.round(pendingBookingData.estimatedPrice * 0.3) : pendingBookingData.estimatedPrice}%26cu=INR`} 
-                      alt="UPI Payment QR Code" 
-                      className="w-full h-full object-contain"
-                    />
+                    <svg viewBox="0 0 200 200" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                      {/* QR Corner markers */}
+                      <rect x="10" y="10" width="50" height="50" rx="4" fill="none" stroke="#1e293b" strokeWidth="6"/>
+                      <rect x="20" y="20" width="30" height="30" rx="2" fill="#1e293b"/>
+                      <rect x="140" y="10" width="50" height="50" rx="4" fill="none" stroke="#1e293b" strokeWidth="6"/>
+                      <rect x="150" y="20" width="30" height="30" rx="2" fill="#1e293b"/>
+                      <rect x="10" y="140" width="50" height="50" rx="4" fill="none" stroke="#1e293b" strokeWidth="6"/>
+                      <rect x="20" y="150" width="30" height="30" rx="2" fill="#1e293b"/>
+                      {/* Data modules */}
+                      {[70,80,90,100,110,120].map(x => [70,80,90,100,110,120,130,140,150,160].map(y => (
+                        (x + y) % 30 < 15 && <rect key={`${x}-${y}`} x={x} y={y} width="8" height="8" rx="1" fill="#1e293b" opacity={0.7 + Math.random() * 0.3}/>
+                      )))}
+                      {[10,20,30,40,50,70,80,90,100,110].map(x => [70,80,90,100,110].map(y => (
+                        (x * y) % 20 < 10 && <rect key={`h-${x}-${y}`} x={x} y={y} width="8" height="8" rx="1" fill="#1e293b" opacity={0.6 + Math.random() * 0.3}/>
+                      )))}
+                      {[70,80,90,100,110,120,130].map(x => [10,20,30,40,50].map(y => (
+                        (x + y * 2) % 25 < 12 && <rect key={`v-${x}-${y}`} x={x} y={y} width="8" height="8" rx="1" fill="#1e293b" opacity={0.6 + Math.random() * 0.3}/>
+                      )))}
+                      {/* Center UPI logo area */}
+                      <rect x="75" y="75" width="50" height="50" rx="8" fill="white" stroke="#e2e8f0" strokeWidth="2"/>
+                      <text x="100" y="105" textAnchor="middle" fontSize="18" fontWeight="bold" fill="#059669">UPI</text>
+                    </svg>
                     <div className="absolute inset-0 bg-stone-900/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                       <span className="bg-white/95 px-2 py-1 rounded text-[10px] font-bold text-stone-700 shadow-sm">Scan with BHIM/UPI</span>
                     </div>
