@@ -38,11 +38,64 @@ import {
   X,
   Plus,
   Minus,
-  Edit3,
   LandPlot,
   Ruler,
-  ShieldCheck
+  ShieldCheck,
+  Wrench,
+  Sprout
 } from 'lucide-react';
+
+// Refined Vector Icon Helpers
+const getCategoryIcon = (catId, isSelected) => {
+  switch (catId) {
+    case 'tractor':
+      return <Tractor className={`w-7 h-7 ${isSelected ? 'text-emerald-400' : 'text-stone-400'}`} />;
+    case 'harvester':
+      return <Wheat className={`w-7 h-7 ${isSelected ? 'text-amber-400' : 'text-stone-400'}`} />;
+    case 'jcb':
+      return <Layers className={`w-7 h-7 ${isSelected ? 'text-orange-400' : 'text-stone-400'}`} />;
+    case 'truck':
+      return <Truck className={`w-7 h-7 ${isSelected ? 'text-blue-400' : 'text-stone-400'}`} />;
+    default:
+      return <Tractor className="w-7 h-7 text-emerald-400" />;
+  }
+};
+
+const getAttachmentIcon = (attId, isSelected) => {
+  switch (attId) {
+    case 'rotavator':
+      return <Settings2 className={`w-5 h-5 ${isSelected ? 'text-emerald-400' : 'text-stone-400'}`} />;
+    case 'plough':
+      return <Wrench className={`w-5 h-5 ${isSelected ? 'text-emerald-400' : 'text-stone-400'}`} />;
+    case 'cultivator':
+      return <Wheat className={`w-5 h-5 ${isSelected ? 'text-amber-400' : 'text-stone-400'}`} />;
+    case 'seedDrill':
+      return <Sprout className={`w-5 h-5 ${isSelected ? 'text-emerald-400' : 'text-stone-400'}`} />;
+    case 'laserLeveler':
+      return <Zap className={`w-5 h-5 ${isSelected ? 'text-blue-400' : 'text-stone-400'}`} />;
+    default:
+      return <Settings2 className="w-5 h-5 text-emerald-400" />;
+  }
+};
+
+const getUnitIcon = (unitId, isSelected) => {
+  switch (unitId) {
+    case 'bigha':
+      return <LandPlot className={`w-4 h-4 ${isSelected ? 'text-emerald-400' : 'text-stone-400'}`} />;
+    case 'acre':
+      return <Tractor className={`w-4 h-4 ${isSelected ? 'text-teal-400' : 'text-stone-400'}`} />;
+    case 'hectare':
+      return <Ruler className={`w-4 h-4 ${isSelected ? 'text-blue-400' : 'text-stone-400'}`} />;
+    case 'hours':
+      return <Clock className={`w-4 h-4 ${isSelected ? 'text-amber-400' : 'text-stone-400'}`} />;
+    case 'biswa':
+      return <Layers className={`w-4 h-4 ${isSelected ? 'text-purple-400' : 'text-stone-400'}`} />;
+    case 'kanal':
+      return <Wheat className={`w-4 h-4 ${isSelected ? 'text-emerald-400' : 'text-stone-400'}`} />;
+    default:
+      return <LandPlot className="w-4 h-4 text-emerald-400" />;
+  }
+};
 
 export default function FarmerBookingView({ onOpenAuthModal }) {
   const { lang, t } = useLanguage();
@@ -310,36 +363,37 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 animate-fade-in">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 animate-fade-in text-stone-100">
       
       {/* Top Banner: Saved Lands & Pre-Bookings Manager Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-stone-900 via-stone-900 to-emerald-950/40 text-white p-4 sm:p-5 rounded-3xl border border-stone-800/80 shadow-lg relative overflow-hidden group">
-        {/* Subtle gradient shimmer */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-500/3 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-stone-900/80 backdrop-blur-xl text-white p-5 rounded-3xl border border-stone-800 shadow-2xl relative overflow-hidden group">
+        <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
         
-        <div className="relative flex items-center gap-3">
-          <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-black text-lg shadow-inner">
-            🌾
+        <div className="relative flex items-center gap-3.5">
+          <div className="w-12 h-12 rounded-2xl bg-emerald-950/80 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-black shadow-lg shadow-emerald-950/50">
+            <Tractor className="w-6 h-6 text-emerald-400" />
           </div>
           <div>
-            <h2 className="font-extrabold text-sm sm:text-base text-white flex items-center gap-2">
-              <span>{lang === 'hi' ? 'किसान बुकिंग डैशबोर्ड' : 'Farmer Booking Cockpit'}</span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-700/50 font-bold backdrop-blur-sm">
+            <div className="flex items-center gap-2">
+              <h2 className="font-black text-base sm:text-lg text-white tracking-tight">
+                {lang === 'hi' ? 'किसान बुकिंग कॉकपिट' : 'Farmer Booking Cockpit'}
+              </h2>
+              <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-950/90 text-emerald-300 border border-emerald-500/40 font-extrabold uppercase tracking-wider backdrop-blur-sm">
                 {lang === 'hi' ? '1-क्लिक वाहन सेवा' : '1-Click Dispatch'}
               </span>
-            </h2>
-            <p className="text-xs text-stone-400 font-medium">
-              {lang === 'hi' ? 'चयनित खेत: ' : 'Active Land: '}
-              <b className="text-emerald-400">{selectedLand?.name || (lang === 'hi' ? 'मेरा खेत' : 'My Farm')} ({selectedLand?.bigha || 3} {lang === 'hi' ? 'बीघा' : 'Bigha'})</b>
+            </div>
+            <p className="text-xs text-stone-400 font-medium mt-0.5">
+              {lang === 'hi' ? 'सक्रिय खेत: ' : 'Active Land: '}
+              <span className="text-emerald-400 font-bold">{selectedLand?.name || (lang === 'hi' ? 'मेरा खेत' : 'My Farm')} ({selectedLand?.bigha || 3} {lang === 'hi' ? 'बीघा' : 'Bigha'})</span>
             </p>
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="relative flex items-center gap-2">
+        <div className="relative flex items-center gap-2.5">
           <button
             onClick={() => setIsPreBookingsModalOpen(true)}
-            className="px-3.5 py-2.5 rounded-xl bg-blue-950/80 hover:bg-blue-900 text-blue-300 border border-blue-700/60 hover:border-blue-600 font-black text-xs flex items-center gap-1.5 transition-all duration-200 active:scale-95 shadow-sm hover:shadow-blue-500/10"
+            className="px-4 py-2.5 rounded-xl bg-blue-950/70 hover:bg-blue-900/90 text-blue-300 border border-blue-500/30 hover:border-blue-500/60 font-bold text-xs flex items-center gap-2 transition-all duration-200 active:scale-95 shadow-md shadow-blue-950/30"
           >
             <Calendar className="w-3.5 h-3.5 text-blue-400" />
             <span>{lang === 'hi' ? 'अग्रिम बुकिंग' : 'Pre-Bookings'} ({preBookings.length})</span>
@@ -347,7 +401,7 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
 
           <button
             onClick={() => setIsSavedLandsModalOpen(true)}
-            className="px-3.5 py-2.5 rounded-xl bg-stone-800/80 hover:bg-stone-700 text-stone-200 border border-stone-700/60 hover:border-stone-600 font-bold text-xs flex items-center gap-1.5 transition-all duration-200 active:scale-95 hover:shadow-emerald-500/10"
+            className="px-4 py-2.5 rounded-xl bg-stone-850/90 hover:bg-stone-800 text-stone-200 border border-stone-700/80 hover:border-emerald-500/50 font-bold text-xs flex items-center gap-2 transition-all duration-200 active:scale-95 shadow-md shadow-black/40"
           >
             <Bookmark className="w-3.5 h-3.5 text-emerald-400" />
             <span>{lang === 'hi' ? 'सहेजे गए खेत' : 'My Saved Lands'} ({savedLands.length})</span>
@@ -361,46 +415,48 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
         <div className="lg:col-span-7 space-y-6">
           
           {/* STEP 1: Select Booking Timing (Instant vs Pre-Book) */}
-          <div className="bg-white rounded-3xl p-6 border border-stone-200/80 shadow-sm hover:shadow-md transition-all duration-300 space-y-4">
+          <div className="bg-stone-900/70 backdrop-blur-xl rounded-3xl p-6 sm:p-7 border border-stone-800/80 shadow-2xl space-y-5">
             <div className="flex items-center justify-between">
               <div>
-                <span className="text-xs font-black uppercase text-stone-400">{lang === 'hi' ? 'चरण 1' : 'Step 1'}</span>
-                <h3 className="text-lg font-black text-stone-900">
+                <span className="text-[11px] font-black uppercase tracking-widest text-emerald-400/90">{lang === 'hi' ? 'चरण 1' : 'STEP 1'}</span>
+                <h3 className="text-lg sm:text-xl font-black text-white tracking-tight mt-0.5">
                   {lang === 'hi' ? 'बुकिंग का समय चुनें' : 'Select Booking Timing'}
                 </h3>
               </div>
-              <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-200 flex items-center gap-1">
-                <Calendar className="w-3 h-3" />
+              <span className="text-xs font-bold text-blue-400 bg-blue-950/70 px-3 py-1 rounded-full border border-blue-500/30 flex items-center gap-1.5 backdrop-blur-sm">
+                <Calendar className="w-3.5 h-3.5" />
                 <span>{bookingTimingMode === 'schedule' ? (lang === 'hi' ? 'अग्रिम आरक्षण' : 'Advanced Reservation') : (lang === 'hi' ? 'तत्काल सेवा' : 'Immediate Need')}</span>
               </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               
               {/* Option A: Instant Dispatch (Now) */}
               <div
                 onClick={() => setBookingTimingMode('instant')}
-                className={`p-4 rounded-2xl border-2 transition cursor-pointer space-y-2 ${
+                className={`p-4 sm:p-5 rounded-2xl border transition-all duration-300 cursor-pointer space-y-3 relative overflow-hidden group ${
                   bookingTimingMode === 'instant'
-                    ? 'border-emerald-600 bg-emerald-50/70 shadow-md ring-2 ring-emerald-500/20'
-                    : 'border-stone-200 bg-stone-50 hover:bg-stone-100'
+                    ? 'border-emerald-500/70 bg-emerald-950/40 shadow-xl shadow-emerald-950/50 ring-1 ring-emerald-500/40'
+                    : 'border-stone-800 bg-stone-950/60 hover:border-stone-700 hover:bg-stone-900/60 text-stone-300'
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-black text-base">
-                    ⚡
-                  </div>
-                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                    bookingTimingMode === 'instant' ? 'border-emerald-600 bg-emerald-600' : 'border-stone-300'
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+                    bookingTimingMode === 'instant' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' : 'bg-stone-850 text-stone-400 border border-stone-700'
                   }`}>
-                    {bookingTimingMode === 'instant' && <Check className="w-3 h-3 text-white stroke-[3]" />}
+                    <Zap className="w-5 h-5 text-emerald-400" />
+                  </div>
+                  <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition ${
+                    bookingTimingMode === 'instant' ? 'border-emerald-500 bg-emerald-500' : 'border-stone-700 bg-stone-900'
+                  }`}>
+                    {bookingTimingMode === 'instant' && <Check className="w-3 h-3 text-stone-950 stroke-[3]" />}
                   </div>
                 </div>
                 <div>
-                  <h4 className="font-black text-stone-900 text-sm">
+                  <h4 className="font-extrabold text-white text-sm sm:text-base">
                     {lang === 'hi' ? 'तुरंत मंगाएं' : 'Instant Dispatch (Now)'}
                   </h4>
-                  <p className="text-xs text-stone-500 font-semibold mt-0.5">
+                  <p className="text-xs text-stone-400 font-medium mt-1">
                     {lang === 'hi' ? 'खेत पर आगमन: ~35-60 मिनट' : 'Farm Arrival: ~35-60 Mins'}
                   </p>
                 </div>
@@ -409,27 +465,29 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
               {/* Option B: Pre-Book for Date & Day */}
               <div
                 onClick={() => setBookingTimingMode('schedule')}
-                className={`p-4 rounded-2xl border-2 transition cursor-pointer space-y-2 ${
+                className={`p-4 sm:p-5 rounded-2xl border transition-all duration-300 cursor-pointer space-y-3 relative overflow-hidden group ${
                   bookingTimingMode === 'schedule'
-                    ? 'border-blue-600 bg-blue-50/70 shadow-md ring-2 ring-blue-500/20'
-                    : 'border-stone-200 bg-stone-50 hover:bg-stone-100'
+                    ? 'border-blue-500/70 bg-blue-950/40 shadow-xl shadow-blue-950/50 ring-1 ring-blue-500/40'
+                    : 'border-stone-800 bg-stone-950/60 hover:border-stone-700 hover:bg-stone-900/60 text-stone-300'
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <div className="w-9 h-9 rounded-xl bg-blue-100 text-blue-800 flex items-center justify-center font-black text-base">
-                    📅
-                  </div>
-                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                    bookingTimingMode === 'schedule' ? 'border-blue-600 bg-blue-600' : 'border-stone-300'
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+                    bookingTimingMode === 'schedule' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/40' : 'bg-stone-850 text-stone-400 border border-stone-700'
                   }`}>
-                    {bookingTimingMode === 'schedule' && <Check className="w-3 h-3 text-white stroke-[3]" />}
+                    <CalendarDays className="w-5 h-5 text-blue-400" />
+                  </div>
+                  <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition ${
+                    bookingTimingMode === 'schedule' ? 'border-blue-500 bg-blue-500' : 'border-stone-700 bg-stone-900'
+                  }`}>
+                    {bookingTimingMode === 'schedule' && <Check className="w-3 h-3 text-stone-950 stroke-[3]" />}
                   </div>
                 </div>
                 <div>
-                  <h4 className="font-black text-stone-900 text-sm">
+                  <h4 className="font-extrabold text-white text-sm sm:text-base">
                     {lang === 'hi' ? 'अग्रिम तारीख के लिए बुक करें' : 'Pre-Book for Date & Day'}
                   </h4>
-                  <p className="text-xs text-stone-500 font-semibold mt-0.5">
+                  <p className="text-xs text-stone-400 font-medium mt-1">
                     {lang === 'hi' ? 'आगामी जुताई/कटाई के लिए आरक्षित' : 'Reserve machinery in advance'}
                   </p>
                 </div>
@@ -439,16 +497,16 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
 
             {/* PRE-BOOKING SPECIFIC INPUTS (Date, Day & Time Slot) */}
             {bookingTimingMode === 'schedule' && (
-              <div className="p-4 rounded-2xl bg-blue-950 text-white space-y-4 border border-blue-800 shadow-md animate-fade-in">
-                <div className="flex items-center gap-2 text-xs font-black text-blue-300 uppercase tracking-wider">
+              <div className="p-5 rounded-2xl bg-stone-950/90 text-white space-y-4 border border-blue-500/30 shadow-2xl animate-fade-in">
+                <div className="flex items-center gap-2 text-xs font-black text-blue-400 uppercase tracking-wider">
                   <Calendar className="w-4 h-4 text-blue-400" />
                   <span>{lang === 'hi' ? 'अग्रिम बुकिंग विवरण' : 'Pre-Booking Schedule Details'}</span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-stone-900">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   {/* Date Picker */}
                   <div>
-                    <label className="block text-[11px] font-black text-blue-200 uppercase mb-1">
+                    <label className="block text-[11px] font-black text-stone-400 uppercase mb-1.5">
                       {lang === 'hi' ? 'तारीख चुनें *' : 'Select Date *'}
                     </label>
                     <input
@@ -456,16 +514,16 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
                       min={tomorrowStr}
                       value={scheduledDate}
                       onChange={(e) => setScheduledDate(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-blue-400 bg-white font-black text-xs text-stone-900 outline-none focus:ring-2 focus:ring-blue-300"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-stone-700 bg-stone-900 font-bold text-xs text-white outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
                     />
                   </div>
 
                   {/* Day of Week Display */}
                   <div>
-                    <label className="block text-[11px] font-black text-blue-200 uppercase mb-1">
+                    <label className="block text-[11px] font-black text-stone-400 uppercase mb-1.5">
                       {lang === 'hi' ? 'दिन' : 'Day of Week'}
                     </label>
-                    <div className="px-3.5 py-2.5 rounded-xl bg-blue-900/90 border border-blue-700 font-black text-xs text-amber-300 flex items-center gap-2">
+                    <div className="px-3.5 py-2.5 rounded-xl bg-stone-900 border border-stone-700 font-bold text-xs text-amber-400 flex items-center gap-2">
                       <CalendarDays className="w-4 h-4" />
                       <span>{computedDayOfWeek}</span>
                     </div>
@@ -473,36 +531,36 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
                 </div>
 
                 {/* Time Window Selection */}
-                <div className="space-y-1.5">
-                  <label className="block text-[11px] font-black text-blue-200 uppercase">
+                <div className="space-y-2">
+                  <label className="block text-[11px] font-black text-stone-400 uppercase">
                     {lang === 'hi' ? 'समय का स्लॉट *' : 'Time Slot *'}
                   </label>
-                  <div className="grid grid-cols-1 gap-2 text-stone-900">
+                  <div className="grid grid-cols-1 gap-2">
                     {timeSlotOptions.map(slot => (
                       <div
                         key={slot.id}
                         onClick={() => setScheduledTimeSlot(slot.id)}
-                        className={`p-3 rounded-xl border-2 transition cursor-pointer flex items-center justify-between ${
+                        className={`p-3.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${
                           scheduledTimeSlot === slot.id
-                            ? 'border-amber-400 bg-blue-900 text-white'
-                            : 'border-blue-800 bg-blue-900/40 text-blue-200 hover:bg-blue-900/70'
+                            ? 'border-amber-500/70 bg-amber-950/30 text-white'
+                            : 'border-stone-800 bg-stone-900/60 text-stone-300 hover:border-stone-700'
                         }`}
                       >
-                        <div className="flex items-center gap-2.5">
-                          <span className="text-base">{slot.icon}</span>
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg">{slot.icon}</span>
                           <div>
-                            <span className="font-black text-xs block">
+                            <span className="font-extrabold text-xs block text-white">
                               {lang === 'hi' ? slot.labelHi : slot.labelEn}
                             </span>
-                            <span className="text-[10px] text-blue-300">
+                            <span className="text-[11px] text-stone-400 font-medium">
                               {slot.desc}
                             </span>
                           </div>
                         </div>
-                        <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                          scheduledTimeSlot === slot.id ? 'border-amber-400 bg-amber-400' : 'border-blue-600'
+                        <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                          scheduledTimeSlot === slot.id ? 'border-amber-400 bg-amber-400' : 'border-stone-700'
                         }`}>
-                          {scheduledTimeSlot === slot.id && <div className="w-1.5 h-1.5 rounded-full bg-blue-950" />}
+                          {scheduledTimeSlot === slot.id && <div className="w-1.5 h-1.5 rounded-full bg-stone-950" />}
                         </div>
                       </div>
                     ))}
@@ -511,7 +569,7 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
 
                 {/* Special Instructions Note */}
                 <div>
-                  <label className="block text-[11px] font-black text-blue-200 uppercase mb-1">
+                  <label className="block text-[11px] font-black text-stone-400 uppercase mb-1.5">
                     {lang === 'hi' ? 'खेत निर्देश / विशेष विवरण' : 'Farm Instructions / Special Notes'}
                   </label>
                   <input
@@ -519,7 +577,7 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
                     value={specialNotes}
                     onChange={(e) => setSpecialNotes(e.target.value)}
                     placeholder={lang === 'hi' ? 'उदा. सड़क से खेत तक चकमार्ग उपलब्ध है' : 'e.g. Approach pathway available from main road'}
-                    className="w-full px-3.5 py-2 rounded-xl border border-blue-700 bg-blue-900/70 text-white text-xs outline-none placeholder:text-blue-400 focus:border-amber-400"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-stone-700 bg-stone-900 text-white text-xs outline-none placeholder:text-stone-500 focus:border-blue-500 transition"
                   />
                 </div>
               </div>
@@ -527,36 +585,42 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
           </div>
 
           {/* STEP 2: Machinery Selection */}
-          <div className="bg-white rounded-3xl p-6 border border-stone-200/80 shadow-sm hover:shadow-md transition-all duration-300 space-y-4">
+          <div className="bg-stone-900/70 backdrop-blur-xl rounded-3xl p-6 sm:p-7 border border-stone-800/80 shadow-2xl space-y-5">
             <div className="flex items-center justify-between">
               <div>
-                <span className="text-xs font-black uppercase text-stone-400">{lang === 'hi' ? 'चरण 2' : 'Step 2'}</span>
-                <h3 className="text-lg font-black text-stone-900">{t('selectMachinery')}</h3>
+                <span className="text-[11px] font-black uppercase tracking-widest text-emerald-400/90">{lang === 'hi' ? 'चरण 2' : 'STEP 2'}</span>
+                <h3 className="text-lg sm:text-xl font-black text-white tracking-tight mt-0.5">
+                  {lang === 'hi' ? 'मशीनरी का चयन करें' : 'Select Machinery Fleet'}
+                </h3>
               </div>
-              <span className="text-xs text-stone-500 font-bold">
+              <span className="text-xs text-stone-400 font-bold px-3 py-1 rounded-full bg-stone-800 border border-stone-700">
                 {currentCategory.capacity}
               </span>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
               {MACHINERY_CATEGORIES.map(cat => {
                 const isSelected = selectedCategoryId === cat.id;
                 return (
                   <div
                     key={cat.id}
                     onClick={() => handleCategoryChange(cat.id)}
-                    className={`p-4 rounded-2xl border-2 transition cursor-pointer text-center space-y-2 ${
+                    className={`p-4 rounded-2xl border transition-all duration-300 cursor-pointer text-center space-y-2.5 relative group ${
                       isSelected
-                        ? 'border-emerald-600 bg-emerald-50/70 shadow-sm ring-2 ring-emerald-500/20'
-                        : 'border-stone-200 hover:bg-stone-50'
+                        ? 'border-emerald-500/80 bg-emerald-950/40 shadow-xl shadow-emerald-950/60 ring-1 ring-emerald-500/40'
+                        : 'border-stone-800 bg-stone-950/60 hover:border-stone-700 hover:bg-stone-900/60 text-stone-300'
                     }`}
                   >
-                    <span className="text-3xl block">{cat.icon}</span>
+                    <div className={`w-12 h-12 rounded-2xl mx-auto flex items-center justify-center transition-all ${
+                      isSelected ? 'bg-emerald-500/20 border border-emerald-500/40' : 'bg-stone-855 border border-stone-700'
+                    }`}>
+                      {getCategoryIcon(cat.id, isSelected)}
+                    </div>
                     <div>
-                      <h4 className="font-extrabold text-xs text-stone-900">
+                      <h4 className="font-extrabold text-xs sm:text-sm text-white">
                         {t(cat.nameKey)}
                       </h4>
-                      <span className="text-[10px] font-black text-emerald-700 mt-1 block">
+                      <span className="text-xs font-black text-emerald-400 mt-1 block tracking-wide">
                         {cat.id === 'truck' ? `₹${rates.truck?.ratePerKm}/km` : cat.id === 'jcb' ? `₹${rates.jcb?.ratePerHour}/${lang === 'hi' ? 'घंटा' : 'hr'}` : `₹${rates[cat.id]?.ratePerBigha}/${lang === 'hi' ? 'बीघा' : 'bigha'}`}
                       </span>
                     </div>
@@ -568,39 +632,43 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
 
           {/* STEP 3: Mandatory Implement/Attachment Selection for Tractors */}
           {currentCategory.attachments && currentCategory.attachments.length > 0 && (
-            <div className="bg-white rounded-3xl p-6 border border-stone-200 shadow-sm space-y-4 animate-fade-in">
+            <div className="bg-stone-900/70 backdrop-blur-xl rounded-3xl p-6 sm:p-7 border border-stone-800/80 shadow-2xl space-y-5 animate-fade-in">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-xs font-black uppercase text-stone-400">{lang === 'hi' ? 'चरण 3' : 'Step 3'}</span>
-                  <h3 className="text-lg font-black text-stone-900">
+                  <span className="text-[11px] font-black uppercase tracking-widest text-emerald-400/90">{lang === 'hi' ? 'चरण 3' : 'STEP 3'}</span>
+                  <h3 className="text-lg sm:text-xl font-black text-white tracking-tight mt-0.5">
                     {lang === 'hi' ? 'यंत्र / उपकरण जोड़ें' : 'Select Implement / Attachment'}
                   </h3>
                 </div>
-                <span className="text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-200">
+                <span className="text-xs font-bold text-amber-400 bg-amber-950/70 px-3 py-1 rounded-full border border-amber-500/30">
                   {lang === 'hi' ? 'अनिवार्य उपकरण' : 'Mandatory Implement'}
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 {currentCategory.attachments.map(att => {
                   const isSelected = selectedAttachmentId === att.id;
                   return (
                     <div
                       key={att.id}
                       onClick={() => setSelectedAttachmentId(att.id)}
-                      className={`p-3.5 rounded-2xl border-2 transition cursor-pointer flex items-center justify-between gap-3 ${
+                      className={`p-4 rounded-2xl border transition-all duration-300 cursor-pointer flex items-center justify-between gap-3 ${
                         isSelected
-                          ? 'border-emerald-600 bg-emerald-50/70 shadow-sm'
-                          : 'border-stone-200 hover:bg-stone-50'
+                          ? 'border-emerald-500/80 bg-emerald-950/40 shadow-xl shadow-emerald-950/60 ring-1 ring-emerald-500/40'
+                          : 'border-stone-800 bg-stone-950/60 hover:border-stone-700 hover:bg-stone-900/60 text-stone-300'
                       }`}
                     >
-                      <div className="flex items-center gap-3">
-                        <span className="text-2xl">{att.icon}</span>
+                      <div className="flex items-center gap-3.5">
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+                          isSelected ? 'bg-emerald-500/20 border border-emerald-500/40' : 'bg-stone-850 border border-stone-700'
+                        }`}>
+                          {getAttachmentIcon(att.id, isSelected)}
+                        </div>
                         <div>
-                          <h5 className="font-extrabold text-xs text-stone-900">
+                          <h5 className="font-extrabold text-xs sm:text-sm text-white">
                             {t(att.nameKey)}
                           </h5>
-                          <p className="text-[10px] text-stone-500 font-semibold">
+                          <p className="text-[11px] text-stone-400 font-medium">
                             {t(att.descKey)}
                           </p>
                         </div>
@@ -608,11 +676,11 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
 
                       <div className="text-right shrink-0">
                         {att.extraRatePerAcre > 0 ? (
-                          <span className="text-[11px] font-black text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+                          <span className="text-xs font-black text-amber-400 bg-amber-950/60 px-2.5 py-1 rounded-lg border border-amber-500/30">
                             +₹{att.extraRatePerAcre}/{lang === 'hi' ? 'बीघा' : 'bigha'}
                           </span>
                         ) : (
-                          <span className="text-[11px] font-black text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                          <span className="text-xs font-black text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded-lg border border-emerald-500/30">
                             {lang === 'hi' ? 'सम्मिलित' : 'Included'}
                           </span>
                         )}
@@ -625,15 +693,15 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
           )}
 
           {/* STEP 4: Universal Multi-Unit Farmland Size & Quantity Selector */}
-          <div className="bg-white rounded-3xl p-6 border border-stone-200/80 shadow-sm hover:shadow-md transition-all duration-300 space-y-4">
+          <div className="bg-stone-900/70 backdrop-blur-xl rounded-3xl p-6 sm:p-7 border border-stone-800/80 shadow-2xl space-y-5">
             <div className="flex items-center justify-between">
               <div>
-                <span className="text-xs font-black uppercase text-stone-400">{lang === 'hi' ? 'चरण 4' : 'Step 4'}</span>
-                <h3 className="text-lg font-black text-stone-900">
+                <span className="text-[11px] font-black uppercase tracking-widest text-emerald-400/90">{lang === 'hi' ? 'चरण 4' : 'STEP 4'}</span>
+                <h3 className="text-lg sm:text-xl font-black text-white tracking-tight mt-0.5">
                   {lang === 'hi' ? 'खेत का आकार व मात्रा' : 'Farmland Size & Quantity'}
                 </h3>
               </div>
-              <span className="text-xs font-black text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200 flex items-center gap-1">
+              <span className="text-xs font-black text-emerald-400 bg-emerald-950/70 px-3 py-1 rounded-full border border-emerald-500/30 flex items-center gap-1.5">
                 <Ruler className="w-3.5 h-3.5" />
                 <span>{lang === 'hi' ? 'सभी इकाइयाँ समर्थित' : 'Multi-Unit Enabled'}</span>
               </span>
@@ -641,11 +709,11 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
 
             {/* Mode 1: Tractor & Harvester & Multi-Unit Land Operations */}
             {(selectedCategoryId === 'tractor' || selectedCategoryId === 'harvester' || selectedCategoryId === 'jcb') && (
-              <div className="space-y-4">
+              <div className="space-y-5">
                 
                 {/* Interactive Unit Selection Pills */}
                 <div>
-                  <label className="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-2">
+                  <label className="block text-xs font-bold text-stone-400 uppercase tracking-wider mb-2.5">
                     {lang === 'hi' ? 'माप की इकाई चुनें:' : 'Select Measurement Unit:'}
                   </label>
                   
@@ -657,14 +725,16 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
                           key={unitObj.id}
                           type="button"
                           onClick={() => handleUnitChange(unitObj.id)}
-                          className={`p-2.5 rounded-2xl border-2 transition text-center space-y-1 active:scale-95 ${
+                          className={`p-3 rounded-2xl border transition-all text-center space-y-1.5 active:scale-95 ${
                             isUnitSelected
-                              ? 'border-emerald-600 bg-emerald-50 text-emerald-950 shadow-sm font-black'
-                              : 'border-stone-200 bg-stone-50 hover:bg-stone-100 text-stone-600 font-bold'
+                              ? 'border-emerald-500/80 bg-emerald-950/50 text-white shadow-lg shadow-emerald-950/60 ring-1 ring-emerald-500/40 font-extrabold'
+                              : 'border-stone-800 bg-stone-950/60 hover:border-stone-700 text-stone-400 font-bold'
                           }`}
                         >
-                          <span className="text-base block">{unitObj.icon}</span>
-                          <span className="text-xs block">{lang === 'hi' ? unitObj.labelHi : unitObj.labelEn}</span>
+                          <div className="flex justify-center">
+                            {getUnitIcon(unitObj.id, isUnitSelected)}
+                          </div>
+                          <span className="text-xs block text-stone-200">{lang === 'hi' ? unitObj.labelHi : unitObj.labelEn}</span>
                         </button>
                       );
                     })}
@@ -672,12 +742,12 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
                 </div>
 
                 {/* Primary Interactive Typing Box + Steppers */}
-                <div className="p-4 rounded-2xl bg-stone-50 border-2 border-stone-200 space-y-3">
-                  <div className="flex items-center gap-3">
+                <div className="p-5 rounded-2xl bg-stone-950/80 border border-stone-800 space-y-4">
+                  <div className="flex items-center gap-3.5">
                     <button
                       type="button"
                       onClick={() => handleQuantityStep(-(currentUnitMeta.step || 0.5))}
-                      className="w-12 h-12 rounded-2xl bg-white border border-stone-300 hover:bg-stone-100 text-stone-800 font-black text-xl flex items-center justify-center shadow-sm active:scale-95 transition"
+                      className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-stone-900 border border-stone-700 hover:border-emerald-500 text-stone-200 hover:text-emerald-400 font-black text-2xl flex items-center justify-center shadow-lg active:scale-95 transition"
                       title="Decrease"
                     >
                       <Minus className="w-5 h-5 stroke-[2.5]" />
@@ -691,9 +761,9 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
                         onChange={(e) => handleQuantityTextChange(e.target.value)}
                         onBlur={handleQuantityBlur}
                         placeholder={lang === 'hi' ? `उदा. ${currentUnitMeta.step || 2}` : `e.g. ${currentUnitMeta.step || 2}`}
-                        className="w-full px-4 py-3.5 rounded-2xl border-2 border-emerald-500 bg-white font-black text-stone-900 text-center text-2xl outline-none shadow-inner focus:ring-4 focus:ring-emerald-500/20"
+                        className="w-full px-4 py-3.5 rounded-2xl border border-stone-700 bg-stone-900 font-black text-emerald-400 text-center text-3xl sm:text-4xl outline-none shadow-inner focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
                       />
-                      <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-black text-stone-400 uppercase pointer-events-none">
+                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-black text-stone-500 uppercase pointer-events-none tracking-wider">
                         {lang === 'hi' ? currentUnitMeta.labelHi : currentUnitMeta.labelEn}
                       </span>
                     </div>
@@ -701,7 +771,7 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
                     <button
                       type="button"
                       onClick={() => handleQuantityStep(currentUnitMeta.step || 0.5)}
-                      className="w-12 h-12 rounded-2xl bg-white border border-stone-300 hover:bg-stone-100 text-stone-800 font-black text-xl flex items-center justify-center shadow-sm active:scale-95 transition"
+                      className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-stone-900 border border-stone-700 hover:border-emerald-500 text-stone-200 hover:text-emerald-400 font-black text-2xl flex items-center justify-center shadow-lg active:scale-95 transition"
                       title="Increase"
                     >
                       <Plus className="w-5 h-5 stroke-[2.5]" />
@@ -710,12 +780,12 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
 
                   {/* Equivalent Real-Time Conversion Tooltip */}
                   {conversionHints && (
-                    <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center justify-between">
+                    <div className="p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-emerald-300 text-xs font-semibold flex items-center justify-between">
                       <span className="flex items-center gap-1.5">
-                        <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                        <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
                         <span>{lang === 'hi' ? 'क्षेत्रफल रूपांतरण:' : 'Area Equivalence:'}</span>
                       </span>
-                      <span className="font-extrabold text-stone-900">
+                      <span className="font-extrabold text-white">
                         {lang === 'hi' 
                           ? `≈ ${conversionHints.bigha} बीघा | ${conversionHints.acre} एकड़ | ${conversionHints.hectare} हेक्टेयर`
                           : `≈ ${conversionHints.bigha} Bigha | ${conversionHints.acre} Acre | ${conversionHints.hectare} Hectare`}
@@ -732,9 +802,9 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
                       step={currentUnitMeta.step || 0.5}
                       value={quantityInput}
                       onChange={(e) => handleSliderQuantityChange(Number(e.target.value))}
-                      className="w-full accent-emerald-600 cursor-pointer h-2.5 bg-stone-200 rounded-lg"
+                      className="w-full accent-emerald-500 cursor-pointer h-2 bg-stone-800 rounded-lg"
                     />
-                    <div className="flex justify-between text-[10px] text-stone-400 font-bold mt-1">
+                    <div className="flex justify-between text-[11px] text-stone-400 font-bold mt-1.5">
                       <span>{currentUnitMeta.defaultMin} {lang === 'hi' ? currentUnitMeta.labelHi : currentUnitMeta.labelEn}</span>
                       <span>{Math.round((currentUnitMeta.defaultMax / 2) * 10) / 10} {lang === 'hi' ? currentUnitMeta.labelHi : currentUnitMeta.labelEn}</span>
                       <span>{currentUnitMeta.defaultMax} {lang === 'hi' ? currentUnitMeta.labelHi : currentUnitMeta.labelEn}</span>
@@ -742,8 +812,8 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
                   </div>
 
                   {/* Quick Preset Pills for Fast Selection */}
-                  <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                    <span className="text-[10px] text-stone-400 font-bold mr-1">{lang === 'hi' ? 'त्वरित चयन:' : 'Quick Select:'}</span>
+                  <div className="flex flex-wrap items-center gap-2 pt-1">
+                    <span className="text-[11px] text-stone-400 font-bold mr-1">{lang === 'hi' ? 'त्वरित चयन:' : 'Quick Select:'}</span>
                     {currentUnitMeta.presets.map(val => (
                       <button
                         key={val}
@@ -752,10 +822,10 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
                           setQuantityInput(val);
                           setQuantityText(String(val));
                         }}
-                        className={`px-2.5 py-1 rounded-lg text-xs font-bold transition ${
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
                           quantityInput === val
-                            ? 'bg-emerald-600 text-white shadow-sm'
-                            : 'bg-white border border-stone-200 text-stone-700 hover:bg-stone-100'
+                            ? 'bg-emerald-500 text-stone-950 shadow-md font-black'
+                            : 'bg-stone-900 border border-stone-800 text-stone-300 hover:border-emerald-500/40 hover:text-white'
                         }`}
                       >
                         {val} {lang === 'hi' ? currentUnitMeta.labelHi : currentUnitMeta.labelEn}
@@ -771,19 +841,19 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
             {/* Mode 2: Truck / Trolley (Distance) */}
             {selectedCategoryId === 'truck' && (
               <div className="space-y-3">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   {MOCK_DROP_LOCATIONS.map(loc => (
                     <div
                       key={loc.id}
                       onClick={() => setSelectedDropLocationId(loc.id)}
-                      className={`p-3 rounded-xl border-2 transition cursor-pointer text-xs flex items-center justify-between ${
+                      className={`p-3.5 rounded-2xl border transition-all cursor-pointer text-xs flex items-center justify-between ${
                         selectedDropLocationId === loc.id
-                          ? 'border-blue-600 bg-blue-50 text-blue-900 font-bold'
-                          : 'border-stone-200 hover:bg-stone-50 text-stone-700'
+                          ? 'border-blue-500/80 bg-blue-950/40 text-white font-bold'
+                          : 'border-stone-800 bg-stone-950/60 hover:border-stone-700 text-stone-300'
                       }`}
                     >
-                      <span>{loc.name}</span>
-                      <span className="font-black text-stone-900">~{loc.distanceKm} km</span>
+                      <span className="text-stone-200">{loc.name}</span>
+                      <span className="font-black text-blue-400">~{loc.distanceKm} km</span>
                     </div>
                   ))}
                 </div>
@@ -798,13 +868,13 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
         <div className="lg:col-span-5 space-y-6">
           
           {/* Live Map Preview */}
-          <div className="bg-white rounded-3xl p-5 border border-stone-200 shadow-sm space-y-3">
+          <div className="bg-stone-900/70 backdrop-blur-xl rounded-3xl p-5 border border-stone-800/80 shadow-2xl space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="font-extrabold text-sm text-stone-900 flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-emerald-600" />
+              <h3 className="font-extrabold text-sm text-white flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-emerald-400" />
                 <span>{lang === 'hi' ? 'खेत लोकेशन व रडार मैप' : 'Farm Location & Radar'}</span>
               </h3>
-              <span className="text-xs text-stone-500 font-bold">
+              <span className="text-xs text-stone-400 font-bold">
                 {selectedLand?.name || (lang === 'hi' ? 'मेरा खेत' : 'My Farm')}
               </span>
             </div>
@@ -817,31 +887,31 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
               activeVehicleType={selectedCategoryId}
               showNearbyDrivers={true}
               bookingStatus="idle"
-              className="h-[260px] w-full rounded-2xl"
+              className="h-[260px] w-full rounded-2xl overflow-hidden border border-stone-800"
             />
           </div>
 
           {/* TOTAL ESTIMATED PRICE CARD */}
-          <div className="bg-gradient-to-br from-stone-900 via-stone-850 to-stone-900 text-white rounded-3xl p-6 shadow-2xl border-2 border-emerald-500/40 space-y-5">
+          <div className="bg-gradient-to-br from-stone-900 via-stone-900 to-emerald-950/50 text-white rounded-3xl p-6 sm:p-7 shadow-2xl border border-emerald-500/30 space-y-5 relative overflow-hidden group">
             
-            <div className="flex items-center justify-between pb-3 border-b border-stone-700">
+            <div className="flex items-center justify-between pb-4 border-b border-stone-800">
               <div>
                 <span className="text-xs text-emerald-400 font-black uppercase tracking-wider flex items-center gap-1.5">
                   <Calculator className="w-4 h-4" />
                   <span>{t('estimatedPrice')}</span>
                 </span>
-                <div className="flex items-baseline gap-1 mt-1">
-                  <span className="text-4xl sm:text-5xl font-black text-white">
+                <div className="flex items-baseline gap-1 mt-1.5">
+                  <span className="text-4xl sm:text-5xl font-black text-white tracking-tight">
                     ₹{fareResult.total}
                   </span>
                 </div>
               </div>
 
               <div className="text-right">
-                <span className="text-xs font-black px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                <span className="text-xs font-black px-3 py-1 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/40">
                   {t(currentCategory.nameKey)}
                 </span>
-                <p className="text-[11px] text-stone-400 mt-1 font-semibold">
+                <p className="text-[11px] text-stone-400 mt-1.5 font-medium">
                   + {t(currentAttachment?.nameKey)}
                 </p>
               </div>
@@ -849,9 +919,9 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
 
             {/* Pre-Booking Timing Banner */}
             {bookingTimingMode === 'schedule' ? (
-              <div className="p-3.5 rounded-2xl bg-blue-950/90 border border-blue-500/50 text-xs text-blue-200 space-y-1.5">
+              <div className="p-4 rounded-2xl bg-blue-950/70 border border-blue-500/30 text-xs text-blue-200 space-y-2">
                 <div className="flex justify-between items-center font-bold">
-                  <span className="text-amber-300 flex items-center gap-1">
+                  <span className="text-amber-300 flex items-center gap-1.5">
                     <Calendar className="w-3.5 h-3.5" />
                     <span>{lang === 'hi' ? 'आरक्षित तारीख:' : 'Reserved Date:'}</span>
                   </span>
@@ -863,22 +933,22 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
                 </div>
               </div>
             ) : (
-              <div className="p-3.5 rounded-2xl bg-stone-800/80 border border-stone-700 space-y-1.5 text-xs">
+              <div className="p-4 rounded-2xl bg-stone-950/80 border border-stone-800 space-y-2 text-xs">
                 <div className="flex justify-between items-center text-stone-300">
-                  <span>{lang === 'hi' ? 'दर गणना:' : 'Calculation Formula:'}</span>
+                  <span className="font-medium text-stone-400">{lang === 'hi' ? 'दर गणना:' : 'Calculation Formula:'}</span>
                   <span className="font-extrabold text-emerald-400">{fareResult.breakdownText}</span>
                 </div>
                 <div className="flex justify-between items-center text-stone-300">
-                  <span>{lang === 'hi' ? 'अनुमानित आगमन समय:' : 'Estimated Farm Arrival:'}</span>
+                  <span className="font-medium text-stone-400">{lang === 'hi' ? 'अनुमानित आगमन समय:' : 'Estimated Farm Arrival:'}</span>
                   <span className="font-bold text-amber-300">{lang === 'hi' ? '~35-60 मिनट (सीधा खेत पर)' : '~35-60 Mins (Direct Dispatch)'}</span>
                 </div>
               </div>
             )}
 
             {/* DISCLAIMER NOTE */}
-            <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-start gap-2">
+            <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs flex items-start gap-2.5">
               <Info className="w-4 h-4 shrink-0 mt-0.5 text-amber-400" />
-              <p className="font-medium leading-relaxed">
+              <p className="font-medium leading-relaxed text-stone-300">
                 {t('priceDisclaimer')}
               </p>
             </div>
@@ -888,8 +958,8 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
               onClick={handleConfirmBooking}
               className={`w-full py-4 rounded-2xl font-black text-base sm:text-lg shadow-xl flex items-center justify-center gap-2 transition active:scale-98 transform ${
                 bookingTimingMode === 'schedule'
-                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-blue-600/30'
-                  : 'bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-stone-950 shadow-emerald-500/25'
+                  ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-600/30'
+                  : 'bg-emerald-500 hover:bg-emerald-400 text-stone-950 shadow-emerald-500/20'
               }`}
             >
               <span>
@@ -897,7 +967,7 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
                   ? (lang === 'hi' ? `तारीख ${scheduledDate} के लिए अग्रिम आरक्षित करें` : `Confirm Pre-Booking for ${scheduledDate}`)
                   : t('confirmBooking')}
               </span>
-              <ChevronRight className="w-6 h-6" />
+              <ChevronRight className="w-5 h-5" />
             </button>
 
           </div>
@@ -909,19 +979,19 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
       {/* MODAL 1: PRE-BOOKING CONFIRMATION POPUP */}
       {scheduledSuccessData && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-stone-950/85 backdrop-blur-md animate-fade-in">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border-2 border-blue-500 relative space-y-5 text-center">
-            <div className="w-16 h-16 rounded-3xl bg-blue-100 text-blue-600 flex items-center justify-center text-3xl mx-auto shadow-inner">
+          <div className="bg-stone-900 text-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-blue-500/40 relative space-y-5 text-center">
+            <div className="w-16 h-16 rounded-3xl bg-blue-950/80 border border-blue-500/40 text-blue-400 flex items-center justify-center text-3xl mx-auto shadow-inner">
               🎉
             </div>
 
             <div className="space-y-1">
-              <span className="text-[10px] font-black uppercase tracking-wider text-blue-700 bg-blue-100 px-3 py-0.5 rounded-full border border-blue-300">
+              <span className="text-[10px] font-black uppercase tracking-wider text-blue-300 bg-blue-950/80 px-3 py-0.5 rounded-full border border-blue-500/30">
                 {lang === 'hi' ? 'अग्रिम बुकिंग सफल' : 'Pre-Booking Confirmed'}
               </span>
-              <h3 className="text-xl font-black text-stone-900 mt-1">
+              <h3 className="text-xl font-black text-white mt-1">
                 {lang === 'hi' ? 'मशीनरी सफलतापूर्वक आरक्षित की गई!' : 'Farm Machinery Reserved!'}
               </h3>
-              <p className="text-xs text-stone-500 font-medium">
+              <p className="text-xs text-stone-400 font-medium">
                 {lang === 'hi' 
                   ? 'ड्राइवर पार्टनर को आपकी आरक्षित तारीख व समय की सूचना भेज दी गई है।' 
                   : 'Your advance booking has been confirmed and scheduled in our dispatch queue.'}
@@ -929,40 +999,40 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
             </div>
 
             {/* Scheduled Details Card */}
-            <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200 text-xs space-y-2 text-left">
+            <div className="p-4 rounded-2xl bg-stone-950/80 border border-stone-800 text-xs space-y-2 text-left">
               <div className="flex justify-between items-center">
-                <span className="text-stone-500">{lang === 'hi' ? 'तारीख व दिन:' : 'Date & Day:'}</span>
-                <b className="text-stone-900">{scheduledSuccessData.scheduledDate} ({scheduledSuccessData.scheduledDay})</b>
+                <span className="text-stone-400">{lang === 'hi' ? 'तारीख व दिन:' : 'Date & Day:'}</span>
+                <b className="text-white">{scheduledSuccessData.scheduledDate} ({scheduledSuccessData.scheduledDay})</b>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-stone-500">{lang === 'hi' ? 'समय स्लॉट:' : 'Time Slot:'}</span>
-                <b className="text-blue-700">{scheduledSuccessData.timeSlot}</b>
+                <span className="text-stone-400">{lang === 'hi' ? 'समय स्लॉट:' : 'Time Slot:'}</span>
+                <b className="text-blue-400">{scheduledSuccessData.timeSlot}</b>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-stone-500">{lang === 'hi' ? 'मशीनरी व यंत्र:' : 'Machinery & Implement:'}</span>
-                <b className="text-emerald-700 capitalize">{scheduledSuccessData.machineryType} + {scheduledSuccessData.attachment?.nameEn}</b>
+                <span className="text-stone-400">{lang === 'hi' ? 'मशीनरी व यंत्र:' : 'Machinery & Implement:'}</span>
+                <b className="text-emerald-400 capitalize">{scheduledSuccessData.machineryType} + {scheduledSuccessData.attachment?.nameEn}</b>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-stone-500">{lang === 'hi' ? 'मात्रा व आकार:' : 'Quantity & Size:'}</span>
-                <b className="text-stone-900">{scheduledSuccessData.landSize} {scheduledSuccessData.sizeUnit?.toUpperCase()}</b>
+                <span className="text-stone-400">{lang === 'hi' ? 'मात्रा व आकार:' : 'Quantity & Size:'}</span>
+                <b className="text-white">{scheduledSuccessData.landSize} {scheduledSuccessData.sizeUnit?.toUpperCase()}</b>
               </div>
-              <div className="flex justify-between items-center pt-2 border-t border-stone-200">
-                <span className="text-stone-500 font-bold">{lang === 'hi' ? 'कुल किराया:' : 'Total Price:'}</span>
-                <span className="text-sm font-bold text-stone-700">₹{scheduledSuccessData.estimatedPrice}</span>
+              <div className="flex justify-between items-center pt-2 border-t border-stone-800">
+                <span className="text-stone-400 font-bold">{lang === 'hi' ? 'कुल किराया:' : 'Total Price:'}</span>
+                <span className="text-sm font-bold text-white">₹{scheduledSuccessData.estimatedPrice}</span>
               </div>
               {scheduledSuccessData.paymentMethod && (
                 <>
                   <div className="flex justify-between items-center text-[11px]">
-                    <span className="text-stone-500">{lang === 'hi' ? 'भुगतान विधि:' : 'Payment Method:'}</span>
-                    <b className="text-stone-800 uppercase">{scheduledSuccessData.paymentMethod === 'cod' ? 'COD (30% Advance)' : 'Online (100% Paid)'}</b>
+                    <span className="text-stone-400">{lang === 'hi' ? 'भुगतान विधि:' : 'Payment Method:'}</span>
+                    <b className="text-stone-200 uppercase">{scheduledSuccessData.paymentMethod === 'cod' ? 'COD (30% Advance)' : 'Online (100% Paid)'}</b>
                   </div>
                   <div className="flex justify-between items-center text-[11px]">
-                    <span className="text-stone-500">{lang === 'hi' ? 'अग्रिम भुगतान:' : 'Paid Advance:'}</span>
-                    <b className="text-emerald-700">₹{scheduledSuccessData.advancePaid}</b>
+                    <span className="text-stone-400">{lang === 'hi' ? 'अग्रिम भुगतान:' : 'Paid Advance:'}</span>
+                    <b className="text-emerald-400">₹{scheduledSuccessData.advancePaid}</b>
                   </div>
-                  <div className="flex justify-between items-center pt-1.5 border-t border-dashed border-stone-200 font-black text-sm">
-                    <span className="text-stone-700">{lang === 'hi' ? 'शेष देय राशि:' : 'Balance Due:'}</span>
-                    <span className="text-amber-700">₹{scheduledSuccessData.balanceDue}</span>
+                  <div className="flex justify-between items-center pt-1.5 border-t border-dashed border-stone-800 font-black text-sm">
+                    <span className="text-stone-300">{lang === 'hi' ? 'शेष देय राशि:' : 'Balance Due:'}</span>
+                    <span className="text-amber-400">₹{scheduledSuccessData.balanceDue}</span>
                   </div>
                 </>
               )}
@@ -970,7 +1040,7 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
 
             <button
               onClick={() => setScheduledSuccessData(null)}
-              className="w-full py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black text-sm shadow-xl shadow-blue-600/30 transition active:scale-95"
+              className="w-full py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-black text-sm shadow-xl shadow-blue-600/30 transition active:scale-95"
             >
               {lang === 'hi' ? 'ठीक है' : 'OK (View in Pre-Bookings)'}
             </button>
@@ -992,15 +1062,15 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
 
       {/* PAYMENT METHOD MODAL */}
       {isPaymentModalOpen && pendingBookingData && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-stone-950/80 backdrop-blur-md animate-fade-in">
-          <div className="bg-white text-stone-900 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-stone-200 relative space-y-6">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-stone-950/85 backdrop-blur-md animate-fade-in">
+          <div className="bg-stone-900 text-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-stone-800 relative space-y-5">
             
             {/* Header */}
             <div className="text-center space-y-1">
-              <h3 className="text-xl font-black text-stone-900">
+              <h3 className="text-xl font-black text-white">
                 {lang === 'hi' ? 'भुगतान विधि चुनें' : 'Choose Payment Method'}
               </h3>
-              <p className="text-xs text-stone-500 font-medium">
+              <p className="text-xs text-stone-400 font-medium">
                 {lang === 'hi' ? 'बुकिंग की पुष्टि करने के लिए भुगतान विकल्प चुनें' : 'Select a payment option to confirm your booking'}
               </p>
             </div>
@@ -1008,20 +1078,20 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
             {paymentStep === 'select' ? (
               <div className="space-y-4">
                 {/* Order Summary */}
-                <div className="p-4 rounded-2xl bg-stone-50 border border-stone-100 flex justify-between items-center">
+                <div className="p-4 rounded-2xl bg-stone-950/80 border border-stone-800 flex justify-between items-center">
                   <div>
-                    <p className="text-[10px] text-stone-400 font-black uppercase tracking-wider">
+                    <p className="text-[10px] text-stone-500 font-black uppercase tracking-wider">
                       {lang === 'hi' ? 'कुल राशि' : 'Total Amount'}
                     </p>
-                    <p className="text-lg font-black text-stone-800">
+                    <p className="text-xl font-black text-white">
                       ₹{pendingBookingData.estimatedPrice}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-[10px] text-stone-400 font-black uppercase tracking-wider">
+                    <p className="text-[10px] text-stone-500 font-black uppercase tracking-wider">
                       {lang === 'hi' ? 'मशीन प्रकार' : 'Machinery'}
                     </p>
-                    <p className="text-xs font-bold text-stone-600 capitalize">
+                    <p className="text-xs font-bold text-emerald-400 capitalize">
                       {pendingBookingData.machineryType === 'truck' ? 'Trolley' : pendingBookingData.machineryType}
                     </p>
                   </div>
@@ -1031,28 +1101,28 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
                 <button
                   type="button"
                   onClick={() => setPaymentMethod('cod')}
-                  className={`w-full text-left p-4 rounded-2xl border-2 transition-all duration-200 ${
+                  className={`w-full text-left p-4 rounded-2xl border transition-all duration-200 ${
                     paymentMethod === 'cod'
-                      ? 'border-emerald-500 bg-emerald-50/50 shadow-md shadow-emerald-500/5'
-                      : 'border-stone-200 hover:border-stone-300 bg-white'
+                      ? 'border-emerald-500/80 bg-emerald-950/40 shadow-xl shadow-emerald-950/50 ring-1 ring-emerald-500/40'
+                      : 'border-stone-800 bg-stone-950/60 hover:border-stone-700'
                   }`}
                 >
                   <div className="flex items-start gap-3">
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 ${
-                      paymentMethod === 'cod' ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-stone-300'
+                    <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 mt-0.5 ${
+                      paymentMethod === 'cod' ? 'border-emerald-500 bg-emerald-500' : 'border-stone-700 bg-stone-900'
                     }`}>
-                      {paymentMethod === 'cod' && <div className="w-2 h-2 rounded-full bg-white" />}
+                      {paymentMethod === 'cod' && <div className="w-2 h-2 rounded-full bg-stone-950" />}
                     </div>
                     <div className="space-y-1">
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-extrabold text-sm text-stone-900">
+                      <div className="flex items-center gap-2">
+                        <span className="font-extrabold text-sm text-white">
                           {lang === 'hi' ? 'कैश ऑन डिलीवरी (COD)' : 'Cash on Delivery (COD)'}
                         </span>
-                        <span className="text-[10px] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">
+                        <span className="text-[10px] font-bold text-amber-400 bg-amber-950/60 border border-amber-500/30 px-2 py-0.5 rounded-full">
                           30% {lang === 'hi' ? 'अग्रिम' : 'Advance'}
                         </span>
                       </div>
-                      <p className="text-xs text-stone-500 leading-normal">
+                      <p className="text-xs text-stone-400 leading-normal">
                         {lang === 'hi'
                           ? `बुकिंग के लिए अभी ₹${Math.round(pendingBookingData.estimatedPrice * 0.3)} का ऑनलाइन भुगतान करें। बाकी ₹${Math.round(pendingBookingData.estimatedPrice * 0.7)} काम के बाद चालक को नकद दें।`
                           : `Pay ₹${Math.round(pendingBookingData.estimatedPrice * 0.3)} (30% booking advance) online now. Pay the remaining ₹${Math.round(pendingBookingData.estimatedPrice * 0.7)} in cash after work.`}
@@ -1065,28 +1135,28 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
                 <button
                   type="button"
                   onClick={() => setPaymentMethod('online')}
-                  className={`w-full text-left p-4 rounded-2xl border-2 transition-all duration-200 ${
+                  className={`w-full text-left p-4 rounded-2xl border transition-all duration-200 ${
                     paymentMethod === 'online'
-                      ? 'border-emerald-500 bg-emerald-50/50 shadow-md shadow-emerald-500/5'
-                      : 'border-stone-200 hover:border-stone-300 bg-white'
+                      ? 'border-emerald-500/80 bg-emerald-950/40 shadow-xl shadow-emerald-950/50 ring-1 ring-emerald-500/40'
+                      : 'border-stone-800 bg-stone-950/60 hover:border-stone-700'
                   }`}
                 >
                   <div className="flex items-start gap-3">
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 ${
-                      paymentMethod === 'online' ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-stone-300'
+                    <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 mt-0.5 ${
+                      paymentMethod === 'online' ? 'border-emerald-500 bg-emerald-500' : 'border-stone-700 bg-stone-900'
                     }`}>
-                      {paymentMethod === 'online' && <div className="w-2 h-2 rounded-full bg-white" />}
+                      {paymentMethod === 'online' && <div className="w-2 h-2 rounded-full bg-stone-950" />}
                     </div>
                     <div className="space-y-1">
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-extrabold text-sm text-stone-900">
+                      <div className="flex items-center gap-2">
+                        <span className="font-extrabold text-sm text-white">
                           {lang === 'hi' ? 'पूर्ण ऑनलाइन भुगतान' : 'Pay Full Amount Online'}
                         </span>
-                        <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+                        <span className="text-[10px] font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded-full">
                           100% {lang === 'hi' ? 'सुरक्षित' : 'Secure'}
                         </span>
                       </div>
-                      <p className="text-xs text-stone-500 leading-normal">
+                      <p className="text-xs text-stone-400 leading-normal">
                         {lang === 'hi'
                           ? `अभी पूरा ₹${pendingBookingData.estimatedPrice} भुगतान करें। काम पूरा होने पर कोई अतिरिक्त शुल्क नहीं देना होगा।`
                           : `Pay the full amount of ₹${pendingBookingData.estimatedPrice} now. No cash hassle after work is completed.`}
@@ -1100,14 +1170,14 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
                   <button
                     type="button"
                     onClick={() => { setIsPaymentModalOpen(false); setPendingBookingData(null); }}
-                    className="w-1/3 py-3 rounded-xl border border-stone-200 text-stone-600 text-sm font-bold hover:bg-stone-50 transition"
+                    className="w-1/3 py-3 rounded-xl border border-stone-700 text-stone-300 text-sm font-bold hover:bg-stone-800 transition"
                   >
                     {lang === 'hi' ? 'रद्द करें' : 'Cancel'}
                   </button>
                   <button
                     type="button"
                     onClick={() => setPaymentStep('upi')}
-                    className="w-2/3 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-black shadow-lg shadow-emerald-600/10 transition flex items-center justify-center gap-1.5"
+                    className="w-2/3 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 text-sm font-black shadow-lg shadow-emerald-500/20 transition flex items-center justify-center gap-1.5"
                   >
                     <span>{lang === 'hi' ? 'भुगतान के लिए आगे बढ़ें' : 'Proceed to Pay'}</span>
                     <ChevronRight className="w-4 h-4" />
@@ -1117,23 +1187,23 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
             ) : (
               /* Simulated UPI QR Screen */
               <div className="space-y-5">
-                <div className="p-4 rounded-2xl bg-stone-50 border border-stone-100 space-y-4 text-center">
+                <div className="p-5 rounded-2xl bg-stone-950/90 border border-stone-800 space-y-4 text-center">
                   <div>
                     <span className="text-[10px] font-black text-stone-400 uppercase tracking-widest block">
                       {lang === 'hi' ? 'भुगतान की जाने वाली राशि' : 'Amount to Pay'}
                     </span>
-                    <span className="text-3xl font-black text-emerald-600">
+                    <span className="text-3xl font-black text-emerald-400">
                       ₹{paymentMethod === 'cod' ? Math.round(pendingBookingData.estimatedPrice * 0.3) : pendingBookingData.estimatedPrice}
                     </span>
                     {paymentMethod === 'cod' && (
-                      <span className="text-[10px] text-stone-400 block mt-0.5">
+                      <span className="text-[11px] text-stone-400 block mt-0.5">
                         (30% {lang === 'hi' ? 'बुकिंग अग्रिम' : 'Booking Advance'})
                       </span>
                     )}
                   </div>
 
                   {/* Simulated QR Code */}
-                  <div className="w-40 h-40 bg-white border border-stone-200 rounded-2xl mx-auto flex items-center justify-center p-2 shadow-sm relative group">
+                  <div className="w-44 h-44 bg-white border border-stone-300 rounded-2xl mx-auto flex items-center justify-center p-3 shadow-md relative group">
                     <svg viewBox="0 0 200 200" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
                       {/* QR Corner markers */}
                       <rect x="10" y="10" width="50" height="50" rx="4" fill="none" stroke="#1e293b" strokeWidth="6"/>
@@ -1144,24 +1214,24 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
                       <rect x="20" y="150" width="30" height="30" rx="2" fill="#1e293b"/>
                       {/* Data modules */}
                       {[70,80,90,100,110,120].map(x => [70,80,90,100,110,120,130,140,150,160].map(y => (
-                        (x + y) % 30 < 15 && <rect key={`${x}-${y}`} x={x} y={y} width="8" height="8" rx="1" fill="#1e293b" opacity={0.7 + Math.random() * 0.3}/>
+                        (x + y) % 30 < 15 && <rect key={`${x}-${y}`} x={x} y={y} width="8" height="8" rx="1" fill="#1e293b" opacity={0.8}/>
                       )))}
                       {[10,20,30,40,50,70,80,90,100,110].map(x => [70,80,90,100,110].map(y => (
-                        (x * y) % 20 < 10 && <rect key={`h-${x}-${y}`} x={x} y={y} width="8" height="8" rx="1" fill="#1e293b" opacity={0.6 + Math.random() * 0.3}/>
+                        (x * y) % 20 < 10 && <rect key={`h-${x}-${y}`} x={x} y={y} width="8" height="8" rx="1" fill="#1e293b" opacity={0.7}/>
                       )))}
                       {[70,80,90,100,110,120,130].map(x => [10,20,30,40,50].map(y => (
-                        (x + y * 2) % 25 < 12 && <rect key={`v-${x}-${y}`} x={x} y={y} width="8" height="8" rx="1" fill="#1e293b" opacity={0.6 + Math.random() * 0.3}/>
+                        (x + y * 2) % 25 < 12 && <rect key={`v-${x}-${y}`} x={x} y={y} width="8" height="8" rx="1" fill="#1e293b" opacity={0.7}/>
                       )))}
                       {/* Center UPI logo area */}
                       <rect x="75" y="75" width="50" height="50" rx="8" fill="white" stroke="#e2e8f0" strokeWidth="2"/>
                       <text x="100" y="105" textAnchor="middle" fontSize="18" fontWeight="bold" fill="#059669">UPI</text>
                     </svg>
                     <div className="absolute inset-0 bg-stone-900/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <span className="bg-white/95 px-2 py-1 rounded text-[10px] font-bold text-stone-700 shadow-sm">Scan with BHIM/UPI</span>
+                      <span className="bg-white/95 px-2.5 py-1 rounded text-[10px] font-bold text-stone-800 shadow-sm">Scan with BHIM/UPI</span>
                     </div>
                   </div>
 
-                  <p className="text-[10px] text-stone-400 font-medium">
+                  <p className="text-[11px] text-stone-400 font-medium">
                     {lang === 'hi'
                       ? 'भुगतान करने के लिए किसी भी यूपीआई ऐप (PhonePe, GPay, Paytm) का उपयोग करके इस क्यूआर कोड को स्कैन करें।'
                       : 'Scan this QR code using any UPI app (PhonePe, GPay, Paytm) to make the payment.'}
@@ -1169,11 +1239,11 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
                 </div>
 
                 {/* Confirm Action Button */}
-                <div className="flex gap-2">
+                <div className="flex gap-2.5">
                   <button
                     type="button"
                     onClick={() => setPaymentStep('select')}
-                    className="w-1/3 py-3.5 rounded-xl border border-stone-200 text-stone-600 text-sm font-bold hover:bg-stone-50 transition"
+                    className="w-1/3 py-3.5 rounded-xl border border-stone-700 text-stone-300 text-sm font-bold hover:bg-stone-800 transition"
                   >
                     {lang === 'hi' ? 'पीछे जाएँ' : 'Back'}
                   </button>
@@ -1183,7 +1253,7 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
                       paymentMethod,
                       paymentMethod === 'cod' ? Math.round(pendingBookingData.estimatedPrice * 0.3) : pendingBookingData.estimatedPrice
                     )}
-                    className="w-2/3 py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-stone-950 text-sm font-black shadow-xl shadow-emerald-500/10 flex items-center justify-center gap-1.5 transition"
+                    className="w-2/3 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 text-sm font-black shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-1.5 transition active:scale-95"
                   >
                     <ShieldCheck className="w-4 h-4 text-stone-950" />
                     <span>
