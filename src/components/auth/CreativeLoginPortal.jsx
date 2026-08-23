@@ -43,11 +43,43 @@ import {
   ChevronRight
 } from 'lucide-react';
 
-// Floating decorative element
-function FloatingEmoji({ emoji, className }) {
+// 3D Floating Leaf with realistic SVG shape
+function Floating3DLeaf({ size = 32, color = '#22c55e', delay = 0, duration = 12, left, animation = 'leaf-fall-1' }) {
   return (
-    <div className={`absolute pointer-events-none select-none text-2xl sm:text-3xl opacity-20 ${className}`}>
-      {emoji}
+    <div
+      className="absolute pointer-events-none select-none leaf-3d z-[1]"
+      style={{
+        left,
+        top: '-5%',
+        width: size,
+        height: size,
+        animation: `${animation} ${duration}s ease-in-out ${delay}s infinite`,
+      }}
+    >
+      <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', height: '100%' }}>
+        {/* Leaf body */}
+        <path
+          d="M50 5 C20 25, 5 55, 50 95 C95 55, 80 25, 50 5Z"
+          fill={color}
+          opacity="0.85"
+        />
+        {/* Center vein */}
+        <path
+          d="M50 15 L50 85"
+          stroke="rgba(255,255,255,0.3)"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+        />
+        {/* Side veins */}
+        <path d="M50 30 L30 45" stroke="rgba(255,255,255,0.2)" strokeWidth="1" strokeLinecap="round" />
+        <path d="M50 30 L70 45" stroke="rgba(255,255,255,0.2)" strokeWidth="1" strokeLinecap="round" />
+        <path d="M50 50 L25 60" stroke="rgba(255,255,255,0.2)" strokeWidth="1" strokeLinecap="round" />
+        <path d="M50 50 L75 60" stroke="rgba(255,255,255,0.2)" strokeWidth="1" strokeLinecap="round" />
+        <path d="M50 65 L32 75" stroke="rgba(255,255,255,0.15)" strokeWidth="0.8" strokeLinecap="round" />
+        <path d="M50 65 L68 75" stroke="rgba(255,255,255,0.15)" strokeWidth="0.8" strokeLinecap="round" />
+        {/* Shine highlight */}
+        <ellipse cx="38" cy="40" rx="8" ry="15" fill="rgba(255,255,255,0.12)" transform="rotate(-15 38 40)" />
+      </svg>
     </div>
   );
 }
@@ -493,9 +525,9 @@ export default function CreativeLoginPortal() {
           loop
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
-          poster="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=1920&q=80"
+          poster="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1920&q=80"
         >
-          <source src="https://videos.pexels.com/video-files/2421545/2421545-hd_1920_1080_30fps.mp4" type="video/mp4" />
+          <source src="https://videos.pexels.com/video-files/2098989/2098989-hd_1920_1080_30fps.mp4" type="video/mp4" />
         </video>
         {/* Dark cinematic overlay for text readability */}
         <div className="absolute inset-0 bg-gradient-to-b from-stone-950/80 via-stone-950/70 to-stone-950/90" />
@@ -505,12 +537,17 @@ export default function CreativeLoginPortal() {
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(to_right,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:64px_64px]" />
       </div>
 
-      {/* ───── Floating Decorative Emojis ───── */}
-      <FloatingEmoji emoji="🌾" className="top-[12%] left-[8%] animate-float opacity-10" />
-      <FloatingEmoji emoji="🚜" className="top-[20%] right-[10%] animate-float-slow opacity-10" />
-      <FloatingEmoji emoji="🌱" className="bottom-[25%] left-[5%] animate-float-delayed opacity-10" />
-      <FloatingEmoji emoji="☀️" className="top-[8%] right-[25%] animate-float text-xl opacity-10" />
-      <FloatingEmoji emoji="🌿" className="bottom-[15%] right-[8%] animate-float-slow opacity-10" />
+      {/* ───── 3D Falling Leaves ───── */}
+      <Floating3DLeaf size={28} color="#22c55e" delay={0} duration={14} left="5%" animation="leaf-fall-1" />
+      <Floating3DLeaf size={22} color="#16a34a" delay={2} duration={11} left="15%" animation="leaf-fall-2" />
+      <Floating3DLeaf size={35} color="#4ade80" delay={4} duration={16} left="25%" animation="leaf-fall-3" />
+      <Floating3DLeaf size={18} color="#15803d" delay={1} duration={13} left="40%" animation="leaf-fall-1" />
+      <Floating3DLeaf size={30} color="#86efac" delay={6} duration={15} left="55%" animation="leaf-fall-2" />
+      <Floating3DLeaf size={24} color="#059669" delay={3} duration={12} left="68%" animation="leaf-fall-3" />
+      <Floating3DLeaf size={20} color="#34d399" delay={8} duration={14} left="78%" animation="leaf-fall-1" />
+      <Floating3DLeaf size={26} color="#10b981" delay={5} duration={17} left="88%" animation="leaf-fall-2" />
+      <Floating3DLeaf size={16} color="#22c55e" delay={7} duration={10} left="95%" animation="leaf-fall-3" />
+      <Floating3DLeaf size={32} color="#4ade80" delay={9} duration={18} left="48%" animation="leaf-fall-1" />
 
       {/* ═══════════ TOP HEADER BAR ═══════════ */}
       <header className="relative z-10 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between animate-fade-in-down">
