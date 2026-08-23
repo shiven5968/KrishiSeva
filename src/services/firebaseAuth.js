@@ -1,5 +1,6 @@
 // Firebase Phone Authentication Service for KrishiSeva
-import { auth, app, RecaptchaVerifier, signInWithPhoneNumber } from '../firebase';
+import { auth, app } from '../firebase';
+import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 
 export { auth, app };
 
@@ -10,7 +11,7 @@ export function getRecaptchaVerifier(containerId = 'recaptcha-container') {
   // Verify DOM container exists
   const container = document.getElementById(containerId);
   if (!container) {
-    console.warn(`[Firebase Auth] #${containerId} not found in DOM, falling back to body.`);
+    console.warn(`[Firebase Auth] #${containerId} not found in DOM.`);
   }
 
   if (window.recaptchaVerifier) {
@@ -42,6 +43,7 @@ export async function sendFirebasePhoneOtp(phoneNumber, containerId = 'recaptcha
 
   const formattedPhone = `+91${cleanNumber}`;
   console.log(`[Firebase Auth] Initiating signInWithPhoneNumber for: ${formattedPhone}`);
+  console.log("Auth Object:", auth);
 
   try {
     const appVerifier = getRecaptchaVerifier(containerId);
@@ -62,7 +64,9 @@ export async function sendFirebasePhoneOtp(phoneNumber, containerId = 'recaptcha
     const errorCode = error?.code || 'auth/unknown';
     let detailedMsg = `[${errorCode}]: ${error.message}`;
 
-    if (errorCode === 'auth/unauthorized-domain') {
+    if (errorCode.includes('api-key-not-valid')) {
+      detailedMsg = `[auth/api-key-not-valid]: The Firebase API Key is not enabled or restricted. Please ensure Identity Toolkit API is enabled in Google Cloud Console, or verify your Web App API Key in Firebase Console -> Project Settings.`;
+    } else if (errorCode === 'auth/unauthorized-domain') {
       detailedMsg = `[auth/unauthorized-domain]: This domain (${window.location.hostname}) is not authorized in Firebase Console. Go to Firebase Console -> Authentication -> Settings -> Authorized Domains -> Add '${window.location.hostname}'.`;
     } else if (errorCode === 'auth/invalid-phone-number') {
       detailedMsg = `[auth/invalid-phone-number]: Invalid phone number format (+91${cleanNumber}).`;

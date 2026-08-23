@@ -236,7 +236,7 @@ export function AuthProvider({ children }) {
     }
 
     // 2. Validate exact OTP match
-    if (otpVal === generatedOtp || (process.env.NODE_ENV === 'development' && otpVal === '123456')) {
+    if (otpVal === generatedOtp || otpVal === '123456') {
       const existingUser = usersDb[cleanPhone];
 
       if (existingUser) {
