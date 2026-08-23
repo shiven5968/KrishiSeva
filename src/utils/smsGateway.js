@@ -1,134 +1,29 @@
-// Live SMS Telephony Gateway for sending real physical SMS to mobile numbers in India & Globally
+// Live WhatsApp & SMS Telephony Gateway for KrishiSeva
+// Supports Official Meta WhatsApp Cloud API, Twilio WhatsApp, UltraMsg, Wati, Interakt, Fast2SMS
 
 export const SMS_PROVIDERS = {
+  META_WHATSAPP: 'meta',
+  TWILIO_WHATSAPP: 'twiliowa',
+  ULTRAMSG: 'ultramsg',
+  WATI: 'wati',
+  INTERAKT: 'interakt',
+  GREENAPI: 'greenapi',
   FAST2SMS: 'fast2sms',
-  TWILIO: 'twilio',
-  CUSTOM: 'custom'
+  TWILIO_SMS: 'twilio'
 };
 
-// Send real SMS over telecom carrier networks
-export async function sendRealSmsToPhone(phoneNumber, otpCode) {
-  const cleanNumber = phoneNumber.replace(/\D/g, '').slice(-10);
-
-  const fast2smsKey = localStorage.getItem('krishi_fast2sms_api_key');
-  const twilioConfig = localStorage.getItem('krishi_twilio_config');
-
-  // 1. If Fast2SMS API Key is present (Instant Delivery to Indian numbers)
-  if (fast2smsKey) {
-    try {
-      const response = await fetch('https://www.fast2sms.com/dev/bulkV2', {
-        method: 'POST',
-        headers: {
-          'authorization': fast2smsKey,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          route: 'otp',
-          variables_values: otpCode,
-          numbers: cleanNumber
-        })
-      });
-      const data = await response.json();
-      return { success: data.return === true, provider: 'Fast2SMS', data };
-    } catch (err) {
-      console.warn('Fast2SMS gateway error:', err);
-    }
-  }
-
-  // 2. If Twilio credentials are saved
-  if (twilioConfig) {
-    try {
-      const { accountSid, authToken, fromNumber } = JSON.parse(twilioConfig);
-      const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
-      const formData = new URLSearchParams();
-      formData.append('To', `+91${cleanNumber}`);
-      formData.append('From', fromNumber);
-      formData.append('Body', `Your KrishiSeva verification OTP is ${otpCode}. Valid for 5 minutes.`);
-
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Authorization': 'Basic ' + btoa(`${accountSid}:${authToken}`),
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: formData
-      });
-      const data = await response.json();
-      return { success: response.ok, provider: 'Twilio', data };
-    } catch (err) {
-      console.warn('Twilio gateway error:', err);
-    }
-  }
-
-  // 3. Fallback: Free Textbelt SMS Relay attempt
-  try {
-    const response = await fetch('https://textbelt.com/text', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        phone: `+91${cleanNumber}`,
-        message: `Your KrishiSeva OTP is ${otpCode}. Valid for 5 mins.`,
-        key: 'textbelt'
-      })
-    });
-    const result = await response.json();
-    return { success: result.success === true, provider: 'Textbelt', data: result };
-  } catch (e) {
-    return { success: false, error: 'No SMS Gateway configured' };
-  }
-}
-
-// Send UIDAI Aadhaar e-KYC Real SMS & WhatsApp
-export async function sendAadhaarEkycSms(phoneNumber, aadhaarOtp, maskedAadhaar) {
-  const cleanNumber = phoneNumber.replace(/\D/g, '').slice(-10);
-  const message = `UIDAI / AgriStack: Your Aadhaar e-KYC OTP is *${aadhaarOtp}* for KrishiSeva land verification (Aadhaar: ${maskedAadhaar || 'XXXX-XXXX-1100'}). Valid for 10 mins. Do not share.`;
-
-  // Also send via UltraMsg WhatsApp if available
-  try {
-    const ultramsgConfigStr = localStorage.getItem('krishi_ultramsg_config');
-    let instance = 'instance189242';
-    let token = '93rhhy7fj9ea2k81';
-    if (ultramsgConfigStr) {
-      const parsed = JSON.parse(ultramsgConfigStr);
-      instance = parsed.instanceId || instance;
-      token = parsed.token || token;
-    }
-    fetch(`https://api.ultramsg.com/${instance}/messages/chat`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        token: token,
-        to: `+91${cleanNumber}`,
-        body: `🇮🇳 *UIDAI & AgriStack Land Registry* 🌾\n\nYour Aadhaar e-KYC Verification OTP is: *${aadhaarOtp}*\n\n(Aadhaar: ${maskedAadhaar || 'XXXX-XXXX-1100'})\n⚡ Valid for 10 minutes.`,
-        priority: '10'
-      })
-    }).catch(() => {});
-  } catch (e) {}
-
-  const fast2smsKey = localStorage.getItem('krishi_fast2sms_api_key');
-  if (fast2smsKey) {
-    try {
-      await fetch('https://www.fast2sms.com/dev/bulkV2', {
-        method: 'POST',
-        headers: {
-          'authorization': fast2smsKey,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          route: 'q',
-          message: message,
-          numbers: cleanNumber
-        })
-      });
-    } catch (e) {}
-  }
-
-  return { success: true, message };
-}
-
-// Send real automated WhatsApp message using UltraMsg WhatsApp Business Gateway
+// ─────────────────────────────────────────────────────────────
+// 1. WhatsApp API Dispatch (Meta Cloud API, Twilio, UltraMsg, etc.)
+// ─────────────────────────────────────────────────────────────
 export async function sendRealWhatsAppOtp(phoneNumber, otpCode, lang = 'en') {
   const cleanNumber = phoneNumber.replace(/\D/g, '').slice(-10);
+
+  const metaConfigStr = localStorage.getItem('krishi_meta_config');
+  const twilioWaConfigStr = localStorage.getItem('krishi_twiliowa_config');
+  const ultramsgConfigStr = localStorage.getItem('krishi_ultramsg_config');
+  const watiConfigStr = localStorage.getItem('krishi_wati_config');
+  const interaktConfigStr = localStorage.getItem('krishi_interakt_config');
+  const greenapiConfigStr = localStorage.getItem('krishi_greenapi_config');
 
   const messageText = lang === 'hi' ?
 `🚜 *कृषि सेवा (KrishiSeva)* 🌾
@@ -151,78 +46,7 @@ Your KrishiSeva verification OTP is: *${otpCode}*
 
 Your Field, Our Power — On-demand farm machinery dispatched in 1 click!`;
 
-  // 1. PRIMARY: UltraMsg WhatsApp Business Gateway (Instance #189242)
-  let ultramsgInstance = 'instance189242';
-  let ultramsgToken = '93rhhy7fj9ea2k81';
-  const ultramsgConfigStr = localStorage.getItem('krishi_ultramsg_config');
-
-  if (ultramsgConfigStr) {
-    try {
-      const { instanceId, token } = JSON.parse(ultramsgConfigStr);
-      if (instanceId) ultramsgInstance = instanceId;
-      if (token) ultramsgToken = token;
-    } catch (e) {}
-  }
-
-  // A. Try internal serverless proxy first (bypasses browser adblockers and CORS)
-  try {
-    const proxyRes = await fetch('/api/send-whatsapp', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ phone: cleanNumber, otp: otpCode, lang })
-    });
-    if (proxyRes.ok) {
-      const proxyData = await proxyRes.json();
-      if (proxyData.success && proxyData.data?.sent === "true") {
-        return { success: true, provider: 'UltraMsg (Vercel Proxy)', status: 'Sent', data: proxyData.data };
-      }
-    }
-  } catch (err) {
-    // Fallback to direct browser fetch
-  }
-
-  // B. Direct browser fetch to UltraMsg
-  if (ultramsgInstance && ultramsgToken) {
-    try {
-      const response = await fetch(`https://api.ultramsg.com/${ultramsgInstance}/messages/chat`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: new URLSearchParams({
-          token: ultramsgToken,
-          to: `+91${cleanNumber}`,
-          body: messageText,
-          priority: '10'
-        })
-      });
-      const data = await response.json();
-      const isUnauthenticated = data.message && (
-        data.message.toLowerCase().includes('not authenticated') ||
-        data.message.toLowerCase().includes('not connected') ||
-        data.message.toLowerCase().includes('qr')
-      );
-      if ((data.sent === "true" || data.success === true || !!data.id) && !isUnauthenticated) {
-        // Auto-clear unsent queue
-        fetch(`https://api.ultramsg.com/${ultramsgInstance}/messages/resendByStatus`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams({ token: ultramsgToken, status: 'unsent' })
-        }).catch(() => {});
-        return { success: true, provider: 'UltraMsg', status: 'Sent', data };
-      } else {
-        const errorMsg = isUnauthenticated 
-          ? 'UltraMsg WhatsApp instance is not paired/authenticated with WhatsApp yet.' 
-          : (data.message || data.error || 'UltraMsg failed to send');
-        return { success: false, provider: 'UltraMsg', status: 'Failed', error: errorMsg, data };
-      }
-    } catch (err) {
-      console.warn('UltraMsg gateway error:', err);
-    }
-  }
-
-  // 2. Secondary: Meta WhatsApp Cloud API integration
-  const metaConfigStr = localStorage.getItem('krishi_meta_config');
+  // ──── A. Primary: Meta WhatsApp Cloud API (Official Business API) ────
   if (metaConfigStr) {
     try {
       const { phoneId, accessToken, templateName } = JSON.parse(metaConfigStr);
@@ -252,25 +76,135 @@ Your Field, Our Power — On-demand farm machinery dispatched in 1 click!`;
         });
         const data = await response.json();
         if (response.ok && data.messages && data.messages.length > 0) {
-          return { success: true, provider: 'Meta Cloud API', status: 'Sent', data };
+          return { success: true, provider: 'Meta WhatsApp Cloud API', status: 'Sent', data };
+        } else {
+          return { 
+            success: false, 
+            provider: 'Meta WhatsApp Cloud API', 
+            status: 'Failed', 
+            error: data.error?.message || 'Meta Cloud API delivery failed', 
+            data 
+          };
         }
       }
     } catch (err) {
-      console.warn('Meta Cloud API error:', err);
+      console.warn('Meta WhatsApp Cloud API error:', err);
     }
   }
 
-  // Check for Green-API config
-  const greenapiConfigStr = localStorage.getItem('krishi_greenapi_config');
+  // ──── B. Twilio WhatsApp API ────
+  if (twilioWaConfigStr) {
+    try {
+      const { accountSid, authToken, fromNumber } = JSON.parse(twilioWaConfigStr);
+      if (accountSid && authToken) {
+        const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
+        const formData = new URLSearchParams();
+        formData.append('To', `whatsapp:+91${cleanNumber}`);
+        formData.append('From', fromNumber.startsWith('whatsapp:') ? fromNumber : `whatsapp:${fromNumber}`);
+        formData.append('Body', messageText);
+
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Basic ' + btoa(`${accountSid}:${authToken}`),
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: formData
+        });
+        const data = await response.json();
+        if (response.ok && data.sid) {
+          return { success: true, provider: 'Twilio WhatsApp', status: 'Sent', data };
+        }
+      }
+    } catch (err) {
+      console.warn('Twilio WhatsApp error:', err);
+    }
+  }
+
+  // ──── C. UltraMsg WhatsApp Gateway (Default #189242 or Custom) ────
+  let ultramsgInstance = 'instance189242';
+  let ultramsgToken = '93rhhy7fj9ea2k81';
+
+  if (ultramsgConfigStr) {
+    try {
+      const parsed = JSON.parse(ultramsgConfigStr);
+      if (parsed.instanceId) ultramsgInstance = parsed.instanceId;
+      if (parsed.token) ultramsgToken = parsed.token;
+    } catch (e) {}
+  }
+
+  if (ultramsgInstance && ultramsgToken) {
+    try {
+      const response = await fetch(`https://api.ultramsg.com/${ultramsgInstance}/messages/chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+          token: ultramsgToken,
+          to: `+91${cleanNumber}`,
+          body: messageText,
+          priority: '10'
+        })
+      });
+      const data = await response.json();
+      const isUnauthenticated = data.message && (
+        data.message.toLowerCase().includes('not authenticated') ||
+        data.message.toLowerCase().includes('not connected') ||
+        data.message.toLowerCase().includes('qr')
+      );
+      if ((data.sent === "true" || data.success === true || !!data.id) && !isUnauthenticated) {
+        // Auto-flush queue
+        fetch(`https://api.ultramsg.com/${ultramsgInstance}/messages/resendByStatus`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ token: ultramsgToken, status: 'unsent' })
+        }).catch(() => {});
+        return { success: true, provider: 'UltraMsg', status: 'Sent', data };
+      } else {
+        const errorMsg = isUnauthenticated 
+          ? 'UltraMsg WhatsApp instance is not paired yet.' 
+          : (data.message || data.error || 'UltraMsg failed to send');
+        return { success: false, provider: 'UltraMsg', status: 'Failed', error: errorMsg, data };
+      }
+    } catch (err) {
+      console.warn('UltraMsg gateway error:', err);
+    }
+  }
+
+  // ──── D. Wati WhatsApp Partner API ────
+  if (watiConfigStr) {
+    try {
+      const { endpoint, token, templateName } = JSON.parse(watiConfigStr);
+      if (endpoint && token) {
+        const response = await fetch(`${endpoint}/api/v1/sendTemplateMessage?whatsappNumber=91${cleanNumber}`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            template_name: templateName || "krishiseva_otp",
+            broadcast_name: "KrishiSeva_OTP",
+            parameters: [{ name: "1", value: otpCode }]
+          })
+        });
+        const data = await response.json();
+        if (data.result === 'success' || data.result === true) {
+          return { success: true, provider: 'Wati WhatsApp', status: 'Sent', data };
+        }
+      }
+    } catch (e) {}
+  }
+
+  // ──── E. Green-API ────
   if (greenapiConfigStr) {
     try {
       const { instanceId, token } = JSON.parse(greenapiConfigStr);
       if (instanceId && token) {
         const response = await fetch(`https://api.green-api.com/waInstance${instanceId}/sendMessage/${token}`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             chatId: `91${cleanNumber}@c.us`,
             message: messageText
@@ -279,14 +213,101 @@ Your Field, Our Power — On-demand farm machinery dispatched in 1 click!`;
         const data = await response.json();
         if (data.idMessage) {
           return { success: true, provider: 'Green-API', status: 'Sent', data };
-        } else {
-          return { success: false, provider: 'Green-API', status: 'Failed', error: 'Green-API failed to send' };
         }
       }
+    } catch (e) {}
+  }
+
+  return { 
+    success: false, 
+    error: 'WhatsApp Gateway could not deliver message. Please use SMS fallback.', 
+    status: 'Failed' 
+  };
+}
+
+// ─────────────────────────────────────────────────────────────
+// 2. Regular SMS Gateway Fallback (Fast2SMS, Twilio SMS, Textbelt)
+// ─────────────────────────────────────────────────────────────
+export async function sendRealSmsToPhone(phoneNumber, otpCode) {
+  const cleanNumber = phoneNumber.replace(/\D/g, '').slice(-10);
+
+  const fast2smsKey = localStorage.getItem('krishi_fast2sms_api_key');
+  const twilioConfig = localStorage.getItem('krishi_twilio_config');
+
+  // Fast2SMS (Direct Indian Telecom SMS)
+  if (fast2smsKey) {
+    try {
+      const response = await fetch('https://www.fast2sms.com/dev/bulkV2', {
+        method: 'POST',
+        headers: {
+          'authorization': fast2smsKey,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          route: 'otp',
+          variables_values: otpCode,
+          numbers: cleanNumber
+        })
+      });
+      const data = await response.json();
+      return { success: data.return === true, provider: 'Fast2SMS', data };
     } catch (err) {
-      console.warn('Green-API gateway error:', err);
+      console.warn('Fast2SMS gateway error:', err);
     }
   }
 
-  return { success: false, error: 'No automated WhatsApp Gateway configured', status: 'Failed' };
+  // Twilio Carrier SMS
+  if (twilioConfig) {
+    try {
+      const { accountSid, authToken, fromNumber } = JSON.parse(twilioConfig);
+      const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
+      const formData = new URLSearchParams();
+      formData.append('To', `+91${cleanNumber}`);
+      formData.append('From', fromNumber);
+      formData.append('Body', `Your KrishiSeva verification OTP is ${otpCode}. Valid for 5 minutes.`);
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Basic ' + btoa(`${accountSid}:${authToken}`),
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: formData
+      });
+      const data = await response.json();
+      return { success: response.ok, provider: 'Twilio SMS', data };
+    } catch (err) {
+      console.warn('Twilio SMS error:', err);
+    }
+  }
+
+  // Fallback: Textbelt SMS Relay
+  try {
+    const response = await fetch('https://textbelt.com/text', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        phone: `+91${cleanNumber}`,
+        message: `Your KrishiSeva OTP is ${otpCode}. Valid for 5 mins.`,
+        key: 'textbelt'
+      })
+    });
+    const result = await response.json();
+    return { success: result.success === true, provider: 'Textbelt', data: result };
+  } catch (e) {
+    return { success: false, error: 'No SMS Gateway configured' };
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// 3. Aadhaar e-KYC SMS & WhatsApp Notification
+// ─────────────────────────────────────────────────────────────
+export async function sendAadhaarEkycSms(phoneNumber, aadhaarOtp, maskedAadhaar) {
+  const cleanNumber = phoneNumber.replace(/\D/g, '').slice(-10);
+  const message = `UIDAI / AgriStack: Your Aadhaar e-KYC OTP is *${aadhaarOtp}* for KrishiSeva land verification (Aadhaar: ${maskedAadhaar || 'XXXX-XXXX-1100'}). Valid for 10 mins. Do not share.`;
+
+  sendRealWhatsAppOtp(cleanNumber, aadhaarOtp).catch(() => {});
+  sendRealSmsToPhone(cleanNumber, aadhaarOtp).catch(() => {});
+
+  return { success: true, message };
 }

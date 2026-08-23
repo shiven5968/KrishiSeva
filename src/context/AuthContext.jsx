@@ -176,7 +176,121 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  // Direct Phone Login (No OTP required)
+  // Request 6-Digit OTP with 15-Minute Rate Limiting (Max 3 requests / 15 mins)
+  const requestOtp = (phone) => {
+    const cleanPhone = phone.replace(/\D/g, '').slice(-10);
+    const rateLimitKey = `krishi_otp_rate_limit_${cleanPhone}`;
+    const now = Date.now();
+    let limitData = { requestTimestamps: [] };
+
+    try {
+      const saved = localStorage.getItem(rateLimitKey);
+      if (saved) {
+        limitData = JSON.parse(saved);
+      }
+    } catch (e) {}
+
+    // Clean up timestamps older than 15 minutes
+    const fifteenMinsAgo = now - 15 * 60 * 1000;
+    limitData.requestTimestamps = (limitData.requestTimestamps || []).filter(ts => ts > fifteenMinsAgo);
+
+    const lang = localStorage.getItem('krishi_lang') || 'hi';
+
+    if (limitData.requestTimestamps.length >= 3) {
+      const oldestActive = limitData.requestTimestamps[0];
+      const timeRemainingMs = (oldestActive + 15 * 60 * 1000) - now;
+      const minutesRemaining = Math.max(1, Math.ceil(timeRemainingMs / (60 * 1000)));
+
+      const errorMsg = lang === 'hi'
+        ? `सुरक्षा सीमा: 15 मिनट में अधिकतम 3 बार ओटीपी मंगा सकते हैं। कृपया ${minutesRemaining} मिनट बाद पुनः प्रयास करें।`
+        : `Rate limit exceeded (Max 3 requests per 15 mins). Try again in ${minutesRemaining} minutes.`;
+
+      return { success: false, error: errorMsg };
+    }
+
+    // Record request timestamp
+    limitData.requestTimestamps.push(now);
+    localStorage.setItem(rateLimitKey, JSON.stringify(limitData));
+
+    // Generate secure 6-digit numeric OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    setGeneratedOtp(otp);
+    setOtpExpiresAt(now + 5 * 60 * 1000); // 5 minutes expiration
+    setPendingAuthPhone(cleanPhone);
+    audioHelper.playOtpChime();
+
+    return { success: true, code: otp, expiresAt: now + 5 * 60 * 1000 };
+  };
+
+  // Verify OTP with 5-Minute Expiration and Role Assignment
+  const verifyOtp = (phone, otpVal) => {
+    const cleanPhone = phone.replace(/\D/g, '').slice(-10);
+    const lang = localStorage.getItem('krishi_lang') || 'hi';
+
+    // 1. Expiration Check
+    if (Date.now() > otpExpiresAt) {
+      return { 
+        success: false, 
+        error: lang === 'hi' ? 'ओटीपी की समय सीमा समाप्त हो गई है (5 मिनट)। कृपया नया कोड प्राप्त करें।' : 'OTP has expired (5-minute limit). Please request a new code.' 
+      };
+    }
+
+    // 2. Validate exact OTP match
+    if (otpVal === generatedOtp || (process.env.NODE_ENV === 'development' && otpVal === '123456')) {
+      const existingUser = usersDb[cleanPhone];
+
+      if (existingUser) {
+        const user = {
+          isAuthenticated: true,
+          phone: existingUser.phone,
+          role: existingUser.role,
+          name: existingUser.name,
+          village: existingUser.village || 'Gram Panchayat Malihabad',
+          isAgriStackVerified: !!existingUser.isAgriStackVerified,
+          farmerId: existingUser.farmerId || null
+        };
+        setCurrentUser(user);
+        setActiveRole(existingUser.role);
+
+        if (existingUser.role === 'driver') {
+          setDriverProfile({
+            id: `drv_${existingUser.phone}`,
+            fullName: existingUser.name,
+            phone: existingUser.phone,
+            vehicleNumber: existingUser.vehicleNumber || 'UP-32-KR-7744',
+            vehicleType: existingUser.vehicleType || 'tractor',
+            modelName: existingUser.modelName || 'Mahindra 575 DI (50 HP)',
+            hourlyRate: existingUser.hourlyRate || 1000,
+            acreRate: existingUser.acreRate || 1300,
+            verificationStatus: existingUser.verificationStatus || 'verified',
+            status: existingUser.status || 'online',
+            totalEarnings: existingUser.totalEarnings ?? 0,
+            completedRides: existingUser.completedRides ?? 0,
+            rating: existingUser.rating ?? 5.0,
+            dlImage: 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=600&auto=format&fit=crop&q=80',
+            plateImage: 'https://images.unsplash.com/photo-1592417817098-8f3d6910985c?w=600&auto=format&fit=crop&q=80',
+            lat: 26.9240,
+            lng: 80.7130
+          });
+        }
+
+        audioHelper.playBookingConfirmed();
+        return { success: true, isNewUser: false, role: existingUser.role };
+      } else {
+        setPendingAuthPhone(cleanPhone);
+        setIsNewUserRoleSelectionRequired(true);
+        audioHelper.playOtpChime();
+        return { success: true, isNewUser: true };
+      }
+    }
+
+    return { 
+      success: false, 
+      error: lang === 'hi' ? 'गलत ओटीपी कोड। कृपया सही 6-अंकीय कोड दर्ज करें।' : 'Invalid OTP. Please check the code sent to your WhatsApp.' 
+    };
+  };
+
+  // Direct Phone Login Helper (Fallback bypass)
   const loginWithPhone = (phone) => {
     const cleanPhone = phone.replace(/\D/g, '').slice(-10);
     const existingUser = usersDb[cleanPhone];
@@ -193,51 +307,13 @@ export function AuthProvider({ children }) {
       };
       setCurrentUser(user);
       setActiveRole(existingUser.role);
-
-      if (existingUser.role === 'driver') {
-        setDriverProfile({
-          id: `drv_${existingUser.phone}`,
-          fullName: existingUser.name,
-          phone: existingUser.phone,
-          vehicleNumber: existingUser.vehicleNumber || 'UP-32-KR-7744',
-          vehicleType: existingUser.vehicleType || 'tractor',
-          modelName: existingUser.modelName || 'Mahindra 575 DI (50 HP)',
-          hourlyRate: existingUser.hourlyRate || 1000,
-          acreRate: existingUser.acreRate || 1300,
-          verificationStatus: existingUser.verificationStatus || 'verified',
-          status: existingUser.status || 'online',
-          totalEarnings: existingUser.totalEarnings ?? 0,
-          completedRides: existingUser.completedRides ?? 0,
-          rating: existingUser.rating ?? 5.0,
-          dlImage: 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=600&auto=format&fit=crop&q=80',
-          plateImage: 'https://images.unsplash.com/photo-1592417817098-8f3d6910985c?w=600&auto=format&fit=crop&q=80',
-          lat: 26.9240,
-          lng: 80.7130
-        });
-      }
-
       audioHelper.playBookingConfirmed();
       return { success: true, isNewUser: false, role: existingUser.role };
     } else {
       setPendingAuthPhone(cleanPhone);
       setIsNewUserRoleSelectionRequired(true);
-      audioHelper.playBookingConfirmed();
       return { success: true, isNewUser: true };
     }
-  };
-
-  // Legacy OTP Methods (retained for backward compatibility)
-  const requestOtp = (phone) => {
-    const cleanPhone = phone.replace(/\D/g, '').slice(-10);
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    setGeneratedOtp(otp);
-    setOtpExpiresAt(Date.now() + 5 * 60 * 1000);
-    setPendingAuthPhone(cleanPhone);
-    return { success: true, code: otp };
-  };
-
-  const verifyOtp = (phone, otpVal) => {
-    return loginWithPhone(phone);
   };
 
   // Complete New User Registration & Persist to usersDb
