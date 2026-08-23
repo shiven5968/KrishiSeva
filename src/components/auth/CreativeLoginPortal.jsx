@@ -517,20 +517,19 @@ export default function CreativeLoginPortal() {
   return (
     <div className="min-h-screen bg-stone-950 text-stone-100 flex flex-col relative overflow-hidden selection:bg-emerald-500 selection:text-stone-950 font-sans">
       
-      {/* ───── Cinematic Hero Background Video ───── */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover"
-          poster="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1920&q=80"
-        >
-          <source src="https://videos.pexels.com/video-files/2098989/2098989-hd_1920_1080_30fps.mp4" type="video/mp4" />
-        </video>
-        {/* Dark cinematic overlay for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-stone-950/80 via-stone-950/70 to-stone-950/90" />
+      {/* ───── Cinematic Background Video (YouTube: SNKWRB1-5pA) ───── */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+        <div className="absolute inset-0 w-full h-full flex items-center justify-center pointer-events-none">
+          <iframe
+            className="pointer-events-none border-0 w-[300vw] h-[300vh] min-w-[180vh] min-h-[100vw] max-w-none opacity-60 scale-125"
+            src="https://www.youtube.com/embed/SNKWRB1-5pA?autoplay=1&mute=1&loop=1&playlist=SNKWRB1-5pA&controls=0&showinfo=0&rel=0&iv_load_policy=3&disablekb=1&modestbranding=1&playsinline=1"
+            title="Agricultural Machinery in Action"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            loading="lazy"
+          />
+        </div>
+        {/* Dark cinematic overlay for text readability & high contrast */}
+        <div className="absolute inset-0 bg-gradient-to-b from-stone-950/80 via-stone-950/70 to-stone-950/95" />
         {/* Emerald accent glow on top */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(16,185,129,0.12),transparent)]" />
         {/* Subtle grid pattern overlay */}
