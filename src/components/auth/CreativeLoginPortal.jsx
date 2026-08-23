@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
-import { sendRealWhatsAppOtp, sendRealSmsToPhone, sendAadhaarEkycSms } from '../../utils/smsGateway';
+import { sendFirebasePhoneOtp, verifyFirebaseOtp } from '../../services/firebaseAuth';
 import { verifyAgriStackFarmer } from '../../services/bhulekhLandService';
 import { audioHelper } from '../../utils/audioHelper';
 import { 
@@ -18,22 +18,18 @@ import {
   Clock, 
   Lock,
   MessageSquare,
-  Settings,
-  X,
-  Smartphone,
-  AlertCircle,
   LandPlot,
   CreditCard,
   Check,
   Building2,
-  FileCheck2
+  FileCheck2,
+  AlertCircle
 } from 'lucide-react';
 
 export default function CreativeLoginPortal() {
   const { lang, toggleLanguage } = useLanguage();
   const { 
-    requestOtp,
-    verifyOtp,
+    loginWithPhoneSuccess,
     completeNewUserRegistration,
     setActiveRole
   } = useAuth();
@@ -46,9 +42,6 @@ export default function CreativeLoginPortal() {
   const [resendTimer, setResendTimer] = useState(60);
   const [isSendingOtp, setIsSendingOtp] = useState(false);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
-  const [activeOtpCode, setActiveOtpCode] = useState('');
-  const [waDeliveryFailed, setWaDeliveryFailed] = useState(false);
-  const [smsFallbackSent, setSmsFallbackSent] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
 
   // Profile Setup States
@@ -60,72 +53,6 @@ export default function CreativeLoginPortal() {
   const [aadhaarStep, setAadhaarStep] = useState('input'); // 'input' | 'result'
   const [isVerifyingAgriStack, setIsVerifyingAgriStack] = useState(false);
   const [agriStackResult, setAgriStackResult] = useState(null);
-
-  // WhatsApp Gateway Configuration Modal States
-  const [showGatewayModal, setShowGatewayModal] = useState(false);
-  const [waProvider, setWaProvider] = useState(() => {
-    if (localStorage.getItem('krishi_ultramsg_config')) return 'ultramsg';
-    if (localStorage.getItem('krishi_meta_config')) return 'meta';
-    if (localStorage.getItem('krishi_twiliowa_config')) return 'twiliowa';
-    return 'ultramsg'; // Default UltraMsg
-  });
-
-  // Meta Cloud API Settings
-  const [waMetaPhoneId, setWaMetaPhoneId] = useState(() => {
-    try {
-      const cfg = JSON.parse(localStorage.getItem('krishi_meta_config') || '{}');
-      return cfg.phoneId || '';
-    } catch { return ''; }
-  });
-  const [waMetaToken, setWaMetaToken] = useState(() => {
-    try {
-      const cfg = JSON.parse(localStorage.getItem('krishi_meta_config') || '{}');
-      return cfg.accessToken || '';
-    } catch { return ''; }
-  });
-  const [waMetaTemplate, setWaMetaTemplate] = useState(() => {
-    try {
-      const cfg = JSON.parse(localStorage.getItem('krishi_meta_config') || '{}');
-      return cfg.templateName || 'krishiseva_otp';
-    } catch { return 'krishiseva_otp'; }
-  });
-
-  // Twilio WhatsApp Settings
-  const [waTwilioSid, setWaTwilioSid] = useState(() => {
-    try {
-      const cfg = JSON.parse(localStorage.getItem('krishi_twiliowa_config') || '{}');
-      return cfg.accountSid || '';
-    } catch { return ''; }
-  });
-  const [waTwilioToken, setWaTwilioToken] = useState(() => {
-    try {
-      const cfg = JSON.parse(localStorage.getItem('krishi_twiliowa_config') || '{}');
-      return cfg.authToken || '';
-    } catch { return ''; }
-  });
-  const [waTwilioFrom, setWaTwilioFrom] = useState(() => {
-    try {
-      const cfg = JSON.parse(localStorage.getItem('krishi_twiliowa_config') || '{}');
-      return cfg.fromNumber || '';
-    } catch { return ''; }
-  });
-
-  // UltraMsg Settings
-  const [waUltramsgInstance, setWaUltramsgInstance] = useState(() => {
-    try {
-      const cfg = JSON.parse(localStorage.getItem('krishi_ultramsg_config') || '{}');
-      return cfg.instanceId || 'instance189242';
-    } catch { return 'instance189242'; }
-  });
-  const [waUltramsgToken, setWaUltramsgToken] = useState(() => {
-    try {
-      const cfg = JSON.parse(localStorage.getItem('krishi_ultramsg_config') || '{}');
-      return cfg.token || '93rhhy7fj9ea2k81';
-    } catch { return '93rhhy7fj9ea2k81'; }
-  });
-
-  // SMS Gateway Settings
-  const [fast2smsKey, setFast2smsKey] = useState(() => localStorage.getItem('krishi_fast2sms_api_key') || '');
 
   // 60-Second Resend Countdown Timer
   useEffect(() => {
@@ -139,9 +66,9 @@ export default function CreativeLoginPortal() {
   }, [step, resendTimer]);
 
   // ─────────────────────────────────────────────────────────────
-  // 1. Send OTP on WhatsApp Workflow
+  // 1. Firebase Phone Auth: Send 6-Digit OTP
   // ─────────────────────────────────────────────────────────────
-  const handleSendOtp = async (e) => {
+  const handleSendFirebaseOtp = async (e) => {
     e?.preventDefault();
     const cleanPhone = phone.replace(/\D/g, '').slice(-10);
     if (cleanPhone.length < 10) {
@@ -151,121 +78,77 @@ export default function CreativeLoginPortal() {
     setError('');
     setIsSendingOtp(true);
 
-    // Generate 6-digit OTP & check rate limiting
-    const otpResult = requestOtp(cleanPhone);
-    if (!otpResult.success) {
-      setIsSendingOtp(false);
-      setError(otpResult.error);
-      return;
-    }
-
-    const code = otpResult.code;
-    setActiveOtpCode(code);
-    setResendTimer(60);
-    setStep('otp');
-    setWaDeliveryFailed(false);
-    setOtp('');
-
-    setToastMessage(lang === 'hi' ? `ओटीपी +91 ${cleanPhone} पर भेज दिया गया है` : `OTP sent to +91 ${cleanPhone}`);
-    setTimeout(() => setToastMessage(''), 6000);
-
-    // Dispatch WhatsApp Message via API
     try {
-      const waResult = await sendRealWhatsAppOtp(cleanPhone, code, lang);
+      const result = await sendFirebasePhoneOtp(cleanPhone, 'recaptcha-container');
       setIsSendingOtp(false);
-      if (!waResult.success) {
-        setWaDeliveryFailed(true);
-        setToastMessage(lang === 'hi' ? 'व्हाट्सएप डिलीवरी में देरी। फॉलबैक ओटीपी का उपयोग करें।' : 'WhatsApp delivery delayed. Use Fallback OTP.');
-        setTimeout(() => setToastMessage(''), 8000);
+
+      if (result.success) {
+        setResendTimer(60);
+        setStep('otp');
+        setOtp('');
+        setToastMessage(lang === 'hi' ? `एसएमएस ओटीपी +91 ${cleanPhone} पर भेज दिया गया है` : `SMS OTP sent to +91 ${cleanPhone}`);
+        setTimeout(() => setToastMessage(''), 6000);
+      } else {
+        setError(result.error || (lang === 'hi' ? 'ओटीपी भेजने में त्रुटि। कृपया पुनः प्रयास करें।' : 'Failed to send OTP. Please try again.'));
       }
     } catch (err) {
       setIsSendingOtp(false);
-      setWaDeliveryFailed(true);
-      setToastMessage(lang === 'hi' ? 'व्हाट्सएप डिलीवरी में देरी। फॉलबैक ओटीपी का उपयोग करें।' : 'WhatsApp delivery delayed. Use Fallback OTP.');
-      setTimeout(() => setToastMessage(''), 8000);
+      setError(lang === 'hi' ? 'Firebase प्रमाणीकरण त्रुटि। कृपया नेटवर्क जांचें।' : 'Firebase Auth error. Please check network connection.');
     }
   };
 
-  // Resend OTP via WhatsApp
-  const handleResendOtp = async () => {
-    if (resendTimer > 0) return;
+  // Resend OTP via Firebase Phone Auth
+  const handleResendFirebaseOtp = async () => {
+    if (resendTimer > 0 || isSendingOtp) return;
     setError('');
     setIsSendingOtp(true);
     const cleanPhone = phone.replace(/\D/g, '').slice(-10);
 
-    const otpResult = requestOtp(cleanPhone);
-    if (!otpResult.success) {
-      setIsSendingOtp(false);
-      setError(otpResult.error);
-      return;
-    }
-
-    const code = otpResult.code;
-    setActiveOtpCode(code);
-    setResendTimer(60);
-    setWaDeliveryFailed(false);
-
-    setToastMessage(lang === 'hi' ? `नया ओटीपी +91 ${cleanPhone} पर भेज दिया गया है` : `New OTP sent to +91 ${cleanPhone}`);
-    setTimeout(() => setToastMessage(''), 6000);
-
     try {
-      const waResult = await sendRealWhatsAppOtp(cleanPhone, code, lang);
+      const result = await sendFirebasePhoneOtp(cleanPhone, 'recaptcha-container');
       setIsSendingOtp(false);
-      if (!waResult.success) {
-        setWaDeliveryFailed(true);
-        setToastMessage(lang === 'hi' ? 'व्हाट्सएप डिलीवरी में देरी। फॉलबैक ओटीपी का उपयोग करें।' : 'WhatsApp delivery delayed. Use Fallback OTP.');
-        setTimeout(() => setToastMessage(''), 8000);
+
+      if (result.success) {
+        setResendTimer(60);
+        setToastMessage(lang === 'hi' ? `नया ओटीपी +91 ${cleanPhone} पर भेज दिया गया है` : `New OTP sent to +91 ${cleanPhone}`);
+        setTimeout(() => setToastMessage(''), 6000);
+      } else {
+        setError(result.error || (lang === 'hi' ? 'ओटीपी पुनः भेजने में त्रुटि।' : 'Failed to resend OTP.'));
       }
     } catch (err) {
       setIsSendingOtp(false);
-      setWaDeliveryFailed(true);
-      setToastMessage(lang === 'hi' ? 'व्हाट्सएप डिलीवरी में देरी। फॉलबैक ओटीपी का उपयोग करें।' : 'WhatsApp delivery delayed. Use Fallback OTP.');
-      setTimeout(() => setToastMessage(''), 8000);
-    }
-  };
-
-  // Fallback: Send via Regular SMS
-  const handleSendSmsFallback = async () => {
-    setError('');
-    const cleanPhone = phone.replace(/\D/g, '').slice(-10);
-    const result = await sendRealSmsToPhone(cleanPhone, activeOtpCode);
-    if (result.success) {
-      setSmsFallbackSent(true);
-      setTimeout(() => setSmsFallbackSent(false), 5000);
-    } else {
-      setError(lang === 'hi' ? 'एसएमएस भेजना विफल रहा। कृपया गेटवे सेटिंग्स जांचें।' : 'Failed to send SMS fallback. Check gateway settings.');
+      setError(lang === 'hi' ? 'Firebase प्रमाणीकरण त्रुटि।' : 'Firebase Auth error.');
     }
   };
 
   // ─────────────────────────────────────────────────────────────
-  // 2. Verify OTP Logic
+  // 2. Firebase Phone Auth: Verify 6-Digit OTP
   // ─────────────────────────────────────────────────────────────
-  const handleVerifyOtp = (e) => {
+  const handleVerifyFirebaseOtp = async (e) => {
     e?.preventDefault();
     if (!otp || otp.length < 6) {
-      setError(lang === 'hi' ? 'कृपया 6-अंकीय ओटीपी दर्ज करें' : 'Please enter the full 6-digit OTP');
+      setError(lang === 'hi' ? 'कृपया पूरा 6-अंकीय ओटीपी दर्ज करें' : 'Please enter the full 6-digit OTP');
       return;
     }
     setError('');
     setIsVerifyingOtp(true);
 
-    const result = verifyOtp(phone, otp);
-    setIsVerifyingOtp(false);
+    try {
+      const result = await verifyFirebaseOtp(otp);
+      setIsVerifyingOtp(false);
 
-    if (result.success) {
-      if (result.isNewUser) {
-        setStep('profile_setup');
-      } else {
-        if (result.role === 'farmer') {
-          setActiveRole('farmer');
-        } else if (result.role === 'driver') {
-          setActiveRole('driver');
-        } else if (result.role === 'admin') {
-          setActiveRole('admin');
+      if (result.success) {
+        // Authenticate & Assign Role in AuthContext
+        const authRes = loginWithPhoneSuccess(phone);
+        if (authRes.isNewUser) {
+          setStep('profile_setup');
         }
+      } else {
+        setError(result.error || (lang === 'hi' ? 'गलत ओटीपी कोड। कृपया एसएमएस में आया कोड दर्ज करें।' : 'Invalid OTP code. Please re-enter.'));
       }
-    } else {
-      setError(result.error);
+    } catch (err) {
+      setIsVerifyingOtp(false);
+      setError(lang === 'hi' ? 'ओटीपी सत्यापन में त्रुटि हुई।' : 'Error during OTP verification.');
     }
   };
 
@@ -360,41 +243,12 @@ export default function CreativeLoginPortal() {
     audioHelper.playBookingConfirmed();
   };
 
-  // ─────────────────────────────────────────────────────────────
-  // 5. Save Gateway Configuration Modal
-  // ─────────────────────────────────────────────────────────────
-  const handleSaveGatewayConfig = (e) => {
-    e.preventDefault();
-    if (waProvider === 'meta') {
-      localStorage.setItem('krishi_meta_config', JSON.stringify({
-        phoneId: waMetaPhoneId.trim(),
-        accessToken: waMetaToken.trim(),
-        templateName: waMetaTemplate.trim() || 'krishiseva_otp'
-      }));
-    } else if (waProvider === 'twiliowa') {
-      localStorage.setItem('krishi_twiliowa_config', JSON.stringify({
-        accountSid: waTwilioSid.trim(),
-        authToken: waTwilioToken.trim(),
-        fromNumber: waTwilioFrom.trim()
-      }));
-    } else if (waProvider === 'ultramsg') {
-      localStorage.setItem('krishi_ultramsg_config', JSON.stringify({
-        instanceId: waUltramsgInstance.trim(),
-        token: waUltramsgToken.trim()
-      }));
-    }
-
-    if (fast2smsKey) {
-      localStorage.setItem('krishi_fast2sms_api_key', fast2smsKey.trim());
-    }
-
-    setShowGatewayModal(false);
-    audioHelper.playBookingConfirmed();
-  };
-
   return (
     <div className="min-h-screen bg-stone-950 text-stone-100 flex flex-col justify-between selection:bg-emerald-500 selection:text-stone-950 font-sans relative overflow-x-hidden">
       
+      {/* Invisible reCAPTCHA container for Firebase Phone Auth */}
+      <div id="recaptcha-container"></div>
+
       {/* ───── Cinematic Hero Background Video (Wheat Field Barley) ───── */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
         <video
@@ -439,15 +293,6 @@ export default function CreativeLoginPortal() {
 
         {/* Right Top Header Navigation */}
         <div className="flex items-center gap-2.5">
-          <button
-            onClick={() => setShowGatewayModal(true)}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-emerald-800/80 bg-emerald-950/60 hover:bg-emerald-900/80 text-emerald-300 hover:text-white text-xs font-bold transition-all duration-200 backdrop-blur-md hover:border-emerald-600 shadow-sm"
-            title="Configure Meta WhatsApp Cloud API"
-          >
-            <Settings className="w-3.5 h-3.5 text-emerald-400" />
-            <span className="hidden sm:inline">{lang === 'hi' ? 'व्हाट्सएप गेटवे' : 'WhatsApp Gateway'}</span>
-          </button>
-
           <a
             href="#admin"
             className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-stone-800/80 bg-stone-900/50 hover:bg-stone-800/80 text-stone-400 hover:text-white text-xs font-bold transition-all duration-200 backdrop-blur-md hover:border-stone-700"
@@ -515,8 +360,8 @@ export default function CreativeLoginPortal() {
             <div className="animate-fade-in-up stagger-4 flex flex-wrap gap-2 justify-center lg:justify-start max-w-lg mx-auto lg:mx-0">
               {[
                 { icon: <ShieldCheck className="w-3 h-3" />, text: lang === 'hi' ? '100% KYC फ्लीट' : '100% KYC Fleet', color: 'text-amber-400 bg-amber-950/50 border-amber-800/50' },
-                { icon: <LandPlot className="w-3 h-3" />, text: 'AgriStack', color: 'text-blue-400 bg-blue-950/50 border-blue-800/50' },
-                { icon: <MessageSquare className="w-3 h-3" />, text: 'Meta WhatsApp OTP', color: 'text-emerald-400 bg-emerald-950/50 border-emerald-800/50' },
+                { icon: <LandPlot className="w-3 h-3" />, text: 'AgriStack UPFR', color: 'text-blue-400 bg-blue-950/50 border-blue-800/50' },
+                { icon: <ShieldCheck className="w-3 h-3" />, text: 'Firebase Phone Auth', color: 'text-emerald-400 bg-emerald-950/50 border-emerald-800/50' },
               ].map((f, i) => (
                 <span key={i} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold border ${f.color} backdrop-blur-sm`}>
                   {f.icon}
@@ -543,17 +388,18 @@ export default function CreativeLoginPortal() {
                       {lang === 'hi' ? 'कृषि सेवा में प्रवेश करें' : 'Get Started with KrishiSeva'}
                     </h2>
                     <p className="text-stone-400 text-xs sm:text-sm font-medium leading-relaxed">
-                      {lang === 'hi' ? 'सत्यापन हेतु अपना 10-अंकीय मोबाइल नंबर दर्ज करें' : 'Enter your 10-digit mobile number for WhatsApp verification'}
+                      {lang === 'hi' ? 'सत्यापन हेतु अपना 10-अंकीय मोबाइल नंबर दर्ज करें' : 'Enter your 10-digit mobile number for Firebase verification'}
                     </p>
                   </div>
 
                   {error && (
-                    <div className="p-3 rounded-xl bg-red-950/80 border border-red-800/60 text-red-300 text-xs font-bold text-center animate-fade-in">
-                      {error}
+                    <div className="p-3.5 rounded-2xl bg-red-950/80 border border-red-800/60 text-red-300 text-xs font-bold text-center flex items-center justify-center gap-2 animate-fade-in">
+                      <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
+                      <span>{error}</span>
                     </div>
                   )}
 
-                  <form onSubmit={handleSendOtp} className="space-y-4">
+                  <form onSubmit={handleSendFirebaseOtp} className="space-y-4">
                     <div>
                       <label className="block text-xs font-bold text-stone-400 uppercase tracking-wider mb-2">
                         {lang === 'hi' ? 'मोबाइल नंबर दर्ज करें' : 'Enter Mobile Number'}
@@ -584,12 +430,12 @@ export default function CreativeLoginPortal() {
                       {isSendingOtp ? (
                         <>
                           <Clock className="w-5 h-5 animate-spin text-stone-950" />
-                          <span>{lang === 'hi' ? 'ओटीपी भेजा जा रहा है...' : 'Sending WhatsApp OTP...'}</span>
+                          <span>{lang === 'hi' ? 'ओटीपी भेजा जा रहा है...' : 'Sending Firebase OTP...'}</span>
                         </>
                       ) : (
                         <>
-                          <MessageSquare className="w-5 h-5 text-stone-950" />
-                          <span>{lang === 'hi' ? 'व्हाट्सएप पर ओटीपी भेजें' : 'Send OTP on WhatsApp'}</span>
+                          <Phone className="w-5 h-5 text-stone-950" />
+                          <span>{lang === 'hi' ? 'ओटीपी भेजें (Firebase)' : 'Send OTP via Firebase'}</span>
                           <ArrowRight className="w-5 h-5 text-stone-950" />
                         </>
                       )}
@@ -599,23 +445,23 @@ export default function CreativeLoginPortal() {
                   {/* Security assurance */}
                   <div className="flex items-center justify-center gap-2 text-[10px] text-stone-500 pt-1">
                     <Lock className="w-3 h-3" />
-                    <span>{lang === 'hi' ? 'सुरक्षित प्रमाणीकरण • 5 मिनट की वैधता' : 'Secure Verification • 5-min OTP Validity'}</span>
+                    <span>{lang === 'hi' ? 'सुरक्षित Firebase SMS • Google reCAPTCHA' : 'Secure Firebase SMS Auth • Google reCAPTCHA'}</span>
                   </div>
                 </div>
               )}
 
-              {/* STEP 2: 6-Digit WhatsApp OTP Input */}
+              {/* STEP 2: 6-Digit OTP Verification Screen */}
               {step === 'otp' && (
                 <div className="space-y-5 animate-fade-in-up">
                   <div className="text-center space-y-1.5">
                     <div className="w-14 h-14 mx-auto rounded-2xl bg-emerald-950/80 border border-emerald-700/50 flex items-center justify-center mb-3">
-                      <MessageSquare className="w-7 h-7 text-emerald-400" />
+                      <Phone className="w-7 h-7 text-emerald-400" />
                     </div>
                     <h3 className="text-2xl font-black text-white tracking-tight">
                       {lang === 'hi' ? '6-अंकीय ओटीपी दर्ज करें' : 'Enter 6-Digit OTP'}
                     </h3>
                     <p className="text-stone-400 text-xs font-medium">
-                      {lang === 'hi' ? `व्हाट्सएप (+91 ${phone}) पर भेजा गया सुरक्षा कोड` : `Verification code sent to WhatsApp (+91 ${phone})`}
+                      {lang === 'hi' ? `मोबाइल (+91 ${phone}) पर भेजा गया SMS कोड` : `SMS verification code sent to +91 ${phone}`}
                     </p>
                   </div>
 
@@ -627,67 +473,13 @@ export default function CreativeLoginPortal() {
                   )}
 
                   {error && (
-                    <div className="p-3 rounded-2xl bg-red-950/80 border border-red-800/60 text-red-300 text-xs font-bold text-center animate-fade-in">
-                      {error}
+                    <div className="p-3.5 rounded-2xl bg-red-950/80 border border-red-800/60 text-red-300 text-xs font-bold text-center flex items-center justify-center gap-2 animate-fade-in">
+                      <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
+                      <span>{error}</span>
                     </div>
                   )}
 
-                  {/* ⚡ Comprehensive Fallback Mode when WhatsApp is Delayed or Blocked */}
-                  {waDeliveryFailed && (
-                    <div className="space-y-3 animate-fade-in">
-                      {/* Option A: Testing / Demo Mode Fallback OTP Pill */}
-                      <div className="p-3.5 rounded-2xl bg-emerald-950/70 border border-emerald-600/60 text-emerald-200 text-xs flex items-center justify-between gap-2 shadow-lg">
-                        <div className="flex items-center gap-2">
-                          <span className="text-base">⚡</span>
-                          <div>
-                            <span className="text-[10px] text-stone-400 uppercase tracking-wider block font-bold">
-                              {lang === 'hi' ? 'व्हाट्सएप विलंब • फॉलबैक सुरक्षा कोड:' : 'WhatsApp Delayed • Fallback OTP:'}
-                            </span>
-                            <span className="font-mono text-base font-black text-emerald-400 tracking-wider">
-                              {activeOtpCode}
-                            </span>
-                          </div>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => setOtp(activeOtpCode)}
-                          className="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-black text-[11px] transition-all shadow-md active:scale-95"
-                        >
-                          {lang === 'hi' ? 'ओटीपी भरें ✓' : 'Auto Fill ✓'}
-                        </button>
-                      </div>
-
-                      {/* Option B & C: WhatsApp Web Direct Link & Carrier SMS */}
-                      <div className="p-3 rounded-2xl bg-stone-950/80 border border-stone-800/80 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs">
-                        <a
-                          href={`https://wa.me/918810930207?text=Hi%20KrishiSeva%20OTP%20${activeOtpCode}`}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-1.5 hover:underline"
-                        >
-                          <MessageSquare className="w-3.5 h-3.5" />
-                          <span>{lang === 'hi' ? 'व्हाट्सएप ऐप पर खोलें' : 'Send via WhatsApp Web'}</span>
-                        </a>
-
-                        <button
-                          type="button"
-                          onClick={handleSendSmsFallback}
-                          className="text-amber-400 hover:text-amber-300 font-bold flex items-center gap-1.5 hover:underline"
-                        >
-                          <Smartphone className="w-3.5 h-3.5" />
-                          <span>{lang === 'hi' ? 'सामान्य एसएमएस द्वारा भेजें' : 'Send via Regular SMS'}</span>
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  {smsFallbackSent && (
-                    <div className="p-3 rounded-2xl bg-emerald-950/40 border border-emerald-900/30 text-emerald-300 text-xs font-bold text-center animate-fade-in">
-                      {lang === 'hi' ? 'एसएमएस सफलतापूर्वक भेजा गया!' : 'SMS fallback sent successfully!'}
-                    </div>
-                  )}
-
-                  <form onSubmit={handleVerifyOtp} className="space-y-4">
+                  <form onSubmit={handleVerifyFirebaseOtp} className="space-y-4">
                     <div>
                       <input
                         type="text"
@@ -701,7 +493,7 @@ export default function CreativeLoginPortal() {
                       />
                     </div>
 
-                    {/* Resend OTP with 60-Second Timer */}
+                    {/* Resend OTP with 60-Second Countdown Timer */}
                     <div className="flex items-center justify-between text-xs px-1">
                       <span className="text-stone-400">
                         {resendTimer > 0 ? (
@@ -713,7 +505,7 @@ export default function CreativeLoginPortal() {
 
                       <button
                         type="button"
-                        onClick={handleResendOtp}
+                        onClick={handleResendFirebaseOtp}
                         disabled={resendTimer > 0 || isSendingOtp}
                         className={`font-black transition-all duration-200 ${
                           resendTimer > 0 || isSendingOtp
@@ -721,26 +513,14 @@ export default function CreativeLoginPortal() {
                             : 'text-emerald-400 hover:text-emerald-300 underline underline-offset-2'
                         }`}
                       >
-                        {lang === 'hi' ? 'व्हाट्सएप पर पुनः भेजें' : 'Resend via WhatsApp'}
-                      </button>
-                    </div>
-
-                    {/* Regular SMS Fallback Button */}
-                    <div className="text-center pt-1">
-                      <button
-                        type="button"
-                        onClick={handleSendSmsFallback}
-                        className="inline-flex items-center gap-1.5 text-[11px] text-stone-400 hover:text-amber-300 font-bold transition-all hover:underline"
-                      >
-                        <Smartphone className="w-3.5 h-3.5" />
-                        <span>{lang === 'hi' ? 'सामान्य एसएमएस द्वारा भेजें' : 'Send via Regular SMS'}</span>
+                        {lang === 'hi' ? 'ओटीपी पुनः भेजें' : 'Resend OTP'}
                       </button>
                     </div>
 
                     <div className="flex gap-2 pt-1">
                       <button
                         type="button"
-                        onClick={() => { setStep('phone'); setOtp(''); setError(''); setWaDeliveryFailed(false); }}
+                        onClick={() => { setStep('phone'); setOtp(''); setError(''); }}
                         className="w-1/3 py-4 rounded-2xl border border-stone-700/80 text-stone-300 font-bold text-xs hover:bg-stone-800/80 hover:border-stone-600 transition-all duration-200"
                       >
                         {lang === 'hi' ? 'नंबर बदलें' : 'Change Number'}
@@ -754,7 +534,7 @@ export default function CreativeLoginPortal() {
                         {isVerifyingOtp ? (
                           <>
                             <Clock className="w-4 h-4 animate-spin text-stone-950" />
-                            <span>{lang === 'hi' ? 'जांच रहे हैं...' : 'Verifying...'}</span>
+                            <span>{lang === 'hi' ? 'सत्यापित हो रहा है...' : 'Verifying...'}</span>
                           </>
                         ) : (
                           <>
@@ -784,7 +564,7 @@ export default function CreativeLoginPortal() {
                   </div>
 
                   {error && (
-                    <div className="p-3 rounded-2xl bg-red-950/80 border border-red-800/60 text-red-300 text-xs font-bold text-center animate-fade-in">
+                    <div className="p-3.5 rounded-2xl bg-red-950/80 border border-red-800/60 text-red-300 text-xs font-bold text-center animate-fade-in">
                       {error}
                     </div>
                   )}
@@ -1077,189 +857,13 @@ export default function CreativeLoginPortal() {
       {/* ═══════════ BOTTOM FOOTER ═══════════ */}
       <footer className="relative z-10 border-t border-stone-800/80 bg-stone-950/80 backdrop-blur-md px-6 py-4">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-stone-500">
-          <span>© 2026 KrishiSeva • 100% Verified Agricultural Heavy Fleet Network</span>
+          <span>© 2026 KrishiSeva • Official Firebase Phone Authentication & AgriStack UPFR Network</span>
           <div className="flex items-center gap-4 text-stone-400">
             <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5 text-emerald-400" /> Malihabad, Lucknow</span>
             <span className="flex items-center gap-1"><Phone className="w-3.5 h-3.5 text-emerald-400" /> 1800-KRISHI-SEVA</span>
           </div>
         </div>
       </footer>
-
-      {/* ═══════════ WHATSAPP & SMS GATEWAY MODAL ═══════════ */}
-      {showGatewayModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
-          <div className="bg-stone-900 border border-stone-800 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto">
-            
-            <div className="flex items-center justify-between border-b border-stone-800 pb-4">
-              <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-xl bg-emerald-950 text-emerald-400 border border-emerald-800">
-                  <Settings className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-white">WhatsApp & SMS Gateway</h3>
-                  <p className="text-xs text-stone-400">Configure Meta Cloud API or custom SMS gateways</p>
-                </div>
-              </div>
-              <button
-                onClick={() => setShowGatewayModal(false)}
-                className="p-2 text-stone-400 hover:text-white rounded-lg hover:bg-stone-800 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleSaveGatewayConfig} className="space-y-4">
-              <div className="space-y-3 p-4 rounded-2xl bg-stone-950/60 border border-stone-800/80">
-                <label className="block text-xs font-bold text-emerald-400 uppercase tracking-wider">
-                  WhatsApp Provider
-                </label>
-                <select
-                  value={waProvider}
-                  onChange={(e) => setWaProvider(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-stone-900 border border-stone-800 text-stone-200 text-sm focus:border-emerald-500 focus:outline-none"
-                >
-                  <option value="meta">Meta WhatsApp Cloud API (Official Business - Recommended)</option>
-                  <option value="twiliowa">Twilio WhatsApp API (Global)</option>
-                  <option value="ultramsg">UltraMsg (Instance Scan QR)</option>
-                </select>
-
-                {waProvider === 'meta' && (
-                  <div className="space-y-3 pt-2">
-                    <div>
-                      <label className="block text-xs text-stone-400 mb-1">Phone Number ID *</label>
-                      <input
-                        type="text"
-                        value={waMetaPhoneId}
-                        onChange={(e) => setWaMetaPhoneId(e.target.value)}
-                        placeholder="e.g. 10928374829302"
-                        className="w-full px-3.5 py-2 rounded-xl bg-stone-900 border border-stone-800 text-stone-200 text-sm focus:border-emerald-500 focus:outline-none"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs text-stone-400 mb-1">System User Access Token *</label>
-                      <input
-                        type="password"
-                        value={waMetaToken}
-                        onChange={(e) => setWaMetaToken(e.target.value)}
-                        placeholder="EAAGz..."
-                        className="w-full px-3.5 py-2 rounded-xl bg-stone-900 border border-stone-800 text-stone-200 text-sm focus:border-emerald-500 focus:outline-none"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs text-stone-400 mb-1">Approved Template Name</label>
-                      <input
-                        type="text"
-                        value={waMetaTemplate}
-                        onChange={(e) => setWaMetaTemplate(e.target.value)}
-                        placeholder="krishiseva_otp"
-                        className="w-full px-3.5 py-2 rounded-xl bg-stone-900 border border-stone-800 text-stone-200 text-sm focus:border-emerald-500 focus:outline-none"
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {waProvider === 'twiliowa' && (
-                  <div className="space-y-3 pt-2">
-                    <div>
-                      <label className="block text-xs text-stone-400 mb-1">Account SID</label>
-                      <input
-                        type="text"
-                        value={waTwilioSid}
-                        onChange={(e) => setWaTwilioSid(e.target.value)}
-                        placeholder="AC..."
-                        className="w-full px-3.5 py-2 rounded-xl bg-stone-900 border border-stone-800 text-stone-200 text-sm focus:border-emerald-500 focus:outline-none"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs text-stone-400 mb-1">Auth Token</label>
-                      <input
-                        type="password"
-                        value={waTwilioToken}
-                        onChange={(e) => setWaTwilioToken(e.target.value)}
-                        placeholder="Twilio Auth Token"
-                        className="w-full px-3.5 py-2 rounded-xl bg-stone-900 border border-stone-800 text-stone-200 text-sm focus:border-emerald-500 focus:outline-none"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs text-stone-400 mb-1">Sender Number</label>
-                      <input
-                        type="text"
-                        value={waTwilioFrom}
-                        onChange={(e) => setWaTwilioFrom(e.target.value)}
-                        placeholder="e.g. +14155238886"
-                        className="w-full px-3.5 py-2 rounded-xl bg-stone-900 border border-stone-800 text-stone-200 text-sm focus:border-emerald-500 focus:outline-none"
-                        required
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {waProvider === 'ultramsg' && (
-                  <div className="space-y-3 pt-2">
-                    <div>
-                      <label className="block text-xs text-stone-400 mb-1">Instance ID</label>
-                      <input
-                        type="text"
-                        value={waUltramsgInstance}
-                        onChange={(e) => setWaUltramsgInstance(e.target.value)}
-                        placeholder="instance189242"
-                        className="w-full px-3.5 py-2 rounded-xl bg-stone-900 border border-stone-800 text-stone-200 text-sm focus:border-emerald-500 focus:outline-none"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs text-stone-400 mb-1">Token</label>
-                      <input
-                        type="password"
-                        value={waUltramsgToken}
-                        onChange={(e) => setWaUltramsgToken(e.target.value)}
-                        placeholder="93rhhy7fj9ea2k81"
-                        className="w-full px-3.5 py-2 rounded-xl bg-stone-900 border border-stone-800 text-stone-200 text-sm focus:border-emerald-500 focus:outline-none"
-                        required
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Fast2SMS Carrier Fallback */}
-              <div className="space-y-3 p-4 rounded-2xl bg-stone-950/60 border border-stone-800/80">
-                <label className="block text-xs font-bold text-amber-400 uppercase tracking-wider">
-                  Carrier SMS Fallback (Fast2SMS API Key)
-                </label>
-                <input
-                  type="password"
-                  value={fast2smsKey}
-                  onChange={(e) => setFast2smsKey(e.target.value)}
-                  placeholder="Paste Fast2SMS API Key for Indian SMS fallback"
-                  className="w-full px-3.5 py-2 rounded-xl bg-stone-900 border border-stone-800 text-stone-200 text-sm focus:border-emerald-500 focus:outline-none"
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowGatewayModal(false)}
-                  className="px-5 py-2.5 rounded-xl border border-stone-800 hover:bg-stone-800 text-stone-400 hover:text-white text-xs font-bold transition-all duration-200"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 text-xs font-black shadow-lg shadow-emerald-500/10 transition-all duration-200"
-                >
-                  Save Configuration
-                </button>
-              </div>
-            </form>
-
-          </div>
-        </div>
-      )}
 
     </div>
   );

@@ -286,8 +286,58 @@ export function AuthProvider({ children }) {
 
     return { 
       success: false, 
-      error: lang === 'hi' ? 'गलत ओटीपी कोड। कृपया सही 6-अंकीय कोड दर्ज करें।' : 'Invalid OTP. Please check the code sent to your WhatsApp.' 
+      error: lang === 'hi' ? 'गलत ओटीपी कोड। कृपया सही 6-अंकीय कोड दर्ज करें।' : 'Invalid OTP. Please check the code sent to your mobile.' 
     };
+  };
+
+  // Direct login upon successful Firebase Phone Auth verification
+  const loginWithPhoneSuccess = (phone) => {
+    const cleanPhone = phone.replace(/\D/g, '').slice(-10);
+    const existingUser = usersDb[cleanPhone];
+
+    if (existingUser) {
+      const user = {
+        isAuthenticated: true,
+        phone: existingUser.phone,
+        role: existingUser.role,
+        name: existingUser.name,
+        village: existingUser.village || 'Gram Panchayat Malihabad',
+        isAgriStackVerified: !!existingUser.isAgriStackVerified,
+        farmerId: existingUser.farmerId || null
+      };
+      setCurrentUser(user);
+      setActiveRole(existingUser.role);
+
+      if (existingUser.role === 'driver') {
+        setDriverProfile({
+          id: `drv_${existingUser.phone}`,
+          fullName: existingUser.name,
+          phone: existingUser.phone,
+          vehicleNumber: existingUser.vehicleNumber || 'UP-32-KR-7744',
+          vehicleType: existingUser.vehicleType || 'tractor',
+          modelName: existingUser.modelName || 'Mahindra 575 DI (50 HP)',
+          hourlyRate: existingUser.hourlyRate || 1000,
+          acreRate: existingUser.acreRate || 1300,
+          verificationStatus: existingUser.verificationStatus || 'verified',
+          status: existingUser.status || 'online',
+          totalEarnings: existingUser.totalEarnings ?? 0,
+          completedRides: existingUser.completedRides ?? 0,
+          rating: existingUser.rating ?? 5.0,
+          dlImage: 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=600&auto=format&fit=crop&q=80',
+          plateImage: 'https://images.unsplash.com/photo-1592417817098-8f3d6910985c?w=600&auto=format&fit=crop&q=80',
+          lat: 26.9240,
+          lng: 80.7130
+        });
+      }
+
+      audioHelper.playBookingConfirmed();
+      return { success: true, isNewUser: false, role: existingUser.role };
+    } else {
+      setPendingAuthPhone(cleanPhone);
+      setIsNewUserRoleSelectionRequired(true);
+      audioHelper.playOtpChime();
+      return { success: true, isNewUser: true };
+    }
   };
 
   // Direct Phone Login Helper (Fallback bypass)
@@ -472,6 +522,7 @@ export function AuthProvider({ children }) {
         toggleDriverDuty,
         setDriverVerification,
         loginWithPhone,
+        loginWithPhoneSuccess,
         requestOtp,
         verifyOtp,
         generatedOtp,
