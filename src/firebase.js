@@ -9,6 +9,9 @@ const firebaseConfig = {
   messagingSenderId: "99454088088"
 };
 
+// Debug Log to confirm key loading
+console.log("Initializing Firebase with API Key:", firebaseConfig.apiKey);
+
 export const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 export const auth = getAuth(app);
 export { RecaptchaVerifier, signInWithPhoneNumber };
