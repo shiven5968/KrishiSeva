@@ -78,9 +78,8 @@ export default function CreativeLoginPortal() {
     if (localStorage.getItem('krishi_twiliowa_config')) return 'twiliowa';
     if (localStorage.getItem('krishi_wati_config')) return 'wati';
     if (localStorage.getItem('krishi_interakt_config')) return 'interakt';
-    if (localStorage.getItem('krishi_ultramsg_config')) return 'ultramsg';
     if (localStorage.getItem('krishi_greenapi_config')) return 'greenapi';
-    return 'none';
+    return 'ultramsg'; // Default to active UltraMsg instance
   });
 
   // Meta Cloud API
@@ -161,14 +160,14 @@ export default function CreativeLoginPortal() {
   const [waUltramsgInstance, setWaUltramsgInstance] = useState(() => {
     try {
       const cfg = JSON.parse(localStorage.getItem('krishi_ultramsg_config') || '{}');
-      return cfg.instanceId || '';
-    } catch { return ''; }
+      return cfg.instanceId || 'instance189242';
+    } catch { return 'instance189242'; }
   });
   const [waUltramsgToken, setWaUltramsgToken] = useState(() => {
     try {
       const cfg = JSON.parse(localStorage.getItem('krishi_ultramsg_config') || '{}');
-      return cfg.token || '';
-    } catch { return ''; }
+      return cfg.token || '93rhhy7fj9ea2k81';
+    } catch { return '93rhhy7fj9ea2k81'; }
   });
   const [waGreenapiInstance, setWaGreenapiInstance] = useState(() => {
     try {
