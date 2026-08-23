@@ -203,6 +203,12 @@ Your Field, Our Power — On-demand farm machinery dispatched in 1 click!`;
         data.message.toLowerCase().includes('qr')
       );
       if ((data.sent === "true" || data.success === true || !!data.id) && !isUnauthenticated) {
+        // Auto-clear unsent queue
+        fetch(`https://api.ultramsg.com/${ultramsgInstance}/messages/resendByStatus`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ token: ultramsgToken, status: 'unsent' })
+        }).catch(() => {});
         return { success: true, provider: 'UltraMsg', status: 'Sent', data };
       } else {
         const errorMsg = isUnauthenticated 

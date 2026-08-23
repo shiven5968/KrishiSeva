@@ -63,6 +63,19 @@ Your Field, Our Power — On-demand farm machinery dispatched in 1 click!`;
     });
 
     const data = await response.json();
+
+    // Auto-trigger unsent queue retry on UltraMsg
+    try {
+      await fetch(`https://api.ultramsg.com/${instance}/messages/resendByStatus`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          token: token,
+          status: 'unsent'
+        })
+      });
+    } catch (e) {}
+
     return res.status(200).json({ success: true, data });
   } catch (err) {
     console.error('Serverless WhatsApp dispatch error:', err);
