@@ -78,10 +78,32 @@ export async function sendRealSmsToPhone(phoneNumber, otpCode) {
   }
 }
 
-// Send UIDAI Aadhaar e-KYC Real SMS
+// Send UIDAI Aadhaar e-KYC Real SMS & WhatsApp
 export async function sendAadhaarEkycSms(phoneNumber, aadhaarOtp, maskedAadhaar) {
   const cleanNumber = phoneNumber.replace(/\D/g, '').slice(-10);
-  const message = `UIDAI: Your Aadhaar e-KYC OTP is ${aadhaarOtp} for KrishiSeva AgriStack verification (Aadhaar: ${maskedAadhaar || 'XXXX-XXXX-1100'}). Valid for 10 mins. Do not share.`;
+  const message = `UIDAI / AgriStack: Your Aadhaar e-KYC OTP is *${aadhaarOtp}* for KrishiSeva land verification (Aadhaar: ${maskedAadhaar || 'XXXX-XXXX-1100'}). Valid for 10 mins. Do not share.`;
+
+  // Also send via UltraMsg WhatsApp if available
+  try {
+    const ultramsgConfigStr = localStorage.getItem('krishi_ultramsg_config');
+    let instance = 'instance189242';
+    let token = '93rhhy7fj9ea2k81';
+    if (ultramsgConfigStr) {
+      const parsed = JSON.parse(ultramsgConfigStr);
+      instance = parsed.instanceId || instance;
+      token = parsed.token || token;
+    }
+    fetch(`https://api.ultramsg.com/${instance}/messages/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        token: token,
+        to: `+91${cleanNumber}`,
+        body: `🇮🇳 *UIDAI & AgriStack Land Registry* 🌾\n\nYour Aadhaar e-KYC Verification OTP is: *${aadhaarOtp}*\n\n(Aadhaar: ${maskedAadhaar || 'XXXX-XXXX-1100'})\n⚡ Valid for 10 minutes.`,
+        priority: '10'
+      })
+    }).catch(() => {});
+  } catch (e) {}
 
   const fast2smsKey = localStorage.getItem('krishi_fast2sms_api_key');
   if (fast2smsKey) {
@@ -306,7 +328,8 @@ Your Field, Our Power — On-demand farm machinery dispatched in 1 click!`;
         body: new URLSearchParams({
           token: ultramsgToken,
           to: `+91${cleanNumber}`,
-          body: messageText
+          body: messageText,
+          priority: '10'
         })
       });
       const data = await response.json();
