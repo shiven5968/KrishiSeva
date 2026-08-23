@@ -310,10 +310,18 @@ Your Field, Our Power — On-demand farm machinery dispatched in 1 click!`;
         })
       });
       const data = await response.json();
-      if (data.sent === "true" || data.success === true || !!data.id) {
+      const isUnauthenticated = data.message && (
+        data.message.toLowerCase().includes('not authenticated') ||
+        data.message.toLowerCase().includes('not connected') ||
+        data.message.toLowerCase().includes('qr')
+      );
+      if ((data.sent === "true" || data.success === true || !!data.id) && !isUnauthenticated) {
         return { success: true, provider: 'UltraMsg', status: 'Sent', data };
       } else {
-        return { success: false, provider: 'UltraMsg', status: 'Failed', error: 'UltraMsg failed to send' };
+        const errorMsg = isUnauthenticated 
+          ? 'UltraMsg WhatsApp instance is not paired/authenticated with WhatsApp yet.' 
+          : (data.message || data.error || 'UltraMsg failed to send');
+        return { success: false, provider: 'UltraMsg', status: 'Failed', error: errorMsg, data };
       }
     } catch (err) {
       console.warn('UltraMsg gateway error:', err);

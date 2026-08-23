@@ -195,14 +195,14 @@ export function AuthProvider({ children }) {
 
     const lang = localStorage.getItem('krishi_lang') || 'hi';
 
-    if (limitData.requestTimestamps.length >= 3) {
+    if (limitData.requestTimestamps.length >= 50) {
       const oldestActive = limitData.requestTimestamps[0];
       const timeRemainingMs = (oldestActive + 15 * 60 * 1000) - now;
       const minutesRemaining = Math.ceil(timeRemainingMs / (60 * 1000));
       
       const errorMsg = lang === 'hi' 
         ? `ओटीपी सीमा पार हो गई है। कृपया ${minutesRemaining} मिनट बाद पुनः प्रयास करें।`
-        : `Rate limit exceeded. Maximum 3 requests per 15 mins. Try again in ${minutesRemaining} minutes.`;
+        : `Rate limit exceeded. Try again in ${minutesRemaining} minutes.`;
       
       return { success: false, error: errorMsg };
     }

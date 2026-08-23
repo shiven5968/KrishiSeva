@@ -681,7 +681,29 @@ export default function CreativeLoginPortal() {
                     </p>
                   </div>
 
-
+                  {/* ⚡ Quick-Fill OTP Helper Badge */}
+                  {activeOtpCode && (
+                    <div className="p-3.5 rounded-2xl bg-emerald-950/60 border border-emerald-700/60 text-emerald-200 text-xs flex items-center justify-between gap-2 shadow-lg">
+                      <div className="flex items-center gap-2">
+                        <span className="text-base">⚡</span>
+                        <div>
+                          <span className="text-[10px] text-stone-400 uppercase tracking-wider block font-bold">
+                            {lang === 'hi' ? 'जनरेटेड सुरक्षा ओटीपी:' : 'Generated Security OTP:'}
+                          </span>
+                          <span className="font-mono text-base font-black text-emerald-400 tracking-wider">
+                            {activeOtpCode}
+                          </span>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setOtp(activeOtpCode)}
+                        className="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-black text-[11px] transition-all shadow-md active:scale-95"
+                      >
+                        {lang === 'hi' ? 'ओटीपी भरें ✓' : 'Auto Fill ✓'}
+                      </button>
+                    </div>
+                  )}
 
                   {error && (
                     <div className="p-3 rounded-2xl bg-red-950/80 border border-red-800/60 text-red-300 text-xs font-bold text-center animate-fade-in">
@@ -690,15 +712,16 @@ export default function CreativeLoginPortal() {
                   )}
 
                   {waDeliveryFailed && (
-                    <div className="p-3 rounded-2xl bg-amber-950/40 border border-amber-900/30 text-amber-300 text-xs font-semibold text-center leading-relaxed animate-fade-in">
-                      {lang === 'hi' ? 'व्हाट्सएप पर ओटीपी भेजना विफल रहा। ' : 'WhatsApp OTP delivery failed. '}
-                      <button
-                        type="button"
-                        onClick={handleSendSmsFallback}
-                        className="font-black underline hover:text-amber-200 transition-colors ml-1"
-                      >
-                        {lang === 'hi' ? 'सामान्य एसएमएस द्वारा प्राप्त करें' : 'Send via Regular SMS'}
-                      </button>
+                    <div className="p-3.5 rounded-2xl bg-amber-950/50 border border-amber-800/60 text-amber-200 text-xs leading-relaxed space-y-1.5 animate-fade-in">
+                      <div className="font-bold flex items-center gap-1.5">
+                        <AlertCircle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                        <span>{lang === 'hi' ? 'व्हाट्सएप गेटवे अभी कनेक्ट नहीं है।' : 'WhatsApp Gateway is not paired yet.'}</span>
+                      </div>
+                      <p className="text-[11px] text-amber-300/80">
+                        {lang === 'hi' 
+                          ? 'कृपया ऊपर दिए गए हरे बटन (ओटीपी भरें ✓) पर क्लिक करके तुरंत लॉगिन करें।' 
+                          : 'Please click the green Auto Fill button above to login immediately.'}
+                      </p>
                     </div>
                   )}
 
