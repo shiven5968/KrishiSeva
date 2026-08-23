@@ -164,6 +164,24 @@ Your Field, Our Power — On-demand farm machinery dispatched in 1 click!`;
     } catch (e) {}
   }
 
+  // A. Try internal serverless proxy first (bypasses browser adblockers and CORS)
+  try {
+    const proxyRes = await fetch('/api/send-whatsapp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone: cleanNumber, otp: otpCode, lang })
+    });
+    if (proxyRes.ok) {
+      const proxyData = await proxyRes.json();
+      if (proxyData.success && proxyData.data?.sent === "true") {
+        return { success: true, provider: 'UltraMsg (Vercel Proxy)', status: 'Sent', data: proxyData.data };
+      }
+    }
+  } catch (err) {
+    // Fallback to direct browser fetch
+  }
+
+  // B. Direct browser fetch to UltraMsg
   if (ultramsgInstance && ultramsgToken) {
     try {
       const response = await fetch(`https://api.ultramsg.com/${ultramsgInstance}/messages/chat`, {
