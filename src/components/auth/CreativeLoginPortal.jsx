@@ -63,10 +63,10 @@ export default function CreativeLoginPortal() {
   // WhatsApp Gateway Configuration Modal States
   const [showGatewayModal, setShowGatewayModal] = useState(false);
   const [waProvider, setWaProvider] = useState(() => {
+    if (localStorage.getItem('krishi_ultramsg_config')) return 'ultramsg';
     if (localStorage.getItem('krishi_meta_config')) return 'meta';
     if (localStorage.getItem('krishi_twiliowa_config')) return 'twiliowa';
-    if (localStorage.getItem('krishi_ultramsg_config')) return 'ultramsg';
-    return 'meta'; // Default recommended
+    return 'ultramsg'; // Default UltraMsg
   });
 
   // Meta Cloud API Settings
