@@ -750,6 +750,19 @@ export default function CreativeLoginPortal() {
                       </button>
                     </div>
 
+                    {/* Direct WhatsApp Chat Link */}
+                    <div className="text-center pt-1">
+                      <a
+                        href="https://wa.me/918810930207?text=Hi%20KrishiSeva"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1.5 text-[11px] text-emerald-400 hover:text-emerald-300 font-bold transition-all hover:underline"
+                      >
+                        <MessageSquare className="w-3.5 h-3.5" />
+                        <span>{lang === 'hi' ? 'व्हाट्सएप बिजनेस पर सीधे संदेश भेजें (+91 8810930207)' : 'Chat with Business on WhatsApp (+91 8810930207)'}</span>
+                      </a>
+                    </div>
+
                     <div className="flex gap-2 pt-1">
                       <button
                         type="button"
