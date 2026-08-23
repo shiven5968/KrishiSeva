@@ -2,10 +2,10 @@
 import { auth, app } from '../firebase';
 import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 
-export { auth, app };
+export { auth, app, RecaptchaVerifier, signInWithPhoneNumber };
 
-// Configure invisible reCAPTCHA verifier
-export function setupRecaptcha(containerId = 'recaptcha-container') {
+// Configure invisible RecaptchaVerifier attached to recaptcha-container
+export function getRecaptchaVerifier(containerId = 'recaptcha-container') {
   if (typeof window === 'undefined') return null;
 
   if (window.recaptchaVerifier) {
@@ -18,17 +18,17 @@ export function setupRecaptcha(containerId = 'recaptcha-container') {
   window.recaptchaVerifier = new RecaptchaVerifier(auth, containerId, {
     size: 'invisible',
     callback: () => {
-      // reCAPTCHA solved
+      console.log('[Firebase Auth] reCAPTCHA verified successfully.');
     },
     'expired-callback': () => {
-      console.warn('reCAPTCHA expired. Resetting verifier.');
+      console.warn('[Firebase Auth] reCAPTCHA expired, resetting verifier.');
     }
   });
 
   return window.recaptchaVerifier;
 }
 
-// Send OTP via Firebase Phone Auth to +91XXXXXXXXXX
+// Send Real SMS OTP via Firebase Phone Auth to +91XXXXXXXXXX
 export async function sendFirebasePhoneOtp(phoneNumber, containerId = 'recaptcha-container') {
   const cleanNumber = String(phoneNumber || '').replace(/\D/g, '').slice(-10);
   if (cleanNumber.length !== 10) {
@@ -36,10 +36,10 @@ export async function sendFirebasePhoneOtp(phoneNumber, containerId = 'recaptcha
   }
 
   const formattedPhone = `+91${cleanNumber}`;
-  console.log(`[Firebase Auth] Initiating signInWithPhoneNumber to: ${formattedPhone}`);
+  console.log(`[Firebase Auth] Initiating signInWithPhoneNumber for: ${formattedPhone}`);
 
   try {
-    const appVerifier = setupRecaptcha(containerId);
+    const appVerifier = getRecaptchaVerifier(containerId);
     const confirmationResult = await signInWithPhoneNumber(auth, formattedPhone, appVerifier);
     window.confirmationResult = confirmationResult;
     return { success: true, confirmationResult, phone: formattedPhone };
@@ -54,11 +54,13 @@ export async function sendFirebasePhoneOtp(phoneNumber, containerId = 'recaptcha
 
     let friendlyError = error.message;
     if (error.code === 'auth/invalid-phone-number') {
-      friendlyError = 'Invalid phone number format.';
+      friendlyError = 'Invalid mobile number format.';
     } else if (error.code === 'auth/too-many-requests') {
-      friendlyError = 'Too many requests. Please try again in a few minutes.';
+      friendlyError = 'Too many requests. Please wait a few moments before trying again.';
     } else if (error.code === 'auth/captcha-check-failed') {
-      friendlyError = 'reCAPTCHA verification failed. Please refresh and try again.';
+      friendlyError = 'Google reCAPTCHA verification failed. Please try again.';
+    } else if (error.code === 'auth/operation-not-allowed') {
+      friendlyError = 'Phone Auth is not enabled in Firebase Console. Please verify Phone Provider is enabled.';
     }
 
     return { success: false, error: friendlyError, rawError: error };
@@ -79,9 +81,9 @@ export async function verifyFirebaseOtp(otpCode) {
     console.error('[Firebase Auth] Verification Error:', error);
     let friendlyError = 'Invalid OTP code. Please try again.';
     if (error.code === 'auth/invalid-verification-code') {
-      friendlyError = 'Invalid verification code. Please check the SMS and re-enter.';
+      friendlyError = 'Incorrect OTP. Please enter the 6-digit code received on your phone.';
     } else if (error.code === 'auth/code-expired') {
-      friendlyError = 'OTP has expired. Please request a new verification code.';
+      friendlyError = 'OTP has expired. Please click "Resend OTP".';
     }
     return { success: false, error: friendlyError, rawError: error };
   }
