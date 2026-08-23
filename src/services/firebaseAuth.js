@@ -1,18 +1,8 @@
 // Firebase Phone Authentication Service for KrishiSeva
-import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
+import { auth, app } from '../firebase';
+import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAKA0aYELgi7U4lNy8qPdsKU4Id6pYCiSM",
-  authDomain: "krishiseva-95318.firebaseapp.com",
-  projectId: "krishiseva-95318",
-  storageBucket: "krishiseva-95318.firebasestorage.app",
-  messagingSenderId: "99454088088"
-};
-
-// Initialize Firebase App
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-export const auth = getAuth(app);
+export { auth, app };
 
 // Configure invisible reCAPTCHA verifier
 export function setupRecaptcha(containerId = 'recaptcha-container') {
