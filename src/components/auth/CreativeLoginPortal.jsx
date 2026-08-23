@@ -166,23 +166,25 @@ export default function CreativeLoginPortal() {
     <div className="min-h-screen bg-stone-950 text-stone-100 flex flex-col justify-between selection:bg-emerald-500 selection:text-stone-950 font-sans relative overflow-x-hidden">
       
       {/* ───── Cinematic Hero Background Video ───── */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
         <video
           autoPlay
           muted
           loop
           playsInline
-          className="absolute inset-0 w-full h-full object-cover"
+          preload="auto"
+          className="absolute inset-0 w-full h-full object-cover scale-105 transition-opacity duration-1000 opacity-60"
           poster="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=1920&q=80"
         >
           <source src="https://videos.pexels.com/video-files/2421545/2421545-hd_1920_1080_30fps.mp4" type="video/mp4" />
+          <source src="https://assets.mixkit.co/videos/preview/mixkit-aerial-view-of-a-tractor-working-in-a-field-42416-large.mp4" type="video/mp4" />
         </video>
-        {/* Dark cinematic overlay for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-stone-950/80 via-stone-950/70 to-stone-950/90" />
+        {/* Balanced cinematic overlay for crisp text readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-stone-950/70 via-stone-950/50 to-stone-950/80" />
         {/* Emerald accent glow on top */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(16,185,129,0.12),transparent)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(16,185,129,0.15),transparent)]" />
         {/* Subtle grid pattern overlay */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(to_right,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:64px_64px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(to_right,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:64px_64px]" />
       </div>
 
       {/* ═══════════ TOP HEADER ═══════════ */}
