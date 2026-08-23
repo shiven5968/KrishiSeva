@@ -23,7 +23,7 @@ export function formatIndianPhoneNumber(rawPhone) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// 1. Dynamic WhatsApp OTP Dispatch via UltraMsg
+// 1. Dynamic WhatsApp OTP Dispatch via UltraMsg with Deep Error Interception
 // ─────────────────────────────────────────────────────────────
 export async function sendRealWhatsAppOtp(phoneNumber, otpCode, lang = 'en') {
   // 1. Sanitize & clean input phone number
@@ -31,12 +31,16 @@ export async function sendRealWhatsAppOtp(phoneNumber, otpCode, lang = 'en') {
 
   if (!cleanNumber || cleanNumber.length !== 10) {
     console.error(`[UltraMsg Gateway] Invalid 10-digit phone number provided: "${phoneNumber}"`);
-    return { success: false, error: 'Please enter a valid 10-digit mobile number' };
+    return { 
+      success: false, 
+      isDelayedOrBlocked: false, 
+      error: 'Please enter a valid 10-digit mobile number' 
+    };
   }
 
   // 2. Dynamic Recipient Binding (+91XXXXXXXXXX)
   const formattedPhoneNumber = `+91${cleanNumber}`;
-  console.log(`[UltraMsg Gateway] Sending OTP ${otpCode} dynamically to recipient: ${formattedPhoneNumber}`);
+  console.info(`[UltraMsg Gateway] Sending OTP ${otpCode} dynamically to recipient: ${formattedPhoneNumber}`);
 
   // 3. Message Template Body
   const messageText = lang === 'hi' ?
@@ -57,6 +61,9 @@ export async function sendRealWhatsAppOtp(phoneNumber, otpCode, lang = 'en') {
   const token = '93rhhy7fj9ea2k81';
 
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout guard
+
     const response = await fetch(`https://api.ultramsg.com/${instanceId}/messages/chat`, {
       method: 'POST',
       headers: {
@@ -64,22 +71,32 @@ export async function sendRealWhatsAppOtp(phoneNumber, otpCode, lang = 'en') {
       },
       body: new URLSearchParams({
         token: token,
-        to: formattedPhoneNumber, // Dynamically bound from user input
+        to: formattedPhoneNumber,
         body: messageText,
         priority: '10'
-      })
+      }),
+      signal: controller.signal
     });
+    clearTimeout(timeoutId);
 
     const data = await response.json();
-    console.log(`[UltraMsg Gateway] Delivery response for ${formattedPhoneNumber}:`, data);
+    console.info(`[UltraMsg Gateway] Delivery response for ${formattedPhoneNumber}:`, data);
 
+    // Deep error inspection
     const isUnauthenticated = data.message && (
       data.message.toLowerCase().includes('not authenticated') ||
       data.message.toLowerCase().includes('not connected') ||
       data.message.toLowerCase().includes('qr')
     );
 
-    if ((data.sent === "true" || data.success === true || !!data.id) && !isUnauthenticated) {
+    const isTemporaryBlock = data.message && (
+      data.message.toLowerCase().includes('temporary_block') ||
+      data.message.toLowerCase().includes('block')
+    );
+
+    const isUnsent = data.status === 'unsent' || data.status === 'invalid';
+
+    if ((data.sent === "true" || data.success === true || !!data.id) && !isUnauthenticated && !isTemporaryBlock) {
       // Auto-flush unsent queue immediately to prevent hold-ups
       fetch(`https://api.ultramsg.com/${instanceId}/messages/resendByStatus`, {
         method: 'POST',
@@ -98,17 +115,37 @@ export async function sendRealWhatsAppOtp(phoneNumber, otpCode, lang = 'en') {
     } else {
       const errorMsg = isUnauthenticated 
         ? 'UltraMsg WhatsApp instance is not paired yet. Please scan QR on UltraMsg.' 
-        : (data.message || data.error || 'UltraMsg failed to deliver message');
-      return { success: false, provider: 'UltraMsg', status: 'Failed', recipient: formattedPhoneNumber, error: errorMsg, data };
+        : isTemporaryBlock 
+          ? 'WhatsApp temporary block on new contact. Use fallback OTP or direct WhatsApp chat.'
+          : (data.message || data.error || 'UltraMsg delivery delayed.');
+          
+      console.warn(`[UltraMsg Gateway] Intercepted delivery issue for ${formattedPhoneNumber}: ${errorMsg}`, data);
+
+      return { 
+        success: false, 
+        isDelayedOrBlocked: true, 
+        provider: 'UltraMsg', 
+        status: 'Delayed', 
+        recipient: formattedPhoneNumber, 
+        error: errorMsg, 
+        data 
+      };
     }
   } catch (err) {
-    console.error(`[UltraMsg Gateway] Network error dispatching to ${formattedPhoneNumber}:`, err);
-    return { success: false, provider: 'UltraMsg', status: 'Failed', recipient: formattedPhoneNumber, error: err.message };
+    console.error(`[UltraMsg Gateway] Network or timeout error for ${formattedPhoneNumber}:`, err);
+    return { 
+      success: false, 
+      isDelayedOrBlocked: true, 
+      provider: 'UltraMsg', 
+      status: 'Failed', 
+      recipient: formattedPhoneNumber, 
+      error: 'WhatsApp delivery timed out or delayed. Use Fallback OTP.' 
+    };
   }
 }
 
 // ─────────────────────────────────────────────────────────────
-// 2. Regular Carrier SMS Fallback (Fast2SMS / Twilio)
+// 2. Regular Carrier SMS Fallback (Fast2SMS / Twilio / Textbelt)
 // ─────────────────────────────────────────────────────────────
 export async function sendRealSmsToPhone(phoneNumber, otpCode) {
   const cleanNumber = formatIndianPhoneNumber(phoneNumber);

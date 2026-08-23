@@ -175,10 +175,14 @@ export default function CreativeLoginPortal() {
       setIsSendingOtp(false);
       if (!waResult.success) {
         setWaDeliveryFailed(true);
+        setToastMessage(lang === 'hi' ? 'व्हाट्सएप डिलीवरी में देरी। फॉलबैक ओटीपी का उपयोग करें।' : 'WhatsApp delivery delayed. Use Fallback OTP.');
+        setTimeout(() => setToastMessage(''), 8000);
       }
     } catch (err) {
       setIsSendingOtp(false);
       setWaDeliveryFailed(true);
+      setToastMessage(lang === 'hi' ? 'व्हाट्सएप डिलीवरी में देरी। फॉलबैक ओटीपी का उपयोग करें।' : 'WhatsApp delivery delayed. Use Fallback OTP.');
+      setTimeout(() => setToastMessage(''), 8000);
     }
   };
 
@@ -209,10 +213,14 @@ export default function CreativeLoginPortal() {
       setIsSendingOtp(false);
       if (!waResult.success) {
         setWaDeliveryFailed(true);
+        setToastMessage(lang === 'hi' ? 'व्हाट्सएप डिलीवरी में देरी। फॉलबैक ओटीपी का उपयोग करें।' : 'WhatsApp delivery delayed. Use Fallback OTP.');
+        setTimeout(() => setToastMessage(''), 8000);
       }
     } catch (err) {
       setIsSendingOtp(false);
       setWaDeliveryFailed(true);
+      setToastMessage(lang === 'hi' ? 'व्हाट्सएप डिलीवरी में देरी। फॉलबैक ओटीपी का उपयोग करें।' : 'WhatsApp delivery delayed. Use Fallback OTP.');
+      setTimeout(() => setToastMessage(''), 8000);
     }
   };
 
@@ -624,16 +632,52 @@ export default function CreativeLoginPortal() {
                     </div>
                   )}
 
+                  {/* ⚡ Comprehensive Fallback Mode when WhatsApp is Delayed or Blocked */}
                   {waDeliveryFailed && (
-                    <div className="p-3 rounded-2xl bg-amber-950/40 border border-amber-900/30 text-amber-300 text-xs font-semibold text-center leading-relaxed animate-fade-in">
-                      {lang === 'hi' ? 'व्हाट्सएप संदेश वितरण में समस्या। ' : 'WhatsApp delivery issue. '}
-                      <button
-                        type="button"
-                        onClick={handleSendSmsFallback}
-                        className="font-black underline hover:text-amber-200 transition-colors ml-1"
-                      >
-                        {lang === 'hi' ? 'सामान्य एसएमएस द्वारा भेजें' : 'Send via Regular SMS'}
-                      </button>
+                    <div className="space-y-3 animate-fade-in">
+                      {/* Option A: Testing / Demo Mode Fallback OTP Pill */}
+                      <div className="p-3.5 rounded-2xl bg-emerald-950/70 border border-emerald-600/60 text-emerald-200 text-xs flex items-center justify-between gap-2 shadow-lg">
+                        <div className="flex items-center gap-2">
+                          <span className="text-base">⚡</span>
+                          <div>
+                            <span className="text-[10px] text-stone-400 uppercase tracking-wider block font-bold">
+                              {lang === 'hi' ? 'व्हाट्सएप विलंब • फॉलबैक सुरक्षा कोड:' : 'WhatsApp Delayed • Fallback OTP:'}
+                            </span>
+                            <span className="font-mono text-base font-black text-emerald-400 tracking-wider">
+                              {activeOtpCode}
+                            </span>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setOtp(activeOtpCode)}
+                          className="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-black text-[11px] transition-all shadow-md active:scale-95"
+                        >
+                          {lang === 'hi' ? 'ओटीपी भरें ✓' : 'Auto Fill ✓'}
+                        </button>
+                      </div>
+
+                      {/* Option B & C: WhatsApp Web Direct Link & Carrier SMS */}
+                      <div className="p-3 rounded-2xl bg-stone-950/80 border border-stone-800/80 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs">
+                        <a
+                          href={`https://wa.me/918810930207?text=Hi%20KrishiSeva%20OTP%20${activeOtpCode}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-1.5 hover:underline"
+                        >
+                          <MessageSquare className="w-3.5 h-3.5" />
+                          <span>{lang === 'hi' ? 'व्हाट्सएप ऐप पर खोलें' : 'Send via WhatsApp Web'}</span>
+                        </a>
+
+                        <button
+                          type="button"
+                          onClick={handleSendSmsFallback}
+                          className="text-amber-400 hover:text-amber-300 font-bold flex items-center gap-1.5 hover:underline"
+                        >
+                          <Smartphone className="w-3.5 h-3.5" />
+                          <span>{lang === 'hi' ? 'सामान्य एसएमएस द्वारा भेजें' : 'Send via Regular SMS'}</span>
+                        </button>
+                      </div>
                     </div>
                   )}
 
