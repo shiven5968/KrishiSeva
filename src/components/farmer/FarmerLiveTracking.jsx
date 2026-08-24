@@ -376,6 +376,66 @@ export default function FarmerLiveTracking() {
                 )}
               </div>
 
+              {/* Live Operator Broadcast Status Stream */}
+              <div className={`rounded-2xl p-4 border space-y-2.5 ${
+                isDark ? 'bg-stone-950/80 border-stone-800' : 'bg-slate-50 border-slate-200'
+              }`}>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-extrabold uppercase tracking-wider text-emerald-500 flex items-center gap-1.5">
+                    <Radio className="w-3.5 h-3.5 text-emerald-500 animate-pulse" />
+                    <span>{lang === 'hi' ? 'दायरे में सक्रिय चालक (3)' : 'Nearby Operators in Range (3)'}</span>
+                  </span>
+                  <span className={`text-[10px] font-bold ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>Malihabad • 5 km</span>
+                </div>
+                
+                <div className="space-y-2">
+                  <div className={`p-2.5 rounded-xl border flex items-center justify-between text-xs transition ${
+                    isDark ? 'bg-stone-900/60 border-stone-800 text-stone-200' : 'bg-white border-slate-200 text-slate-800'
+                  }`}>
+                    <div className="flex items-center gap-2.5">
+                      <span className="text-sm">🚜</span>
+                      <div>
+                        <span className="font-bold block">Mahindra 575 DI (50 HP)</span>
+                        <span className={`text-[10px] ${isDark ? 'text-stone-500' : 'text-slate-500'}`}>Jagjit Singh • 1.2 km away</span>
+                      </div>
+                    </div>
+                    <span className="text-[10px] font-bold text-emerald-500 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20 animate-pulse">
+                      Pinging 📡
+                    </span>
+                  </div>
+
+                  <div className={`p-2.5 rounded-xl border flex items-center justify-between text-xs transition ${
+                    isDark ? 'bg-stone-900/60 border-stone-800 text-stone-200' : 'bg-white border-slate-200 text-slate-800'
+                  }`}>
+                    <div className="flex items-center gap-2.5">
+                      <span className="text-sm">🌾</span>
+                      <div>
+                        <span className="font-bold block">Preet 987 Combine (110 HP)</span>
+                        <span className={`text-[10px] ${isDark ? 'text-stone-500' : 'text-slate-500'}`}>Rampal Sharma • 2.8 km away</span>
+                      </div>
+                    </div>
+                    <span className="text-[10px] font-bold text-amber-500 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20 animate-pulse">
+                      Pinging 📡
+                    </span>
+                  </div>
+
+                  <div className={`p-2.5 rounded-xl border flex items-center justify-between text-xs transition ${
+                    isDark ? 'bg-stone-900/60 border-stone-800 text-stone-200' : 'bg-white border-slate-200 text-slate-800'
+                  }`}>
+                    <div className="flex items-center gap-2.5">
+                      <span className="text-sm">🚜</span>
+                      <div>
+                        <span className="font-bold block">Swaraj 855 FE (52 HP)</span>
+                        <span className={`text-[10px] ${isDark ? 'text-stone-500' : 'text-slate-500'}`}>Gurmeet Singh • 3.4 km away</span>
+                      </div>
+                    </div>
+                    <span className="text-[10px] font-bold text-emerald-500 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20 animate-pulse">
+                      Pinging 📡
+                    </span>
+                  </div>
+                </div>
+              </div>
+
               {/* Cancel Request Button (Opens Reason Modal) */}
               <button
                 onClick={() => setIsCancelModalOpen(true)}
