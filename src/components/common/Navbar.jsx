@@ -84,24 +84,7 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
 
           {/* STRICT ROLE-BASED NAVIGATION */}
           
-          {/* 1. FARMER VIEW */}
-          {currentUser && currentUser.role === 'farmer' && (
-            <div className="hidden sm:flex items-center gap-2">
-              <button
-                onClick={() => onOpenSavedLandsModal && onOpenSavedLandsModal()}
-                className={`px-3.5 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition shadow-sm ${
-                  isDark 
-                    ? 'bg-stone-900 hover:bg-stone-800 text-stone-200 border border-stone-800' 
-                    : 'bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200'
-                }`}
-              >
-                <Bookmark className="w-3.5 h-3.5 text-emerald-500" />
-                <span>{lang === 'hi' ? 'सहेजे गए खेत' : 'My Saved Lands'}</span>
-              </button>
-            </div>
-          )}
-
-          {/* 2. DRIVER VIEW */}
+          {/* 1. DRIVER VIEW */}
           {currentUser && currentUser.role === 'driver' && (
             <div className="hidden sm:flex items-center gap-2">
               <div className={`px-3 py-1 rounded-xl border flex items-center gap-2 ${
