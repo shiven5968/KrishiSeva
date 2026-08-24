@@ -571,7 +571,7 @@ export default function CreativeLoginPortal() {
             {/* Subtle emerald radial ambient light glow behind the card */}
             <div className="absolute -inset-10 bg-emerald-500/10 blur-[120px] pointer-events-none rounded-full z-0" />
             
-            <div className="bg-slate-900/70 border border-white/10 backdrop-blur-2xl rounded-3xl p-6 sm:p-8 shadow-[0_0_50px_rgba(0,0,0,0.8)] transition-all duration-300 relative z-10">
+            <div className="bg-[#0A0E13] border border-white/10 backdrop-blur-2xl rounded-3xl p-6 sm:p-8 shadow-[0_20px_60px_rgba(0,0,0,0.8)] transition-all duration-300 relative z-10">
 
               {/* STEP 1: Phone Number Input & Send WhatsApp OTP */}
               {step === 'phone' && (
@@ -599,7 +599,7 @@ export default function CreativeLoginPortal() {
                       }`}>
                         {lang === 'hi' ? 'मोबाइल नंबर' : 'Enter Mobile Number'}
                       </label>
-                      <div className="bg-[#090D14] border border-emerald-500/50 focus-within:border-emerald-400 rounded-2xl p-3 flex items-center gap-3">
+                      <div className="bg-[#05080C] border border-white/10 focus-within:border-emerald-500/60 rounded-2xl p-3.5 flex items-center gap-3 transition-all">
                         <span className="font-semibold text-xs flex items-center gap-1.5 pointer-events-none text-slate-300 border-r border-slate-700 pr-3 select-none">
                           <span>IN</span>
                           <span>+91</span>
@@ -649,7 +649,7 @@ export default function CreativeLoginPortal() {
                     <div className="grid grid-cols-2 gap-2.5">
                       <div
                         onClick={() => quickDemoLogin('farmer')}
-                        className="bg-slate-900 border border-slate-850 hover:border-emerald-500/40 p-3 rounded-2xl cursor-pointer transition-all duration-250 flex items-center justify-between group active:scale-95 text-slate-200"
+                        className="bg-white/[0.03] hover:bg-white/[0.07] border border-white/10 hover:border-emerald-500/40 p-3.5 rounded-2xl transition-all duration-250 cursor-pointer flex items-center justify-between group active:scale-95 text-slate-200"
                       >
                         <div className="flex items-center gap-2">
                           <span className="text-xl">🌾</span>
@@ -667,7 +667,7 @@ export default function CreativeLoginPortal() {
 
                       <div
                         onClick={() => quickDemoLogin('driver')}
-                        className="bg-slate-900 border border-slate-850 hover:border-emerald-500/40 p-3 rounded-2xl cursor-pointer transition-all duration-250 flex items-center justify-between group active:scale-95 text-slate-200"
+                        className="bg-white/[0.03] hover:bg-white/[0.07] border border-white/10 hover:border-emerald-500/40 p-3.5 rounded-2xl transition-all duration-250 cursor-pointer flex items-center justify-between group active:scale-95 text-slate-200"
                       >
                         <div className="flex items-center gap-2">
                           <span className="text-xl">🚜</span>
