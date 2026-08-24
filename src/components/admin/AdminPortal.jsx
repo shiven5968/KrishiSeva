@@ -200,36 +200,15 @@ export default function AdminPortal() {
       isDark ? 'bg-[#090D0B] text-stone-100' : 'bg-slate-50 text-slate-900'
     }`}>
       
-      {/* ══════════════ TOP COMMAND BAR ══════════════ */}
-      <header className={`sticky top-0 z-50 border-b backdrop-blur-2xl transition-colors duration-200 ${
-        isDark ? 'bg-[#090D0B]/90 border-stone-800' : 'bg-white/90 border-slate-200 shadow-sm'
+      {/* ══════════════ SUB-COMMAND TABS STRIP ══════════════ */}
+      <div className={`border-b py-3 px-4 sm:px-6 lg:px-8 transition-colors duration-200 ${
+        isDark ? 'bg-stone-900/40 border-stone-800/80' : 'bg-white/70 border-slate-200'
       }`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
           
-          {/* Logo & Security Beacon */}
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center text-stone-950 font-black shadow-lg shadow-emerald-500/25 shrink-0">
-              <Tractor className="w-5 h-5 text-stone-950" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className={`text-base font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  Krishi<span className="text-emerald-500">Seva</span>
-                </span>
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-950/80 text-emerald-400 border border-emerald-800/60 text-[9px] font-black tracking-wider uppercase">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  <span>COMMAND ROOT</span>
-                </span>
-              </div>
-              <p className={`text-[10px] font-bold ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
-                Enterprise Operations • Malihabad Node
-              </p>
-            </div>
-          </div>
-
-          {/* Center Tabs Navigation */}
-          <nav className={`hidden md:flex items-center p-1 rounded-2xl border text-xs font-black ${
-            isDark ? 'bg-stone-900/80 border-stone-800' : 'bg-slate-100 border-slate-200'
+          {/* Navigation Pill Tabs */}
+          <nav className={`flex items-center p-1 rounded-2xl border text-xs font-black shadow-sm ${
+            isDark ? 'bg-stone-950 border-stone-800' : 'bg-slate-100 border-slate-200'
           }`}>
             <button
               onClick={() => setActiveTab('dashboard')}
@@ -285,90 +264,29 @@ export default function AdminPortal() {
             </button>
           </nav>
 
-          {/* Right Header Utilities */}
-          <div className="flex items-center gap-2 sm:gap-2.5">
-            {/* Theme Toggle */}
-            <button
-              onClick={toggleTheme}
-              className={`p-2 rounded-xl border text-xs font-bold transition ${
-                isDark 
-                  ? 'bg-stone-900 text-amber-300 border-stone-700 hover:border-amber-400/50' 
-                  : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200'
-              }`}
-              title="Toggle theme"
-            >
-              {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-600" />}
-            </button>
+          {/* Right Status Badge & Public App shortcut */}
+          <div className="flex items-center gap-3">
+            <div className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl border text-[11px] font-bold ${
+              isDark ? 'bg-stone-950 border-stone-800 text-stone-300' : 'bg-slate-50 border-slate-200 text-slate-600'
+            }`}>
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span>Malihabad Node: Operational</span>
+            </div>
 
-            {/* Language Toggle */}
-            <button
-              onClick={toggleLanguage}
-              className={`px-3 py-2 rounded-xl border text-xs font-black flex items-center gap-1.5 transition ${
-                isDark 
-                  ? 'bg-stone-900 text-emerald-400 border-stone-700 hover:bg-stone-800' 
-                  : 'bg-emerald-50 text-emerald-700 border-slate-300 hover:bg-emerald-100'
-              }`}
-            >
-              <Globe className="w-3.5 h-3.5 text-emerald-500" />
-              <span>{lang === 'hi' ? 'English' : 'हिंदी'}</span>
-            </button>
-
-            {/* 1-Click Exit to Public Home */}
             <button
               onClick={() => {
                 window.location.hash = '';
                 setActiveRole('landing');
               }}
-              className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-stone-950 font-black text-xs shadow-md shadow-emerald-500/20 transition flex items-center gap-1.5 active:scale-95"
+              className="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-black text-xs shadow-sm transition flex items-center gap-1.5 active:scale-95"
             >
               <Home className="w-3.5 h-3.5 text-stone-950" />
-              <span className="hidden sm:inline">{lang === 'hi' ? 'मुख्य पृष्ठ' : 'Public App'}</span>
-            </button>
-
-            {/* Admin Logout */}
-            <button
-              onClick={logout}
-              className={`p-2 rounded-xl border transition ${
-                isDark 
-                  ? 'border-stone-800 bg-stone-900/60 text-stone-400 hover:text-red-400 hover:border-red-900' 
-                  : 'border-slate-300 bg-slate-100 text-slate-600 hover:text-red-600'
-              }`}
-              title="Logout from Admin"
-            >
-              <LogOut className="w-4 h-4" />
+              <span>{lang === 'hi' ? 'मुख्य पृष्ठ' : 'Public App'}</span>
             </button>
           </div>
 
         </div>
-
-        {/* Mobile Navigation Tabs */}
-        <div className="md:hidden flex items-center justify-around px-2 py-2 border-t border-stone-800/40 text-xs font-black">
-          <button
-            onClick={() => setActiveTab('dashboard')}
-            className={`px-3 py-1.5 rounded-lg ${activeTab === 'dashboard' ? 'bg-emerald-500 text-stone-950' : 'text-stone-400'}`}
-          >
-            Dashboard
-          </button>
-          <button
-            onClick={() => setActiveTab('kyc')}
-            className={`px-3 py-1.5 rounded-lg ${activeTab === 'kyc' ? 'bg-emerald-500 text-stone-950' : 'text-stone-400'}`}
-          >
-            KYC ({pendingApplications.length})
-          </button>
-          <button
-            onClick={() => setActiveTab('directory')}
-            className={`px-3 py-1.5 rounded-lg ${activeTab === 'directory' ? 'bg-emerald-500 text-stone-950' : 'text-stone-400'}`}
-          >
-            Fleet
-          </button>
-          <button
-            onClick={() => setActiveTab('pricing')}
-            className={`px-3 py-1.5 rounded-lg ${activeTab === 'pricing' ? 'bg-emerald-500 text-stone-950' : 'text-stone-400'}`}
-          >
-            Pricing
-          </button>
-        </div>
-      </header>
+      </div>
 
       {/* ══════════════ MAIN CONTENT CONTAINER ══════════════ */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
