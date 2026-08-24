@@ -70,11 +70,11 @@ export default function CreativeLoginPortal() {
   const [agriStackResult, setAgriStackResult] = useState(null);
 
   // Driver Essentials KYC States
-  const [driverDlNumber, setDriverDlNumber] = useState('UP32 20190088771');
+  const [driverDlNumber, setDriverDlNumber] = useState('');
   const [driverVehicleType, setDriverVehicleType] = useState('tractor');
-  const [driverModelName, setDriverModelName] = useState('Mahindra 575 DI (50 HP)');
-  const [driverVehicleNumber, setDriverVehicleNumber] = useState('UP-32-BT-9901');
-  const [driverImplement, setDriverImplement] = useState('Rotavator (6 Feet)');
+  const [driverModelName, setDriverModelName] = useState('');
+  const [driverVehicleNumber, setDriverVehicleNumber] = useState('');
+  const [driverImplement, setDriverImplement] = useState('');
   const [isSubmittingDriverKyc, setIsSubmittingDriverKyc] = useState(false);
   const [kycSubStep, setKycSubStep] = useState('details'); // 'details' | 'uploads'
   const [dlPhoto, setDlPhoto] = useState('');
@@ -1208,49 +1208,7 @@ export default function CreativeLoginPortal() {
                     </p>
                   </div>
 
-                  {/* Benchmark Demo Presets */}
-                  <div className={`p-3 rounded-2xl border space-y-2 ${
-                    isDark ? 'bg-stone-950 border-stone-800' : 'bg-slate-100 border-slate-200'
-                  }`}>
-                    <span className="text-[10px] font-black text-stone-400 uppercase tracking-wider block">
-                      {lang === 'hi' ? '⚡ त्वरित डेमो फ्लीट प्रीसेट:' : '⚡ Quick Demo Fleet Presets:'}
-                    </span>
-                    <div className="grid grid-cols-1 gap-1.5">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setDriverModelName('Mahindra 575 DI (50 HP)');
-                          setDriverVehicleNumber('UP-32-BT-9901');
-                          setDriverVehicleType('tractor');
-                          setDriverImplement('Rotavator (6 Feet)');
-                        }}
-                        className="p-2.5 rounded-xl bg-emerald-950/30 hover:bg-emerald-950/60 border border-emerald-800/50 hover:border-emerald-500 text-left transition-all duration-200 flex items-center justify-between group"
-                      >
-                        <div>
-                          <span className="text-xs font-black text-emerald-300 block">Mahindra 575 DI (50 HP)</span>
-                          <span className="text-[10px] text-stone-400">UP-32-BT-9901 • Rotavator</span>
-                        </div>
-                        <span className="text-[10px] font-bold text-emerald-400 px-2 py-0.5 rounded-lg bg-emerald-900/50">चुनें ✓</span>
-                      </button>
 
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setDriverModelName('Preet 987 Combine (110 HP)');
-                          setDriverVehicleNumber('PB-10-AZ-4421');
-                          setDriverVehicleType('harvester');
-                          setDriverImplement('Combine Harvester + Cutter');
-                        }}
-                        className="p-2.5 rounded-xl bg-amber-950/30 hover:bg-amber-950/60 border border-amber-800/50 hover:border-amber-500 text-left transition-all duration-200 flex items-center justify-between group"
-                      >
-                        <div>
-                          <span className="text-xs font-black text-amber-300 block">Preet 987 Combine (110 HP)</span>
-                          <span className="text-[10px] text-stone-400">PB-10-AZ-4421 • Multi-Crop</span>
-                        </div>
-                        <span className="text-[10px] font-bold text-amber-400 px-2 py-0.5 rounded-lg bg-amber-900/50">चुनें ✓</span>
-                      </button>
-                    </div>
-                  </div>
 
                   {error && (
                     <div className="p-3.5 rounded-2xl bg-red-950/85 border border-red-700/60 text-red-200 text-xs font-bold flex items-start gap-2 animate-fade-in">
