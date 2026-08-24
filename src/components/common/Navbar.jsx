@@ -3,37 +3,20 @@ import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
 import { useRealtimeSync } from '../../context/RealtimeSyncContext';
 import { useSavedLands } from '../../context/SavedLandsContext';
-import { audioHelper } from '../../utils/audioHelper';
 import LogoutConfirmationModal from './LogoutConfirmationModal';
 import { 
   Tractor, 
   Globe, 
-  Volume2, 
-  VolumeX, 
   ShieldCheck, 
-  User, 
-  Truck, 
-  Radio, 
-  BellRing,
-  HelpCircle,
   LogOut,
   LogIn,
-  Bookmark,
-  Power,
-  Home
+  Bookmark
 } from 'lucide-react';
 
 export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
-  const { lang, toggleLanguage, t } = useLanguage();
-  const { activeRole, setActiveRole, currentUser, driverProfile, toggleDriverDuty, logout } = useAuth();
-  const { pendingApplications, activeBooking } = useRealtimeSync();
-  const [isMuted, setIsMuted] = useState(false);
+  const { lang, toggleLanguage } = useLanguage();
+  const { activeRole, setActiveRole, currentUser, driverProfile, logout } = useAuth();
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
-
-  const handleAudioToggle = () => {
-    const muted = audioHelper.toggleMute();
-    setIsMuted(muted);
-  };
 
   // Clicking Logo returns user to their authenticated home dashboard (NOT logged out)
   const handleLogoClick = () => {
@@ -59,8 +42,6 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
     logout();
     window.location.hash = '';
   };
-
-  const isDriverOnline = driverProfile.status === 'online';
 
   return (
     <>
@@ -99,22 +80,18 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
                 <Bookmark className="w-3.5 h-3.5 text-emerald-400" />
                 <span>{lang === 'hi' ? 'सहेजे गए खेत' : 'My Saved Lands'}</span>
               </button>
-
-              {activeBooking && ['searching', 'accepted', 'arrived', 'in_progress'].includes(activeBooking.status) && (
-                <span className="px-3 py-1 rounded-xl bg-amber-950 text-amber-300 border border-amber-700 font-black text-xs flex items-center gap-1.5 animate-pulse">
-                  <span className="w-2 h-2 rounded-full bg-amber-400"></span>
-                  <span>Active Booking ({activeBooking.status})</span>
-                </span>
-              )}
             </div>
           )}
 
           {/* 2. DRIVER VIEW */}
-          {currentUser && currentUser.role === 'driver' && driverProfile.verificationStatus === 'verified' && (
-            <div className="hidden sm:flex items-center gap-3">
-              <span className="text-xs font-black text-stone-300 bg-stone-900 px-3 py-1.5 rounded-xl border border-stone-700">
-                ₹{driverProfile.totalEarnings.toLocaleString()} Earned
-              </span>
+          {currentUser && currentUser.role === 'driver' && (
+            <div className="hidden sm:flex items-center gap-2">
+              <div className="px-3 py-1 rounded-xl bg-stone-900 border border-stone-800 flex items-center gap-2">
+                <span className={`w-2 h-2 rounded-full ${driverProfile.status === 'online' ? 'bg-emerald-500 animate-pulse' : 'bg-stone-500'}`} />
+                <span className="text-xs font-bold text-stone-300">
+                  {driverProfile.status === 'online' ? (lang === 'hi' ? 'ड्यूटी पर (Online)' : 'On Duty (Online)') : (lang === 'hi' ? 'ड्यूटी बंद (Offline)' : 'Off Duty (Offline)')}
+                </span>
+              </div>
             </div>
           )}
 
@@ -131,15 +108,6 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
           {/* Right Utility Buttons */}
           <div className="flex items-center gap-2">
             
-            {/* Audio Feedback Toggle */}
-            <button
-              onClick={handleAudioToggle}
-              className={`p-2 rounded-xl border transition ${isMuted ? 'bg-stone-900 text-stone-500 border-stone-800' : 'bg-emerald-950/80 text-emerald-400 border-emerald-800'}`}
-              title={isMuted ? 'Unmute Audio Cues' : 'Mute Audio Cues'}
-            >
-              {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-            </button>
-
             {/* Language Toggle */}
             <button
               onClick={toggleLanguage}
