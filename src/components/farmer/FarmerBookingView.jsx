@@ -416,7 +416,9 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
             </div>
             <p className="text-xs text-stone-400 font-medium mt-0.5">
               {lang === 'hi' ? 'सक्रिय खेत: ' : 'Active Land: '}
-              <span className="text-emerald-400 font-bold">{selectedLand?.name || (lang === 'hi' ? 'मेरा खेत' : 'My Farm')} ({selectedLand?.bigha || 3} {lang === 'hi' ? 'बीघा' : 'Bigha'})</span>
+              <span className="text-emerald-400 font-bold">
+                {selectedLand ? localize(selectedLand.name) : (lang === 'hi' ? 'मेरा खेत' : 'My Farm')} ({selectedLand?.bigha || 3} {lang === 'hi' ? 'बीघा' : 'Bigha'})
+              </span>
             </p>
           </div>
         </div>

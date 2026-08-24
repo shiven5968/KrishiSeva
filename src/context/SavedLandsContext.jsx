@@ -8,47 +8,18 @@ export const INITIAL_SAVED_LANDS = [
   {
     id: 'land_1',
     userPhone: '9876543210',
-    name: 'नडी वाला खेत (Khet near River)',
-    bigha: 4.5,
-    cropType: 'Wheat / गेहूँ',
-    address: 'Plot #12, Gomti River Basin, Malihabad',
-    lat: 26.9135,
-    lng: 80.7020,
-    soilType: 'Alluvial Loam (दोमट मिट्टी)',
-    icon: '🌊',
-    isGovtVerified: true,
-    khasraNumber: '142',
-    areaHectare: 1.139,
-    ulpin: 'UP-LKO-MLH-142-01'
-  },
-  {
-    id: 'land_2',
-    userPhone: '9876543210',
     name: 'गाँव की मुख्य ज़मीन (Main Village Land)',
     bigha: 3.0,
-    cropType: 'Paddy / धान',
+    cropType: 'Wheat / गेहूँ',
     address: 'Khet #14, Gram Panchayat Rampur, Malihabad',
     lat: 26.9168,
     lng: 80.7075,
-    soilType: 'Clay Soil (चिकनी मिट्टी)',
+    soilType: 'Alluvial Loam (दोमट मिट्टी)',
     icon: '🏡',
     isGovtVerified: true,
-    khasraNumber: '74',
+    khasraNumber: '142',
     areaHectare: 0.760,
-    ulpin: 'UP-LKO-MLH-074-04'
-  },
-  {
-    id: 'land_3',
-    userPhone: '9876543210',
-    name: 'पश्चिम चक (West Highway Plot)',
-    bigha: 6.0,
-    cropType: 'Mustard / सरसों',
-    address: 'Chak #7, Near State Highway 25',
-    lat: 26.9080,
-    lng: 80.6960,
-    soilType: 'Sandy Loam (बलुई मिट्टी)',
-    icon: '🛣️',
-    isGovtVerified: false
+    ulpin: 'UP-LKO-MLH-142-01'
   }
 ];
 

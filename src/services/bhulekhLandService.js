@@ -144,7 +144,7 @@ export const REGISTERED_AGRISTACK_RECORDS = {
     district: 'Lucknow',
     tehsil: 'Malihabad (मलिहाबाद)',
     village: 'Gram Rampur (रामपुर)',
-    totalLandBigha: 7.5,
+    totalLandBigha: 3.0,
     ekycStatus: 'UIDAI e-KYC Verified Cultivator',
     linkedLands: [
       {
@@ -159,20 +159,6 @@ export const REGISTERED_AGRISTACK_RECORDS = {
         soilType: 'Alluvial Loam (दोमट मिट्टी)',
         lat: 26.9168,
         lng: 80.7075,
-        isVerified: true
-      },
-      {
-        id: 'land_upfr_102',
-        name: 'नहर के पास वाला खेत (Canal Side Land)',
-        district: 'Lucknow',
-        tehsil: 'Malihabad (मलिहाबाद)',
-        village: 'Gram Rampur (रामपुर)',
-        khasraNumber: '74',
-        bigha: 4.5,
-        hectare: 1.14,
-        soilType: 'Clay Loam (चिकनी दोमट)',
-        lat: 26.9135,
-        lng: 80.7020,
         isVerified: true
       }
     ]
