@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
-import { sendFirebasePhoneOtp, verifyFirebaseOtp } from '../../services/firebaseAuth';
+import { sendRealWhatsAppOtp } from '../../utils/smsGateway';
 import { verifyAgriStackFarmer } from '../../services/bhulekhLandService';
 import { audioHelper } from '../../utils/audioHelper';
 import { 
@@ -29,7 +29,8 @@ import {
 export default function CreativeLoginPortal() {
   const { lang, toggleLanguage } = useLanguage();
   const { 
-    loginWithPhoneSuccess,
+    requestOtp,
+    verifyOtp,
     completeNewUserRegistration,
     setActiveRole
   } = useAuth();
@@ -43,6 +44,8 @@ export default function CreativeLoginPortal() {
   const [isSendingOtp, setIsSendingOtp] = useState(false);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [activeOtpCode, setActiveOtpCode] = useState('');
+  const [waDeliveryDelayed, setWaDeliveryDelayed] = useState(false);
 
   // Profile Setup States
   const [userName, setUserName] = useState('');
@@ -66,9 +69,9 @@ export default function CreativeLoginPortal() {
   }, [step, resendTimer]);
 
   // ─────────────────────────────────────────────────────────────
-  // 1. Firebase Phone Auth: Send 6-Digit OTP
+  // 1. WhatsApp OTP Dispatch Workflow (UltraMsg instance189366)
   // ─────────────────────────────────────────────────────────────
-  const handleSendFirebaseOtp = async (e) => {
+  const handleSendWhatsAppOtp = async (e) => {
     e?.preventDefault();
     const cleanPhone = phone.replace(/\D/g, '').slice(-10);
     if (cleanPhone.length < 10) {
@@ -78,53 +81,76 @@ export default function CreativeLoginPortal() {
     setError('');
     setIsSendingOtp(true);
 
+    // 1. Generate 6-digit random OTP in AuthContext (with 15-min rate limit & 5-min expiry)
+    const otpResult = requestOtp(cleanPhone);
+    if (!otpResult.success) {
+      setIsSendingOtp(false);
+      setError(otpResult.error);
+      return;
+    }
+
+    const code = otpResult.code;
+    setActiveOtpCode(code);
+    setResendTimer(60);
+    setStep('otp');
+    setOtp('');
+    setWaDeliveryDelayed(false);
+
+    setToastMessage(lang === 'hi' ? `व्हाट्सएप पर ओटीपी भेज दिया गया है (+91 ${cleanPhone})` : `OTP Sent via WhatsApp (+91 ${cleanPhone})`);
+    setTimeout(() => setToastMessage(''), 6000);
+
+    // 2. Send via UltraMsg WhatsApp API
     try {
-      const result = await sendFirebasePhoneOtp(cleanPhone, 'recaptcha-container');
+      const waRes = await sendRealWhatsAppOtp(cleanPhone, code, lang);
       setIsSendingOtp(false);
 
-      if (result.success) {
-        setResendTimer(60);
-        setStep('otp');
-        setOtp('');
-        setToastMessage(lang === 'hi' ? `एसएमएस ओटीपी +91 ${cleanPhone} पर भेज दिया गया है` : `SMS OTP sent to +91 ${cleanPhone}`);
-        setTimeout(() => setToastMessage(''), 6000);
-      } else {
-        setError(result.error || (lang === 'hi' ? 'ओटीपी भेजने में त्रुटि। कृपया पुनः प्रयास करें।' : 'Failed to send OTP. Please try again.'));
+      if (!waRes.success) {
+        setWaDeliveryDelayed(true);
       }
     } catch (err) {
       setIsSendingOtp(false);
-      setError(lang === 'hi' ? 'Firebase प्रमाणीकरण त्रुटि। कृपया नेटवर्क जांचें।' : 'Firebase Auth error. Please check network connection.');
+      setWaDeliveryDelayed(true);
     }
   };
 
-  // Resend OTP via Firebase Phone Auth
-  const handleResendFirebaseOtp = async () => {
+  // Resend OTP via WhatsApp
+  const handleResendWhatsAppOtp = async () => {
     if (resendTimer > 0 || isSendingOtp) return;
     setError('');
     setIsSendingOtp(true);
     const cleanPhone = phone.replace(/\D/g, '').slice(-10);
 
-    try {
-      const result = await sendFirebasePhoneOtp(cleanPhone, 'recaptcha-container');
+    const otpResult = requestOtp(cleanPhone);
+    if (!otpResult.success) {
       setIsSendingOtp(false);
+      setError(otpResult.error);
+      return;
+    }
 
-      if (result.success) {
-        setResendTimer(60);
-        setToastMessage(lang === 'hi' ? `नया ओटीपी +91 ${cleanPhone} पर भेज दिया गया है` : `New OTP sent to +91 ${cleanPhone}`);
-        setTimeout(() => setToastMessage(''), 6000);
-      } else {
-        setError(result.error || (lang === 'hi' ? 'ओटीपी पुनः भेजने में त्रुटि।' : 'Failed to resend OTP.'));
+    const code = otpResult.code;
+    setActiveOtpCode(code);
+    setResendTimer(60);
+    setWaDeliveryDelayed(false);
+
+    setToastMessage(lang === 'hi' ? `नया ओटीपी व्हाट्सएप पर भेज दिया गया है (+91 ${cleanPhone})` : `New OTP Sent via WhatsApp (+91 ${cleanPhone})`);
+    setTimeout(() => setToastMessage(''), 6000);
+
+    try {
+      const waRes = await sendRealWhatsAppOtp(cleanPhone, code, lang);
+      setIsSendingOtp(false);
+      if (!waRes.success) {
+        setWaDeliveryDelayed(true);
       }
     } catch (err) {
       setIsSendingOtp(false);
-      setError(lang === 'hi' ? 'Firebase प्रमाणीकरण त्रुटि।' : 'Firebase Auth error.');
+      setWaDeliveryDelayed(true);
     }
   };
 
   // ─────────────────────────────────────────────────────────────
-  // 2. Firebase Phone Auth: Verify 6-Digit OTP
+  // 2. Verify 6-Digit WhatsApp OTP Logic
   // ─────────────────────────────────────────────────────────────
-  const handleVerifyFirebaseOtp = async (e) => {
+  const handleVerifyOtp = (e) => {
     e?.preventDefault();
     if (!otp || otp.length < 6) {
       setError(lang === 'hi' ? 'कृपया पूरा 6-अंकीय ओटीपी दर्ज करें' : 'Please enter the full 6-digit OTP');
@@ -133,22 +159,23 @@ export default function CreativeLoginPortal() {
     setError('');
     setIsVerifyingOtp(true);
 
-    try {
-      const result = await verifyFirebaseOtp(otp);
-      setIsVerifyingOtp(false);
+    const result = verifyOtp(phone, otp);
+    setIsVerifyingOtp(false);
 
-      if (result.success) {
-        // Authenticate & Assign Role in AuthContext
-        const authRes = loginWithPhoneSuccess(phone);
-        if (authRes.isNewUser) {
-          setStep('profile_setup');
-        }
+    if (result.success) {
+      if (result.isNewUser) {
+        setStep('profile_setup');
       } else {
-        setError(result.error || (lang === 'hi' ? 'गलत ओटीपी कोड। कृपया एसएमएस में आया कोड दर्ज करें।' : 'Invalid OTP code. Please re-enter.'));
+        if (result.role === 'farmer') {
+          setActiveRole('farmer');
+        } else if (result.role === 'driver') {
+          setActiveRole('driver');
+        } else if (result.role === 'admin') {
+          setActiveRole('admin');
+        }
       }
-    } catch (err) {
-      setIsVerifyingOtp(false);
-      setError(lang === 'hi' ? 'ओटीपी सत्यापन में त्रुटि हुई।' : 'Error during OTP verification.');
+    } else {
+      setError(result.error);
     }
   };
 
@@ -246,9 +273,6 @@ export default function CreativeLoginPortal() {
   return (
     <div className="min-h-screen bg-stone-950 text-stone-100 flex flex-col justify-between selection:bg-emerald-500 selection:text-stone-950 font-sans relative overflow-x-hidden">
       
-      {/* Invisible reCAPTCHA container for Firebase Phone Auth */}
-      <div id="recaptcha-container"></div>
-
       {/* ───── Cinematic Hero Background Video (Wheat Field Barley) ───── */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
         <video
@@ -361,7 +385,7 @@ export default function CreativeLoginPortal() {
               {[
                 { icon: <ShieldCheck className="w-3 h-3" />, text: lang === 'hi' ? '100% KYC फ्लीट' : '100% KYC Fleet', color: 'text-amber-400 bg-amber-950/50 border-amber-800/50' },
                 { icon: <LandPlot className="w-3 h-3" />, text: 'AgriStack UPFR', color: 'text-blue-400 bg-blue-950/50 border-blue-800/50' },
-                { icon: <ShieldCheck className="w-3 h-3" />, text: 'Firebase Phone Auth', color: 'text-emerald-400 bg-emerald-950/50 border-emerald-800/50' },
+                { icon: <MessageSquare className="w-3 h-3" />, text: 'UltraMsg WhatsApp OTP', color: 'text-emerald-400 bg-emerald-950/50 border-emerald-800/50' },
               ].map((f, i) => (
                 <span key={i} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold border ${f.color} backdrop-blur-sm`}>
                   {f.icon}
@@ -388,36 +412,18 @@ export default function CreativeLoginPortal() {
                       {lang === 'hi' ? 'कृषि सेवा में प्रवेश करें' : 'Get Started with KrishiSeva'}
                     </h2>
                     <p className="text-stone-400 text-xs sm:text-sm font-medium leading-relaxed">
-                      {lang === 'hi' ? 'सत्यापन हेतु अपना 10-अंकीय मोबाइल नंबर दर्ज करें' : 'Enter your 10-digit mobile number for Firebase verification'}
+                      {lang === 'hi' ? 'व्हाट्सएप सत्यापन हेतु अपना 10-अंकीय मोबाइल नंबर दर्ज करें' : 'Enter your 10-digit mobile number for WhatsApp verification'}
                     </p>
                   </div>
 
                   {error && (
-                    <div className="space-y-2 animate-fade-in">
-                      <div className="p-3.5 rounded-2xl bg-red-950/80 border border-red-800/60 text-red-300 text-xs font-bold text-center flex items-start justify-center gap-2">
-                        <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
-                        <span className="text-left leading-relaxed">{error}</span>
-                      </div>
-
-                      {/* Quick Test Login Fallback */}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const cleanPhone = phone.replace(/\D/g, '').slice(-10) || '9876543210';
-                          const authRes = loginWithPhoneSuccess(cleanPhone);
-                          if (authRes.isNewUser) {
-                            setStep('profile_setup');
-                          }
-                        }}
-                        className="w-full py-2.5 rounded-xl bg-amber-950/40 hover:bg-amber-900/60 border border-amber-700/60 text-amber-300 hover:text-amber-200 text-xs font-black transition-all flex items-center justify-center gap-1.5 shadow-md active:scale-95"
-                      >
-                        <span>⚡</span>
-                        <span>{lang === 'hi' ? 'त्वरित टेस्ट लॉगिन (डेवलपमेंट मोड)' : 'Quick Test Login (Bypass Firebase Error)'}</span>
-                      </button>
+                    <div className="p-3.5 rounded-2xl bg-red-950/80 border border-red-800/60 text-red-300 text-xs font-bold text-center flex items-center justify-center gap-2 animate-fade-in">
+                      <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
+                      <span>{error}</span>
                     </div>
                   )}
 
-                  <form onSubmit={handleSendFirebaseOtp} className="space-y-4">
+                  <form onSubmit={handleSendWhatsAppOtp} className="space-y-4">
                     <div>
                       <label className="block text-xs font-bold text-stone-400 uppercase tracking-wider mb-2">
                         {lang === 'hi' ? 'मोबाइल नंबर दर्ज करें' : 'Enter Mobile Number'}
@@ -448,12 +454,12 @@ export default function CreativeLoginPortal() {
                       {isSendingOtp ? (
                         <>
                           <Clock className="w-5 h-5 animate-spin text-stone-950" />
-                          <span>{lang === 'hi' ? 'ओटीपी भेजा जा रहा है...' : 'Sending Firebase OTP...'}</span>
+                          <span>{lang === 'hi' ? 'व्हाट्सएप ओटीपी भेजा जा रहा है...' : 'Sending WhatsApp OTP...'}</span>
                         </>
                       ) : (
                         <>
-                          <Phone className="w-5 h-5 text-stone-950" />
-                          <span>{lang === 'hi' ? 'ओटीपी भेजें (Firebase)' : 'Send OTP via Firebase'}</span>
+                          <MessageSquare className="w-5 h-5 text-stone-950" />
+                          <span>{lang === 'hi' ? 'व्हाट्सएप द्वारा ओटीपी भेजें' : 'Send OTP via WhatsApp'}</span>
                           <ArrowRight className="w-5 h-5 text-stone-950" />
                         </>
                       )}
@@ -463,23 +469,23 @@ export default function CreativeLoginPortal() {
                   {/* Security assurance */}
                   <div className="flex items-center justify-center gap-2 text-[10px] text-stone-500 pt-1">
                     <Lock className="w-3 h-3" />
-                    <span>{lang === 'hi' ? 'सुरक्षित Firebase SMS • Google reCAPTCHA' : 'Secure Firebase SMS Auth • Google reCAPTCHA'}</span>
+                    <span>{lang === 'hi' ? 'सुरक्षित व्हाट्सएप प्रमाणीकरण • 5 मिनट वैधता' : 'Secure WhatsApp OTP • 5-min Validity'}</span>
                   </div>
                 </div>
               )}
 
-              {/* STEP 2: 6-Digit OTP Verification Screen */}
+              {/* STEP 2: 6-Digit WhatsApp OTP Verification Screen */}
               {step === 'otp' && (
                 <div className="space-y-5 animate-fade-in-up">
                   <div className="text-center space-y-1.5">
                     <div className="w-14 h-14 mx-auto rounded-2xl bg-emerald-950/80 border border-emerald-700/50 flex items-center justify-center mb-3">
-                      <Phone className="w-7 h-7 text-emerald-400" />
+                      <MessageSquare className="w-7 h-7 text-emerald-400" />
                     </div>
                     <h3 className="text-2xl font-black text-white tracking-tight">
                       {lang === 'hi' ? '6-अंकीय ओटीपी दर्ज करें' : 'Enter 6-Digit OTP'}
                     </h3>
                     <p className="text-stone-400 text-xs font-medium">
-                      {lang === 'hi' ? `मोबाइल (+91 ${phone}) पर भेजा गया SMS कोड` : `SMS verification code sent to +91 ${phone}`}
+                      {lang === 'hi' ? `व्हाट्सएप (+91 ${phone}) पर भेजा गया सुरक्षा कोड` : `WhatsApp verification code sent to +91 ${phone}`}
                     </p>
                   </div>
 
@@ -497,7 +503,31 @@ export default function CreativeLoginPortal() {
                     </div>
                   )}
 
-                  <form onSubmit={handleVerifyFirebaseOtp} className="space-y-4">
+                  {/* WhatsApp Delayed Fallback Notice */}
+                  {waDeliveryDelayed && (
+                    <div className="p-3.5 rounded-2xl bg-emerald-950/70 border border-emerald-600/60 text-emerald-200 text-xs flex items-center justify-between gap-2 shadow-lg animate-fade-in">
+                      <div className="flex items-center gap-2">
+                        <span className="text-base">⚡</span>
+                        <div>
+                          <span className="text-[10px] text-stone-400 uppercase tracking-wider block font-bold">
+                            {lang === 'hi' ? 'व्हाट्सएप विलंब • फॉलबैक सुरक्षा कोड:' : 'WhatsApp Delayed • Fallback Code:'}
+                          </span>
+                          <span className="font-mono text-base font-black text-emerald-400 tracking-wider">
+                            {activeOtpCode}
+                          </span>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setOtp(activeOtpCode)}
+                        className="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-black text-[11px] transition-all shadow-md active:scale-95"
+                      >
+                        {lang === 'hi' ? 'ओटीपी भरें ✓' : 'Auto Fill ✓'}
+                      </button>
+                    </div>
+                  )}
+
+                  <form onSubmit={handleVerifyOtp} className="space-y-4">
                     <div>
                       <input
                         type="text"
@@ -523,7 +553,7 @@ export default function CreativeLoginPortal() {
 
                       <button
                         type="button"
-                        onClick={handleResendFirebaseOtp}
+                        onClick={handleResendWhatsAppOtp}
                         disabled={resendTimer > 0 || isSendingOtp}
                         className={`font-black transition-all duration-200 ${
                           resendTimer > 0 || isSendingOtp
@@ -531,14 +561,14 @@ export default function CreativeLoginPortal() {
                             : 'text-emerald-400 hover:text-emerald-300 underline underline-offset-2'
                         }`}
                       >
-                        {lang === 'hi' ? 'ओटीपी पुनः भेजें' : 'Resend OTP'}
+                        {lang === 'hi' ? 'व्हाट्सएप पर पुनः भेजें' : 'Resend via WhatsApp'}
                       </button>
                     </div>
 
                     <div className="flex gap-2 pt-1">
                       <button
                         type="button"
-                        onClick={() => { setStep('phone'); setOtp(''); setError(''); }}
+                        onClick={() => { setStep('phone'); setOtp(''); setError(''); setWaDeliveryDelayed(false); }}
                         className="w-1/3 py-4 rounded-2xl border border-stone-700/80 text-stone-300 font-bold text-xs hover:bg-stone-800/80 hover:border-stone-600 transition-all duration-200"
                       >
                         {lang === 'hi' ? 'नंबर बदलें' : 'Change Number'}
@@ -577,7 +607,7 @@ export default function CreativeLoginPortal() {
                       {lang === 'hi' ? 'अपनी प्रोफाइल बनाएं' : 'Set Up Your Profile'}
                     </h3>
                     <p className="text-stone-400 text-xs font-medium">
-                      {lang === 'hi' ? `सत्यापित मोबाइल: +91 ${phone}` : `Verified Mobile: +91 ${phone}`}
+                      {lang === 'hi' ? `सत्यापित व्हाट्सएप: +91 ${phone}` : `Verified WhatsApp: +91 ${phone}`}
                     </p>
                   </div>
 
@@ -875,7 +905,7 @@ export default function CreativeLoginPortal() {
       {/* ═══════════ BOTTOM FOOTER ═══════════ */}
       <footer className="relative z-10 border-t border-stone-800/80 bg-stone-950/80 backdrop-blur-md px-6 py-4">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-stone-500">
-          <span>© 2026 KrishiSeva • Official Firebase Phone Authentication & AgriStack UPFR Network</span>
+          <span>© 2026 KrishiSeva • WhatsApp Business Verified Fleet Network & AgriStack UPFR</span>
           <div className="flex items-center gap-4 text-stone-400">
             <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5 text-emerald-400" /> Malihabad, Lucknow</span>
             <span className="flex items-center gap-1"><Phone className="w-3.5 h-3.5 text-emerald-400" /> 1800-KRISHI-SEVA</span>

@@ -1,16 +1,15 @@
-// Live WhatsApp & SMS Telephony Gateway for KrishiSeva
-// Primary Provider: UltraMsg WhatsApp Business Gateway (Instance #189242)
+// Live WhatsApp Telephony Gateway for KrishiSeva
+// Provider: UltraMsg WhatsApp Business Gateway (Instance #189366)
 
-export const SMS_PROVIDERS = {
-  ULTRAMSG: 'ultramsg',
-  META_WHATSAPP: 'meta',
-  TWILIO_WHATSAPP: 'twiliowa',
-  FAST2SMS: 'fast2sms',
-  TWILIO_SMS: 'twilio'
+export const ULTRAMSG_CONFIG = {
+  INSTANCE_ID: 'instance189366',
+  TOKEN: 'sn81kdn2krygh3eg',
+  ENDPOINT: 'https://api.ultramsg.com/instance189366/messages/chat',
+  RESEND_ENDPOINT: 'https://api.ultramsg.com/instance189366/messages/resendByStatus'
 };
 
 // ─────────────────────────────────────────────────────────────
-// Phone Number Sanitization & Formatting Helper
+// Phone Number Sanitization & Formatting Helper (e.g. 919876543210)
 // ─────────────────────────────────────────────────────────────
 export function formatIndianPhoneNumber(rawPhone) {
   let cleaned = String(rawPhone || '').replace(/\D/g, '');
@@ -23,27 +22,26 @@ export function formatIndianPhoneNumber(rawPhone) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// 1. Dynamic WhatsApp OTP Dispatch via UltraMsg with Deep Error Interception
+// Dynamic WhatsApp OTP Dispatch via UltraMsg
 // ─────────────────────────────────────────────────────────────
 export async function sendRealWhatsAppOtp(phoneNumber, otpCode, lang = 'en') {
-  // 1. Sanitize & clean input phone number
+  // 1. Sanitize & extract 10-digit mobile number
   const cleanNumber = formatIndianPhoneNumber(phoneNumber);
 
   if (!cleanNumber || cleanNumber.length !== 10) {
-    console.error(`[UltraMsg Gateway] Invalid 10-digit phone number provided: "${phoneNumber}"`);
+    console.error(`[UltraMsg Gateway] Invalid 10-digit phone number: "${phoneNumber}"`);
     return { 
       success: false, 
-      isDelayedOrBlocked: false, 
       error: 'Please enter a valid 10-digit mobile number' 
     };
   }
 
-  // 2. Dynamic Recipient Binding (+91XXXXXXXXXX)
-  const formattedPhoneNumber = `+91${cleanNumber}`;
-  console.info(`[UltraMsg Gateway] Sending OTP ${otpCode} dynamically to recipient: ${formattedPhoneNumber}`);
+  // 2. Format to country code without '+' (e.g. 919876543210)
+  const formattedRecipient = `91${cleanNumber}`;
+  console.info(`[UltraMsg Gateway] Sending WhatsApp OTP ${otpCode} to ${formattedRecipient}`);
 
-  // 3. Message Template Body
-  const messageText = lang === 'hi' ?
+  // 3. Message Body
+  const messageBody = lang === 'hi' ?
 `🚜 *कृषि सेवा (KrishiSeva)* 🌾
 
 नमस्ते!
@@ -56,23 +54,19 @@ export async function sendRealWhatsAppOtp(phoneNumber, otpCode, lang = 'en') {
 :
 `Your KrishiSeva verification code is ${otpCode}. Valid for 5 minutes. Do not share this code.`;
 
-  // 4. UltraMsg Endpoint & Dynamic Payload
-  const instanceId = 'instance189242';
-  const token = '93rhhy7fj9ea2k81';
-
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout guard
+    const timeoutId = setTimeout(() => controller.abort(), 12000); // 12s timeout
 
-    const response = await fetch(`https://api.ultramsg.com/${instanceId}/messages/chat`, {
+    const response = await fetch(ULTRAMSG_CONFIG.ENDPOINT, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       },
       body: new URLSearchParams({
-        token: token,
-        to: formattedPhoneNumber,
-        body: messageText,
+        token: ULTRAMSG_CONFIG.TOKEN,
+        to: formattedRecipient,
+        body: messageBody,
         priority: '10'
       }),
       signal: controller.signal
@@ -80,9 +74,8 @@ export async function sendRealWhatsAppOtp(phoneNumber, otpCode, lang = 'en') {
     clearTimeout(timeoutId);
 
     const data = await response.json();
-    console.info(`[UltraMsg Gateway] Delivery response for ${formattedPhoneNumber}:`, data);
+    console.info(`[UltraMsg Gateway] Response for ${formattedRecipient}:`, data);
 
-    // Deep error inspection
     const isUnauthenticated = data.message && (
       data.message.toLowerCase().includes('not authenticated') ||
       data.message.toLowerCase().includes('not connected') ||
@@ -94,21 +87,19 @@ export async function sendRealWhatsAppOtp(phoneNumber, otpCode, lang = 'en') {
       data.message.toLowerCase().includes('block')
     );
 
-    const isUnsent = data.status === 'unsent' || data.status === 'invalid';
-
     if ((data.sent === "true" || data.success === true || !!data.id) && !isUnauthenticated && !isTemporaryBlock) {
-      // Auto-flush unsent queue immediately to prevent hold-ups
-      fetch(`https://api.ultramsg.com/${instanceId}/messages/resendByStatus`, {
+      // Auto-flush unsent queue immediately
+      fetch(ULTRAMSG_CONFIG.RESEND_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ token: token, status: 'unsent' })
+        body: new URLSearchParams({ token: ULTRAMSG_CONFIG.TOKEN, status: 'unsent' })
       }).catch(() => {});
 
       return { 
         success: true, 
         provider: 'UltraMsg WhatsApp API', 
         status: 'Sent', 
-        recipient: formattedPhoneNumber,
+        recipient: formattedRecipient,
         messageId: data.id, 
         data 
       };
@@ -116,110 +107,39 @@ export async function sendRealWhatsAppOtp(phoneNumber, otpCode, lang = 'en') {
       const errorMsg = isUnauthenticated 
         ? 'UltraMsg WhatsApp instance is not paired yet. Please scan QR on UltraMsg.' 
         : isTemporaryBlock 
-          ? 'WhatsApp temporary block on new contact. Use fallback OTP or direct WhatsApp chat.'
-          : (data.message || data.error || 'UltraMsg delivery delayed.');
-          
-      console.warn(`[UltraMsg Gateway] Intercepted delivery issue for ${formattedPhoneNumber}: ${errorMsg}`, data);
+          ? 'WhatsApp temporary block on new contact. Use fallback code.'
+          : (data.message || data.error || 'WhatsApp message dispatch delayed.');
+
+      console.warn(`[UltraMsg Gateway] Delivery warning for ${formattedRecipient}: ${errorMsg}`, data);
 
       return { 
         success: false, 
-        isDelayedOrBlocked: true, 
+        isDelayed: true, 
         provider: 'UltraMsg', 
         status: 'Delayed', 
-        recipient: formattedPhoneNumber, 
+        recipient: formattedRecipient, 
         error: errorMsg, 
         data 
       };
     }
   } catch (err) {
-    console.error(`[UltraMsg Gateway] Network or timeout error for ${formattedPhoneNumber}:`, err);
+    console.error(`[UltraMsg Gateway] Network error dispatching to ${formattedRecipient}:`, err);
     return { 
       success: false, 
-      isDelayedOrBlocked: true, 
+      isDelayed: true, 
       provider: 'UltraMsg', 
       status: 'Failed', 
-      recipient: formattedPhoneNumber, 
-      error: 'WhatsApp delivery timed out or delayed. Use Fallback OTP.' 
+      recipient: formattedRecipient, 
+      error: 'WhatsApp delivery timed out. Please check network.' 
     };
   }
 }
 
 // ─────────────────────────────────────────────────────────────
-// 2. Regular Carrier SMS Fallback (Fast2SMS / Twilio / Textbelt)
-// ─────────────────────────────────────────────────────────────
-export async function sendRealSmsToPhone(phoneNumber, otpCode) {
-  const cleanNumber = formatIndianPhoneNumber(phoneNumber);
-  const fast2smsKey = localStorage.getItem('krishi_fast2sms_api_key');
-  const twilioConfig = localStorage.getItem('krishi_twilio_config');
-
-  if (fast2smsKey) {
-    try {
-      const response = await fetch('https://www.fast2sms.com/dev/bulkV2', {
-        method: 'POST',
-        headers: {
-          'authorization': fast2smsKey,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          route: 'otp',
-          variables_values: otpCode,
-          numbers: cleanNumber
-        })
-      });
-      const data = await response.json();
-      return { success: data.return === true, provider: 'Fast2SMS', data };
-    } catch (err) {
-      console.warn('Fast2SMS error:', err);
-    }
-  }
-
-  if (twilioConfig) {
-    try {
-      const { accountSid, authToken, fromNumber } = JSON.parse(twilioConfig);
-      const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
-      const formData = new URLSearchParams();
-      formData.append('To', `+91${cleanNumber}`);
-      formData.append('From', fromNumber);
-      formData.append('Body', `Your KrishiSeva verification code is ${otpCode}. Valid for 5 minutes. Do not share this code.`);
-
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Authorization': 'Basic ' + btoa(`${accountSid}:${authToken}`),
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: formData
-      });
-      const data = await response.json();
-      return { success: response.ok, provider: 'Twilio SMS', data };
-    } catch (err) {
-      console.warn('Twilio SMS error:', err);
-    }
-  }
-
-  try {
-    const response = await fetch('https://textbelt.com/text', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        phone: `+91${cleanNumber}`,
-        message: `Your KrishiSeva OTP is ${otpCode}. Valid for 5 mins.`,
-        key: 'textbelt'
-      })
-    });
-    const result = await response.json();
-    return { success: result.success === true, provider: 'Textbelt', data: result };
-  } catch (e) {
-    return { success: false, error: 'No SMS Gateway configured' };
-  }
-}
-
-// ─────────────────────────────────────────────────────────────
-// 3. Aadhaar e-KYC Notification
+// Aadhaar e-KYC Notification via WhatsApp
 // ─────────────────────────────────────────────────────────────
 export async function sendAadhaarEkycSms(phoneNumber, aadhaarOtp, maskedAadhaar) {
   const cleanNumber = formatIndianPhoneNumber(phoneNumber);
   sendRealWhatsAppOtp(cleanNumber, aadhaarOtp).catch(() => {});
-  sendRealSmsToPhone(cleanNumber, aadhaarOtp).catch(() => {});
   return { success: true };
 }
