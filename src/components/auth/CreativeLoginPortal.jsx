@@ -451,18 +451,28 @@ export default function CreativeLoginPortal() {
           <source src="/videos/hero_field_bg.mp4" type="video/mp4" />
         </video>
         {/* Soft Vignette Overlay for Crisp Readability */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black via-slate-950/95 to-emerald-950/40 backdrop-blur-[2px] transition-colors duration-300" />
+        <div className={`absolute inset-0 backdrop-blur-[2px] transition-colors duration-300 ${
+          isDark 
+            ? 'bg-gradient-to-br from-black via-slate-950/95 to-emerald-950/40' 
+            : 'bg-gradient-to-br from-white/80 via-white/70 to-emerald-50/45'
+        }`} />
       </div>
 
       {/* ═══════════ SEAMLESS FULL-WIDTH NAVBAR ═══════════ */}
-      <header className="w-full fixed top-0 left-0 right-0 z-50 px-6 sm:px-8 py-4 flex items-center justify-between bg-black/20 backdrop-blur-xl border-b border-white/10 shadow-sm transition-colors duration-200">
+      <header className={`w-full fixed top-0 left-0 right-0 z-50 px-6 sm:px-8 py-4 flex items-center justify-between border-b shadow-sm transition-colors duration-200 ${
+        isDark 
+          ? 'bg-black/20 backdrop-blur-xl border-white/10' 
+          : 'bg-white/60 backdrop-blur-xl border-slate-200/80'
+      }`}>
         {/* Brand Logo (Far Left) */}
         <div className="flex items-center gap-3 group cursor-pointer">
           <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center text-stone-950 font-black shadow-lg shadow-emerald-500/25 transition-all group-hover:scale-105 group-hover:shadow-emerald-500/40">
             <Tractor className="w-4.5 h-4.5 text-stone-950" />
           </div>
           <div>
-            <span className="text-lg font-black tracking-tight text-white transition-all duration-300 group-hover:text-emerald-400 group-hover:drop-shadow-[0_0_8px_rgba(52,211,153,0.6)]">
+            <span className={`text-lg font-black tracking-tight transition-all duration-300 group-hover:text-emerald-450 group-hover:drop-shadow-[0_0_8px_rgba(52,211,153,0.5)] ${
+              isDark ? 'text-white' : 'text-slate-900'
+            }`}>
               KrishiSeva
             </span>
           </div>
@@ -473,16 +483,24 @@ export default function CreativeLoginPortal() {
           {/* Admin Login Quick Link */}
           <button
             onClick={() => setActiveRole('admin')}
-            className="bg-stone-900/90 hover:bg-stone-800/90 border border-stone-800/80 text-stone-300 text-xs px-3.5 py-1.5 rounded-full transition-all active:scale-95 flex items-center gap-1.5 hover:border-emerald-500/30 hover:text-white"
+            className={`text-xs px-3.5 py-1.5 rounded-full border transition-all active:scale-95 flex items-center gap-1.5 ${
+              isDark 
+                ? 'bg-stone-900/90 hover:bg-stone-800/90 border-stone-800/80 text-stone-300 hover:border-emerald-500/30 hover:text-white' 
+                : 'bg-white/90 hover:bg-slate-50 border-slate-200 text-slate-700 hover:border-emerald-500/40 hover:text-slate-900 shadow-sm'
+            }`}
           >
-            <Lock className="w-3.5 h-3.5 text-stone-400" />
+            <Lock className={`w-3.5 h-3.5 ${isDark ? 'text-stone-400' : 'text-slate-550'}`} />
             <span>{lang === 'hi' ? 'एडमिन लॉगिन' : 'Admin Login'}</span>
           </button>
 
           {/* Dark / Light Theme Switcher */}
           <button
             onClick={toggleTheme}
-            className="bg-stone-900/90 hover:bg-stone-800/90 border border-stone-800/80 text-stone-300 text-xs px-3.5 py-1.5 rounded-full transition-all active:scale-95 flex items-center gap-1.5 hover:border-emerald-500/30 hover:text-white"
+            className={`text-xs px-3.5 py-1.5 rounded-full border transition-all active:scale-95 flex items-center gap-1.5 ${
+              isDark 
+                ? 'bg-stone-900/90 hover:bg-stone-800/90 border-stone-800/80 text-stone-300 hover:border-emerald-500/30 hover:text-white' 
+                : 'bg-white/90 hover:bg-slate-50 border-slate-200 text-slate-700 hover:border-emerald-500/40 hover:text-slate-900 shadow-sm'
+            }`}
             title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
           >
             {isDark ? (
@@ -492,7 +510,7 @@ export default function CreativeLoginPortal() {
               </>
             ) : (
               <>
-                <Moon className="w-3.5 h-3.5 text-indigo-400" />
+                <Moon className="w-3.5 h-3.5 text-indigo-500" />
                 <span>Dark</span>
               </>
             )}
@@ -501,9 +519,13 @@ export default function CreativeLoginPortal() {
           {/* Language Switcher */}
           <button
             onClick={toggleLanguage}
-            className="bg-stone-900/90 hover:bg-stone-800/90 border border-stone-800/80 text-stone-300 text-xs px-3.5 py-1.5 rounded-full transition-all active:scale-95 flex items-center gap-1.5 hover:border-emerald-500/30 hover:text-white"
+            className={`text-xs px-3.5 py-1.5 rounded-full border transition-all active:scale-95 flex items-center gap-1.5 ${
+              isDark 
+                ? 'bg-stone-900/90 hover:bg-stone-800/90 border-stone-800/80 text-stone-300 hover:border-emerald-500/30 hover:text-white' 
+                : 'bg-white/90 hover:bg-slate-50 border-slate-200 text-slate-700 hover:border-emerald-500/40 hover:text-slate-900 shadow-sm'
+            }`}
           >
-            <Globe className="w-3.5 h-3.5 text-emerald-450" />
+            <Globe className="w-3.5 h-3.5 text-emerald-550" />
             <span>{lang === 'hi' ? 'English' : 'हिंदी'}</span>
           </button>
         </div>
@@ -571,7 +593,11 @@ export default function CreativeLoginPortal() {
             {/* Subtle emerald radial ambient light glow behind the card */}
             <div className="absolute -inset-10 bg-emerald-500/10 blur-[120px] pointer-events-none rounded-full z-0" />
             
-            <div className="bg-[#0A0E13] border border-white/10 backdrop-blur-2xl rounded-3xl p-6 sm:p-8 shadow-[0_20px_60px_rgba(0,0,0,0.8)] transition-all duration-300 relative z-10">
+            <div className={`border backdrop-blur-2xl rounded-3xl p-6 sm:p-8 transition-all duration-300 relative z-10 ${
+              isDark 
+                ? 'bg-[#0A0E13] border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.8)]' 
+                : 'bg-white/85 border-slate-200 shadow-[0_20px_60px_rgba(15,23,42,0.15)] text-slate-800'
+            }`}>
 
               {/* STEP 1: Phone Number Input & Send WhatsApp OTP */}
               {step === 'phone' && (
@@ -595,12 +621,18 @@ export default function CreativeLoginPortal() {
                   <form onSubmit={handleSendWhatsAppOtp} className="space-y-4">
                     <div>
                       <label className={`block text-xs font-bold uppercase tracking-wider mb-2 ${
-                        isDark ? 'text-stone-400' : 'text-slate-600'
+                        isDark ? 'text-stone-400' : 'text-slate-650'
                       }`}>
                         {lang === 'hi' ? 'मोबाइल नंबर' : 'Enter Mobile Number'}
                       </label>
-                      <div className="bg-[#05080C] border border-white/10 focus-within:border-emerald-500/60 rounded-2xl p-3.5 flex items-center gap-3 transition-all">
-                        <span className="font-semibold text-xs flex items-center gap-1.5 pointer-events-none text-slate-300 border-r border-slate-700 pr-3 select-none">
+                      <div className={`border p-3.5 flex items-center gap-3 transition-all rounded-2xl ${
+                        isDark 
+                          ? 'bg-[#05080C] border-white/10 focus-within:border-emerald-500/60' 
+                          : 'bg-slate-50 border-slate-250 focus-within:border-emerald-500/60'
+                      }`}>
+                        <span className={`font-semibold text-xs flex items-center gap-1.5 pointer-events-none border-r pr-3 select-none ${
+                          isDark ? 'text-slate-350 border-slate-700' : 'text-slate-500 border-slate-300'
+                        }`}>
                           <span>IN</span>
                           <span>+91</span>
                         </span>
@@ -610,7 +642,9 @@ export default function CreativeLoginPortal() {
                           value={phone}
                           onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
                           placeholder="9236581609"
-                          className="w-full bg-transparent text-white focus:outline-none placeholder:text-slate-650 border-none p-0 focus:ring-0"
+                          className={`w-full bg-transparent focus:outline-none border-none p-0 focus:ring-0 ${
+                            isDark ? 'text-white placeholder:text-slate-605' : 'text-slate-900 placeholder:text-slate-400'
+                          }`}
                           required
                           autoFocus
                         />
@@ -649,15 +683,23 @@ export default function CreativeLoginPortal() {
                     <div className="grid grid-cols-2 gap-2.5">
                       <div
                         onClick={() => quickDemoLogin('farmer')}
-                        className="bg-white/[0.03] hover:bg-white/[0.07] border border-white/10 hover:border-emerald-500/40 p-3.5 rounded-2xl transition-all duration-250 cursor-pointer flex items-center justify-between group active:scale-95 text-slate-200"
+                        className={`border p-3.5 rounded-2xl cursor-pointer transition-all duration-250 flex items-center justify-between group active:scale-95 ${
+                          isDark 
+                            ? 'bg-white/[0.03] hover:bg-white/[0.07] border-white/10 hover:border-emerald-500/40 text-slate-200' 
+                            : 'bg-slate-50 hover:bg-slate-100/80 border-slate-200 hover:border-emerald-500/40 text-slate-800 shadow-xs'
+                        }`}
                       >
                         <div className="flex items-center gap-2">
                           <span className="text-xl">🌾</span>
                           <div>
-                            <span className="text-xs font-bold block group-hover:text-white transition-colors duration-200">
+                            <span className={`text-xs font-bold block group-hover:text-emerald-505 transition-colors duration-200 ${
+                              isDark ? 'text-white' : 'text-slate-900'
+                            }`}>
                               {lang === 'hi' ? 'बलराम (किसान)' : 'Balram (Farmer)'}
                             </span>
-                            <span className="text-[10px] text-slate-400 font-mono">
+                            <span className={`text-[10px] font-mono ${
+                              isDark ? 'text-slate-400' : 'text-slate-500'
+                            }`}>
                               9876543210
                             </span>
                           </div>
@@ -667,15 +709,23 @@ export default function CreativeLoginPortal() {
 
                       <div
                         onClick={() => quickDemoLogin('driver')}
-                        className="bg-white/[0.03] hover:bg-white/[0.07] border border-white/10 hover:border-emerald-500/40 p-3.5 rounded-2xl transition-all duration-250 cursor-pointer flex items-center justify-between group active:scale-95 text-slate-200"
+                        className={`border p-3.5 rounded-2xl cursor-pointer transition-all duration-250 flex items-center justify-between group active:scale-95 ${
+                          isDark 
+                            ? 'bg-white/[0.03] hover:bg-white/[0.07] border-white/10 hover:border-emerald-500/40 text-slate-200' 
+                            : 'bg-slate-50 hover:bg-slate-100/80 border-slate-200 hover:border-emerald-500/40 text-slate-800 shadow-xs'
+                        }`}
                       >
                         <div className="flex items-center gap-2">
                           <span className="text-xl">🚜</span>
                           <div>
-                            <span className="text-xs font-bold block group-hover:text-white transition-colors duration-200">
+                            <span className={`text-xs font-bold block group-hover:text-emerald-505 transition-colors duration-200 ${
+                              isDark ? 'text-white' : 'text-slate-900'
+                            }`}>
                               {lang === 'hi' ? 'जगजीत (चालक)' : 'Jagjit (Driver)'}
                             </span>
-                            <span className="text-[10px] text-slate-400 font-mono">
+                            <span className={`text-[10px] font-mono ${
+                              isDark ? 'text-slate-400' : 'text-slate-500'
+                            }`}>
                               9876501234
                             </span>
                           </div>
@@ -1466,7 +1516,9 @@ export default function CreativeLoginPortal() {
 
       {/* ═══════════ MINIMALIST FOOTER ═══════════ */}
       <footer className={`relative z-10 border-t px-6 py-4 transition-colors duration-200 ${
-        isDark ? 'border-stone-800/80 bg-[#090D0B] text-stone-400' : 'border-slate-200 bg-white text-slate-500'
+        isDark 
+          ? 'border-stone-800/80 bg-[#090D0B] text-stone-400' 
+          : 'border-slate-200 bg-white/40 backdrop-blur-md text-slate-505'
       }`}>
         <div className="max-w-7xl mx-auto flex items-center justify-center text-center text-xs">
           <span>© 2026 KrishiSeva • Precision Farm Fleet Network</span>
