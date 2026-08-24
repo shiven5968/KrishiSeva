@@ -707,13 +707,9 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
                       </div>
 
                       <div className="text-right shrink-0">
-                        {att.extraRatePerAcre > 0 ? (
+                        {att.extraRatePerAcre > 0 && (
                           <span className="text-xs font-black text-amber-400 bg-amber-950/60 px-2.5 py-1 rounded-lg border border-amber-500/30">
                             +₹{att.extraRatePerAcre}/{lang === 'hi' ? 'बीघा' : 'bigha'}
-                          </span>
-                        ) : (
-                          <span className="text-xs font-black text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded-lg border border-emerald-500/30">
-                            {lang === 'hi' ? 'सम्मिलित' : 'Included'}
                           </span>
                         )}
                       </div>
