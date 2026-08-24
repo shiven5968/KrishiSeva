@@ -222,11 +222,11 @@ export default function FarmerLiveTracking() {
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
         
         {/* Left Column: Full Live Map */}
-        <div className="lg:col-span-8 space-y-4">
-          <div className={`rounded-3xl p-5 border shadow-2xl space-y-3 transition-colors duration-200 ${
+        <div className="lg:col-span-8 flex flex-col">
+          <div className={`rounded-3xl p-5 border shadow-2xl space-y-3 transition-colors duration-200 flex-1 flex flex-col ${
             isDark ? 'bg-stone-900/90 border-stone-800 shadow-black/40' : 'bg-white border-slate-200 shadow-slate-200/50'
           }`}>
             <div className="flex items-center justify-between">
@@ -257,181 +257,185 @@ export default function FarmerLiveTracking() {
             </div>
 
             {/* Live Leaflet Map Component */}
-            <LiveMap
-              farmerLocation={activeBooking.farmerLocation}
-              driverPos={driverCurrentPos}
-              routeWaypoints={isSearching ? [] : routeWaypoints}
-              activeVehicleType={activeBooking.machineryType}
-              showNearbyDrivers={isSearching}
-              bookingStatus={activeBooking.status}
-              className={`h-[460px] w-full rounded-2xl overflow-hidden border ${isDark ? 'border-stone-800' : 'border-slate-200'}`}
-            />
+            <div className="flex-1 min-h-[580px] w-full rounded-2xl overflow-hidden relative">
+              <LiveMap
+                farmerLocation={activeBooking.farmerLocation}
+                driverPos={driverCurrentPos}
+                routeWaypoints={isSearching ? [] : routeWaypoints}
+                activeVehicleType={activeBooking.machineryType}
+                showNearbyDrivers={isSearching}
+                bookingStatus={activeBooking.status}
+                className={`h-full w-full rounded-2xl overflow-hidden border ${isDark ? 'border-stone-800' : 'border-slate-200'}`}
+              />
+            </div>
           </div>
         </div>
 
         {/* Right Column: Dynamic State Display */}
-        <div className="lg:col-span-4 space-y-6">
+        <div className="lg:col-span-4 flex flex-col">
           
           {/* 1. SEARCHING STATE: Machinery Request Info & Actions */}
           {isSearching && (
-            <div className={`rounded-3xl p-6 border shadow-2xl space-y-5 animate-fade-in transition-colors duration-200 ${
+            <div className={`rounded-3xl p-6 border shadow-2xl space-y-4 animate-fade-in transition-colors duration-200 flex-1 flex flex-col justify-between ${
               isDark ? 'bg-stone-900/90 border-stone-800 text-white shadow-black/40' : 'bg-white border-slate-200 text-slate-900 shadow-slate-200/50'
             }`}>
               
-              <div className="flex items-center justify-between pb-3 border-b border-stone-800/40">
-                <span className="text-xs font-black uppercase tracking-wider text-emerald-500">
-                  {lang === 'hi' ? 'अनुरोधित बुकिंग विवरण' : 'Booking Request Summary'}
-                </span>
-                <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500">
-                  {lang === 'hi' ? 'लाइव प्रसारण' : 'Broadcast Live'}
-                </span>
-              </div>
-
-              {/* Machinery Requested Summary */}
-              <div className={`rounded-2xl p-4 border space-y-2.5 text-xs ${
-                isDark ? 'bg-stone-950/80 border-stone-800' : 'bg-slate-50 border-slate-200'
-              }`}>
-                <div className="flex justify-between items-center">
-                  <span className={`font-medium ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>{lang === 'hi' ? 'अनुरोधित मशीन:' : 'Requested Machinery:'}</span>
-                  <span className={`font-bold capitalize ${isDark ? 'text-white' : 'text-slate-900'}`}>{activeBooking.machineryType}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className={`font-medium ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>{lang === 'hi' ? 'उपकरण (Attachment):' : 'Implement:'}</span>
-                  <span className="font-extrabold text-emerald-500">{t(activeBooking.attachment?.nameKey)}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className={`font-medium ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>{lang === 'hi' ? 'खेत का आकार:' : 'Farm Size:'}</span>
-                  <span className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{activeBooking.landSize} {activeBooking.sizeUnit}</span>
-                </div>
-                <div className={`flex justify-between items-center pt-2 border-t ${isDark ? 'border-stone-800' : 'border-slate-200'}`}>
-                  <span className={`font-bold ${isDark ? 'text-stone-300' : 'text-slate-700'}`}>{lang === 'hi' ? 'अनुमानित किराया:' : 'Estimated Fare:'}</span>
-                  <span className="text-xl font-black text-amber-500">₹{activeBooking.estimatedPrice}</span>
-                </div>
-                {activeBooking.paymentMethod && (
-                  <>
-                    <div className="flex justify-between items-center">
-                      <span className={`font-medium ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>{lang === 'hi' ? 'भुगतान विधि:' : 'Payment Method:'}</span>
-                      <span className={`font-bold uppercase ${isDark ? 'text-white' : 'text-slate-900'}`}>{activeBooking.paymentMethod === 'cod' ? 'COD' : 'Online'}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className={`font-medium ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>{lang === 'hi' ? 'अग्रिम भुगतान:' : 'Paid Advance:'}</span>
-                      <span className="font-bold text-emerald-500">₹{activeBooking.advancePaid || 0}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className={`font-medium ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>{lang === 'hi' ? 'शेष देय राशि:' : 'Balance Due:'}</span>
-                      <span className="font-bold text-amber-500">₹{activeBooking.balanceDue || 0}</span>
-                    </div>
-                  </>
-                )}
-              </div>
-
-              {/* Bargaining / Counter-Offer Section */}
-              <div className={`rounded-2xl p-4 border space-y-3 animate-fade-in ${
-                isDark ? 'bg-stone-950/80 border-stone-800' : 'bg-slate-50 border-slate-200'
-              }`}>
-                <div className="flex items-center gap-1.5 text-xs text-emerald-500 font-extrabold uppercase tracking-wider">
-                  <Coins className="w-3.5 h-3.5" />
-                  <span>{lang === 'hi' ? 'किराया मोल-भाव (Bargain Price)' : 'Want to Bargain?'}</span>
-                </div>
-                <p className={`text-[10px] leading-normal ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
-                  {lang === 'hi'
-                    ? 'अपना नया प्रस्तावित किराया दर्ज करें। आस-पास के ऑपरेटरों को आपका ऑफर तुरंत दिखेगा।'
-                    : 'Enter your proposed fare. Nearby operators will see your counter-offer immediately.'}
-                </p>
-                <div className="flex gap-2">
-                  <div className="relative flex-1">
-                    <span className={`absolute left-3.5 top-1/2 -translate-y-1/2 font-bold text-xs ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>₹</span>
-                    <input
-                      type="number"
-                      value={bargainPriceInput}
-                      onChange={(e) => {
-                        setBargainPriceInput(e.target.value);
-                        setIsBargainSuccess(false);
-                      }}
-                      placeholder={activeBooking.estimatedPrice}
-                      className={`w-full pl-7 pr-3 py-2 border rounded-xl text-xs font-black focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition ${
-                        isDark ? 'bg-stone-900 border-stone-700 text-white' : 'bg-white border-slate-300 text-slate-900'
-                      }`}
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const val = Number(bargainPriceInput);
-                      if (val > 0) {
-                        updateBookingPrice(val);
-                        setIsBargainSuccess(true);
-                        setTimeout(() => setIsBargainSuccess(false), 3000);
-                      }
-                    }}
-                    className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-stone-950 text-xs font-black rounded-xl shadow-lg shadow-emerald-500/10 transition active:scale-95 shrink-0"
-                  >
-                    {lang === 'hi' ? 'ऑफर भेजें' : 'Send Offer'}
-                  </button>
-                </div>
-                {isBargainSuccess && (
-                  <p className="text-[10px] text-emerald-500 font-black text-center animate-pulse">
-                    {lang === 'hi' ? '✓ नया काउंटर-ऑफर भेजा गया!' : '✓ Counter-offer sent successfully!'}
-                  </p>
-                )}
-              </div>
-
-              {/* Live Operator Broadcast Status Stream */}
-              <div className={`rounded-2xl p-4 border space-y-2.5 ${
-                isDark ? 'bg-stone-950/80 border-stone-800' : 'bg-slate-50 border-slate-200'
-              }`}>
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-extrabold uppercase tracking-wider text-emerald-500 flex items-center gap-1.5">
-                    <Radio className="w-3.5 h-3.5 text-emerald-500 animate-pulse" />
-                    <span>{lang === 'hi' ? 'दायरे में सक्रिय चालक (3)' : 'Nearby Operators in Range (3)'}</span>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-stone-800/40">
+                  <span className="text-xs font-black uppercase tracking-wider text-emerald-500">
+                    {lang === 'hi' ? 'अनुरोधित बुकिंग विवरण' : 'Booking Request Summary'}
                   </span>
-                  <span className={`text-[10px] font-bold ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>Malihabad • 5 km</span>
+                  <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500">
+                    {lang === 'hi' ? 'लाइव प्रसारण' : 'Broadcast Live'}
+                  </span>
                 </div>
-                
-                <div className="space-y-2">
-                  <div className={`p-2.5 rounded-xl border flex items-center justify-between text-xs transition ${
-                    isDark ? 'bg-stone-900/60 border-stone-800 text-stone-200' : 'bg-white border-slate-200 text-slate-800'
-                  }`}>
-                    <div className="flex items-center gap-2.5">
-                      <span className="text-sm">🚜</span>
-                      <div>
-                        <span className="font-bold block">Mahindra 575 DI (50 HP)</span>
-                        <span className={`text-[10px] ${isDark ? 'text-stone-500' : 'text-slate-500'}`}>Jagjit Singh • 1.2 km away</span>
-                      </div>
-                    </div>
-                    <span className="text-[10px] font-bold text-emerald-500 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20 animate-pulse">
-                      Pinging 📡
-                    </span>
-                  </div>
 
-                  <div className={`p-2.5 rounded-xl border flex items-center justify-between text-xs transition ${
-                    isDark ? 'bg-stone-900/60 border-stone-800 text-stone-200' : 'bg-white border-slate-200 text-slate-800'
-                  }`}>
-                    <div className="flex items-center gap-2.5">
-                      <span className="text-sm">🌾</span>
-                      <div>
-                        <span className="font-bold block">Preet 987 Combine (110 HP)</span>
-                        <span className={`text-[10px] ${isDark ? 'text-stone-500' : 'text-slate-500'}`}>Rampal Sharma • 2.8 km away</span>
-                      </div>
-                    </div>
-                    <span className="text-[10px] font-bold text-amber-500 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20 animate-pulse">
-                      Pinging 📡
-                    </span>
+                {/* Machinery Requested Summary */}
+                <div className={`rounded-2xl p-4 border space-y-2.5 text-xs ${
+                  isDark ? 'bg-stone-950/80 border-stone-800' : 'bg-slate-50 border-slate-200'
+                }`}>
+                  <div className="flex justify-between items-center">
+                    <span className={`font-medium ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>{lang === 'hi' ? 'अनुरोधित मशीन:' : 'Requested Machinery:'}</span>
+                    <span className={`font-bold capitalize ${isDark ? 'text-white' : 'text-slate-900'}`}>{activeBooking.machineryType}</span>
                   </div>
-
-                  <div className={`p-2.5 rounded-xl border flex items-center justify-between text-xs transition ${
-                    isDark ? 'bg-stone-900/60 border-stone-800 text-stone-200' : 'bg-white border-slate-200 text-slate-800'
-                  }`}>
-                    <div className="flex items-center gap-2.5">
-                      <span className="text-sm">🚜</span>
-                      <div>
-                        <span className="font-bold block">Swaraj 855 FE (52 HP)</span>
-                        <span className={`text-[10px] ${isDark ? 'text-stone-500' : 'text-slate-500'}`}>Gurmeet Singh • 3.4 km away</span>
+                  <div className="flex justify-between items-center">
+                    <span className={`font-medium ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>{lang === 'hi' ? 'उपकरण (Attachment):' : 'Implement:'}</span>
+                    <span className="font-extrabold text-emerald-500">{t(activeBooking.attachment?.nameKey)}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className={`font-medium ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>{lang === 'hi' ? 'खेत का आकार:' : 'Farm Size:'}</span>
+                    <span className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{activeBooking.landSize} {activeBooking.sizeUnit}</span>
+                  </div>
+                  <div className={`flex justify-between items-center pt-2 border-t ${isDark ? 'border-stone-800' : 'border-slate-200'}`}>
+                    <span className={`font-bold ${isDark ? 'text-stone-300' : 'text-slate-700'}`}>{lang === 'hi' ? 'अनुमानित किराया:' : 'Estimated Fare:'}</span>
+                    <span className="text-xl font-black text-amber-500">₹{activeBooking.estimatedPrice}</span>
+                  </div>
+                  {activeBooking.paymentMethod && (
+                    <>
+                      <div className="flex justify-between items-center">
+                        <span className={`font-medium ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>{lang === 'hi' ? 'भुगतान विधि:' : 'Payment Method:'}</span>
+                        <span className={`font-bold uppercase ${isDark ? 'text-white' : 'text-slate-900'}`}>{activeBooking.paymentMethod === 'cod' ? 'COD' : 'Online'}</span>
                       </div>
+                      <div className="flex justify-between items-center">
+                        <span className={`font-medium ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>{lang === 'hi' ? 'अग्रिम भुगतान:' : 'Paid Advance:'}</span>
+                        <span className="font-bold text-emerald-500">₹{activeBooking.advancePaid || 0}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className={`font-medium ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>{lang === 'hi' ? 'शेष देय राशि:' : 'Balance Due:'}</span>
+                        <span className="font-bold text-amber-500">₹{activeBooking.balanceDue || 0}</span>
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {/* Bargaining / Counter-Offer Section */}
+                <div className={`rounded-2xl p-4 border space-y-3 animate-fade-in ${
+                  isDark ? 'bg-stone-950/80 border-stone-800' : 'bg-slate-50 border-slate-200'
+                }`}>
+                  <div className="flex items-center gap-1.5 text-xs text-emerald-500 font-extrabold uppercase tracking-wider">
+                    <Coins className="w-3.5 h-3.5" />
+                    <span>{lang === 'hi' ? 'किराया मोल-भाव (Bargain Price)' : 'Want to Bargain?'}</span>
+                  </div>
+                  <p className={`text-[10px] leading-normal ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+                    {lang === 'hi'
+                      ? 'अपना नया प्रस्तावित किराया दर्ज करें। आस-पास के ऑपरेटरों को आपका ऑफर तुरंत दिखेगा।'
+                      : 'Enter your proposed fare. Nearby operators will see your counter-offer immediately.'}
+                  </p>
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <span className={`absolute left-3.5 top-1/2 -translate-y-1/2 font-bold text-xs ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>₹</span>
+                      <input
+                        type="number"
+                        value={bargainPriceInput}
+                        onChange={(e) => {
+                          setBargainPriceInput(e.target.value);
+                          setIsBargainSuccess(false);
+                        }}
+                        placeholder={activeBooking.estimatedPrice}
+                        className={`w-full pl-7 pr-3 py-2 border rounded-xl text-xs font-black focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition ${
+                          isDark ? 'bg-stone-900 border-stone-700 text-white' : 'bg-white border-slate-300 text-slate-900'
+                        }`}
+                      />
                     </div>
-                    <span className="text-[10px] font-bold text-emerald-500 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20 animate-pulse">
-                      Pinging 📡
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const val = Number(bargainPriceInput);
+                        if (val > 0) {
+                          updateBookingPrice(val);
+                          setIsBargainSuccess(true);
+                          setTimeout(() => setIsBargainSuccess(false), 3000);
+                        }
+                      }}
+                      className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-stone-950 text-xs font-black rounded-xl shadow-lg shadow-emerald-500/10 transition active:scale-95 shrink-0"
+                    >
+                      {lang === 'hi' ? 'ऑफर भेजें' : 'Send Offer'}
+                    </button>
+                  </div>
+                  {isBargainSuccess && (
+                    <p className="text-[10px] text-emerald-500 font-black text-center animate-pulse">
+                      {lang === 'hi' ? '✓ नया काउंटर-ऑफर भेजा गया!' : '✓ Counter-offer sent successfully!'}
+                    </p>
+                  )}
+                </div>
+
+                {/* Live Operator Broadcast Status Stream */}
+                <div className={`rounded-2xl p-4 border space-y-2.5 ${
+                  isDark ? 'bg-stone-950/80 border-stone-800' : 'bg-slate-50 border-slate-200'
+                }`}>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-extrabold uppercase tracking-wider text-emerald-500 flex items-center gap-1.5">
+                      <Radio className="w-3.5 h-3.5 text-emerald-500 animate-pulse" />
+                      <span>{lang === 'hi' ? 'दायरे में सक्रिय चालक (3)' : 'Nearby Operators in Range (3)'}</span>
                     </span>
+                    <span className={`text-[10px] font-bold ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>Malihabad • 5 km</span>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className={`p-2.5 rounded-xl border flex items-center justify-between text-xs transition ${
+                      isDark ? 'bg-stone-900/60 border-stone-800 text-stone-200' : 'bg-white border-slate-200 text-slate-800'
+                    }`}>
+                      <div className="flex items-center gap-2.5">
+                        <span className="text-sm">🚜</span>
+                        <div>
+                          <span className="font-bold block">Mahindra 575 DI (50 HP)</span>
+                          <span className={`text-[10px] ${isDark ? 'text-stone-500' : 'text-slate-500'}`}>Jagjit Singh • 1.2 km away</span>
+                        </div>
+                      </div>
+                      <span className="text-[10px] font-bold text-emerald-500 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20 animate-pulse">
+                        Pinging 📡
+                      </span>
+                    </div>
+
+                    <div className={`p-2.5 rounded-xl border flex items-center justify-between text-xs transition ${
+                      isDark ? 'bg-stone-900/60 border-stone-800 text-stone-200' : 'bg-white border-slate-200 text-slate-800'
+                    }`}>
+                      <div className="flex items-center gap-2.5">
+                        <span className="text-sm">🌾</span>
+                        <div>
+                          <span className="font-bold block">Preet 987 Combine (110 HP)</span>
+                          <span className={`text-[10px] ${isDark ? 'text-stone-500' : 'text-slate-500'}`}>Rampal Sharma • 2.8 km away</span>
+                        </div>
+                      </div>
+                      <span className="text-[10px] font-bold text-amber-500 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20 animate-pulse">
+                        Pinging 📡
+                      </span>
+                    </div>
+
+                    <div className={`p-2.5 rounded-xl border flex items-center justify-between text-xs transition ${
+                      isDark ? 'bg-stone-900/60 border-stone-800 text-stone-200' : 'bg-white border-slate-200 text-slate-800'
+                    }`}>
+                      <div className="flex items-center gap-2.5">
+                        <span className="text-sm">🚜</span>
+                        <div>
+                          <span className="font-bold block">Swaraj 855 FE (52 HP)</span>
+                          <span className={`text-[10px] ${isDark ? 'text-stone-500' : 'text-slate-500'}`}>Gurmeet Singh • 3.4 km away</span>
+                        </div>
+                      </div>
+                      <span className="text-[10px] font-bold text-emerald-500 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20 animate-pulse">
+                        Pinging 📡
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -439,7 +443,7 @@ export default function FarmerLiveTracking() {
               {/* Cancel Request Button (Opens Reason Modal) */}
               <button
                 onClick={() => setIsCancelModalOpen(true)}
-                className={`w-full py-3.5 rounded-2xl border border-red-500/50 font-bold text-xs flex items-center justify-center gap-2 transition active:scale-98 ${
+                className={`w-full py-3.5 rounded-2xl border border-red-500/50 font-bold text-xs flex items-center justify-center gap-2 transition active:scale-98 mt-3 ${
                   isDark ? 'text-red-400 hover:bg-red-950/40' : 'text-red-600 hover:bg-red-50'
                 }`}
               >
@@ -452,7 +456,7 @@ export default function FarmerLiveTracking() {
 
           {/* 2. MATCHED STATE: Driver Assigned, Photo, Call Driver & Live GPS Info */}
           {!isSearching && assignedDriver && (
-            <div className={`rounded-3xl p-6 border shadow-2xl space-y-5 animate-fade-in transition-colors duration-200 ${
+            <div className={`rounded-3xl p-6 border shadow-2xl space-y-5 animate-fade-in transition-colors duration-200 flex-1 flex flex-col justify-between ${
               isDark ? 'bg-stone-900/90 border-emerald-600/40 text-white shadow-black/40' : 'bg-white border-emerald-500/30 text-slate-900 shadow-slate-200/50'
             }`}>
               
@@ -561,6 +565,27 @@ export default function FarmerLiveTracking() {
 
         </div>
 
+      </div>
+
+      {/* Bottom Dispatch SLA & Trust Bar */}
+      <div className={`p-4 rounded-2xl border flex flex-col md:flex-row items-center justify-between gap-4 text-xs transition-colors duration-200 ${
+        isDark ? 'bg-stone-900/60 border-stone-800/80 text-stone-300' : 'bg-white border-slate-200 text-slate-700 shadow-sm'
+      }`}>
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="font-bold">
+            {lang === 'hi' ? '⚡ 35-60 मिनट में त्वरित मशीन डिलीवरी गारंटी (SLA)' : '⚡ 35-60 Min Rapid Machinery Dispatch Guarantee (SLA)'}
+          </span>
+        </div>
+        <div className="flex items-center gap-4 text-[11px]">
+          <span className="flex items-center gap-1 text-emerald-500 font-semibold">
+            🛡️ {lang === 'hi' ? 'भूलेख एवं जीपीएस सत्यापित' : 'Bhulekh & GPS Geotagged'}
+          </span>
+          <span className={isDark ? 'text-stone-700' : 'text-slate-300'}>•</span>
+          <span className="flex items-center gap-1 text-blue-500 font-semibold">
+            💬 {lang === 'hi' ? '24x7 किसान सहायता उपलब्ध' : '24x7 Kisaan Helpdesk'}
+          </span>
+        </div>
       </div>
 
       {/* Cancellation Reason Modal */}
