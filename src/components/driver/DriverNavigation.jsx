@@ -55,8 +55,8 @@ export default function DriverNavigation() {
       updateBookingStatus('in_progress');
     } else {
       setOtpError(lang === 'hi' 
-        ? `गलत ओटीपी! किसान के स्क्रीन पर प्रदर्शित 4-अंकों का पिन (${expectedOtp}) दर्ज करें।` 
-        : `Incorrect PIN! Please enter the 4-digit PIN (${expectedOtp}) shown on farmer's screen.`);
+        ? `गलत ओटीपी! कृपया किसान के स्क्रीन पर प्रदर्शित 4-अंकों का पिन दर्ज करें।` 
+        : `Incorrect PIN! Please enter the 4-digit PIN shown on farmer's screen.`);
     }
   };
 
@@ -316,13 +316,13 @@ export default function DriverNavigation() {
 
                 {/* Quick Hint / Master bypass */}
                 <div className="flex items-center justify-between text-[11px] text-stone-400 px-1">
-                  <span>Farmer OTP: <b className="text-emerald-400 font-mono">{activeBooking?.startOtp || '4821'}</b></span>
+                  <span>{lang === 'hi' ? 'ओटीपी किसान से पूछें' : 'Ask farmer for PIN'}</span>
                   <button 
                     type="button" 
                     onClick={() => setStartOtpInput(activeBooking?.startOtp || '4821')} 
                     className="text-amber-400 hover:underline font-bold"
                   >
-                    Auto-Fill
+                    Auto-Fill (Demo)
                   </button>
                 </div>
 
