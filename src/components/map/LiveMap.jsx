@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import { generateNearbyDrivers, generateFarmPlotPolygon, calculateDistanceKm } from '../../utils/geoUtils';
 import { useRealtimeSync } from '../../context/RealtimeSyncContext';
+import { useTheme } from '../../context/ThemeContext';
 import { Layers, Crosshair, Navigation2, Compass, Radio } from 'lucide-react';
 
 // Tile Layer URLs
@@ -61,6 +62,7 @@ export default function LiveMap({
   className = 'h-[300px] w-full rounded-2xl'
 }) {
   const { onlineFleet } = useRealtimeSync();
+  const { isDark } = useTheme();
   const mapContainerRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const tileLayerRef = useRef(null);
@@ -91,7 +93,8 @@ export default function LiveMap({
       attributionControl: false
     });
 
-    const tileLayer = L.tileLayer(MAP_LAYERS.standard.url, {
+    const initialTileUrl = MAP_LAYERS.standard.url;
+    const tileLayer = L.tileLayer(initialTileUrl, {
       maxZoom: 19
     }).addTo(map);
     tileLayerRef.current = tileLayer;
@@ -122,22 +125,31 @@ export default function LiveMap({
     };
   }, []);
 
-  // Switch Tile Layers (Standard vs Satellite)
-  const toggleMapLayer = () => {
+  // Sync Tile Layer whenever activeLayerType or isDark changes
+  useEffect(() => {
     const map = mapInstanceRef.current;
     if (!map) return;
-
-    const nextType = activeLayerType === 'standard' ? 'satellite' : 'standard';
-    setActiveLayerType(nextType);
 
     if (tileLayerRef.current) {
       map.removeLayer(tileLayerRef.current);
     }
 
-    const newTileLayer = L.tileLayer(MAP_LAYERS[nextType].url, {
+    const tileUrl = activeLayerType === 'satellite'
+      ? MAP_LAYERS.satellite.url
+      : MAP_LAYERS.standard.url;
+
+    const newTileLayer = L.tileLayer(tileUrl, {
       maxZoom: 19
     }).addTo(map);
     tileLayerRef.current = newTileLayer;
+
+    const t = setTimeout(() => map.invalidateSize(), 60);
+    return () => clearTimeout(t);
+  }, [activeLayerType, isDark]);
+
+  // Switch Tile Layers (Standard vs Satellite)
+  const toggleMapLayer = () => {
+    setActiveLayerType(prev => prev === 'standard' ? 'satellite' : 'standard');
   };
 
   // Browser Real GPS Geolocation Trigger
