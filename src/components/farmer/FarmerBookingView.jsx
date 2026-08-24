@@ -12,6 +12,7 @@ import LiveMap from '../map/LiveMap';
 import SavedLandsModal from './SavedLandsModal';
 import PreBookingsModal from './PreBookingsModal';
 import FarmerBookingHistoryModal from './FarmerBookingHistoryModal';
+import DeleteAccountModal from '../common/DeleteAccountModal';
 import confetti from 'canvas-confetti';
 import { 
   Tractor, 
@@ -29,6 +30,7 @@ import {
   Info,
   Truck,
   Bookmark,
+  Trash2,
   PlusCircle,
   Settings2,
   Calendar,
@@ -245,6 +247,7 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
   const [isSavedLandsModalOpen, setIsSavedLandsModalOpen] = useState(false);
   const [isPreBookingsModalOpen, setIsPreBookingsModalOpen] = useState(false);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+  const [isDeleteAccountModalOpen, setIsDeleteAccountModalOpen] = useState(false);
 
   // Booking Timing Mode: 'instant' (Now) vs 'schedule' (Pre-Book for Date & Day)
   const [bookingTimingMode, setBookingTimingMode] = useState('instant');
@@ -597,6 +600,19 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
           >
             <Bookmark className="w-3.5 h-3.5 text-emerald-500" />
             <span>{lang === 'hi' ? 'सहेजे गए खेत' : 'My Saved Lands'} ({savedLands.length})</span>
+          </button>
+
+          <button
+            onClick={() => setIsDeleteAccountModalOpen(true)}
+            className={`px-3.5 py-2.5 rounded-xl border font-bold text-xs flex items-center gap-1.5 transition-all duration-200 active:scale-95 shadow-md ${
+              isDark 
+                ? 'bg-stone-900 hover:bg-red-950/80 text-stone-400 hover:text-red-400 border-stone-800 hover:border-red-800/60 shadow-black/40' 
+                : 'bg-slate-100 hover:bg-red-50 text-slate-500 hover:text-red-600 border-slate-200'
+            }`}
+            title={lang === 'hi' ? 'खाता हमेशा के लिए हटाएं' : 'Delete Account Permanently'}
+          >
+            <Trash2 className="w-3.5 h-3.5 text-red-500" />
+            <span>{lang === 'hi' ? 'खाता हटाएं' : 'Delete Account'}</span>
           </button>
         </div>
       </div>
@@ -1674,6 +1690,12 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
       <FarmerBookingHistoryModal
         isOpen={isHistoryModalOpen}
         onClose={() => setIsHistoryModalOpen(false)}
+      />
+
+      {/* Permanent Account Deletion Modal */}
+      <DeleteAccountModal
+        isOpen={isDeleteAccountModalOpen}
+        onClose={() => setIsDeleteAccountModalOpen(false)}
       />
 
     </div>

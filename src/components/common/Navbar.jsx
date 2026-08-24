@@ -6,6 +6,7 @@ import { useRealtimeSync } from '../../context/RealtimeSyncContext';
 import { useSavedLands } from '../../context/SavedLandsContext';
 import LogoutConfirmationModal from './LogoutConfirmationModal';
 import FarmerBookingHistoryModal from '../farmer/FarmerBookingHistoryModal';
+import DeleteAccountModal from './DeleteAccountModal';
 import { 
   Tractor, 
   Globe, 
@@ -15,7 +16,8 @@ import {
   Bookmark,
   Sun,
   Moon,
-  History
+  History,
+  Trash2
 } from 'lucide-react';
 
 export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
@@ -24,6 +26,7 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
   const { activeRole, setActiveRole, currentUser, driverProfile, logout } = useAuth();
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+  const [isDeleteAccountModalOpen, setIsDeleteAccountModalOpen] = useState(false);
 
   // Clicking Logo returns user to their authenticated home dashboard (NOT logged out)
   const handleLogoClick = () => {
@@ -185,14 +188,30 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
                   onClick={() => setIsLogoutModalOpen(true)}
                   className={`px-3 py-1.5 rounded-xl border font-bold text-xs flex items-center gap-1.5 transition active:scale-95 ${
                     isDark 
-                      ? 'bg-stone-900 hover:bg-red-950 text-stone-300 hover:text-red-400 border-stone-700 hover:border-red-700' 
-                      : 'bg-slate-100 hover:bg-red-50 text-slate-700 hover:text-red-600 border-slate-200 hover:border-red-200'
+                      ? 'bg-stone-900 hover:bg-stone-850 text-stone-300 hover:text-white border-stone-700 hover:border-stone-600' 
+                      : 'bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border-slate-200 hover:border-slate-300'
                   }`}
                   title="Log out of this session"
                 >
                   <LogOut className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">{lang === 'hi' ? 'लॉगआउट' : 'Logout'}</span>
                 </button>
+
+                {/* Farmer / User Delete Account Option */}
+                {currentUser.role === 'farmer' && (
+                  <button
+                    onClick={() => setIsDeleteAccountModalOpen(true)}
+                    className={`px-2.5 py-1.5 rounded-xl border font-bold text-xs flex items-center gap-1 transition active:scale-95 ${
+                      isDark 
+                        ? 'bg-stone-900 hover:bg-red-950 text-stone-400 hover:text-red-400 border-stone-800 hover:border-red-800/60' 
+                        : 'bg-slate-100 hover:bg-red-50 text-slate-500 hover:text-red-600 border-slate-200 hover:border-red-200'
+                    }`}
+                    title={lang === 'hi' ? 'खाता हमेशा के लिए हटाएं (Delete Account)' : 'Delete Account Permanently'}
+                  >
+                    <Trash2 className="w-3.5 h-3.5 text-red-500" />
+                    <span className="hidden md:inline">{lang === 'hi' ? 'खाता हटाएं' : 'Delete'}</span>
+                  </button>
+                )}
               </div>
             ) : (
               <button
@@ -221,6 +240,12 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
         onClose={() => setIsLogoutModalOpen(false)}
         onConfirmLogout={handleConfirmLogout}
         userName={currentUser?.name}
+      />
+
+      {/* Permanent Account Deletion Modal */}
+      <DeleteAccountModal
+        isOpen={isDeleteAccountModalOpen}
+        onClose={() => setIsDeleteAccountModalOpen(false)}
       />
     </>
   );

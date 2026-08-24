@@ -576,6 +576,56 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // Delete Farmer / User Account Permanently from Database
+  const deleteAccount = (phoneToDelete = '') => {
+    const targetPhone = (phoneToDelete || currentUser?.phone || '').replace(/\D/g, '').slice(-10);
+    if (!targetPhone) return { success: false, error: 'No phone number provided' };
+
+    // 1. Remove permanently from usersDb
+    setUsersDb(prev => {
+      const updated = { ...prev };
+      delete updated[targetPhone];
+      localStorage.setItem('krishi_users_db', JSON.stringify(updated));
+      return updated;
+    });
+
+    // 2. Clear current session and active role
+    setCurrentUser(null);
+    setActiveRole('landing');
+    localStorage.removeItem('krishi_current_user');
+    localStorage.removeItem('krishi_role');
+    localStorage.removeItem('krishi_active_booking');
+
+    // 3. Purge farmer-specific saved data
+    try {
+      // Purge farmer booking history
+      localStorage.removeItem('krishi_farmer_booking_history');
+
+      // Purge pre-bookings
+      localStorage.removeItem('krishi_pre_bookings');
+
+      // Purge rate limiting for this phone
+      localStorage.removeItem(`krishi_otp_rate_limit_${targetPhone}`);
+
+      // Filter out saved lands belonging to this phone
+      const savedLandsRaw = localStorage.getItem('krishi_saved_lands');
+      if (savedLandsRaw) {
+        const parsedLands = JSON.parse(savedLandsRaw);
+        const filteredLands = parsedLands.filter(l => l.userPhone !== targetPhone);
+        localStorage.setItem('krishi_saved_lands', JSON.stringify(filteredLands));
+      }
+    } catch (e) {
+      console.warn('Error clearing user data on account deletion:', e);
+    }
+
+    if (typeof window !== 'undefined') {
+      window.location.hash = '';
+    }
+
+    audioHelper.playOtpChime();
+    return { success: true };
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -600,7 +650,8 @@ export function AuthProvider({ children }) {
         isNewUserRoleSelectionRequired,
         completeNewUserRegistration,
         quickDemoLogin,
-        logout
+        logout,
+        deleteAccount
       }}
     >
       {children}
