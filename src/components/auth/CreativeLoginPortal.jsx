@@ -28,7 +28,9 @@ import {
   Zap,
   CheckCheck,
   Sun,
-  Moon
+  Moon,
+  FileText,
+  Wrench
 } from 'lucide-react';
 
 export default function CreativeLoginPortal() {
@@ -44,7 +46,7 @@ export default function CreativeLoginPortal() {
   // Authentication States
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
-  const [step, setStep] = useState('phone'); // 'phone' | 'otp' | 'profile_setup' | 'agristack_verify'
+  const [step, setStep] = useState('phone'); // 'phone' | 'otp' | 'profile_setup' | 'agristack_verify' | 'driver_kyc'
   const [error, setError] = useState('');
   const [resendTimer, setResendTimer] = useState(60);
   const [isSendingOtp, setIsSendingOtp] = useState(false);
@@ -53,18 +55,23 @@ export default function CreativeLoginPortal() {
   const [activeOtpCode, setActiveOtpCode] = useState('');
   const [waDeliveryDelayed, setWaDeliveryDelayed] = useState(false);
 
-  // Minimalist Role Toggle Segment Control ('farmer' | 'driver')
-  const [loginRoleTab, setLoginRoleTab] = useState('farmer');
-
-  // Profile Setup States
+  // Profile Setup States (Role chosen AFTER OTP verification)
   const [userName, setUserName] = useState('');
-  const [selectedRole, setSelectedRole] = useState('farmer');
+  const [selectedRole, setSelectedRole] = useState('farmer'); // 'farmer' | 'driver'
 
-  // AgriStack & Aadhaar States
+  // AgriStack & Aadhaar States (Farmer KYC)
   const [aadhaarNumber, setAadhaarNumber] = useState('');
   const [aadhaarStep, setAadhaarStep] = useState('input'); // 'input' | 'result'
   const [isVerifyingAgriStack, setIsVerifyingAgriStack] = useState(false);
   const [agriStackResult, setAgriStackResult] = useState(null);
+
+  // Driver Essentials KYC States
+  const [driverDlNumber, setDriverDlNumber] = useState('UP32 20190088771');
+  const [driverVehicleType, setDriverVehicleType] = useState('tractor');
+  const [driverModelName, setDriverModelName] = useState('Mahindra 575 DI (50 HP)');
+  const [driverVehicleNumber, setDriverVehicleNumber] = useState('UP-32-BT-9901');
+  const [driverImplement, setDriverImplement] = useState('Rotavator (6 Feet)');
+  const [isSubmittingDriverKyc, setIsSubmittingDriverKyc] = useState(false);
 
   // 60-Second Resend Countdown Timer
   useEffect(() => {
@@ -90,7 +97,7 @@ export default function CreativeLoginPortal() {
     setError('');
     setIsSendingOtp(true);
 
-    // 1. Generate 6-digit random OTP in AuthContext (with 15-min rate limit & 5-min expiry)
+    // 1. Generate 6-digit random OTP in AuthContext
     const otpResult = requestOtp(cleanPhone);
     if (!otpResult.success) {
       setIsSendingOtp(false);
@@ -173,9 +180,10 @@ export default function CreativeLoginPortal() {
 
     if (result.success) {
       if (result.isNewUser) {
-        setSelectedRole(loginRoleTab);
+        // New user -> prompt for Role (Farmer vs Driver) and Name
         setStep('profile_setup');
       } else {
+        // Returning user -> log straight into cockpit
         if (result.role === 'farmer') {
           setActiveRole('farmer');
         } else if (result.role === 'driver') {
@@ -190,7 +198,7 @@ export default function CreativeLoginPortal() {
   };
 
   // ─────────────────────────────────────────────────────────────
-  // 3. New User Profile & Role Setup
+  // 3. User Profile & Role Decision: Farmer -> Aadhaar KYC, Driver -> Driver KYC
   // ─────────────────────────────────────────────────────────────
   const handleProceedFromProfile = (e) => {
     e?.preventDefault();
@@ -201,22 +209,18 @@ export default function CreativeLoginPortal() {
     setError('');
 
     if (selectedRole === 'driver') {
-      completeNewUserRegistration('driver', {
-        name: userName.trim(),
-        phone
-      });
-      setActiveRole('driver');
-      audioHelper.playBookingConfirmed();
+      // Proceed to Driver Essentials KYC
+      setStep('driver_kyc');
       return;
     }
 
-    // If farmer, proceed to AgriStack land sync
+    // If farmer, proceed to Aadhaar e-KYC / AgriStack land sync
     setAadhaarStep('input');
     setStep('agristack_verify');
   };
 
   // ─────────────────────────────────────────────────────────────
-  // 4. AgriStack Aadhaar Direct Verification
+  // 4A. Farmer: AgriStack Aadhaar Verification
   // ─────────────────────────────────────────────────────────────
   const handleVerifyAadhaar = async (e) => {
     e?.preventDefault();
@@ -255,8 +259,8 @@ export default function CreativeLoginPortal() {
       completeNewUserRegistration('farmer', {
         name: userName.trim() || p.kisanCardName,
         phone,
-        village: p.village,
-        tehsil: p.tehsil,
+        village: p.village || 'Gram Malihabad',
+        tehsil: p.tehsil || 'Malihabad',
         isAgriStackVerified: true,
         farmerId: p.farmerId,
         linkedLands: p.linkedLands
@@ -264,7 +268,8 @@ export default function CreativeLoginPortal() {
     } else {
       completeNewUserRegistration('farmer', {
         name: userName.trim(),
-        phone
+        phone,
+        village: 'Gram Malihabad'
       });
     }
     setActiveRole('farmer');
@@ -274,10 +279,43 @@ export default function CreativeLoginPortal() {
   const handleSkipAgriStack = () => {
     completeNewUserRegistration('farmer', {
       name: userName.trim(),
-      phone
+      phone,
+      village: 'Gram Malihabad'
     });
     setActiveRole('farmer');
     audioHelper.playBookingConfirmed();
+  };
+
+  // ─────────────────────────────────────────────────────────────
+  // 4B. Driver: Essentials KYC Registration Workflow
+  // ─────────────────────────────────────────────────────────────
+  const handleCompleteDriverKyc = (e) => {
+    e?.preventDefault();
+    if (!driverDlNumber.trim() || !driverVehicleNumber.trim()) {
+      setError(lang === 'hi' ? 'कृपया ड्राइविंग लाइसेंस व वाहन संख्या दर्ज करें' : 'Please enter DL number and Vehicle number');
+      return;
+    }
+    setError('');
+    setIsSubmittingDriverKyc(true);
+
+    setTimeout(() => {
+      setIsSubmittingDriverKyc(false);
+      completeNewUserRegistration('driver', {
+        name: userName.trim(),
+        phone,
+        dlNumber: driverDlNumber.trim(),
+        vehicleType: driverVehicleType,
+        modelName: driverModelName.trim(),
+        vehicleNumber: driverVehicleNumber.trim(),
+        implement: driverImplement,
+        verificationStatus: 'verified',
+        status: 'online',
+        hourlyRate: 1000,
+        acreRate: 1300
+      });
+      setActiveRole('driver');
+      audioHelper.playBookingConfirmed();
+    }, 600);
   };
 
   return (
@@ -298,239 +336,171 @@ export default function CreativeLoginPortal() {
           }`}
           poster="https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=1920&q=80"
         >
-          <source src="/videos/hero-wheat-field.mp4" type="video/mp4" />
+          <source src="https://videos.pexels.com/video-files/2421545/2421545-hd_1920_1080_30fps.mp4" type="video/mp4" />
         </video>
-        
-        {/* Dark/Light Vignette Overlay */}
-        <div className={`absolute inset-0 transition-colors duration-200 ${
+        <div className={`absolute inset-0 transition-colors duration-300 ${
           isDark 
-            ? 'bg-gradient-to-b from-[#090D0B]/95 via-[#090D0B]/80 to-[#090D0B]' 
-            : 'bg-gradient-to-b from-slate-50/95 via-slate-50/85 to-slate-50'
+            ? 'bg-gradient-to-b from-[#090D0B]/85 via-[#090D0B]/70 to-[#090D0B]/95' 
+            : 'bg-gradient-to-b from-slate-50/80 via-slate-50/60 to-slate-50/90'
         }`} />
-        
-        {/* Emerald Ambient Light Beam */}
-        <div className={`absolute inset-0 ${
-          isDark 
-            ? 'bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(16,185,129,0.12),transparent)]' 
-            : 'bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(16,185,129,0.08),transparent)]'
-        }`} />
-        
-        {/* Subtle grid lines */}
-        <div className={`absolute inset-0 ${
-          isDark
-            ? 'bg-[linear-gradient(rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(to_right,rgba(255,255,255,0.015)_1px,transparent_1px)]'
-            : 'bg-[linear-gradient(rgba(0,0,0,0.02)_1px,transparent_1px),linear-gradient(to_right,rgba(0,0,0,0.02)_1px,transparent_1px)]'
-        } bg-[size:64px_64px]`} />
       </div>
 
-      {/* ═══════════ FLOATING MINIMALIST HEADER ═══════════ */}
-      <div className="relative z-20 px-4 sm:px-8 pt-4 sm:pt-6 max-w-7xl mx-auto w-full">
-        <header className={`flex items-center justify-between px-5 sm:px-7 py-3.5 rounded-2xl backdrop-blur-xl border shadow-2xl transition-colors duration-200 ${
+      {/* ═══════════ FLOATING HEADER ═══════════ */}
+      <header className="relative z-50 max-w-7xl mx-auto w-full px-4 sm:px-6 pt-5">
+        <div className={`rounded-2xl px-5 py-3.5 border shadow-2xl flex items-center justify-between transition-colors duration-200 ${
           isDark 
-            ? 'bg-[#0B0F12]/80 border-stone-800/80 shadow-black/80' 
-            : 'bg-white/85 border-slate-200 shadow-slate-200/50'
+            ? 'bg-stone-900/80 backdrop-blur-2xl border-stone-800 shadow-black/40' 
+            : 'bg-white/85 backdrop-blur-2xl border-slate-200 shadow-slate-200/50'
         }`}>
-          
-          {/* Glowing KrishiSeva Brand Icon & Logo */}
-          <div className="flex items-center gap-3 group cursor-pointer">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center text-stone-950 font-black shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-all duration-300">
+          {/* Brand Logo */}
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center text-stone-950 font-black shadow-lg shadow-emerald-500/25">
               <Tractor className="w-5 h-5 text-stone-950" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <span className={`font-extrabold text-2xl tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  Krishi<span className="text-emerald-500">Seva</span>
-                </span>
-                {lang === 'hi' && (
-                  <span className={`text-[10px] px-2 py-0.5 rounded-md font-bold hidden sm:inline-block ${
-                    isDark ? 'bg-stone-900 text-emerald-400 border border-stone-800' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                  }`}>
-                    कृषि सेवा
-                  </span>
-                )}
-              </div>
+              <span className={`text-lg font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                Krishi<span className="text-emerald-500">Seva</span>
+              </span>
             </div>
           </div>
 
-          {/* Right Controls: Theme Toggle, Language Switcher & Admin Login */}
-          <div className="flex items-center gap-2.5">
-            
-            {/* Admin Login Pill Button */}
-            <a
-              href="#admin"
-              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl border text-xs font-bold transition-all duration-200 shadow-sm active:scale-95 ${
+          {/* Right Actions */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Admin Login Quick Link */}
+            <button
+              onClick={() => setActiveRole('admin')}
+              className={`px-3 py-1.5 rounded-xl border text-xs font-bold transition-all duration-200 flex items-center gap-1.5 ${
                 isDark 
-                  ? 'border-stone-800 hover:border-emerald-500/50 bg-stone-900/60 hover:bg-stone-900 text-stone-300 hover:text-white' 
-                  : 'border-slate-200 hover:border-emerald-500/50 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900'
+                  ? 'border-stone-750 bg-stone-900/60 text-stone-300 hover:text-white hover:border-stone-600' 
+                  : 'border-slate-300 bg-slate-100 text-slate-700 hover:text-slate-900 hover:bg-slate-200'
               }`}
-              title="Admin Login"
             >
-              <Lock className="w-3.5 h-3.5 text-stone-400 group-hover:text-emerald-500" />
+              <Lock className="w-3.5 h-3.5 text-stone-400" />
               <span>{lang === 'hi' ? 'एडमिन लॉगिन' : 'Admin Login'}</span>
-            </a>
+            </button>
 
-            {/* Theme Toggle Button (Dark 🌙 / Light ☀️) */}
+            {/* Dark / Light Theme Switcher */}
             <button
               onClick={toggleTheme}
-              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl border text-xs font-bold shadow-sm transition-all duration-200 active:scale-95 ${
+              className={`px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition-all duration-200 ${
                 isDark 
-                  ? 'border-stone-800 bg-stone-900/60 hover:bg-stone-900 text-amber-400 hover:border-amber-500/40' 
-                  : 'border-slate-200 bg-slate-100 hover:bg-slate-200 text-slate-800 hover:border-slate-300'
+                  ? 'bg-stone-900/90 text-amber-300 border-amber-500/30 hover:border-amber-500/60 shadow-inner' 
+                  : 'bg-indigo-50 text-indigo-700 border-indigo-200 hover:border-indigo-400'
               }`}
-              title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+              title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
             >
               {isDark ? (
                 <>
                   <Sun className="w-3.5 h-3.5 text-amber-400" />
-                  <span className="hidden sm:inline">Light</span>
+                  <span>Light</span>
                 </>
               ) : (
                 <>
                   <Moon className="w-3.5 h-3.5 text-indigo-600" />
-                  <span className="hidden sm:inline">Dark</span>
+                  <span>Dark</span>
                 </>
               )}
             </button>
 
-            {/* Minimalist Language Toggle */}
+            {/* Language Switcher */}
             <button
               onClick={toggleLanguage}
-              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl border text-xs font-bold shadow-sm transition-all duration-200 active:scale-95 ${
+              className={`px-3 py-1.5 rounded-xl border text-xs font-black flex items-center gap-1.5 transition-all duration-200 ${
                 isDark 
-                  ? 'border-stone-800 bg-stone-900/60 hover:bg-stone-900 text-stone-200 hover:text-white hover:border-emerald-500/50' 
-                  : 'border-slate-200 bg-slate-100 hover:bg-slate-200 text-slate-800 hover:text-slate-900 hover:border-slate-300'
+                  ? 'border-stone-750 bg-stone-900 text-emerald-400 hover:bg-stone-800' 
+                  : 'border-slate-300 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
               }`}
             >
               <Globe className="w-3.5 h-3.5 text-emerald-500" />
               <span>{lang === 'hi' ? 'English' : 'हिंदी'}</span>
             </button>
-
           </div>
+        </div>
+      </header>
 
-        </header>
-      </div>
-
-      {/* ═══════════ UBER RIDE-HAILING HERO & BOOKING SECTION ═══════════ */}
-      <main className="relative z-10 flex-1 flex items-center max-w-7xl mx-auto w-full px-4 sm:px-8 py-8 sm:py-12">
-        
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center w-full">
+      {/* ═══════════ HERO & AUTH CONTAINER ═══════════ */}
+      <main className="relative z-10 max-w-7xl mx-auto w-full px-4 sm:px-6 py-8 md:py-14 my-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
-          {/* ──── LEFT COLUMN: Uber-Style Hero Headline & Quick Specs ──── */}
-          <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
+          {/* LEFT COLUMN: Commanding Headlines */}
+          <div className="lg:col-span-7 space-y-6 text-left">
             
-            {/* Bold, Ultra-Clean Uber-Style Headline */}
-            <h1 className={`text-4xl sm:text-5xl lg:text-[4.2rem] font-black tracking-tight leading-[1.08] ${
-              isDark ? 'text-white' : 'text-slate-900'
-            }`}>
-              {lang === 'hi' ? (
-                <>
-                  मांग पर मशीनरी। <br />
-                  <span className="text-emerald-500">
-                    सीधे आपके खेत तक।
-                  </span>
-                </>
-              ) : (
-                <>
-                  Machinery on Demand. <br />
-                  <span className="text-emerald-500">
-                    Directly to Your Farm.
-                  </span>
-                </>
-              )}
-            </h1>
-
-            {/* Subtitle */}
-            <p className={`text-sm sm:text-base lg:text-lg leading-relaxed max-w-xl mx-auto lg:mx-0 font-medium ${
-              isDark ? 'text-stone-300' : 'text-slate-600'
-            }`}>
-              {lang === 'hi'
-                ? 'ट्रैक्टर, कंबाइन हार्वेस्टर और जेसीबी की त्वरित बुकिंग। रियल-टाइम में वाहन का आगमन ट्रैक करें।'
-                : 'Instant booking for tractors, harvesters, and earthmovers. Track dispatches in real-time.'}
-            </p>
-
-            {/* Quick Specs Grid: 3 Clean Borderless Glass Pill Badges */}
-            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2.5 pt-2">
-              
-              <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border text-xs font-bold shadow-md transition-colors ${
-                isDark ? 'bg-stone-900/80 border-stone-800 text-stone-200' : 'bg-white border-slate-200 text-slate-800'
+            <div className="space-y-4">
+              <h1 className={`text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.08] ${
+                isDark ? 'text-white' : 'text-slate-900'
               }`}>
-                <span className="text-base">🚜</span>
-                <span>{lang === 'hi' ? 'सत्यापित मशीनरी' : 'Verified Equipment'}</span>
-              </div>
+                {lang === 'hi' ? (
+                  <>
+                    मांग पर मशीनें।<br />
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-green-500">
+                      सीधे आपके खेत पर।
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    Machinery on Demand.<br />
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-green-500">
+                      Directly to Your Farm.
+                    </span>
+                  </>
+                )}
+              </h1>
 
-              <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border text-xs font-bold shadow-md transition-colors ${
-                isDark ? 'bg-stone-900/80 border-stone-800 text-stone-200' : 'bg-white border-slate-200 text-slate-800'
+              <p className={`text-base sm:text-lg max-w-xl font-medium leading-relaxed ${
+                isDark ? 'text-stone-300' : 'text-slate-600'
               }`}>
-                <span className="text-base">⏱️</span>
-                <span>{lang === 'hi' ? 'त्वरित डिस्पैच' : 'Instant Dispatch'}</span>
-              </div>
+                {lang === 'hi'
+                  ? 'ट्रैक्टर, हार्वेस्टर एवं अर्थमूवर की तत्काल 1-क्लिक बुकिंग। वास्तविक समय में अपने खेत तक लाइव जीपीएस ट्रैक करें।'
+                  : 'Instant booking for tractors, harvesters, and earthmovers. Track dispatches in real-time.'}
+              </p>
+            </div>
 
-              <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border text-xs font-bold shadow-md transition-colors ${
-                isDark ? 'bg-stone-900/80 border-stone-800 text-stone-200' : 'bg-white border-slate-200 text-slate-800'
+            {/* Feature Badges */}
+            <div className="flex flex-wrap items-center gap-2.5 pt-2">
+              <span className={`px-3.5 py-2 rounded-xl border text-xs font-black flex items-center gap-2 ${
+                isDark ? 'bg-stone-900/70 border-stone-800 text-stone-200' : 'bg-white border-slate-200 text-slate-800 shadow-sm'
               }`}>
-                <span className="text-base">🛡️</span>
-                <span>{lang === 'hi' ? 'एग्रीस्टैक सत्यापित' : 'AgriStack Verified'}</span>
-              </div>
+                <Tractor className="w-4 h-4 text-emerald-500" />
+                <span>{lang === 'hi' ? 'सत्यापित कृषि उपकरण' : 'Verified Equipment'}</span>
+              </span>
 
+              <span className={`px-3.5 py-2 rounded-xl border text-xs font-black flex items-center gap-2 ${
+                isDark ? 'bg-stone-900/70 border-stone-800 text-stone-200' : 'bg-white border-slate-200 text-slate-800 shadow-sm'
+              }`}>
+                <Zap className="w-4 h-4 text-amber-500" />
+                <span>{lang === 'hi' ? 'त्वरित 1-क्लिक वाहन सेवा' : 'Instant Dispatch'}</span>
+              </span>
+
+              <span className={`px-3.5 py-2 rounded-xl border text-xs font-black flex items-center gap-2 ${
+                isDark ? 'bg-stone-900/70 border-stone-800 text-stone-200' : 'bg-white border-slate-200 text-slate-800 shadow-sm'
+              }`}>
+                <ShieldCheck className="w-4 h-4 text-blue-500" />
+                <span>{lang === 'hi' ? 'एग्रीस्टैक भूलेख सत्यापित' : 'AgriStack Verified'}</span>
+              </span>
             </div>
 
           </div>
 
-          {/* ──── RIGHT COLUMN: Uber/Rapido-Style Booking Card ──── */}
-          <div className="lg:col-span-5 flex justify-center lg:justify-end animate-fade-in">
-            <div className={`relative backdrop-blur-2xl rounded-3xl p-7 sm:p-8 border shadow-2xl space-y-6 max-w-md w-full transition-colors duration-200 ${
+          {/* RIGHT COLUMN: WhatsApp OTP & Role Onboarding Card */}
+          <div className="lg:col-span-5 w-full">
+            <div className={`rounded-3xl border shadow-2xl overflow-hidden transition-all duration-300 relative ${
               isDark 
-                ? 'bg-[#0B0F12]/90 border-stone-800 shadow-black/90 ring-1 ring-white/5' 
-                : 'bg-white/95 border-slate-200 shadow-xl shadow-slate-200/50'
+                ? 'bg-stone-900/90 backdrop-blur-2xl border-stone-800 shadow-black/60' 
+                : 'bg-white backdrop-blur-2xl border-slate-200 shadow-slate-200/70'
             }`}>
               
-              <div className="relative space-y-5">
+              <div className="p-6 sm:p-8">
 
-              {/* STEP 1: Phone Number Input */}
+              {/* STEP 1: Phone Number Input & Send WhatsApp OTP */}
               {step === 'phone' && (
-                <div className="space-y-5">
-                  
-                  {/* Card Header & Minimalist Role Segment Control */}
-                  <div className="space-y-3">
-                    <div className="space-y-1">
-                      <h2 className={`text-2xl sm:text-3xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                        {lang === 'hi' ? 'शुरुआत करें' : 'Get Started'}
-                      </h2>
-                      <p className={`text-xs font-medium ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
-                        {lang === 'hi' ? 'व्हाट्सएप ओटीपी प्राप्त करने हेतु अपना मोबाइल नंबर दर्ज करें' : 'Enter your mobile number to receive your WhatsApp OTP'}
-                      </p>
-                    </div>
-
-                    {/* Minimalist Role Toggle Segment Control: [ Farmer | Driver ] */}
-                    <div className={`grid grid-cols-2 p-1 rounded-xl border ${
-                      isDark ? 'bg-stone-950 border-stone-800' : 'bg-slate-100 border-slate-200'
-                    }`}>
-                      <button
-                        type="button"
-                        onClick={() => setLoginRoleTab('farmer')}
-                        className={`py-2 rounded-lg text-xs font-black transition-all flex items-center justify-center gap-1.5 ${
-                          loginRoleTab === 'farmer'
-                            ? 'bg-emerald-500 text-stone-950 shadow-md'
-                            : isDark ? 'text-stone-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
-                        }`}
-                      >
-                        <Tractor className="w-3.5 h-3.5" />
-                        <span>{lang === 'hi' ? 'किसान (Farmer)' : 'Farmer'}</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => setLoginRoleTab('driver')}
-                        className={`py-2 rounded-lg text-xs font-black transition-all flex items-center justify-center gap-1.5 ${
-                          loginRoleTab === 'driver'
-                            ? 'bg-emerald-500 text-stone-950 shadow-md'
-                            : isDark ? 'text-stone-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
-                        }`}
-                      >
-                        <Truck className="w-3.5 h-3.5" />
-                        <span>{lang === 'hi' ? 'ड्राइवर (Driver)' : 'Driver'}</span>
-                      </button>
-                    </div>
+                <div className="space-y-5 animate-fade-in">
+                  <div className="space-y-1">
+                    <h3 className={`text-2xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                      {lang === 'hi' ? 'शुरू करें' : 'Get Started'}
+                    </h3>
+                    <p className={`text-xs font-medium ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+                      {lang === 'hi' ? 'व्हाट्सएप ओटीपी प्राप्त करने हेतु अपना मोबाइल नंबर दर्ज करें' : 'Enter your mobile number to receive your WhatsApp OTP'}
+                    </p>
                   </div>
 
                   {error && (
@@ -729,7 +699,7 @@ export default function CreativeLoginPortal() {
                 </div>
               )}
 
-              {/* STEP 3: Profile Setup & Role Selection */}
+              {/* STEP 3: Profile Setup & Choose Role (Farmer vs Driver) */}
               {step === 'profile_setup' && (
                 <div className="space-y-5 animate-fade-in">
                   <div className="space-y-1.5 text-center">
@@ -737,7 +707,7 @@ export default function CreativeLoginPortal() {
                       <Sparkles className="w-6 h-6 text-emerald-400" />
                     </div>
                     <h3 className={`text-2xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                      {lang === 'hi' ? 'अपनी प्रोफाइल बनाएं' : 'Set Up Your Profile'}
+                      {lang === 'hi' ? 'अपनी भूमिका व नाम चुनें' : 'Choose Your Account Type'}
                     </h3>
                     <p className={`text-xs font-medium ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
                       {lang === 'hi' ? `सत्यापित व्हाट्सएप: +91 ${phone}` : `Verified WhatsApp: +91 ${phone}`}
@@ -777,7 +747,7 @@ export default function CreativeLoginPortal() {
                       <label className={`block text-xs font-bold uppercase tracking-wider mb-2 ${
                         isDark ? 'text-stone-300' : 'text-slate-700'
                       }`}>
-                        {lang === 'hi' ? 'अपनी मुख्य भूमिका चुनें *' : 'Select Your Primary Role *'}
+                        {lang === 'hi' ? 'अपनी मुख्य भूमिका चुनें *' : 'Select Your Role *'}
                       </label>
                       <div className="grid grid-cols-2 gap-3">
                         <button
@@ -795,10 +765,10 @@ export default function CreativeLoginPortal() {
                           </div>
                           <div>
                             <span className={`font-black text-sm block ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                              {lang === 'hi' ? 'किसान' : 'Farmer'}
+                              {lang === 'hi' ? 'किसान (Farmer)' : 'Farmer'}
                             </span>
                             <span className={`text-[11px] leading-tight block ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
-                              {lang === 'hi' ? 'मशीन बुक करें' : 'Book Machinery'}
+                              {lang === 'hi' ? 'खेत के लिए मशीन बुक करें' : 'Book Machinery'}
                             </span>
                           </div>
                         </button>
@@ -818,10 +788,10 @@ export default function CreativeLoginPortal() {
                           </div>
                           <div>
                             <span className={`font-black text-sm block ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                              {lang === 'hi' ? 'ड्राइवर / मालिक' : 'Fleet Driver'}
+                              {lang === 'hi' ? 'चालक / फ्लीट मालिक' : 'Driver / Partner'}
                             </span>
                             <span className={`text-[11px] leading-tight block ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
-                              {lang === 'hi' ? 'कमाई शुरू करें' : 'Earn Bookings'}
+                              {lang === 'hi' ? 'मशीन जोड़ें व कमाई करें' : 'Earn Bookings'}
                             </span>
                           </div>
                         </button>
@@ -832,14 +802,18 @@ export default function CreativeLoginPortal() {
                       type="submit"
                       className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-stone-950 font-black text-base shadow-xl shadow-emerald-500/20 hover:shadow-emerald-500/30 transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98] hover:translate-y-[-1px]"
                     >
-                      <span>{lang === 'hi' ? 'आगे बढ़ें' : 'Continue'}</span>
+                      <span>
+                        {selectedRole === 'farmer' 
+                          ? (lang === 'hi' ? 'आधार सत्यापन हेतु आगे बढ़ें' : 'Continue to Aadhaar KYC') 
+                          : (lang === 'hi' ? 'चालक विवरण हेतु आगे बढ़ें' : 'Continue to Driver KYC')}
+                      </span>
                       <ArrowRight className="w-5 h-5 text-stone-950" />
                     </button>
                   </form>
                 </div>
               )}
 
-              {/* STEP 4: AgriStack Farmer Registry Verification */}
+              {/* STEP 4A: AgriStack Farmer Aadhaar Verification (If Farmer Selected) */}
               {step === 'agristack_verify' && (
                 <div className="space-y-4 animate-fade-in">
                   
@@ -954,7 +928,7 @@ export default function CreativeLoginPortal() {
                             ) : (
                               <>
                                 <FileCheck2 className="w-4 h-4 text-stone-950" />
-                                <span>{lang === 'hi' ? 'सत्यापित करें व खेत लाएं' : 'Verify & Fetch Land Records'}</span>
+                                <span>{lang === 'hi' ? 'सत्यापित करें व खेत लाएं' : 'Verify & Fetch Lands'}</span>
                               </>
                             )}
                           </button>
@@ -1033,11 +1007,197 @@ export default function CreativeLoginPortal() {
                         className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-stone-950 font-black text-sm shadow-xl shadow-emerald-500/20 transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98] hover:translate-y-[-1px]"
                       >
                         <CheckCircle2 className="w-4 h-4 text-stone-950" />
-                        <span>{lang === 'hi' ? 'सत्यापित खेतों के साथ आगे बढ़ें' : 'Proceed with Verified Lands'}</span>
+                        <span>{lang === 'hi' ? 'सत्यापित खेतों के साथ कॉकपिट में प्रवेश करें' : 'Enter Farmer Cockpit'}</span>
                       </button>
                     </div>
                   )}
 
+                </div>
+              )}
+
+              {/* STEP 4B: Driver Essentials KYC Onboarding (If Driver Selected) */}
+              {step === 'driver_kyc' && (
+                <div className="space-y-4 animate-fade-in">
+                  <div className="text-center space-y-1.5">
+                    <div className="w-12 h-12 mx-auto rounded-2xl bg-emerald-950/80 border border-emerald-500/40 flex items-center justify-center mb-2">
+                      <Truck className="w-6 h-6 text-emerald-400" />
+                    </div>
+                    <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-stone-900 text-emerald-300 border border-stone-800 text-[11px] font-bold">
+                      <ShieldCheck className="w-3 h-3 text-emerald-400" />
+                      <span>Vahan & Sarathi Fleet Verification</span>
+                    </div>
+                    <h3 className={`text-xl font-black mt-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                      {lang === 'hi' ? 'चालक व मशीन आवश्यक विवरण' : 'Driver & Machinery Essentials'}
+                    </h3>
+                    <p className={`text-xs font-medium ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+                      {lang === 'hi' 
+                        ? 'अपना ड्राइविंग लाइसेंस व वाहन विवरण दर्ज कर फ्लीट नेटवर्क से तुरंत जुड़ें।' 
+                        : 'Enter your DL and machinery details to start receiving nearby bookings.'}
+                    </p>
+                  </div>
+
+                  {/* Benchmark Demo Presets */}
+                  <div className={`p-3 rounded-2xl border space-y-2 ${
+                    isDark ? 'bg-stone-950 border-stone-800' : 'bg-slate-100 border-slate-200'
+                  }`}>
+                    <span className="text-[10px] font-black text-stone-400 uppercase tracking-wider block">
+                      {lang === 'hi' ? '⚡ त्वरित डेमो फ्लीट प्रीसेट:' : '⚡ Quick Demo Fleet Presets:'}
+                    </span>
+                    <div className="grid grid-cols-1 gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setDriverModelName('Mahindra 575 DI (50 HP)');
+                          setDriverVehicleNumber('UP-32-BT-9901');
+                          setDriverVehicleType('tractor');
+                          setDriverImplement('Rotavator (6 Feet)');
+                        }}
+                        className="p-2.5 rounded-xl bg-emerald-950/30 hover:bg-emerald-950/60 border border-emerald-800/50 hover:border-emerald-500 text-left transition-all duration-200 flex items-center justify-between group"
+                      >
+                        <div>
+                          <span className="text-xs font-black text-emerald-300 block">Mahindra 575 DI (50 HP)</span>
+                          <span className="text-[10px] text-stone-400">UP-32-BT-9901 • Rotavator</span>
+                        </div>
+                        <span className="text-[10px] font-bold text-emerald-400 px-2 py-0.5 rounded-lg bg-emerald-900/50">चुनें ✓</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setDriverModelName('Preet 987 Combine (110 HP)');
+                          setDriverVehicleNumber('PB-10-AZ-4421');
+                          setDriverVehicleType('harvester');
+                          setDriverImplement('Combine Harvester + Cutter');
+                        }}
+                        className="p-2.5 rounded-xl bg-amber-950/30 hover:bg-amber-950/60 border border-amber-800/50 hover:border-amber-500 text-left transition-all duration-200 flex items-center justify-between group"
+                      >
+                        <div>
+                          <span className="text-xs font-black text-amber-300 block">Preet 987 Combine (110 HP)</span>
+                          <span className="text-[10px] text-stone-400">PB-10-AZ-4421 • Multi-Crop</span>
+                        </div>
+                        <span className="text-[10px] font-bold text-amber-400 px-2 py-0.5 rounded-lg bg-amber-900/50">चुनें ✓</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {error && (
+                    <div className="p-3.5 rounded-2xl bg-red-950/85 border border-red-700/60 text-red-200 text-xs font-bold flex items-start gap-2 animate-fade-in">
+                      <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+                      <span>{error}</span>
+                    </div>
+                  )}
+
+                  <form onSubmit={handleCompleteDriverKyc} className="space-y-3.5">
+                    <div>
+                      <label className={`block text-[11px] font-bold uppercase tracking-wider mb-1 ${
+                        isDark ? 'text-stone-300' : 'text-slate-700'
+                      }`}>
+                        {lang === 'hi' ? 'ड्राइविंग लाइसेंस (DL) संख्या *' : 'Driving License (DL) Number *'}
+                      </label>
+                      <input
+                        type="text"
+                        value={driverDlNumber}
+                        onChange={(e) => setDriverDlNumber(e.target.value)}
+                        placeholder="UP32 20190088771"
+                        className={`w-full px-4 py-3 rounded-xl border font-bold text-xs outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition ${
+                          isDark ? 'border-stone-700 bg-stone-950 text-white' : 'border-slate-300 bg-slate-50 text-slate-900'
+                        }`}
+                        required
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className={`block text-[11px] font-bold uppercase tracking-wider mb-1 ${
+                          isDark ? 'text-stone-300' : 'text-slate-700'
+                        }`}>
+                          {lang === 'hi' ? 'वाहन प्रकार *' : 'Vehicle Type *'}
+                        </label>
+                        <select
+                          value={driverVehicleType}
+                          onChange={(e) => setDriverVehicleType(e.target.value)}
+                          className={`w-full px-3 py-3 rounded-xl border font-bold text-xs outline-none focus:border-emerald-500 ${
+                            isDark ? 'border-stone-700 bg-stone-950 text-white' : 'border-slate-300 bg-slate-50 text-slate-900'
+                          }`}
+                        >
+                          <option value="tractor">🚜 Tractor</option>
+                          <option value="harvester">🌾 Harvester</option>
+                          <option value="jcb">🏗️ Earthmover (JCB)</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className={`block text-[11px] font-bold uppercase tracking-wider mb-1 ${
+                          isDark ? 'text-stone-300' : 'text-slate-700'
+                        }`}>
+                          {lang === 'hi' ? 'नंबर प्लेट (RC) *' : 'Vehicle Number *'}
+                        </label>
+                        <input
+                          type="text"
+                          value={driverVehicleNumber}
+                          onChange={(e) => setDriverVehicleNumber(e.target.value)}
+                          placeholder="UP-32-BT-9901"
+                          className={`w-full px-3 py-3 rounded-xl border font-bold text-xs outline-none focus:border-emerald-500 ${
+                            isDark ? 'border-stone-700 bg-stone-950 text-white' : 'border-slate-300 bg-slate-50 text-slate-900'
+                          }`}
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className={`block text-[11px] font-bold uppercase tracking-wider mb-1 ${
+                        isDark ? 'text-stone-300' : 'text-slate-700'
+                      }`}>
+                        {lang === 'hi' ? 'मशीनरी मॉडल का नाम *' : 'Machinery Model Name *'}
+                      </label>
+                      <input
+                        type="text"
+                        value={driverModelName}
+                        onChange={(e) => setDriverModelName(e.target.value)}
+                        placeholder="Mahindra 575 DI (50 HP)"
+                        className={`w-full px-4 py-3 rounded-xl border font-bold text-xs outline-none focus:border-emerald-500 ${
+                          isDark ? 'border-stone-700 bg-stone-950 text-white' : 'border-slate-300 bg-slate-50 text-slate-900'
+                        }`}
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className={`block text-[11px] font-bold uppercase tracking-wider mb-1 ${
+                        isDark ? 'text-stone-300' : 'text-slate-700'
+                      }`}>
+                        {lang === 'hi' ? 'संलग्न उपकरण (Implement)' : 'Equipped Attachment'}
+                      </label>
+                      <input
+                        type="text"
+                        value={driverImplement}
+                        onChange={(e) => setDriverImplement(e.target.value)}
+                        placeholder="Rotavator (6 Feet)"
+                        className={`w-full px-4 py-3 rounded-xl border font-bold text-xs outline-none focus:border-emerald-500 ${
+                          isDark ? 'border-stone-700 bg-stone-950 text-white' : 'border-slate-300 bg-slate-50 text-slate-900'
+                        }`}
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={isSubmittingDriverKyc}
+                      className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-stone-950 font-black text-sm shadow-xl shadow-emerald-500/20 transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98] hover:translate-y-[-1px] mt-2"
+                    >
+                      {isSubmittingDriverKyc ? (
+                        <>
+                          <Clock className="w-4 h-4 animate-spin text-stone-950" />
+                          <span>{lang === 'hi' ? 'सत्यापित हो रहा है...' : 'Verifying & Registering...'}</span>
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle2 className="w-4 h-4 text-stone-950" />
+                          <span>{lang === 'hi' ? 'फ्लीट सत्यापन पूर्ण करें व कॉकपिट में जाएं' : 'Complete Driver Registration & Enter'}</span>
+                        </>
+                      )}
+                    </button>
+                  </form>
                 </div>
               )}
 
@@ -1054,7 +1214,7 @@ export default function CreativeLoginPortal() {
         isDark ? 'border-stone-800/80 bg-[#090D0B] text-stone-400' : 'border-slate-200 bg-white text-slate-500'
       }`}>
         <div className="max-w-7xl mx-auto flex items-center justify-center text-center text-xs">
-          <span>© 2026 KrishiSeva • Precision Farm Fleet Network • Malihabad, Lucknow</span>
+          <span>© 2026 KrishiSeva • Precision Farm Fleet Network • Malihabad</span>
         </div>
       </footer>
 

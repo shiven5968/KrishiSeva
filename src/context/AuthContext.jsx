@@ -9,7 +9,7 @@ export const MOCK_USER_DATABASE = {
     phone: '9876543210',
     role: 'farmer',
     name: 'Balram Singh (बलराम सिंह)',
-    village: 'Gram Malihabad, Lucknow',
+    village: 'Gram Malihabad',
     isRegistered: true,
     isAgriStackVerified: true,
     farmerId: 'UPFR-2026-88910'
