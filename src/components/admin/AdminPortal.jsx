@@ -837,10 +837,10 @@ export default function AdminPortal() {
                       </div>
                       <div className="text-right">
                         <span className={`text-[10px] uppercase font-bold block ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
-                          Proposed Rates
+                          Platform Dynamic Rates
                         </span>
-                        <span className="font-extrabold text-emerald-500">
-                          ₹{app.acreRate}/bigha • ₹{app.hourlyRate}/hr
+                        <span className="font-extrabold text-emerald-500 text-xs">
+                          Auto-Managed by Admin Node
                         </span>
                       </div>
                     </div>

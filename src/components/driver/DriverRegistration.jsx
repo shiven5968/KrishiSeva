@@ -26,8 +26,6 @@ export default function DriverRegistration() {
     vehicleType: driverProfile?.vehicleType && driverProfile.vehicleType !== 'tractor' ? driverProfile.vehicleType : '',
     modelName: driverProfile?.modelName && driverProfile.modelName !== 'Tractor (50 HP)' ? driverProfile.modelName : '',
     vehicleNumber: driverProfile?.vehicleNumber || '',
-    hourlyRate: driverProfile?.hourlyRate || '',
-    acreRate: driverProfile?.acreRate || '',
     dlPhoto: driverProfile?.dlImage || '',
     platePhoto: driverProfile?.plateImage || ''
   });
@@ -61,8 +59,8 @@ export default function DriverRegistration() {
       vehicleType: formData.vehicleType,
       modelName: formData.modelName,
       vehicleNumber: formData.vehicleNumber,
-      hourlyRate: Number(formData.hourlyRate) || 1000,
-      acreRate: Number(formData.acreRate) || 1300,
+      hourlyRate: 1000,
+      acreRate: 1300,
       dlPhoto: dlPreview,
       platePhoto: platePreview
     };
@@ -162,46 +160,19 @@ export default function DriverRegistration() {
             </div>
           </div>
 
-          {/* Vehicle Model & Pricing Rates */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
-                Model / Make (उदा. Sonalika Tiger 55) *
-              </label>
-              <input
-                type="text"
-                value={formData.modelName}
-                onChange={(e) => setFormData({ ...formData, modelName: e.target.value })}
-                className="w-full px-4 py-3 rounded-xl border border-stone-300 font-bold text-stone-900 focus:ring-4 focus:ring-blue-100 focus:border-blue-600 outline-none"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
-                Hourly Rate (प्रति घंटा दर ₹) *
-              </label>
-              <input
-                type="number"
-                value={formData.hourlyRate}
-                onChange={(e) => setFormData({ ...formData, hourlyRate: e.target.value })}
-                className="w-full px-4 py-3 rounded-xl border border-stone-300 font-bold text-stone-900 focus:ring-4 focus:ring-blue-100 focus:border-blue-600 outline-none"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
-                Per Bigha Rate (प्रति बीघा दर ₹) *
-              </label>
-              <input
-                type="number"
-                value={formData.acreRate}
-                onChange={(e) => setFormData({ ...formData, acreRate: e.target.value })}
-                className="w-full px-4 py-3 rounded-xl border border-stone-300 font-bold text-stone-900 focus:ring-4 focus:ring-blue-100 focus:border-blue-600 outline-none"
-                required
-              />
-            </div>
+          {/* Vehicle Model */}
+          <div>
+            <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
+              Model / Make (उदा. Mahindra 575 DI / Sonalika Tiger 55) *
+            </label>
+            <input
+              type="text"
+              value={formData.modelName}
+              onChange={(e) => setFormData({ ...formData, modelName: e.target.value })}
+              placeholder="e.g. Mahindra 575 DI (50 HP)"
+              className="w-full px-4 py-3 rounded-xl border border-stone-300 font-bold text-stone-900 focus:ring-4 focus:ring-blue-100 focus:border-blue-600 outline-none"
+              required
+            />
           </div>
 
           {/* DOCUMENT UPLOADS (Driving License and Vehicle Plate Photo) */}
