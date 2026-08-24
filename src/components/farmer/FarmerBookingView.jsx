@@ -1422,35 +1422,6 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
                         </p>
                       </div>
 
-                      {/* 1-Click Interactive Demo Simulation Button */}
-                      <button
-                        type="button"
-                        onClick={handleSimulateInstantPayment}
-                        disabled={isSimulatingPayment}
-                        className="w-full py-3 rounded-2xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/50 text-amber-300 hover:text-amber-200 text-xs font-black transition-all flex items-center justify-center gap-2 shadow-lg active:scale-95 disabled:opacity-75"
-                      >
-                        {isSimulatingPayment ? (
-                          <>
-                            <Clock className="w-4 h-4 animate-spin text-amber-400" />
-                            <span>{lang === 'hi' ? 'भुगतान सत्यापित हो रहा है...' : 'Verifying Instant Payment...'}</span>
-                          </>
-                        ) : (
-                          <>
-                            <span>⚡</span>
-                            <span>{lang === 'hi' ? 'त्वरित भुगतान टेस्ट करें (डेमो 1-क्लिक)' : 'Simulate Instant Payment (1-Click Demo)'}</span>
-                          </>
-                        )}
-                      </button>
-
-                      {/* Deep Link to UPI App (Mobile / Tablets) */}
-                      <a
-                        href={upiPayload}
-                        className="w-full py-2.5 rounded-xl bg-stone-850 hover:bg-stone-800 border border-stone-700 text-stone-300 hover:text-white text-xs font-bold transition flex items-center justify-center gap-1.5"
-                      >
-                        <Smartphone className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>{lang === 'hi' ? 'मोबाइल UPI ऐप में खोलें' : 'Open in UPI App directly'}</span>
-                      </a>
-
                       {/* Modal Action Buttons */}
                       <div className="flex gap-2.5 pt-1">
                         <button
