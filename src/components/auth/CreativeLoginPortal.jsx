@@ -458,81 +458,63 @@ export default function CreativeLoginPortal() {
         }`} />
       </div>
 
-      {/* ═══════════ FLOATING HEADER ═══════════ */}
-      <header className="relative z-50 max-w-7xl mx-auto w-full px-4 sm:px-6 pt-5">
-        <div className={`rounded-2xl px-5 py-3.5 border shadow-2xl flex items-center justify-between transition-colors duration-200 ${
-          isDark 
-            ? 'bg-stone-900/80 backdrop-blur-2xl border-stone-800 shadow-black/40' 
-            : 'bg-white/85 backdrop-blur-2xl border-slate-200 shadow-slate-200/50'
-        }`}>
-          {/* Brand Logo */}
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center text-stone-950 font-black shadow-lg shadow-emerald-500/25">
-              <Tractor className="w-5 h-5 text-stone-950" />
-            </div>
-            <div>
-              <span className={`text-lg font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                Krishi<span className="text-emerald-500">Seva</span>
-              </span>
-            </div>
+      {/* ═══════════ SEAMLESS FULL-WIDTH NAVBAR ═══════════ */}
+      <header className="w-full fixed top-0 left-0 right-0 z-50 px-6 sm:px-8 py-4 flex items-center justify-between bg-black/20 backdrop-blur-xl border-b border-white/10 shadow-sm transition-colors duration-200">
+        {/* Brand Logo (Far Left) */}
+        <div className="flex items-center gap-3 group cursor-pointer">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center text-stone-950 font-black shadow-lg shadow-emerald-500/25 transition-all group-hover:scale-105 group-hover:shadow-emerald-500/40">
+            <Tractor className="w-4.5 h-4.5 text-stone-950" />
           </div>
-
-          {/* Right Actions */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* Admin Login Quick Link */}
-            <button
-              onClick={() => setActiveRole('admin')}
-              className={`px-3 py-1.5 rounded-xl border text-xs font-bold transition-all duration-200 flex items-center gap-1.5 ${
-                isDark 
-                  ? 'border-stone-750 bg-stone-900/60 text-stone-300 hover:text-white hover:border-stone-600' 
-                  : 'border-slate-300 bg-slate-100 text-slate-700 hover:text-slate-900 hover:bg-slate-200'
-              }`}
-            >
-              <Lock className="w-3.5 h-3.5 text-stone-400" />
-              <span>{lang === 'hi' ? 'एडमिन लॉगिन' : 'Admin Login'}</span>
-            </button>
-
-            {/* Dark / Light Theme Switcher */}
-            <button
-              onClick={toggleTheme}
-              className={`px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition-all duration-200 ${
-                isDark 
-                  ? 'bg-stone-900/90 text-amber-300 border-amber-500/30 hover:border-amber-500/60 shadow-inner' 
-                  : 'bg-indigo-50 text-indigo-700 border-indigo-200 hover:border-indigo-400'
-              }`}
-              title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-            >
-              {isDark ? (
-                <>
-                  <Sun className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Light</span>
-                </>
-              ) : (
-                <>
-                  <Moon className="w-3.5 h-3.5 text-indigo-600" />
-                  <span>Dark</span>
-                </>
-              )}
-            </button>
-
-            {/* Language Switcher */}
-            <button
-              onClick={toggleLanguage}
-              className={`px-3 py-1.5 rounded-xl border text-xs font-black flex items-center gap-1.5 transition-all duration-200 ${
-                isDark 
-                  ? 'border-stone-750 bg-stone-900 text-emerald-400 hover:bg-stone-800' 
-                  : 'border-slate-300 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
-              }`}
-            >
-              <Globe className="w-3.5 h-3.5 text-emerald-500" />
-              <span>{lang === 'hi' ? 'English' : 'हिंदी'}</span>
-            </button>
+          <div>
+            <span className="text-lg font-black tracking-tight text-white transition-all duration-300 group-hover:text-emerald-400 group-hover:drop-shadow-[0_0_8px_rgba(52,211,153,0.6)]">
+              KrishiSeva
+            </span>
           </div>
+        </div>
+
+        {/* Actions & Controls (Far Right) */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Admin Login Quick Link */}
+          <button
+            onClick={() => setActiveRole('admin')}
+            className="bg-white/5 hover:bg-white/15 border border-white/10 backdrop-blur-lg px-4 py-2 rounded-full text-xs font-semibold text-slate-200 transition-all active:scale-95 flex items-center gap-1.5 hover:border-emerald-500/40 hover:text-white"
+          >
+            <Lock className="w-3 h-3 text-slate-300" />
+            <span>{lang === 'hi' ? 'एडमिन लॉगिन' : 'Admin Login'}</span>
+          </button>
+
+          {/* Dark / Light Theme Switcher */}
+          <button
+            onClick={toggleTheme}
+            className="bg-white/5 hover:bg-white/15 border border-white/10 backdrop-blur-lg px-4 py-2 rounded-full text-xs font-semibold text-slate-200 transition-all active:scale-95 flex items-center gap-1.5 hover:border-emerald-500/40 hover:text-white"
+            title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          >
+            {isDark ? (
+              <>
+                <Sun className="w-3.5 h-3.5 text-amber-400" />
+                <span>Light</span>
+              </>
+            ) : (
+              <>
+                <Moon className="w-3.5 h-3.5 text-indigo-300" />
+                <span>Dark</span>
+              </>
+            )}
+          </button>
+
+          {/* Language Switcher */}
+          <button
+            onClick={toggleLanguage}
+            className="bg-white/5 hover:bg-white/15 border border-white/10 backdrop-blur-lg px-4 py-2 rounded-full text-xs font-semibold text-slate-200 transition-all active:scale-95 flex items-center gap-1.5 hover:border-emerald-500/40 hover:text-white"
+          >
+            <Globe className="w-3.5 h-3.5 text-emerald-400" />
+            <span>{lang === 'hi' ? 'English' : 'हिंदी'}</span>
+          </button>
         </div>
       </header>
 
       {/* ═══════════ HERO & AUTH CONTAINER ═══════════ */}
-      <main className="relative z-10 max-w-7xl mx-auto w-full px-4 sm:px-6 py-8 md:py-14 my-auto">
+      <main className="relative z-10 max-w-7xl mx-auto w-full px-4 sm:px-6 pt-24 pb-8 md:py-14 my-auto">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
           {/* LEFT COLUMN: Commanding Headlines */}
