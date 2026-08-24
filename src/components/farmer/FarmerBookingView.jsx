@@ -10,6 +10,7 @@ import { DEFAULT_FARM_LOCATION } from '../../utils/geoUtils';
 import LiveMap from '../map/LiveMap';
 import SavedLandsModal from './SavedLandsModal';
 import PreBookingsModal from './PreBookingsModal';
+import confetti from 'canvas-confetti';
 import { 
   Tractor, 
   Layers, 
@@ -42,7 +43,11 @@ import {
   Ruler,
   ShieldCheck,
   Wrench,
-  Sprout
+  Sprout,
+  Copy,
+  Smartphone,
+  ExternalLink,
+  QrCode
 } from 'lucide-react';
 
 // Refined Vector Icon Helpers
@@ -123,6 +128,8 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
   const [paymentStep, setPaymentStep] = useState('select'); // 'select' | 'upi'
   const [paymentMethod, setPaymentMethod] = useState('cod'); // 'cod' | 'online'
   const [pendingBookingData, setPendingBookingData] = useState(null);
+  const [isSimulatingPayment, setIsSimulatingPayment] = useState(false);
+  const [copiedUpi, setCopiedUpi] = useState(false);
 
   // Selected Machine Category (default 'tractor')
   const [selectedCategoryId, setSelectedCategoryId] = useState('tractor');
@@ -360,6 +367,31 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
 
     setIsPaymentModalOpen(false);
     setPendingBookingData(null);
+  };
+
+  const handleCopyUpi = () => {
+    try {
+      navigator.clipboard.writeText('krishiseva@ybl');
+      setCopiedUpi(true);
+      setTimeout(() => setCopiedUpi(false), 2500);
+    } catch (e) {}
+  };
+
+  const handleSimulateInstantPayment = () => {
+    if (!pendingBookingData || isSimulatingPayment) return;
+    setIsSimulatingPayment(true);
+    setTimeout(() => {
+      setIsSimulatingPayment(false);
+      try {
+        confetti({
+          particleCount: 80,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+      } catch (e) {}
+      const paidAmount = paymentMethod === 'cod' ? Math.round(pendingBookingData.estimatedPrice * 0.3) : pendingBookingData.estimatedPrice;
+      handleExecuteBookingWithPayment(paymentMethod, paidAmount);
+    }, 1200);
   };
 
   return (
@@ -864,8 +896,8 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
 
         </div>
 
-        {/* Right Column: Live Map + Dynamic Pricing Card */}
-        <div className="lg:col-span-5 space-y-6">
+        {/* Right Column: Live Map + Dynamic Pricing Card + Fleet Radar (Sticky on Desktop) */}
+        <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-20 self-start">
           
           {/* Live Map Preview */}
           <div className="bg-stone-900/70 backdrop-blur-xl rounded-3xl p-5 border border-stone-800/80 shadow-2xl space-y-3">
@@ -887,7 +919,7 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
               activeVehicleType={selectedCategoryId}
               showNearbyDrivers={true}
               bookingStatus="idle"
-              className="h-[260px] w-full rounded-2xl overflow-hidden border border-stone-800"
+              className="h-[220px] w-full rounded-2xl overflow-hidden border border-stone-800"
             />
           </div>
 
@@ -970,6 +1002,48 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
               <ChevronRight className="w-5 h-5" />
             </button>
 
+          </div>
+
+          {/* Live Nearby Machinery Fleet Status Widget */}
+          <div className="bg-stone-900/70 backdrop-blur-xl rounded-3xl p-5 border border-stone-800/80 shadow-2xl space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-black uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                </span>
+                <span>{lang === 'hi' ? 'सक्रिय नजदीकी फ्लीट' : 'Active Nearby Fleet'}</span>
+              </span>
+              <span className="text-[10px] text-stone-400 font-bold">मलिहाबाद जोन • 5 km</span>
+            </div>
+
+            <div className="space-y-2">
+              <div className="p-3 rounded-2xl bg-stone-950/60 border border-stone-800/80 flex items-center justify-between text-xs hover:border-emerald-700/50 transition">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-950/80 border border-emerald-700/50 flex items-center justify-center text-emerald-400 font-black">
+                    <Tractor className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="font-bold text-white block">Mahindra 575 DI (50 HP)</span>
+                    <span className="text-[10px] text-stone-500">जगजीत सिंह • 1.2 km दूर</span>
+                  </div>
+                </div>
+                <span className="px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 text-[10px] font-extrabold border border-emerald-800/60">उपलब्ध ✓</span>
+              </div>
+
+              <div className="p-3 rounded-2xl bg-stone-950/60 border border-stone-800/80 flex items-center justify-between text-xs hover:border-amber-700/50 transition">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-amber-950/80 border border-amber-700/50 flex items-center justify-center text-amber-400 font-black">
+                    <Wheat className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="font-bold text-white block">Preet 987 Combine (110 HP)</span>
+                    <span className="text-[10px] text-stone-500">रामपाल शर्मा • 2.8 km दूर</span>
+                  </div>
+                </div>
+                <span className="px-2 py-0.5 rounded-full bg-amber-950 text-amber-300 text-[10px] font-extrabold border border-amber-800/60">उपलब्ध ✓</span>
+              </div>
+            </div>
           </div>
 
         </div>
@@ -1060,10 +1134,10 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
         onClose={() => setIsPreBookingsModalOpen(false)}
       />
 
-      {/* PAYMENT METHOD MODAL */}
+      {/* PAYMENT METHOD & UPI QR DEMO MODAL */}
       {isPaymentModalOpen && pendingBookingData && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-stone-950/85 backdrop-blur-md animate-fade-in">
-          <div className="bg-stone-900 text-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-stone-800 relative space-y-5">
+          <div className="bg-stone-900 text-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-stone-800 relative space-y-5 max-h-[90vh] overflow-y-auto">
             
             {/* Header */}
             <div className="text-center space-y-1">
@@ -1170,14 +1244,14 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
                   <button
                     type="button"
                     onClick={() => { setIsPaymentModalOpen(false); setPendingBookingData(null); }}
-                    className="w-1/3 py-3 rounded-xl border border-stone-700 text-stone-300 text-sm font-bold hover:bg-stone-800 transition"
+                    className="w-1/3 py-3.5 rounded-xl border border-stone-700 text-stone-300 text-sm font-bold hover:bg-stone-800 transition"
                   >
                     {lang === 'hi' ? 'रद्द करें' : 'Cancel'}
                   </button>
                   <button
                     type="button"
                     onClick={() => setPaymentStep('upi')}
-                    className="w-2/3 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 text-sm font-black shadow-lg shadow-emerald-500/20 transition flex items-center justify-center gap-1.5"
+                    className="w-2/3 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 text-sm font-black shadow-lg shadow-emerald-500/20 transition flex items-center justify-center gap-1.5"
                   >
                     <span>{lang === 'hi' ? 'भुगतान के लिए आगे बढ़ें' : 'Proceed to Pay'}</span>
                     <ChevronRight className="w-4 h-4" />
@@ -1185,82 +1259,138 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
                 </div>
               </div>
             ) : (
-              /* Simulated UPI QR Screen */
-              <div className="space-y-5">
-                <div className="p-5 rounded-2xl bg-stone-950/90 border border-stone-800 space-y-4 text-center">
-                  <div>
-                    <span className="text-[10px] font-black text-stone-400 uppercase tracking-widest block">
-                      {lang === 'hi' ? 'भुगतान की जाने वाली राशि' : 'Amount to Pay'}
-                    </span>
-                    <span className="text-3xl font-black text-emerald-400">
-                      ₹{paymentMethod === 'cod' ? Math.round(pendingBookingData.estimatedPrice * 0.3) : pendingBookingData.estimatedPrice}
-                    </span>
-                    {paymentMethod === 'cod' && (
-                      <span className="text-[11px] text-stone-400 block mt-0.5">
-                        (30% {lang === 'hi' ? 'बुकिंग अग्रिम' : 'Booking Advance'})
-                      </span>
-                    )}
-                  </div>
+              /* Live Working UPI QR Screen */
+              <div className="space-y-4 animate-fade-in">
+                {(() => {
+                  const payableAmount = paymentMethod === 'cod' 
+                    ? Math.round(pendingBookingData.estimatedPrice * 0.3) 
+                    : pendingBookingData.estimatedPrice;
+                  const upiPayload = `upi://pay?pa=krishiseva@ybl&pn=KrishiSeva&am=${payableAmount}&cu=INR&tn=KrishiSeva%20Machinery%20Booking`;
+                  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiPayload)}`;
 
-                  {/* Simulated QR Code */}
-                  <div className="w-44 h-44 bg-white border border-stone-300 rounded-2xl mx-auto flex items-center justify-center p-3 shadow-md relative group">
-                    <svg viewBox="0 0 200 200" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-                      {/* QR Corner markers */}
-                      <rect x="10" y="10" width="50" height="50" rx="4" fill="none" stroke="#1e293b" strokeWidth="6"/>
-                      <rect x="20" y="20" width="30" height="30" rx="2" fill="#1e293b"/>
-                      <rect x="140" y="10" width="50" height="50" rx="4" fill="none" stroke="#1e293b" strokeWidth="6"/>
-                      <rect x="150" y="20" width="30" height="30" rx="2" fill="#1e293b"/>
-                      <rect x="10" y="140" width="50" height="50" rx="4" fill="none" stroke="#1e293b" strokeWidth="6"/>
-                      <rect x="20" y="150" width="30" height="30" rx="2" fill="#1e293b"/>
-                      {/* Data modules */}
-                      {[70,80,90,100,110,120].map(x => [70,80,90,100,110,120,130,140,150,160].map(y => (
-                        (x + y) % 30 < 15 && <rect key={`${x}-${y}`} x={x} y={y} width="8" height="8" rx="1" fill="#1e293b" opacity={0.8}/>
-                      )))}
-                      {[10,20,30,40,50,70,80,90,100,110].map(x => [70,80,90,100,110].map(y => (
-                        (x * y) % 20 < 10 && <rect key={`h-${x}-${y}`} x={x} y={y} width="8" height="8" rx="1" fill="#1e293b" opacity={0.7}/>
-                      )))}
-                      {[70,80,90,100,110,120,130].map(x => [10,20,30,40,50].map(y => (
-                        (x + y * 2) % 25 < 12 && <rect key={`v-${x}-${y}`} x={x} y={y} width="8" height="8" rx="1" fill="#1e293b" opacity={0.7}/>
-                      )))}
-                      {/* Center UPI logo area */}
-                      <rect x="75" y="75" width="50" height="50" rx="8" fill="white" stroke="#e2e8f0" strokeWidth="2"/>
-                      <text x="100" y="105" textAnchor="middle" fontSize="18" fontWeight="bold" fill="#059669">UPI</text>
-                    </svg>
-                    <div className="absolute inset-0 bg-stone-900/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <span className="bg-white/95 px-2.5 py-1 rounded text-[10px] font-bold text-stone-800 shadow-sm">Scan with BHIM/UPI</span>
-                    </div>
-                  </div>
+                  return (
+                    <>
+                      <div className="p-4 rounded-2xl bg-stone-950/90 border border-stone-800 space-y-3 text-center">
+                        <div>
+                          <span className="text-[10px] font-black text-stone-400 uppercase tracking-widest block">
+                            {lang === 'hi' ? 'भुगतान की जाने वाली राशि' : 'Amount to Pay'}
+                          </span>
+                          <span className="text-3xl font-black text-emerald-400">
+                            ₹{payableAmount}
+                          </span>
+                          {paymentMethod === 'cod' && (
+                            <span className="text-[11px] text-stone-400 block mt-0.5">
+                              (30% {lang === 'hi' ? 'बुकिंग अग्रिम' : 'Booking Advance'})
+                            </span>
+                          )}
+                        </div>
 
-                  <p className="text-[11px] text-stone-400 font-medium">
-                    {lang === 'hi'
-                      ? 'भुगतान करने के लिए किसी भी यूपीआई ऐप (PhonePe, GPay, Paytm) का उपयोग करके इस क्यूआर कोड को स्कैन करें।'
-                      : 'Scan this QR code using any UPI app (PhonePe, GPay, Paytm) to make the payment.'}
-                  </p>
-                </div>
+                        {/* Live Generated QR Code with High-Quality Display */}
+                        <div className="w-44 h-44 bg-white rounded-2xl mx-auto flex items-center justify-center p-2 shadow-xl relative group border-2 border-emerald-500/40 overflow-hidden">
+                          <img 
+                            src={qrUrl}
+                            alt="UPI QR Code" 
+                            className="w-full h-full object-contain"
+                            onError={(e) => {
+                              // Fallback inline rendering if offline
+                              e.target.style.display = 'none';
+                              e.target.nextSibling.style.display = 'block';
+                            }}
+                          />
+                          <div style={{ display: 'none' }} className="w-full h-full">
+                            <svg viewBox="0 0 200 200" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                              <rect x="10" y="10" width="50" height="50" rx="4" fill="none" stroke="#1e293b" strokeWidth="6"/>
+                              <rect x="20" y="20" width="30" height="30" rx="2" fill="#1e293b"/>
+                              <rect x="140" y="10" width="50" height="50" rx="4" fill="none" stroke="#1e293b" strokeWidth="6"/>
+                              <rect x="150" y="20" width="30" height="30" rx="2" fill="#1e293b"/>
+                              <rect x="10" y="140" width="50" height="50" rx="4" fill="none" stroke="#1e293b" strokeWidth="6"/>
+                              <rect x="20" y="150" width="30" height="30" rx="2" fill="#1e293b"/>
+                              {[70,80,90,100,110,120].map(x => [70,80,90,100,110,120,130,140,150,160].map(y => (
+                                (x + y) % 30 < 15 && <rect key={`${x}-${y}`} x={x} y={y} width="8" height="8" rx="1" fill="#1e293b" opacity={0.8}/>
+                              )))}
+                              <rect x="75" y="75" width="50" height="50" rx="8" fill="white" stroke="#e2e8f0" strokeWidth="2"/>
+                              <text x="100" y="105" textAnchor="middle" fontSize="18" fontWeight="bold" fill="#059669">UPI</text>
+                            </svg>
+                          </div>
+                        </div>
 
-                {/* Confirm Action Button */}
-                <div className="flex gap-2.5">
-                  <button
-                    type="button"
-                    onClick={() => setPaymentStep('select')}
-                    className="w-1/3 py-3.5 rounded-xl border border-stone-700 text-stone-300 text-sm font-bold hover:bg-stone-800 transition"
-                  >
-                    {lang === 'hi' ? 'पीछे जाएँ' : 'Back'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleExecuteBookingWithPayment(
-                      paymentMethod,
-                      paymentMethod === 'cod' ? Math.round(pendingBookingData.estimatedPrice * 0.3) : pendingBookingData.estimatedPrice
-                    )}
-                    className="w-2/3 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 text-sm font-black shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-1.5 transition active:scale-95"
-                  >
-                    <ShieldCheck className="w-4 h-4 text-stone-950" />
-                    <span>
-                      {lang === 'hi' ? 'मैंने भुगतान कर दिया है' : 'I Have Paid & Confirm'}
-                    </span>
-                  </button>
-                </div>
+                        {/* UPI ID & Quick Copy */}
+                        <div className="flex items-center justify-center gap-2 text-xs">
+                          <span className="text-stone-400">UPI ID:</span>
+                          <code className="font-bold text-emerald-300 bg-stone-900 px-2 py-0.5 rounded-lg border border-stone-700">krishiseva@ybl</code>
+                          <button
+                            type="button"
+                            onClick={handleCopyUpi}
+                            className="text-stone-400 hover:text-white p-1 rounded hover:bg-stone-800 transition"
+                            title="Copy UPI ID"
+                          >
+                            <Copy className="w-3.5 h-3.5" />
+                          </button>
+                          {copiedUpi && <span className="text-[10px] text-emerald-400 font-bold">Copied!</span>}
+                        </div>
+
+                        <p className="text-[11px] text-stone-400 font-medium">
+                          {lang === 'hi'
+                            ? 'PhonePe, Google Pay, Paytm या किसी भी UPI ऐप से स्कैन करके भुगतान करें।'
+                            : 'Scan with PhonePe, Google Pay, Paytm or any UPI app to pay.'}
+                        </p>
+                      </div>
+
+                      {/* 1-Click Interactive Demo Simulation Button */}
+                      <button
+                        type="button"
+                        onClick={handleSimulateInstantPayment}
+                        disabled={isSimulatingPayment}
+                        className="w-full py-3 rounded-2xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/50 text-amber-300 hover:text-amber-200 text-xs font-black transition-all flex items-center justify-center gap-2 shadow-lg active:scale-95 disabled:opacity-75"
+                      >
+                        {isSimulatingPayment ? (
+                          <>
+                            <Clock className="w-4 h-4 animate-spin text-amber-400" />
+                            <span>{lang === 'hi' ? 'भुगतान सत्यापित हो रहा है...' : 'Verifying Instant Payment...'}</span>
+                          </>
+                        ) : (
+                          <>
+                            <span>⚡</span>
+                            <span>{lang === 'hi' ? 'त्वरित भुगतान टेस्ट करें (डेमो 1-क्लिक)' : 'Simulate Instant Payment (1-Click Demo)'}</span>
+                          </>
+                        )}
+                      </button>
+
+                      {/* Deep Link to UPI App (Mobile / Tablets) */}
+                      <a
+                        href={upiPayload}
+                        className="w-full py-2.5 rounded-xl bg-stone-850 hover:bg-stone-800 border border-stone-700 text-stone-300 hover:text-white text-xs font-bold transition flex items-center justify-center gap-1.5"
+                      >
+                        <Smartphone className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>{lang === 'hi' ? 'मोबाइल UPI ऐप में खोलें' : 'Open in UPI App directly'}</span>
+                      </a>
+
+                      {/* Modal Action Buttons */}
+                      <div className="flex gap-2.5 pt-1">
+                        <button
+                          type="button"
+                          onClick={() => setPaymentStep('select')}
+                          className="w-1/3 py-3 rounded-xl border border-stone-700 text-stone-300 text-xs font-bold hover:bg-stone-800 transition"
+                        >
+                          {lang === 'hi' ? 'पीछे जाएँ' : 'Back'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleExecuteBookingWithPayment(
+                            paymentMethod,
+                            paymentMethod === 'cod' ? Math.round(pendingBookingData.estimatedPrice * 0.3) : pendingBookingData.estimatedPrice
+                          )}
+                          className="w-2/3 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 text-xs font-black shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-1.5 transition active:scale-95"
+                        >
+                          <CheckCircle2 className="w-4 h-4 text-stone-950" />
+                          <span>
+                            {lang === 'hi' ? 'मैंने भुगतान कर दिया है ✓' : 'I Have Paid & Confirm ✓'}
+                          </span>
+                        </button>
+                      </div>
+                    </>
+                  );
+                })()}
               </div>
             )}
           </div>
