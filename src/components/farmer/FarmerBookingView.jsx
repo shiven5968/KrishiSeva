@@ -1093,19 +1093,25 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
                 </span>
               </div>
 
-              <div className="p-3 rounded-2xl bg-stone-950/60 border border-stone-800/80 flex items-center justify-between text-xs hover:border-amber-700/50 transition">
+              <div className={`p-3 rounded-2xl border flex items-center justify-between text-xs transition ${
+                isDark ? 'bg-stone-950/60 border-stone-800/80 hover:border-amber-700/50' : 'bg-slate-50 border-slate-200 hover:border-amber-400'
+              }`}>
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-amber-950/80 border border-amber-700/50 flex items-center justify-center text-amber-400 font-black">
+                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-black ${
+                    isDark ? 'bg-amber-950/80 border border-amber-700/50 text-amber-400' : 'bg-amber-100 border border-amber-300 text-amber-700'
+                  }`}>
                     <Wheat className="w-4 h-4" />
                   </div>
                   <div>
-                    <span className="font-bold text-white block">Preet 987 Combine (110 HP)</span>
-                    <span className="text-[10px] text-stone-500">
+                    <span className={`font-bold block ${isDark ? 'text-white' : 'text-slate-900'}`}>Preet 987 Combine (110 HP)</span>
+                    <span className={`text-[10px] ${isDark ? 'text-stone-500' : 'text-slate-500'}`}>
                       {lang === 'hi' ? 'रामपाल शर्मा • 2.8 km दूर' : 'Rampal Sharma • 2.8 km away'}
                     </span>
                   </div>
                 </div>
-                <span className="px-2 py-0.5 rounded-full bg-amber-950 text-amber-300 text-[10px] font-extrabold border border-amber-800/60">
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold border ${
+                  isDark ? 'bg-amber-950 text-amber-300 border-amber-800/60' : 'bg-amber-100 text-amber-800 border-amber-300'
+                }`}>
                   {lang === 'hi' ? 'उपलब्ध ✓' : 'Available ✓'}
                 </span>
               </div>
