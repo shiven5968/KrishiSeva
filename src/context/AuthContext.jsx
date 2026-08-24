@@ -450,13 +450,14 @@ export function AuthProvider({ children }) {
     return user;
   };
 
-  // Quick Direct Login
+  // Quick Direct Demo Login
   const quickDemoLogin = (profileType) => {
     if (profileType === 'farmer') {
       const user = usersDb['9876543210'] || MOCK_USER_DATABASE['9876543210'];
       setCurrentUser({ isAuthenticated: true, ...user });
       setActiveRole('farmer');
-    } else if (profileType === 'verified_driver') {
+      if (typeof window !== 'undefined') window.location.hash = '#farmer';
+    } else if (profileType === 'verified_driver' || profileType === 'driver') {
       const user = usersDb['9876501234'] || MOCK_USER_DATABASE['9876501234'];
       setCurrentUser({ isAuthenticated: true, ...user });
       setDriverProfile({
@@ -465,13 +466,17 @@ export function AuthProvider({ children }) {
         fullName: user.name,
         totalEarnings: 84500,
         completedRides: 142,
-        rating: 4.95
+        rating: 4.95,
+        status: 'online',
+        verificationStatus: 'verified'
       });
       setActiveRole('driver');
+      if (typeof window !== 'undefined') window.location.hash = '#driver';
     } else if (profileType === 'admin') {
       const user = usersDb['9999999999'] || MOCK_USER_DATABASE['9999999999'];
       setCurrentUser({ isAuthenticated: true, ...user });
       setActiveRole('admin');
+      if (typeof window !== 'undefined') window.location.hash = '#admin';
     }
     audioHelper.playBookingConfirmed();
   };

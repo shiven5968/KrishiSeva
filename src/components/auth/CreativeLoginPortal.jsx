@@ -40,7 +40,8 @@ export default function CreativeLoginPortal() {
     requestOtp,
     verifyOtp,
     completeNewUserRegistration,
-    setActiveRole
+    setActiveRole,
+    quickDemoLogin
   } = useAuth();
 
   // Authentication States
@@ -560,6 +561,65 @@ export default function CreativeLoginPortal() {
                       )}
                     </button>
                   </form>
+
+                  {/* Quick 1-Click Demo Logins */}
+                  <div className="pt-2 space-y-2.5">
+                    <div className="flex items-center gap-2">
+                      <div className={`h-px flex-1 ${isDark ? 'bg-stone-800' : 'bg-slate-200'}`} />
+                      <span className="text-[10px] font-black uppercase tracking-wider text-emerald-500">
+                        {lang === 'hi' ? '⚡ 1-क्लिक डेमो लॉगिन (बिना ओटीपी)' : '⚡ 1-Click Demo Login (No OTP)'}
+                      </span>
+                      <div className={`h-px flex-1 ${isDark ? 'bg-stone-800' : 'bg-slate-200'}`} />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2.5">
+                      <button
+                        type="button"
+                        onClick={() => quickDemoLogin('farmer')}
+                        className={`p-3 rounded-2xl border text-left transition-all duration-200 flex items-center justify-between group active:scale-95 ${
+                          isDark 
+                            ? 'bg-emerald-950/40 hover:bg-emerald-950/80 border-emerald-500/30 hover:border-emerald-500 text-emerald-300' 
+                            : 'bg-emerald-50 hover:bg-emerald-100 border-emerald-200 text-emerald-900 shadow-sm'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="text-xl">🌾</span>
+                          <div>
+                            <span className="text-xs font-black block">
+                              {lang === 'hi' ? 'बलराम (किसान)' : 'Balram (Farmer)'}
+                            </span>
+                            <span className="text-[10px] text-stone-400 font-mono">
+                              9876543210
+                            </span>
+                          </div>
+                        </div>
+                        <ArrowRight className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all text-emerald-400" />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => quickDemoLogin('driver')}
+                        className={`p-3 rounded-2xl border text-left transition-all duration-200 flex items-center justify-between group active:scale-95 ${
+                          isDark 
+                            ? 'bg-blue-950/40 hover:bg-blue-950/80 border-blue-500/30 hover:border-blue-500 text-blue-300' 
+                            : 'bg-blue-50 hover:bg-blue-100 border-blue-200 text-blue-900 shadow-sm'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="text-xl">🚜</span>
+                          <div>
+                            <span className="text-xs font-black block">
+                              {lang === 'hi' ? 'जगजीत (चालक)' : 'Jagjit (Driver)'}
+                            </span>
+                            <span className="text-[10px] text-stone-400 font-mono">
+                              9876501234
+                            </span>
+                          </div>
+                        </div>
+                        <ArrowRight className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all text-blue-400" />
+                      </button>
+                    </div>
+                  </div>
 
                   {/* Minimal Security Text */}
                   <div className={`flex items-center justify-center gap-2 text-[10px] pt-1 ${
@@ -1236,6 +1296,52 @@ export default function CreativeLoginPortal() {
         </div>
 
       </main>
+
+      {/* ═══════════ QUICK DEMO ACCESS BAR AT BOTTOM ═══════════ */}
+      <div className={`relative z-10 border-t py-3.5 px-4 sm:px-6 transition-colors duration-200 ${
+        isDark ? 'border-stone-800/80 bg-[#090D0B]/95 backdrop-blur-xl' : 'border-slate-200 bg-white/95 backdrop-blur-xl shadow-lg'
+      }`}>
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <span className="flex h-2.5 w-2.5 relative">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+            </span>
+            <span className="text-xs font-black uppercase tracking-wider text-emerald-400">
+              {lang === 'hi' ? '⚡ 1-क्लिक त्वरित डेमो एक्सेस:' : '⚡ 1-Click Instant Demo Portals:'}
+            </span>
+            <span className={`hidden md:inline text-xs ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+              {lang === 'hi' ? '(बिना ओटीपी के सीधे कॉकपिट में जाएं)' : '(Skip OTP & test cockpits instantly)'}
+            </span>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2.5">
+            <button
+              onClick={() => quickDemoLogin('farmer')}
+              className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-black text-xs transition-all shadow-md active:scale-95 flex items-center gap-1.5"
+            >
+              <span>🌾 {lang === 'hi' ? 'किसान कॉकपिट (Demo Farmer)' : 'Enter Farmer Cockpit'}</span>
+              <ArrowRight className="w-3.5 h-3.5 text-stone-950" />
+            </button>
+
+            <button
+              onClick={() => quickDemoLogin('driver')}
+              className="px-4 py-2 rounded-xl bg-blue-500 hover:bg-blue-400 text-stone-950 font-black text-xs transition-all shadow-md active:scale-95 flex items-center gap-1.5"
+            >
+              <span>🚜 {lang === 'hi' ? 'चालक कॉकपिट (Demo Driver)' : 'Enter Driver Cockpit'}</span>
+              <ArrowRight className="w-3.5 h-3.5 text-stone-950" />
+            </button>
+
+            <button
+              onClick={() => quickDemoLogin('admin')}
+              className="px-4 py-2 rounded-xl bg-purple-500 hover:bg-purple-400 text-stone-950 font-black text-xs transition-all shadow-md active:scale-95 flex items-center gap-1.5"
+            >
+              <span>🛡️ {lang === 'hi' ? 'एडमिन कंसोल (Super Admin)' : 'Admin Console'}</span>
+              <ArrowRight className="w-3.5 h-3.5 text-stone-950" />
+            </button>
+          </div>
+        </div>
+      </div>
 
       {/* ═══════════ MINIMALIST FOOTER ═══════════ */}
       <footer className={`relative z-10 border-t px-6 py-4 transition-colors duration-200 ${
