@@ -24,10 +24,8 @@ import {
   Building2,
   FileCheck2,
   AlertCircle,
-  IndianRupee,
   Zap,
-  ShieldAlert,
-  Award
+  CheckCheck
 } from 'lucide-react';
 
 export default function CreativeLoginPortal() {
@@ -51,7 +49,7 @@ export default function CreativeLoginPortal() {
   const [activeOtpCode, setActiveOtpCode] = useState('');
   const [waDeliveryDelayed, setWaDeliveryDelayed] = useState(false);
 
-  // Active Role Selector in Login Card ('farmer' | 'driver')
+  // Minimalist Role Toggle Segment Control ('farmer' | 'driver')
   const [loginRoleTab, setLoginRoleTab] = useState('farmer');
 
   // Profile Setup States
@@ -279,9 +277,9 @@ export default function CreativeLoginPortal() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0F0D] text-stone-100 flex flex-col justify-between selection:bg-[#D4AF37] selection:text-stone-950 font-sans relative overflow-x-hidden">
+    <div className="min-h-screen bg-[#090D0B] text-stone-100 flex flex-col justify-between selection:bg-emerald-500 selection:text-stone-950 font-sans relative overflow-x-hidden">
       
-      {/* ───── Cinematic Hero Background Video (Wheat Field Barley) ───── */}
+      {/* ───── Deep Matte Background with Subtle HD Farm Vignette ───── */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
         <video
           autoPlay
@@ -289,70 +287,64 @@ export default function CreativeLoginPortal() {
           loop
           playsInline
           preload="auto"
-          className="absolute inset-0 w-full h-full object-cover scale-105 transition-opacity duration-1000 opacity-70"
+          className="absolute inset-0 w-full h-full object-cover scale-105 transition-opacity duration-1000 opacity-40 grayscale-[20%]"
           poster="https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=1920&q=80"
         >
           <source src="/videos/hero-wheat-field.mp4" type="video/mp4" />
         </video>
         
-        {/* Rich Forest Emerald + Dark Obsidian Vignette Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#051C14]/90 via-[#0A0F0D]/65 to-[#0A0F0D]/95" />
+        {/* Ultra-Modern Dark Obsidian & Matte Charcoal Vignette (Zero Murky Tints) */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#090D0B]/95 via-[#090D0B]/80 to-[#090D0B]" />
         
-        {/* Luxury Gold & Emerald Ambient Glow */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-15%,rgba(212,175,55,0.18),transparent)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_10%_40%,rgba(16,185,129,0.12),transparent)]" />
+        {/* Emerald Ambient Light Beam */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(16,185,129,0.12),transparent)]" />
         
-        {/* Subtle geometric grid pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(212,175,55,0.02)_1px,transparent_1px),linear-gradient(to_right,rgba(212,175,55,0.02)_1px,transparent_1px)] bg-[size:64px_64px]" />
+        {/* Subtle grid lines */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(to_right,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:64px_64px]" />
       </div>
 
-      {/* ═══════════ FLOATING TOP NAVIGATION BAR ═══════════ */}
+      {/* ═══════════ FLOATING MINIMALIST HEADER ═══════════ */}
       <div className="relative z-20 px-4 sm:px-8 pt-4 sm:pt-6 max-w-7xl mx-auto w-full">
-        <header className="flex items-center justify-between px-5 sm:px-8 py-3.5 rounded-2xl bg-[#0A0F0D]/60 backdrop-blur-xl border border-[#D4AF37]/20 shadow-2xl shadow-black/60">
+        <header className="flex items-center justify-between px-5 sm:px-7 py-3.5 rounded-2xl bg-[#0B0F12]/80 backdrop-blur-xl border border-stone-800/80 shadow-2xl shadow-black/80">
           
-          {/* Glowing KrishiSeva Brand Emblem */}
-          <div className="flex items-center gap-3.5 group cursor-pointer">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#D4AF37] via-amber-500 to-[#10B981] p-[1.5px] shadow-lg shadow-amber-500/20 group-hover:shadow-amber-500/40 group-hover:scale-105 transition-all duration-300">
-              <div className="w-full h-full bg-[#051C14] rounded-2xl flex items-center justify-center">
-                <Tractor className="w-6 h-6 text-[#D4AF37]" />
-              </div>
+          {/* Glowing KrishiSeva Brand Icon & Logo */}
+          <div className="flex items-center gap-3 group cursor-pointer">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center text-stone-950 font-black shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-all duration-300">
+              <Tractor className="w-5 h-5 text-stone-950" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-black text-2xl text-white tracking-tight">
-                  Krishi<span className="text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] to-amber-300">Seva</span>
+                <span className="font-extrabold text-2xl text-white tracking-tight">
+                  Krishi<span className="text-emerald-400">Seva</span>
                 </span>
                 {lang === 'hi' && (
-                  <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-[#051C14] text-[#D4AF37] border border-[#D4AF37]/40 font-black hidden sm:inline-block">
+                  <span className="text-[10px] px-2 py-0.5 rounded-md bg-stone-900 text-emerald-400 border border-stone-800 font-bold hidden sm:inline-block">
                     कृषि सेवा
                   </span>
                 )}
               </div>
-              <p className="text-[11px] text-stone-400 font-medium hidden md:block tracking-wide">
-                {lang === 'hi' ? 'ना बिचौलिया, ना इंतज़ार — मशीन सीधा खेत पर' : 'Not a Call, Just a Click — Precision Farm Machinery'}
-              </p>
             </div>
           </div>
 
-          {/* Right Navigation Controls */}
-          <div className="flex items-center gap-3">
+          {/* Right Controls: Minimalist Language Toggle & Admin Login Pill */}
+          <div className="flex items-center gap-2.5">
             
-            {/* Admin Portal Quick Link */}
+            {/* Admin Login Pill Button */}
             <a
               href="#admin"
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-[#D4AF37]/35 hover:border-[#D4AF37] bg-[#051C14]/70 hover:bg-[#051C14] text-[#D4AF37] hover:text-amber-200 text-xs font-black transition-all duration-200 shadow-sm hover:shadow-amber-500/20 active:scale-95"
-              title="Admin Portal Access"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-stone-800 hover:border-emerald-500/50 bg-stone-900/60 hover:bg-stone-900 text-stone-300 hover:text-white text-xs font-bold transition-all duration-200 shadow-sm active:scale-95"
+              title="Admin Login"
             >
-              <Lock className="w-3.5 h-3.5 text-[#D4AF37]" />
-              <span>{lang === 'hi' ? 'प्रशासक पोर्टल' : 'Admin Portal'}</span>
+              <Lock className="w-3.5 h-3.5 text-stone-400 group-hover:text-emerald-400" />
+              <span>{lang === 'hi' ? 'एडमिन लॉगिन' : 'Admin Login'}</span>
             </a>
 
-            {/* Interactive Language Toggle Pill */}
+            {/* Minimalist Language Toggle */}
             <button
               onClick={toggleLanguage}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-stone-700/80 bg-stone-900/70 hover:bg-stone-800/80 text-stone-200 hover:text-white text-xs font-black shadow-sm transition-all duration-200 active:scale-95 hover:border-[#D4AF37]/40"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-stone-800 bg-stone-900/60 hover:bg-stone-900 text-stone-200 hover:text-white text-xs font-bold shadow-sm transition-all duration-200 active:scale-95 hover:border-emerald-500/50"
             >
-              <Globe className="w-3.5 h-3.5 text-[#10B981]" />
+              <Globe className="w-3.5 h-3.5 text-emerald-400" />
               <span>{lang === 'hi' ? 'English' : 'हिंदी'}</span>
             </button>
 
@@ -361,105 +353,78 @@ export default function CreativeLoginPortal() {
         </header>
       </div>
 
-      {/* ═══════════ HERO & AUTH SECTION ═══════════ */}
+      {/* ═══════════ UBER RIDE-HAILING HERO & BOOKING SECTION ═══════════ */}
       <main className="relative z-10 flex-1 flex items-center max-w-7xl mx-auto w-full px-4 sm:px-8 py-8 sm:py-12">
         
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center w-full">
           
-          {/* ──── LEFT COLUMN: Ultra-Premium Hero & Trust Grid ──── */}
-          <div className="lg:col-span-7 space-y-7 text-center lg:text-left">
+          {/* ──── LEFT COLUMN: Uber-Style Hero Headline & Quick Specs ──── */}
+          <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
             
-            {/* Floating Live Status Pill */}
-            <div className="animate-fade-in inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#051C14]/85 border border-[#10B981]/40 text-emerald-300 text-xs font-black shadow-xl shadow-black/40 backdrop-blur-md hover:border-[#10B981]/70 transition-all duration-300 cursor-default">
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#10B981] opacity-75" />
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#10B981]" />
+            {/* Floating Compact Chip */}
+            <div className="animate-fade-in inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-stone-900/90 border border-emerald-500/30 text-emerald-300 text-xs font-bold shadow-lg backdrop-blur-md cursor-default">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
               </span>
               <span>
                 {lang === 'hi' 
-                  ? '⚡ 500+ फ्लीट सक्रिय • मलिहाबाद व संपूर्ण उ.प्र.' 
-                  : '⚡ 500+ Fleets Operational across Malihabad & UP'}
+                  ? '⚡ रियल-टाइम फ्लीट नेटवर्क • मलिहाबाद' 
+                  : '⚡ Real-Time Fleet Network • Malihabad'}
               </span>
             </div>
 
-            {/* Commanding Hero Headline */}
-            <h1 className="text-4xl sm:text-5xl lg:text-[4rem] font-black text-white tracking-tight leading-[1.08]">
+            {/* Bold, Ultra-Clean Uber-Style Headline */}
+            <h1 className="text-4xl sm:text-5xl lg:text-[4.2rem] font-black text-white tracking-tight leading-[1.08]">
               {lang === 'hi' ? (
                 <>
-                  खेत आपका, <br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] via-amber-300 to-[#F59E0B]">
-                    मशीन हमारी।
+                  मांग पर मशीनरी। <br />
+                  <span className="text-emerald-400">
+                    सीधे आपके खेत तक।
                   </span>
                 </>
               ) : (
                 <>
-                  Your Field, <br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] via-amber-300 to-[#F59E0B]">
-                    Our Power.
+                  Machinery on Demand. <br />
+                  <span className="text-emerald-400">
+                    Directly to Your Farm.
                   </span>
                 </>
               )}
             </h1>
 
-            {/* Sub-headline */}
+            {/* Subtitle */}
             <p className="text-stone-300 text-sm sm:text-base lg:text-lg leading-relaxed max-w-xl mx-auto lg:mx-0 font-medium">
               {lang === 'hi'
-                ? 'ट्रैक्टर, कंबाइन हार्वेस्टर व जेसीबी का भारत का अग्रणी प्रिसिजन नेटवर्क। एग्रीस्टैक UPFR सत्यापन के साथ पारदर्शी दरें सीधे खेत की सीमा तक।'
-                : "India's premier high-precision fleet network for tractors, harvesters, and JCBs. Transparent flat pricing with AgriStack UPFR verification."}
+                ? 'ट्रैक्टर, कंबाइन हार्वेस्टर और जेसीबी की त्वरित बुकिंग। रियल-टाइम में वाहन का आगमन ट्रैक करें।'
+                : 'Instant booking for tractors, harvesters, and earthmovers. Track dispatches in real-time.'}
             </p>
 
-            {/* ──── Trust Metrics Grid (3 Stat Cards) ──── */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 max-w-xl mx-auto lg:mx-0 pt-1">
+            {/* Quick Specs Grid: 3 Clean Borderless Glass Pill Badges */}
+            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2.5 pt-2">
               
-              {/* Stat 1: 15 Min Guarantee */}
-              <div className="p-4 rounded-2xl bg-[#0A0F0D]/60 backdrop-blur-xl border border-[#D4AF37]/20 shadow-lg hover:border-[#D4AF37]/40 transition-all duration-300 text-left">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <div className="w-7 h-7 rounded-xl bg-amber-950/80 border border-amber-500/40 flex items-center justify-center text-amber-400">
-                    <Clock className="w-4 h-4" />
-                  </div>
-                  <span className="text-base font-black text-white tracking-tight">15 Min</span>
-                </div>
-                <p className="text-[11px] text-stone-400 font-bold leading-tight">
-                  {lang === 'hi' ? 'खेत पर डिस्पैच गारंटी' : 'Dispatch Guarantee'}
-                </p>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-stone-900/80 border border-stone-800 text-stone-200 text-xs font-bold shadow-md">
+                <span className="text-base">🚜</span>
+                <span>{lang === 'hi' ? 'सत्यापित मशीनरी' : 'Verified Equipment'}</span>
               </div>
 
-              {/* Stat 2: Flat Rate */}
-              <div className="p-4 rounded-2xl bg-[#0A0F0D]/60 backdrop-blur-xl border border-[#10B981]/25 shadow-lg hover:border-[#10B981]/50 transition-all duration-300 text-left">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <div className="w-7 h-7 rounded-xl bg-emerald-950/80 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
-                    <IndianRupee className="w-4 h-4" />
-                  </div>
-                  <span className="text-base font-black text-white tracking-tight">₹1,300<span className="text-xs text-stone-400 font-normal">/Bigha</span></span>
-                </div>
-                <p className="text-[11px] text-stone-400 font-bold leading-tight">
-                  {lang === 'hi' ? 'पारदर्शी निश्चित दर' : 'Flat Rate Pricing'}
-                </p>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-stone-900/80 border border-stone-800 text-stone-200 text-xs font-bold shadow-md">
+                <span className="text-base">⏱️</span>
+                <span>{lang === 'hi' ? 'त्वरित डिस्पैच' : 'Instant Dispatch'}</span>
               </div>
 
-              {/* Stat 3: 100% KYC */}
-              <div className="p-4 rounded-2xl bg-[#0A0F0D]/60 backdrop-blur-xl border border-[#D4AF37]/20 shadow-lg hover:border-[#D4AF37]/40 transition-all duration-300 text-left">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <div className="w-7 h-7 rounded-xl bg-amber-950/80 border border-amber-500/40 flex items-center justify-center text-amber-400">
-                    <ShieldCheck className="w-4 h-4" />
-                  </div>
-                  <span className="text-base font-black text-white tracking-tight">100% KYC</span>
-                </div>
-                <p className="text-[11px] text-stone-400 font-bold leading-tight">
-                  {lang === 'hi' ? 'सत्यापित फ्लीट ऑपरेटर' : 'Verified Fleet Network'}
-                </p>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-stone-900/80 border border-stone-800 text-stone-200 text-xs font-bold shadow-md">
+                <span className="text-base">🛡️</span>
+                <span>{lang === 'hi' ? 'एग्रीस्टैक सत्यापित' : 'AgriStack Verified'}</span>
               </div>
 
             </div>
 
           </div>
 
-          {/* ──── RIGHT COLUMN: Glassmorphism Login Container ──── */}
+          {/* ──── RIGHT COLUMN: Uber/Rapido-Style Booking Card ──── */}
           <div className="lg:col-span-5 flex justify-center lg:justify-end animate-fade-in">
-            <div className="relative bg-[#0A0F0D]/80 backdrop-blur-2xl rounded-3xl p-7 sm:p-8 border border-[#D4AF37]/25 shadow-2xl shadow-black/80 space-y-6 max-w-md w-full group/card ring-1 ring-white/5">
-              
-              {/* Ambient Gold Glow behind card */}
-              <div className="absolute -inset-1 rounded-3xl bg-gradient-to-br from-[#D4AF37]/15 via-transparent to-[#10B981]/10 opacity-60 blur-xl pointer-events-none" />
+            <div className="relative bg-[#0B0F12]/90 backdrop-blur-2xl rounded-3xl p-7 sm:p-8 border border-stone-800 shadow-2xl shadow-black/90 space-y-6 max-w-md w-full ring-1 ring-white/5">
               
               <div className="relative space-y-5">
 
@@ -467,25 +432,25 @@ export default function CreativeLoginPortal() {
               {step === 'phone' && (
                 <div className="space-y-5">
                   
-                  {/* Card Header & Role Selector Tab */}
+                  {/* Card Header & Minimalist Role Segment Control */}
                   <div className="space-y-3">
                     <div className="space-y-1">
                       <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-                        {lang === 'hi' ? 'कृषि सेवा में प्रवेश करें' : 'Get Started with KrishiSeva'}
+                        {lang === 'hi' ? 'शुरुआत करें' : 'Get Started'}
                       </h2>
                       <p className="text-stone-400 text-xs font-medium">
-                        {lang === 'hi' ? 'व्हाट्सएप सत्यापन हेतु अपना मोबाइल नंबर दर्ज करें' : 'Enter your 10-digit mobile number for WhatsApp verification'}
+                        {lang === 'hi' ? 'व्हाट्सएप ओटीपी प्राप्त करने हेतु अपना मोबाइल नंबर दर्ज करें' : 'Enter your mobile number to receive your WhatsApp OTP'}
                       </p>
                     </div>
 
-                    {/* Role Selector Tab: Farmer vs Fleet Partner */}
-                    <div className="grid grid-cols-2 p-1 rounded-2xl bg-[#051C14]/80 border border-stone-800">
+                    {/* Minimalist Role Toggle Segment Control: [ Farmer | Driver ] */}
+                    <div className="grid grid-cols-2 p-1 rounded-xl bg-stone-950 border border-stone-800">
                       <button
                         type="button"
                         onClick={() => setLoginRoleTab('farmer')}
-                        className={`py-2 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 ${
+                        className={`py-2 rounded-lg text-xs font-black transition-all flex items-center justify-center gap-1.5 ${
                           loginRoleTab === 'farmer'
-                            ? 'bg-gradient-to-r from-[#D4AF37] to-amber-500 text-stone-950 shadow-md'
+                            ? 'bg-emerald-500 text-stone-950 shadow-md'
                             : 'text-stone-400 hover:text-white'
                         }`}
                       >
@@ -496,14 +461,14 @@ export default function CreativeLoginPortal() {
                       <button
                         type="button"
                         onClick={() => setLoginRoleTab('driver')}
-                        className={`py-2 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 ${
+                        className={`py-2 rounded-lg text-xs font-black transition-all flex items-center justify-center gap-1.5 ${
                           loginRoleTab === 'driver'
-                            ? 'bg-gradient-to-r from-[#D4AF37] to-amber-500 text-stone-950 shadow-md'
+                            ? 'bg-emerald-500 text-stone-950 shadow-md'
                             : 'text-stone-400 hover:text-white'
                         }`}
                       >
                         <Truck className="w-3.5 h-3.5" />
-                        <span>{lang === 'hi' ? 'फ्लीट पार्टनर' : 'Fleet Partner'}</span>
+                        <span>{lang === 'hi' ? 'ड्राइवर (Driver)' : 'Driver'}</span>
                       </button>
                     </div>
                   </div>
@@ -517,11 +482,11 @@ export default function CreativeLoginPortal() {
 
                   <form onSubmit={handleSendWhatsAppOtp} className="space-y-4">
                     <div>
-                      <label className="block text-xs font-bold text-stone-300 uppercase tracking-wider mb-2">
-                        {lang === 'hi' ? 'मोबाइल नंबर दर्ज करें' : 'Enter Mobile Number'}
+                      <label className="block text-xs font-bold text-stone-400 uppercase tracking-wider mb-2">
+                        {lang === 'hi' ? 'मोबाइल नंबर' : 'Enter Mobile Number'}
                       </label>
                       <div className="relative group">
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#D4AF37] font-black text-sm flex items-center gap-1.5 pointer-events-none">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-300 font-black text-sm flex items-center gap-1.5 pointer-events-none">
                           <span>🇮🇳</span>
                           <span>+91</span>
                         </span>
@@ -531,7 +496,7 @@ export default function CreativeLoginPortal() {
                           value={phone}
                           onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
                           placeholder="9236581609"
-                          className="w-full pl-20 pr-4 py-4 rounded-2xl border border-stone-700/80 bg-[#051C14]/80 focus:border-[#D4AF37] focus:ring-2 focus:ring-amber-500/25 font-black text-white text-base outline-none transition-all duration-200 hover:border-stone-600 shadow-inner"
+                          className="w-full pl-20 pr-4 py-4 rounded-2xl border border-stone-700 bg-stone-950 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/25 font-black text-white text-base outline-none transition-all duration-200 hover:border-stone-600 shadow-inner"
                           required
                           autoFocus
                         />
@@ -541,7 +506,7 @@ export default function CreativeLoginPortal() {
                     <button
                       type="submit"
                       disabled={isSendingOtp}
-                      className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#D4AF37] via-amber-400 to-[#F59E0B] hover:from-amber-300 hover:to-yellow-400 text-stone-950 font-black text-base shadow-xl shadow-amber-500/25 hover:shadow-amber-500/40 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-75"
+                      className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-stone-950 font-black text-base shadow-xl shadow-emerald-500/20 hover:shadow-emerald-500/30 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-75"
                     >
                       {isSendingOtp ? (
                         <>
@@ -558,10 +523,10 @@ export default function CreativeLoginPortal() {
                     </button>
                   </form>
 
-                  {/* Security Micro-Text & Badges */}
+                  {/* Minimal Security Text */}
                   <div className="flex items-center justify-center gap-2 text-[10px] text-stone-400 pt-1">
-                    <Lock className="w-3 h-3 text-[#D4AF37]" />
-                    <span>{lang === 'hi' ? '256-बिट एन्क्रिप्टेड • फास्ट-ट्रैक सत्यापन • 5 मिनट वैधता' : '256-Bit Encrypted • Fast-Track Verification • 5-min Validity'}</span>
+                    <Lock className="w-3 h-3 text-emerald-400" />
+                    <span>{lang === 'hi' ? '256-बिट सुरक्षित • 5 मिनट वैधता' : '256-Bit Secure • 5-min Validity'}</span>
                   </div>
                 </div>
               )}
@@ -570,8 +535,8 @@ export default function CreativeLoginPortal() {
               {step === 'otp' && (
                 <div className="space-y-5 animate-fade-in">
                   <div className="text-center space-y-1.5">
-                    <div className="w-14 h-14 mx-auto rounded-2xl bg-[#051C14] border border-[#D4AF37]/50 flex items-center justify-center mb-3 shadow-inner">
-                      <MessageSquare className="w-7 h-7 text-[#D4AF37]" />
+                    <div className="w-14 h-14 mx-auto rounded-2xl bg-emerald-950/80 border border-emerald-500/40 flex items-center justify-center mb-3 shadow-inner">
+                      <MessageSquare className="w-7 h-7 text-emerald-400" />
                     </div>
                     <h3 className="text-2xl font-black text-white tracking-tight">
                       {lang === 'hi' ? '6-अंकीय ओटीपी दर्ज करें' : 'Enter 6-Digit OTP'}
@@ -582,8 +547,8 @@ export default function CreativeLoginPortal() {
                   </div>
 
                   {toastMessage && (
-                    <div className="p-3.5 rounded-2xl bg-amber-950/90 border border-[#D4AF37]/60 text-amber-300 text-xs font-bold text-center flex items-center justify-center gap-2 animate-fade-in shadow-lg">
-                      <CheckCircle2 className="w-4 h-4 text-[#D4AF37] shrink-0" />
+                    <div className="p-3.5 rounded-2xl bg-emerald-950/90 border border-emerald-500/60 text-emerald-300 text-xs font-bold text-center flex items-center justify-center gap-2 animate-fade-in shadow-lg">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                       <span>{toastMessage}</span>
                     </div>
                   )}
@@ -597,14 +562,14 @@ export default function CreativeLoginPortal() {
 
                   {/* WhatsApp Delayed Fallback Notice */}
                   {waDeliveryDelayed && (
-                    <div className="p-3.5 rounded-2xl bg-[#051C14] border border-[#D4AF37]/50 text-amber-200 text-xs flex items-center justify-between gap-2 shadow-lg animate-fade-in">
+                    <div className="p-3.5 rounded-2xl bg-emerald-950/70 border border-emerald-600/50 text-emerald-200 text-xs flex items-center justify-between gap-2 shadow-lg animate-fade-in">
                       <div className="flex items-center gap-2">
                         <span className="text-base">⚡</span>
                         <div>
                           <span className="text-[10px] text-stone-400 uppercase tracking-wider block font-bold">
                             {lang === 'hi' ? 'व्हाट्सएप विलंब • फॉलबैक कोड:' : 'WhatsApp Delayed • Fallback Code:'}
                           </span>
-                          <span className="font-mono text-base font-black text-[#D4AF37] tracking-wider">
+                          <span className="font-mono text-base font-black text-emerald-400 tracking-wider">
                             {activeOtpCode}
                           </span>
                         </div>
@@ -612,7 +577,7 @@ export default function CreativeLoginPortal() {
                       <button
                         type="button"
                         onClick={() => setOtp(activeOtpCode)}
-                        className="px-3 py-1.5 rounded-xl bg-[#D4AF37] hover:bg-amber-400 text-stone-950 font-black text-[11px] transition-all shadow-md active:scale-95"
+                        className="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-black text-[11px] transition-all shadow-md active:scale-95"
                       >
                         {lang === 'hi' ? 'ओटीपी भरें ✓' : 'Auto Fill ✓'}
                       </button>
@@ -627,7 +592,7 @@ export default function CreativeLoginPortal() {
                         value={otp}
                         onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
                         placeholder="••••••"
-                        className="w-full py-4 text-center tracking-[0.6em] rounded-2xl border border-stone-700/80 bg-[#051C14]/80 focus:border-[#D4AF37] focus:ring-2 focus:ring-amber-500/25 font-black text-[#D4AF37] text-3xl outline-none transition-all duration-200 shadow-inner"
+                        className="w-full py-4 text-center tracking-[0.6em] rounded-2xl border border-stone-700 bg-stone-950 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/25 font-black text-emerald-400 text-3xl outline-none transition-all duration-200 shadow-inner"
                         required
                         autoFocus
                       />
@@ -637,7 +602,7 @@ export default function CreativeLoginPortal() {
                     <div className="flex items-center justify-between text-xs px-1">
                       <span className="text-stone-400">
                         {resendTimer > 0 ? (
-                          lang === 'hi' ? <span><b className="text-[#D4AF37] tabular-nums">{resendTimer}s</b> में पुनः भेजें</span> : <span>Resend in <b className="text-[#D4AF37] tabular-nums">{resendTimer}s</b></span>
+                          lang === 'hi' ? <span><b className="text-emerald-400 tabular-nums">{resendTimer}s</b> में पुनः भेजें</span> : <span>Resend in <b className="text-emerald-400 tabular-nums">{resendTimer}s</b></span>
                         ) : (
                           <span>{lang === 'hi' ? 'ओटीपी नहीं मिला?' : "Didn't get code?"}</span>
                         )}
@@ -650,7 +615,7 @@ export default function CreativeLoginPortal() {
                         className={`font-black transition-all duration-200 ${
                           resendTimer > 0 || isSendingOtp
                             ? 'text-stone-600 cursor-not-allowed' 
-                            : 'text-[#D4AF37] hover:text-amber-300 underline underline-offset-2'
+                            : 'text-emerald-400 hover:text-emerald-300 underline underline-offset-2'
                         }`}
                       >
                         {lang === 'hi' ? 'व्हाट्सएप पर पुनः भेजें' : 'Resend via WhatsApp'}
@@ -661,7 +626,7 @@ export default function CreativeLoginPortal() {
                       <button
                         type="button"
                         onClick={() => { setStep('phone'); setOtp(''); setError(''); setWaDeliveryDelayed(false); }}
-                        className="w-1/3 py-4 rounded-2xl border border-stone-700/80 text-stone-300 font-bold text-xs hover:bg-stone-800/80 hover:border-stone-600 transition-all duration-200"
+                        className="w-1/3 py-4 rounded-2xl border border-stone-700 text-stone-300 font-bold text-xs hover:bg-stone-800 hover:border-stone-600 transition-all duration-200"
                       >
                         {lang === 'hi' ? 'नंबर बदलें' : 'Change Number'}
                       </button>
@@ -669,7 +634,7 @@ export default function CreativeLoginPortal() {
                       <button
                         type="submit"
                         disabled={isVerifyingOtp}
-                        className="w-2/3 py-4 rounded-2xl bg-gradient-to-r from-[#D4AF37] via-amber-400 to-[#F59E0B] hover:from-amber-300 hover:to-yellow-400 text-stone-950 font-black text-sm shadow-xl shadow-amber-500/25 hover:shadow-amber-500/40 transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98] hover:translate-y-[-1px] disabled:opacity-75"
+                        className="w-2/3 py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-stone-950 font-black text-sm shadow-xl shadow-emerald-500/20 hover:shadow-emerald-500/30 transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98] hover:translate-y-[-1px] disabled:opacity-75"
                       >
                         {isVerifyingOtp ? (
                           <>
@@ -692,8 +657,8 @@ export default function CreativeLoginPortal() {
               {step === 'profile_setup' && (
                 <div className="space-y-5 animate-fade-in">
                   <div className="space-y-1.5 text-center">
-                    <div className="w-12 h-12 mx-auto rounded-2xl bg-[#051C14] border border-[#D4AF37]/50 flex items-center justify-center mb-2">
-                      <Sparkles className="w-6 h-6 text-[#D4AF37]" />
+                    <div className="w-12 h-12 mx-auto rounded-2xl bg-emerald-950/80 border border-emerald-500/40 flex items-center justify-center mb-2">
+                      <Sparkles className="w-6 h-6 text-emerald-400" />
                     </div>
                     <h3 className="text-2xl font-black text-white tracking-tight">
                       {lang === 'hi' ? 'अपनी प्रोफाइल बनाएं' : 'Set Up Your Profile'}
@@ -721,7 +686,7 @@ export default function CreativeLoginPortal() {
                           value={userName}
                           onChange={(e) => setUserName(e.target.value)}
                           placeholder={lang === 'hi' ? 'उदा. रामेश्वर सिंह' : 'e.g. Rameshwar Singh'}
-                          className="w-full pl-12 pr-4 py-3.5 rounded-2xl border border-stone-700/80 bg-[#051C14]/80 font-bold text-white text-sm outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-amber-500/25 transition-all duration-200 hover:border-stone-600"
+                          className="w-full pl-12 pr-4 py-3.5 rounded-2xl border border-stone-700 bg-stone-950 font-bold text-white text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/25 transition-all duration-200 hover:border-stone-600"
                           required
                           autoFocus
                         />
@@ -738,13 +703,13 @@ export default function CreativeLoginPortal() {
                           onClick={() => setSelectedRole('farmer')}
                           className={`p-4 rounded-2xl border text-left transition-all duration-200 flex flex-col justify-between space-y-2 ${
                             selectedRole === 'farmer'
-                              ? 'border-[#D4AF37] bg-gradient-to-br from-[#051C14] to-amber-950/40 shadow-lg shadow-amber-500/15 ring-1 ring-[#D4AF37]/40'
-                              : 'border-stone-800 bg-[#0A0F0D]/60 hover:border-stone-700 text-stone-400'
+                              ? 'border-emerald-500 bg-emerald-950/40 shadow-lg shadow-emerald-500/15 ring-1 ring-emerald-500/30'
+                              : 'border-stone-800 bg-stone-950/60 hover:border-stone-700 text-stone-400'
                           }`}
                         >
                           <div className="flex items-center justify-between">
-                            <Tractor className={`w-6 h-6 ${selectedRole === 'farmer' ? 'text-[#D4AF37]' : 'text-stone-500'}`} />
-                            {selectedRole === 'farmer' && <CheckCircle2 className="w-4 h-4 text-[#D4AF37]" />}
+                            <Tractor className={`w-6 h-6 ${selectedRole === 'farmer' ? 'text-emerald-400' : 'text-stone-500'}`} />
+                            {selectedRole === 'farmer' && <CheckCircle2 className="w-4 h-4 text-emerald-400" />}
                           </div>
                           <div>
                             <span className="font-black text-white text-sm block">
@@ -761,17 +726,17 @@ export default function CreativeLoginPortal() {
                           onClick={() => setSelectedRole('driver')}
                           className={`p-4 rounded-2xl border text-left transition-all duration-200 flex flex-col justify-between space-y-2 ${
                             selectedRole === 'driver'
-                              ? 'border-[#D4AF37] bg-gradient-to-br from-[#051C14] to-amber-950/40 shadow-lg shadow-amber-500/15 ring-1 ring-[#D4AF37]/40'
-                              : 'border-stone-800 bg-[#0A0F0D]/60 hover:border-stone-700 text-stone-400'
+                              ? 'border-emerald-500 bg-emerald-950/40 shadow-lg shadow-emerald-500/15 ring-1 ring-emerald-500/30'
+                              : 'border-stone-800 bg-stone-950/60 hover:border-stone-700 text-stone-400'
                           }`}
                         >
                           <div className="flex items-center justify-between">
-                            <Truck className={`w-6 h-6 ${selectedRole === 'driver' ? 'text-[#D4AF37]' : 'text-stone-500'}`} />
-                            {selectedRole === 'driver' && <CheckCircle2 className="w-4 h-4 text-[#D4AF37]" />}
+                            <Truck className={`w-6 h-6 ${selectedRole === 'driver' ? 'text-emerald-400' : 'text-stone-500'}`} />
+                            {selectedRole === 'driver' && <CheckCircle2 className="w-4 h-4 text-emerald-400" />}
                           </div>
                           <div>
                             <span className="font-black text-white text-sm block">
-                              {lang === 'hi' ? 'ड्राइवर / मालिक' : 'Fleet Owner'}
+                              {lang === 'hi' ? 'ड्राइवर / मालिक' : 'Fleet Driver'}
                             </span>
                             <span className="text-[11px] text-stone-400 leading-tight block">
                               {lang === 'hi' ? 'कमाई शुरू करें' : 'Earn Bookings'}
@@ -783,7 +748,7 @@ export default function CreativeLoginPortal() {
 
                     <button
                       type="submit"
-                      className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#D4AF37] via-amber-400 to-[#F59E0B] hover:from-amber-300 hover:to-yellow-400 text-stone-950 font-black text-base shadow-xl shadow-amber-500/25 hover:shadow-amber-500/40 transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98] hover:translate-y-[-1px]"
+                      className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-stone-950 font-black text-base shadow-xl shadow-emerald-500/20 hover:shadow-emerald-500/30 transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98] hover:translate-y-[-1px]"
                     >
                       <span>{lang === 'hi' ? 'आगे बढ़ें' : 'Continue'}</span>
                       <ArrowRight className="w-5 h-5 text-stone-950" />
@@ -799,11 +764,11 @@ export default function CreativeLoginPortal() {
                   {aadhaarStep === 'input' && (
                     <div className="space-y-4">
                       <div className="text-center space-y-1.5">
-                        <div className="w-12 h-12 mx-auto rounded-2xl bg-[#051C14] border border-[#10B981]/50 flex items-center justify-center mb-2">
-                          <Building2 className="w-6 h-6 text-[#10B981]" />
+                        <div className="w-12 h-12 mx-auto rounded-2xl bg-emerald-950/80 border border-emerald-500/40 flex items-center justify-center mb-2">
+                          <Building2 className="w-6 h-6 text-emerald-400" />
                         </div>
-                        <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#051C14] text-emerald-300 border border-[#10B981]/40 text-[11px] font-bold">
-                          <LandPlot className="w-3 h-3 text-[#10B981]" />
+                        <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-stone-900 text-emerald-300 border border-stone-800 text-[11px] font-bold">
+                          <LandPlot className="w-3 h-3 text-emerald-400" />
                           <span>AgriStack • UPFR (Unified Farmer Registry)</span>
                         </div>
                         <h3 className="text-xl font-black text-white mt-1">
@@ -817,7 +782,7 @@ export default function CreativeLoginPortal() {
                       </div>
 
                       {/* Demo Aadhaar Benchmark Profiles */}
-                      <div className="p-3 rounded-2xl bg-[#051C14]/80 border border-stone-800 space-y-2">
+                      <div className="p-3 rounded-2xl bg-stone-950 border border-stone-800 space-y-2">
                         <span className="text-[10px] font-black text-stone-400 uppercase tracking-wider block">
                           {lang === 'hi' ? '⚡ पंजीकृत एग्रीस्टैक प्रोफाइल:' : '⚡ Registered AgriStack Benchmark Profiles:'}
                         </span>
@@ -825,25 +790,25 @@ export default function CreativeLoginPortal() {
                           <button
                             type="button"
                             onClick={() => setAadhaarNumber('5544 3322 1100')}
-                            className="p-2.5 rounded-xl bg-amber-950/30 hover:bg-amber-950/60 border border-amber-700/50 hover:border-[#D4AF37] text-left transition-all duration-200 flex items-center justify-between group"
+                            className="p-2.5 rounded-xl bg-emerald-950/30 hover:bg-emerald-950/60 border border-emerald-800/50 hover:border-emerald-500 text-left transition-all duration-200 flex items-center justify-between group"
                           >
                             <div>
-                              <span className="text-xs font-black text-[#D4AF37] block">{lang === 'hi' ? '5544 3322 1100 (डेमो आधार 1)' : '5544 3322 1100 (Demo Aadhaar 1)'}</span>
+                              <span className="text-xs font-black text-emerald-300 block">{lang === 'hi' ? '5544 3322 1100 (डेमो आधार 1)' : '5544 3322 1100 (Demo Aadhaar 1)'}</span>
                               <span className="text-[10px] text-stone-400">{lang === 'hi' ? 'गाटा #142 (3.0 बीघा), गाटा #74 (4.5 बीघा)' : 'Gata #142 (3.0 Bigha), Gata #74 (4.5 Bigha)'}</span>
                             </div>
-                            <span className="text-[10px] font-bold text-[#D4AF37] px-2 py-0.5 rounded-lg bg-amber-900/50 group-hover:bg-amber-900/80">{lang === 'hi' ? 'पंजीकृत ✓' : 'Registered ✓'}</span>
+                            <span className="text-[10px] font-bold text-emerald-400 px-2 py-0.5 rounded-lg bg-emerald-900/50 group-hover:bg-emerald-900/80">{lang === 'hi' ? 'पंजीकृत ✓' : 'Registered ✓'}</span>
                           </button>
 
                           <button
                             type="button"
                             onClick={() => setAadhaarNumber('8899 4433 2211')}
-                            className="p-2.5 rounded-xl bg-emerald-950/30 hover:bg-emerald-950/60 border border-emerald-800/50 hover:border-[#10B981] text-left transition-all duration-200 flex items-center justify-between group"
+                            className="p-2.5 rounded-xl bg-teal-950/30 hover:bg-teal-950/60 border border-teal-800/50 hover:border-teal-500 text-left transition-all duration-200 flex items-center justify-between group"
                           >
                             <div>
-                              <span className="text-xs font-black text-emerald-300 block">{lang === 'hi' ? '8899 4433 2211 (डेमो आधार 2)' : '8899 4433 2211 (Demo Aadhaar 2)'}</span>
+                              <span className="text-xs font-black text-teal-300 block">{lang === 'hi' ? '8899 4433 2211 (डेमो आधार 2)' : '8899 4433 2211 (Demo Aadhaar 2)'}</span>
                               <span className="text-[10px] text-stone-400">{lang === 'hi' ? 'गाटा #215 (6.0 बीघा)' : 'Gata #215 (6.0 Bigha)'}</span>
                             </div>
-                            <span className="text-[10px] font-bold text-emerald-400 px-2 py-0.5 rounded-lg bg-emerald-900/50 group-hover:bg-emerald-900/80">{lang === 'hi' ? 'पंजीकृत ✓' : 'Registered ✓'}</span>
+                            <span className="text-[10px] font-bold text-teal-400 px-2 py-0.5 rounded-lg bg-teal-900/50 group-hover:bg-teal-900/80">{lang === 'hi' ? 'पंजीकृत ✓' : 'Registered ✓'}</span>
                           </button>
                         </div>
                       </div>
@@ -871,7 +836,7 @@ export default function CreativeLoginPortal() {
                               value={aadhaarNumber}
                               onChange={(e) => setAadhaarNumber(e.target.value)}
                               placeholder="5544 3322 1100"
-                              className="w-full pl-12 pr-4 py-4 rounded-2xl border border-stone-700/80 bg-[#051C14]/80 font-black text-white tracking-widest text-base outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-amber-500/20 transition-all duration-200 hover:border-stone-600"
+                              className="w-full pl-12 pr-4 py-4 rounded-2xl border border-stone-700 bg-stone-950 font-black text-white tracking-widest text-base outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-200 hover:border-stone-600"
                               autoFocus
                             />
                           </div>
@@ -881,7 +846,7 @@ export default function CreativeLoginPortal() {
                           <button
                             type="button"
                             onClick={handleSkipAgriStack}
-                            className="w-1/3 py-4 rounded-2xl border border-stone-700/80 text-stone-400 hover:text-stone-200 hover:bg-stone-800/80 hover:border-stone-600 font-bold text-xs transition-all duration-200"
+                            className="w-1/3 py-4 rounded-2xl border border-stone-700 text-stone-400 hover:text-stone-200 hover:bg-stone-800 hover:border-stone-600 font-bold text-xs transition-all duration-200"
                           >
                             {lang === 'hi' ? 'बाद में करें' : 'Skip for Now'}
                           </button>
@@ -889,16 +854,16 @@ export default function CreativeLoginPortal() {
                           <button
                             type="submit"
                             disabled={isVerifyingAgriStack}
-                            className="w-2/3 py-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs sm:text-sm shadow-xl shadow-emerald-500/20 transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98] hover:translate-y-[-1px]"
+                            className="w-2/3 py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-stone-950 font-black text-xs sm:text-sm shadow-xl shadow-emerald-500/20 transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98] hover:translate-y-[-1px]"
                           >
                             {isVerifyingAgriStack ? (
                               <>
-                                <Clock className="w-4 h-4 animate-spin" />
+                                <Clock className="w-4 h-4 animate-spin text-stone-950" />
                                 <span>{lang === 'hi' ? 'जांच रहे हैं...' : 'Verifying Registry...'}</span>
                               </>
                             ) : (
                               <>
-                                <FileCheck2 className="w-4 h-4" />
+                                <FileCheck2 className="w-4 h-4 text-stone-950" />
                                 <span>{lang === 'hi' ? 'सत्यापित करें व खेत लाएं' : 'Verify & Fetch Land Records'}</span>
                               </>
                             )}
@@ -912,20 +877,20 @@ export default function CreativeLoginPortal() {
                   {aadhaarStep === 'result' && agriStackResult && (
                     <div className="space-y-4 animate-fade-in">
                       
-                      <div className="p-5 rounded-3xl bg-gradient-to-br from-[#051C14] via-[#0A0F0D] to-[#051C14] border-2 border-[#D4AF37]/60 shadow-xl shadow-amber-500/10 space-y-3 text-white relative overflow-hidden">
+                      <div className="p-5 rounded-3xl bg-gradient-to-br from-stone-900 via-stone-950 to-stone-900 border-2 border-emerald-500/60 shadow-xl shadow-emerald-500/10 space-y-3 text-white relative overflow-hidden">
                         
                         <div className="relative">
-                          <div className="flex items-center justify-between border-b border-amber-800/60 pb-2.5">
+                          <div className="flex items-center justify-between border-b border-stone-800 pb-2.5">
                             <div className="flex items-center gap-2">
                               <span className="text-xl">🇮🇳</span>
                               <div>
-                                <h4 className="font-black text-xs uppercase tracking-wider text-[#D4AF37]">
+                                <h4 className="font-black text-xs uppercase tracking-wider text-emerald-400">
                                   {lang === 'hi' ? 'किसान पहचान पत्र (Kisan Pehchaan Patra)' : 'Digital Farmer Identity Card'}
                                 </h4>
                                 <p className="text-[10px] text-stone-400">{lang === 'hi' ? 'AgriStack UPFR द्वारा सत्यापित' : 'AgriStack UPFR Verified'}</p>
                               </div>
                             </div>
-                            <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-[#D4AF37] text-stone-950 flex items-center gap-1 shadow-lg shadow-amber-500/20">
+                            <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-emerald-500 text-stone-950 flex items-center gap-1 shadow-lg shadow-emerald-500/20">
                               <Check className="w-3 h-3 stroke-[3]" />
                               <span>{lang === 'hi' ? 'सत्यापित कृषक' : 'Verified Cultivator'}</span>
                             </span>
@@ -938,7 +903,7 @@ export default function CreativeLoginPortal() {
                             </div>
                             <div>
                               <span className="text-[10px] text-stone-400 block">{lang === 'hi' ? 'किसान आईडी' : 'Farmer ID'}</span>
-                              <b className="font-mono text-[#D4AF37]">{agriStackResult.farmerProfile.farmerId}</b>
+                              <b className="font-mono text-emerald-400">{agriStackResult.farmerProfile.farmerId}</b>
                             </div>
                             <div>
                               <span className="text-[10px] text-stone-400 block">{lang === 'hi' ? 'ग्राम व तहसील' : 'Village & Tehsil'}</span>
@@ -946,24 +911,24 @@ export default function CreativeLoginPortal() {
                             </div>
                             <div>
                               <span className="text-[10px] text-stone-400 block">{lang === 'hi' ? 'कुल कृषि भूमि' : 'Total Farmland Area'}</span>
-                              <b className="text-[#D4AF37] text-sm">{agriStackResult.farmerProfile.totalLandBigha} {lang === 'hi' ? 'बीघा' : 'Bigha'}</b>
+                              <b className="text-emerald-400 text-sm">{agriStackResult.farmerProfile.totalLandBigha} {lang === 'hi' ? 'बीघा' : 'Bigha'}</b>
                             </div>
                           </div>
 
-                          <div className="pt-2 border-t border-amber-900/50 space-y-1.5 mt-2">
-                            <span className="text-[10px] font-black uppercase tracking-wider text-[#D4AF37] flex items-center gap-1">
-                              <LandPlot className="w-3 h-3 text-[#D4AF37]" />
+                          <div className="pt-2 border-t border-stone-800 space-y-1.5 mt-2">
+                            <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 flex items-center gap-1">
+                              <LandPlot className="w-3 h-3 text-emerald-400" />
                               <span>{lang === 'hi' ? `आधार से प्राप्त खेत (${agriStackResult.farmerProfile.linkedLands.length} प्लॉट):` : `Auto-Fetched Lands (${agriStackResult.farmerProfile.linkedLands.length} Plots):`}</span>
                             </span>
                             
                             <div className="space-y-1">
                               {agriStackResult.farmerProfile.linkedLands.map(l => (
-                                <div key={l.id} className="p-2.5 rounded-xl bg-stone-950/60 border border-amber-900/50 flex items-center justify-between text-xs hover:bg-stone-950/80 transition-all duration-200">
+                                <div key={l.id} className="p-2.5 rounded-xl bg-stone-950 border border-stone-800 flex items-center justify-between text-xs hover:bg-stone-900 transition-all duration-200">
                                   <div>
                                     <span className="font-bold text-white block">{l.name}</span>
                                     <span className="text-[10px] text-stone-400">{lang === 'hi' ? `गाटा संख्या: #${l.khasraNumber} • ${l.soilType}` : `Gata / Khasra No: #${l.khasraNumber} • ${l.soilType}`}</span>
                                   </div>
-                                  <span className="font-black text-[#D4AF37] text-xs">{l.bigha} {lang === 'hi' ? 'बीघा' : 'Bigha'}</span>
+                                  <span className="font-black text-emerald-400 text-xs">{l.bigha} {lang === 'hi' ? 'बीघा' : 'Bigha'}</span>
                                 </div>
                               ))}
                             </div>
@@ -975,7 +940,7 @@ export default function CreativeLoginPortal() {
                       <button
                         type="button"
                         onClick={handleCompleteAgriStackRegistration}
-                        className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#D4AF37] via-amber-400 to-[#F59E0B] hover:from-amber-300 hover:to-yellow-400 text-stone-950 font-black text-sm shadow-xl shadow-amber-500/25 hover:shadow-amber-500/40 transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98] hover:translate-y-[-1px]"
+                        className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-stone-950 font-black text-sm shadow-xl shadow-emerald-500/20 transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98] hover:translate-y-[-1px]"
                       >
                         <CheckCircle2 className="w-4 h-4 text-stone-950" />
                         <span>{lang === 'hi' ? 'सत्यापित खेतों के साथ आगे बढ़ें' : 'Proceed with Verified Lands'}</span>
@@ -994,14 +959,10 @@ export default function CreativeLoginPortal() {
 
       </main>
 
-      {/* ═══════════ BOTTOM FOOTER ═══════════ */}
-      <footer className="relative z-10 border-t border-stone-800/80 bg-[#0A0F0D]/90 backdrop-blur-md px-6 py-4">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-stone-400">
-          <span>© 2026 KrishiSeva • Precision Farm Fleet Network & AgriStack UPFR</span>
-          <div className="flex items-center gap-4 text-stone-300">
-            <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5 text-[#D4AF37]" /> Malihabad, Lucknow</span>
-            <span className="flex items-center gap-1"><Phone className="w-3.5 h-3.5 text-[#D4AF37]" /> 1800-KRISHI-SEVA</span>
-          </div>
+      {/* ═══════════ MINIMALIST FOOTER ═══════════ */}
+      <footer className="relative z-10 border-t border-stone-800/80 bg-[#090D0B] px-6 py-4">
+        <div className="max-w-7xl mx-auto flex items-center justify-center text-center text-xs text-stone-400">
+          <span>© 2026 KrishiSeva • Precision Farm Fleet Network • Malihabad, Lucknow</span>
         </div>
       </footer>
 
