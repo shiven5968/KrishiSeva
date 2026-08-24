@@ -30,7 +30,10 @@ import {
   Sun,
   Moon,
   FileText,
-  Wrench
+  Wrench,
+  Camera,
+  Upload,
+  RefreshCw
 } from 'lucide-react';
 
 export default function CreativeLoginPortal() {
@@ -73,6 +76,11 @@ export default function CreativeLoginPortal() {
   const [driverVehicleNumber, setDriverVehicleNumber] = useState('UP-32-BT-9901');
   const [driverImplement, setDriverImplement] = useState('Rotavator (6 Feet)');
   const [isSubmittingDriverKyc, setIsSubmittingDriverKyc] = useState(false);
+  const [kycSubStep, setKycSubStep] = useState('details'); // 'details' | 'uploads'
+  const [dlPhoto, setDlPhoto] = useState('');
+  const [vehiclePhoto, setVehiclePhoto] = useState('');
+  const [faceImage, setFaceImage] = useState('');
+  const [faceAuthStatus, setFaceAuthStatus] = useState('idle'); // 'idle' | 'scanning' | 'success'
 
   // 60-Second Resend Countdown Timer
   useEffect(() => {
@@ -290,10 +298,36 @@ export default function CreativeLoginPortal() {
   // ─────────────────────────────────────────────────────────────
   // 4B. Driver: Essentials KYC Registration Workflow
   // ─────────────────────────────────────────────────────────────
+  const handleProceedToKycUploads = (e) => {
+    e?.preventDefault();
+    if (!driverDlNumber.trim()) {
+      setError(lang === 'hi' ? 'कृपया ड्राइविंग लाइसेंस (DL) संख्या दर्ज करें' : 'Please enter Driving License (DL) Number');
+      return;
+    }
+    if (!driverVehicleNumber.trim()) {
+      setError(lang === 'hi' ? 'कृपया वाहन संख्या (RC) दर्ज करें' : 'Please enter Vehicle Number');
+      return;
+    }
+    if (!driverModelName.trim()) {
+      setError(lang === 'hi' ? 'कृपया मशीनरी मॉडल का नाम दर्ज करें' : 'Please enter Machinery Model Name');
+      return;
+    }
+    setError('');
+    setKycSubStep('uploads');
+  };
+
   const handleCompleteDriverKyc = (e) => {
     e?.preventDefault();
-    if (!driverDlNumber.trim() || !driverVehicleNumber.trim()) {
-      setError(lang === 'hi' ? 'कृपया ड्राइविंग लाइसेंस व वाहन संख्या दर्ज करें' : 'Please enter DL number and Vehicle number');
+    if (!dlPhoto) {
+      setError(lang === 'hi' ? 'कृपया ड्राइविंग लाइसेंस (DL) फोटो अपलोड करें' : 'Please upload Driving License (DL) photo');
+      return;
+    }
+    if (!vehiclePhoto) {
+      setError(lang === 'hi' ? 'कृपया वाहन/मशीनरी का फोटो अपलोड करें' : 'Please upload Vehicle photo');
+      return;
+    }
+    if (faceAuthStatus !== 'success') {
+      setError(lang === 'hi' ? 'कृपया चेहरा प्रमाणीकरण (Face Authentication) पूर्ण करें' : 'Please complete Face Authentication');
       return;
     }
     setError('');
@@ -312,11 +346,25 @@ export default function CreativeLoginPortal() {
         verificationStatus: 'verified',
         status: 'online',
         hourlyRate: 1000,
-        acreRate: 1300
+        acreRate: 1300,
+        dlImage: dlPhoto,
+        plateImage: vehiclePhoto,
+        faceImage: faceImage
       });
       setActiveRole('driver');
       audioHelper.playBookingConfirmed();
-    }, 600);
+    }, 1000);
+  };
+
+  const triggerFaceScan = () => {
+    setFaceAuthStatus('scanning');
+    setError('');
+    audioHelper.playOtpChime();
+    setTimeout(() => {
+      setFaceAuthStatus('success');
+      setFaceImage('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80');
+      audioHelper.playBookingConfirmed();
+    }, 2500);
   };
 
   return (
@@ -1078,8 +1126,8 @@ export default function CreativeLoginPortal() {
                 </div>
               )}
 
-              {/* STEP 4B: Driver Essentials KYC Onboarding (If Driver Selected) */}
-              {step === 'driver_kyc' && (
+              {/* STEP 4B: Driver Essentials KYC Onboarding - Step 1: Details */}
+              {step === 'driver_kyc' && kycSubStep === 'details' && (
                 <div className="space-y-4 animate-fade-in">
                   <div className="text-center space-y-1.5">
                     <div className="w-12 h-12 mx-auto rounded-2xl bg-emerald-950/80 border border-emerald-500/40 flex items-center justify-center mb-2">
@@ -1087,7 +1135,7 @@ export default function CreativeLoginPortal() {
                     </div>
                     <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-stone-900 text-emerald-300 border border-stone-800 text-[11px] font-bold">
                       <ShieldCheck className="w-3 h-3 text-emerald-400" />
-                      <span>Vahan & Sarathi Fleet Verification</span>
+                      <span>Step 1 of 2: Fleet Information</span>
                     </div>
                     <h3 className={`text-xl font-black mt-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>
                       {lang === 'hi' ? 'चालक व मशीन आवश्यक विवरण' : 'Driver & Machinery Essentials'}
@@ -1150,7 +1198,7 @@ export default function CreativeLoginPortal() {
                     </div>
                   )}
 
-                  <form onSubmit={handleCompleteDriverKyc} className="space-y-3.5">
+                  <form onSubmit={handleProceedToKycUploads} className="space-y-3.5">
                     <div>
                       <label className={`block text-[11px] font-bold uppercase tracking-wider mb-1 ${
                         isDark ? 'text-stone-300' : 'text-slate-700'
@@ -1245,21 +1293,195 @@ export default function CreativeLoginPortal() {
 
                     <button
                       type="submit"
-                      disabled={isSubmittingDriverKyc}
                       className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-stone-950 font-black text-sm shadow-xl shadow-emerald-500/20 transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98] hover:translate-y-[-1px] mt-2"
                     >
-                      {isSubmittingDriverKyc ? (
-                        <>
-                          <Clock className="w-4 h-4 animate-spin text-stone-950" />
-                          <span>{lang === 'hi' ? 'सत्यापित हो रहा है...' : 'Verifying & Registering...'}</span>
-                        </>
-                      ) : (
-                        <>
-                          <CheckCircle2 className="w-4 h-4 text-stone-950" />
-                          <span>{lang === 'hi' ? 'फ्लीट सत्यापन पूर्ण करें व कॉकपिट में जाएं' : 'Complete Driver Registration & Enter'}</span>
-                        </>
-                      )}
+                      <span>{lang === 'hi' ? 'दस्तावेज़ और चेहरा सत्यापन पर जाएं' : 'Proceed to Document & Face Verification'}</span>
+                      <ArrowRight className="w-4 h-4 text-stone-950" />
                     </button>
+                  </form>
+                </div>
+              )}
+
+              {/* STEP 4B: Driver Essentials KYC Onboarding - Step 2: Uploads & Face Auth */}
+              {step === 'driver_kyc' && kycSubStep === 'uploads' && (
+                <div className="space-y-4 animate-fade-in">
+                  <div className="text-center space-y-1.5">
+                    <div className="w-12 h-12 mx-auto rounded-2xl bg-emerald-950/80 border border-emerald-500/40 flex items-center justify-center mb-2">
+                      <ShieldCheck className="w-6 h-6 text-emerald-400" />
+                    </div>
+                    <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-stone-900 text-emerald-300 border border-stone-800 text-[11px] font-bold">
+                      <Camera className="w-3 h-3 text-emerald-400" />
+                      <span>Step 2 of 2: Biometrics & Documents</span>
+                    </div>
+                    <h3 className={`text-xl font-black mt-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                      {lang === 'hi' ? 'दस्तावेज़ व चेहरा सत्यापन' : 'Biometrics & KYC Uploads'}
+                    </h3>
+                  </div>
+
+                  {error && (
+                    <div className="p-3.5 rounded-2xl bg-red-950/85 border border-red-700/60 text-red-200 text-xs font-bold flex items-start gap-2 animate-fade-in">
+                      <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+                      <span>{error}</span>
+                    </div>
+                  )}
+
+                  <div className="space-y-4">
+                    {/* Photo upload: Driving License */}
+                    <div className="space-y-1.5">
+                      <span className={`block text-[11px] font-bold uppercase tracking-wider ${isDark ? 'text-stone-300' : 'text-slate-700'}`}>
+                        {lang === 'hi' ? 'ड्राइविंग लाइसेंस (DL) फोटो *' : 'Driving License Photo *'}
+                      </span>
+                      {dlPhoto ? (
+                        <div className="relative border border-emerald-500/30 rounded-2xl overflow-hidden bg-black/60 p-2 flex items-center justify-between gap-3 animate-fade-in">
+                          <img src={dlPhoto} className="w-16 h-12 object-cover rounded-xl border border-stone-800" />
+                          <div className="flex-1 min-w-0">
+                            <span className="text-xs font-bold block truncate">DL_{driverDlNumber}.jpg</span>
+                            <span className="text-[10px] text-emerald-400 font-bold flex items-center gap-1">✓ Ready</span>
+                          </div>
+                          <button 
+                            onClick={() => setDlPhoto('')}
+                            className="px-2.5 py-1.5 text-[10px] font-bold bg-stone-900 hover:bg-stone-850 rounded-lg text-red-400 hover:text-red-300"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setDlPhoto('https://images.unsplash.com/photo-1554774853-719586f82d77?w=300&q=80')}
+                          className={`w-full p-4 border-2 border-dashed rounded-2xl text-center flex flex-col items-center justify-center gap-1 transition ${
+                            isDark ? 'border-stone-800 bg-stone-900/50 hover:border-emerald-500/50' : 'border-slate-300 bg-slate-50 hover:border-emerald-500/50'
+                          }`}
+                        >
+                          <Upload className="w-5 h-5 text-stone-400" />
+                          <span className="text-xs font-bold">{lang === 'hi' ? 'डीएल फोटो अपलोड करें' : 'Upload DL Card Photo'}</span>
+                          <span className="text-[9px] text-stone-500">Max size 5MB • Click to simulate upload</span>
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Photo upload: Vehicle */}
+                    <div className="space-y-1.5">
+                      <span className={`block text-[11px] font-bold uppercase tracking-wider ${isDark ? 'text-stone-300' : 'text-slate-700'}`}>
+                        {lang === 'hi' ? 'वाहन / मशीनरी फोटो *' : 'Vehicle / Machinery Photo *'}
+                      </span>
+                      {vehiclePhoto ? (
+                        <div className="relative border border-emerald-500/30 rounded-2xl overflow-hidden bg-black/60 p-2 flex items-center justify-between gap-3 animate-fade-in">
+                          <img src={vehiclePhoto} className="w-16 h-12 object-cover rounded-xl border border-stone-800" />
+                          <div className="flex-1 min-w-0">
+                            <span className="text-xs font-bold block truncate">RC_{driverVehicleNumber}.jpg</span>
+                            <span className="text-[10px] text-emerald-400 font-bold flex items-center gap-1">✓ Ready</span>
+                          </div>
+                          <button 
+                            onClick={() => setVehiclePhoto('')}
+                            className="px-2.5 py-1.5 text-[10px] font-bold bg-stone-900 hover:bg-stone-850 rounded-lg text-red-400 hover:text-red-300"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setVehiclePhoto('https://images.unsplash.com/photo-1592417817098-8f3d6910985c?w=300&q=80')}
+                          className={`w-full p-4 border-2 border-dashed rounded-2xl text-center flex flex-col items-center justify-center gap-1 transition ${
+                            isDark ? 'border-stone-800 bg-stone-900/50 hover:border-emerald-500/50' : 'border-slate-300 bg-slate-50 hover:border-emerald-500/50'
+                          }`}
+                        >
+                          <Tractor className="w-5 h-5 text-stone-400" />
+                          <span className="text-xs font-bold">{lang === 'hi' ? 'वाहन फोटो अपलोड करें' : 'Upload Vehicle Photo'}</span>
+                          <span className="text-[9px] text-stone-500">Max size 5MB • Click to simulate upload</span>
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Biometric Face Authentication Container */}
+                    <div className={`p-4 rounded-2xl border ${
+                      isDark ? 'bg-stone-950 border-stone-800' : 'bg-slate-50 border-slate-200'
+                    }`}>
+                      <span className={`block text-[11px] font-bold uppercase tracking-wider mb-2.5 text-center ${
+                        isDark ? 'text-stone-300' : 'text-slate-700'
+                      }`}>
+                        🛡️ {lang === 'hi' ? 'सुरक्षित बायोमेट्रिक चेहरा सत्यापन' : 'Secure Biometric Face Authentication'}
+                      </span>
+
+                      <div className="flex flex-col items-center justify-center space-y-3">
+                        {/* Circular guide scanner */}
+                        <div className="w-28 h-28 rounded-full border-4 border-dashed border-emerald-500/30 relative overflow-hidden flex items-center justify-center bg-black/60 group shadow-inner">
+                          {faceAuthStatus === 'idle' && (
+                            <User className="w-12 h-12 text-stone-600 group-hover:scale-110 transition duration-300" />
+                          )}
+
+                          {faceAuthStatus === 'scanning' && (
+                            <div className="w-full h-full relative flex items-center justify-center">
+                              <span className="text-xl animate-pulse">📷</span>
+                              <div className="absolute left-0 right-0 h-0.5 bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)] animate-[bounce_2s_infinite]" />
+                            </div>
+                          )}
+
+                          {faceAuthStatus === 'success' && faceImage && (
+                            <img src={faceImage} className="w-full h-full object-cover animate-fade-in" />
+                          )}
+                        </div>
+
+                        {/* Status Label */}
+                        <div className="text-center">
+                          {faceAuthStatus === 'idle' && (
+                            <span className="text-[11px] font-bold text-stone-500">Ready to scan face / चेहरा स्कैन के लिए तैयार</span>
+                          )}
+                          {faceAuthStatus === 'scanning' && (
+                            <span className="text-[11px] font-bold text-amber-400 animate-pulse">Scanning biometric coordinates... (Blink your eyes)</span>
+                          )}
+                          {faceAuthStatus === 'success' && (
+                            <span className="text-[11px] font-bold text-emerald-400 flex items-center gap-1 justify-center">
+                              <CheckCheck className="w-4 h-4" /> Face Authenticated Successfully!
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Trigger button */}
+                        {faceAuthStatus !== 'success' && (
+                          <button
+                            type="button"
+                            disabled={faceAuthStatus === 'scanning'}
+                            onClick={triggerFaceScan}
+                            className="px-4 py-2 rounded-xl bg-stone-900 border border-stone-800 hover:border-emerald-500/40 text-emerald-400 text-xs font-bold transition flex items-center gap-1.5 active:scale-95 disabled:opacity-50"
+                          >
+                            <Camera className="w-3.5 h-3.5" />
+                            <span>{faceAuthStatus === 'scanning' ? 'Scanning...' : (lang === 'hi' ? 'स्कैन शुरू करें' : 'Start Biometric Scan')}</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <form onSubmit={handleCompleteDriverKyc} className="space-y-2">
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setKycSubStep('details')}
+                        className={`flex-1 py-3.5 rounded-2xl font-black text-xs transition border ${
+                          isDark ? 'bg-stone-900 border-stone-800 text-stone-300 hover:bg-stone-850' : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'
+                        }`}
+                      >
+                        {lang === 'hi' ? '← पीछे जाएँ' : '← Back'}
+                      </button>
+
+                      <button
+                        type="submit"
+                        disabled={isSubmittingDriverKyc}
+                        className="flex-[2] py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-stone-950 font-black text-xs shadow-xl shadow-emerald-500/20 transition duration-300 flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-50"
+                      >
+                        {isSubmittingDriverKyc ? (
+                          <>
+                            <Clock className="w-4 h-4 animate-spin text-stone-950" />
+                            <span>{lang === 'hi' ? 'सत्यापित हो रहा है...' : 'Verifying KYC...'}</span>
+                          </>
+                        ) : (
+                          <>
+                            <CheckCircle2 className="w-4 h-4 text-stone-950" />
+                            <span>{lang === 'hi' ? 'रजिस्ट्रेशन पूर्ण करें व प्रवेश करें' : 'Complete Registration & Enter'}</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
                   </form>
                 </div>
               )}
