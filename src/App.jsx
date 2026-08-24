@@ -86,8 +86,8 @@ function MainContent() {
     return <CreativeLoginPortal />;
   }
 
-  // Check strictly if there is an active running booking
-  const hasActiveBooking = activeBooking && ['searching', 'accepted', 'arrived', 'in_progress'].includes(activeBooking.status);
+  // Check strictly if there is an active running booking (including completed for 5-star rating)
+  const hasActiveBooking = activeBooking && ['searching', 'accepted', 'arrived', 'in_progress', 'completed'].includes(activeBooking.status);
 
   return (
     <div className={`min-h-screen flex flex-col transition-colors duration-200 ${isDark ? 'bg-[#090D0B] text-stone-100' : 'bg-slate-50 text-slate-900'}`}>

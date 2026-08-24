@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useRealtimeSync } from '../../context/RealtimeSyncContext';
 import { useSavedLands } from '../../context/SavedLandsContext';
 import LogoutConfirmationModal from './LogoutConfirmationModal';
+import FarmerBookingHistoryModal from '../farmer/FarmerBookingHistoryModal';
 import { 
   Tractor, 
   Globe, 
@@ -13,7 +14,8 @@ import {
   LogIn,
   Bookmark,
   Sun,
-  Moon
+  Moon,
+  History
 } from 'lucide-react';
 
 export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
@@ -21,6 +23,7 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
   const { theme, toggleTheme, isDark } = useTheme();
   const { activeRole, setActiveRole, currentUser, driverProfile, logout } = useAuth();
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
 
   // Clicking Logo returns user to their authenticated home dashboard (NOT logged out)
   const handleLogoClick = () => {
@@ -147,6 +150,22 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
               <span>{lang === 'hi' ? 'English' : 'हिंदी'}</span>
             </button>
 
+            {/* Farmer Booking History Button */}
+            {currentUser && currentUser.role === 'farmer' && (
+              <button
+                onClick={() => setIsHistoryModalOpen(true)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold shadow-sm transition active:scale-95 ${
+                  isDark 
+                    ? 'border-emerald-500/30 bg-emerald-950/40 hover:bg-emerald-900/50 text-emerald-300' 
+                    : 'border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-800'
+                }`}
+                title={lang === 'hi' ? 'बुकिंग इतिहास देखें' : 'View Booking History'}
+              >
+                <History className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="hidden sm:inline">{lang === 'hi' ? 'इतिहास' : 'History'}</span>
+              </button>
+            )}
+
             {/* User Profile & Explicit Logout */}
             {currentUser && currentUser.isAuthenticated ? (
               <div className="flex items-center gap-2">
@@ -189,6 +208,12 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
 
         </div>
       </header>
+
+      {/* Farmer Booking History Modal */}
+      <FarmerBookingHistoryModal
+        isOpen={isHistoryModalOpen}
+        onClose={() => setIsHistoryModalOpen(false)}
+      />
 
       {/* Logout Confirmation Modal (Yes / No) */}
       <LogoutConfirmationModal

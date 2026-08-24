@@ -448,6 +448,8 @@ export function RealtimeSyncProvider({ children }) {
           lng: (bookingDetails.farmerLocation?.lng || DEFAULT_FARM_LOCATION.lng) + 0.0076
         };
 
+    const generatedOtp = String(Math.floor(1000 + Math.random() * 9000));
+
     const booking = {
       id: `book_${Date.now()}`,
       farmerName: bookingDetails.farmerName || 'Balram Kisan',
@@ -461,6 +463,7 @@ export function RealtimeSyncProvider({ children }) {
       estimatedPrice: bookingDetails.estimatedPrice,
       estimatedETA: bookingDetails.estimatedETA || '35-60 Mins',
       status: 'searching',
+      startOtp: generatedOtp,
       createdAt: new Date().toISOString(),
       driverStartPos: initialDriverPos
     };
@@ -560,8 +563,28 @@ export function RealtimeSyncProvider({ children }) {
       console.warn('Error updating payout to local storage:', err);
     }
 
-    const updatedBooking = { ...booking, status: 'completed' };
+    const updatedBooking = { 
+      ...booking, 
+      status: 'completed',
+      completedAt: new Date().toISOString()
+    };
     setActiveBooking(updatedBooking);
+
+    // Save to Farmer Booking History in localStorage
+    try {
+      const historyKey = 'krishi_farmer_booking_history';
+      const existingHistory = JSON.parse(localStorage.getItem(historyKey) || '[]');
+      const newHistoryItem = {
+        ...updatedBooking,
+        id: updatedBooking.id || `book_${Date.now()}`,
+        completedAt: new Date().toISOString(),
+        paidAmount: payout
+      };
+      const updatedHistory = [newHistoryItem, ...existingHistory.filter(b => b.id !== newHistoryItem.id)];
+      localStorage.setItem(historyKey, JSON.stringify(updatedHistory));
+    } catch (e) {
+      console.warn('Error saving booking history:', e);
+    }
 
     // Broadcast status change and payout
     broadcast('BOOKING_STATUS_CHANGED', updatedBooking);
@@ -614,6 +637,22 @@ export function RealtimeSyncProvider({ children }) {
           localStorage.setItem('krishi_users_db', JSON.stringify(parsedUsers));
         }
       }
+
+      // Update rating in farmer booking history
+      const historyKey = 'krishi_farmer_booking_history';
+      const existingHistory = JSON.parse(localStorage.getItem(historyKey) || '[]');
+      const updatedHistory = existingHistory.map(b => {
+        if (b.id === ratingData.bookingId || (activeBooking && b.id === activeBooking.id)) {
+          return {
+            ...b,
+            farmerRating: stars,
+            feedbackTags: tags,
+            feedbackComment: comment
+          };
+        }
+        return b;
+      });
+      localStorage.setItem(historyKey, JSON.stringify(updatedHistory));
     } catch (err) {
       console.warn('Error updating driver rating in local storage:', err);
     }

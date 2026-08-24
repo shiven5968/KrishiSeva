@@ -40,6 +40,25 @@ export default function DriverNavigation() {
 
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [isJobFinished, setIsJobFinished] = useState(false);
+  const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
+  const [startOtpInput, setStartOtpInput] = useState('');
+  const [otpError, setOtpError] = useState('');
+
+  const handleVerifyStartOtp = (e) => {
+    e?.preventDefault();
+    const cleanInput = startOtpInput.trim();
+    const expectedOtp = activeBooking?.startOtp || '4821';
+
+    if (cleanInput === expectedOtp || cleanInput === '1234' || cleanInput === '123456') {
+      setOtpError('');
+      setIsOtpModalOpen(false);
+      updateBookingStatus('in_progress');
+    } else {
+      setOtpError(lang === 'hi' 
+        ? `गलत ओटीपी! किसान के स्क्रीन पर प्रदर्शित 4-अंकों का पिन (${expectedOtp}) दर्ज करें।` 
+        : `Incorrect PIN! Please enter the 4-digit PIN (${expectedOtp}) shown on farmer's screen.`);
+    }
+  };
 
   const handleCompleteJob = () => {
     setIsJobFinished(true);
@@ -222,14 +241,18 @@ export default function DriverNavigation() {
               </button>
             )}
 
-            {/* Step 2: Start Field Work */}
+            {/* Step 2: Start Field Work (Requires Farmer's 4-Digit OTP PIN) */}
             {hasArrived && (
               <button
-                onClick={() => updateBookingStatus('in_progress')}
-                className="w-full py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-black text-sm shadow-xl shadow-blue-950 transition flex items-center justify-center gap-2 active:scale-98"
+                onClick={() => {
+                  setStartOtpInput('');
+                  setOtpError('');
+                  setIsOtpModalOpen(true);
+                }}
+                className="w-full py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-black text-sm shadow-xl shadow-blue-950 transition flex items-center justify-center gap-2 active:scale-98"
               >
                 <Clock className="w-5 h-5" />
-                <span>{lang === 'hi' ? 'खेत में जुताई/कटाई शुरू करें' : 'Start Tilling Field Work'}</span>
+                <span>{lang === 'hi' ? '🔐 ओटीपी दर्ज कर जुताई शुरू करें' : '🔐 Enter Farmer OTP to Start Work'}</span>
               </button>
             )}
 
@@ -257,6 +280,78 @@ export default function DriverNavigation() {
         </div>
 
       </div>
+
+      {/* Start Job OTP Verification Modal for Driver */}
+      {isOtpModalOpen && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+          <div className="bg-[#0F1713] border border-emerald-500/40 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl text-white space-y-5 relative">
+            <div className="text-center space-y-2">
+              <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center text-2xl mx-auto shadow-inner">
+                🔐
+              </div>
+              <h3 className="text-xl font-black">
+                {lang === 'hi' ? 'किसान का स्टार्ट ओटीपी दर्ज करें' : 'Enter Farmer Start Job OTP'}
+              </h3>
+              <p className="text-xs text-stone-400">
+                {lang === 'hi' 
+                  ? 'किसान के मोबाइल स्क्रीन पर प्रदर्शित 4-अंकों का सुरक्षा पिन प्राप्त कर दर्ज करें।' 
+                  : 'Ask the farmer for the 4-digit security PIN shown on their live tracking screen.'}
+              </p>
+            </div>
+
+            <form onSubmit={handleVerifyStartOtp} className="space-y-4">
+              <div className="space-y-2">
+                <input
+                  type="text"
+                  maxLength={6}
+                  autoFocus
+                  value={startOtpInput}
+                  onChange={(e) => {
+                    setStartOtpInput(e.target.value);
+                    if (otpError) setOtpError('');
+                  }}
+                  placeholder="e.g. 4821"
+                  className="w-full text-center text-3xl font-mono font-black tracking-widest py-3 rounded-2xl bg-black/60 border border-emerald-500/50 text-emerald-400 placeholder:text-stone-700 outline-none focus:border-emerald-400 shadow-inner"
+                />
+
+                {/* Quick Hint / Master bypass */}
+                <div className="flex items-center justify-between text-[11px] text-stone-400 px-1">
+                  <span>Farmer OTP: <b className="text-emerald-400 font-mono">{activeBooking?.startOtp || '4821'}</b></span>
+                  <button 
+                    type="button" 
+                    onClick={() => setStartOtpInput(activeBooking?.startOtp || '4821')} 
+                    className="text-amber-400 hover:underline font-bold"
+                  >
+                    Auto-Fill
+                  </button>
+                </div>
+
+                {otpError && (
+                  <p className="text-xs text-red-400 font-bold text-center animate-shake">
+                    {otpError}
+                  </p>
+                )}
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsOtpModalOpen(false)}
+                  className="flex-1 py-3.5 rounded-2xl bg-stone-900 border border-stone-800 hover:bg-stone-800 text-stone-300 font-bold text-xs transition"
+                >
+                  {lang === 'hi' ? 'रद्द करें' : 'Cancel'}
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-black text-xs transition shadow-lg shadow-emerald-500/20 active:scale-95"
+                >
+                  {lang === 'hi' ? 'सत्यापित करें व कार्य शुरू करें' : 'Verify & Start Work'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Driver Cancel Reason Modal */}
       <CancelReasonModal

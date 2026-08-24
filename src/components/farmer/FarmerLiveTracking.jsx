@@ -498,6 +498,37 @@ export default function FarmerLiveTracking() {
                 </div>
               </div>
 
+              {/* Start Job Security OTP PIN (Shown prominently to farmer until completed) */}
+              {activeBooking.status !== 'completed' && (
+                <div className={`p-4 rounded-2xl border text-center space-y-2 relative overflow-hidden shadow-xl transition-all ${
+                  isDark 
+                    ? 'bg-gradient-to-r from-emerald-950/80 via-stone-950 to-emerald-950/80 border-emerald-500/50 shadow-emerald-950/50' 
+                    : 'bg-gradient-to-r from-emerald-50 via-white to-emerald-50 border-emerald-300 shadow-emerald-200/40'
+                }`}>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-emerald-500 flex items-center gap-1">
+                      <span>🔐</span>
+                      <span>{lang === 'hi' ? 'खेत कार्य प्रारंभ पिन (Start OTP)' : 'Start Job Security PIN'}</span>
+                    </span>
+                    <span className="text-[10px] font-bold text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/30 animate-pulse">
+                      {lang === 'hi' ? 'ड्राइवर को बताएं' : 'Share with Driver'}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-center gap-2 py-1">
+                    <div className="font-mono text-3xl sm:text-4xl font-black tracking-widest text-emerald-400 bg-black/40 px-6 py-1.5 rounded-2xl border border-emerald-500/40 shadow-inner">
+                      {activeBooking.startOtp || '4821'}
+                    </div>
+                  </div>
+
+                  <p className={`text-[11px] font-medium leading-tight ${isDark ? 'text-stone-300' : 'text-slate-600'}`}>
+                    {lang === 'hi' 
+                      ? 'ड्राइवर के आपके खेत पर पहुँचने के बाद ही यह 4-अंकों का पिन चालक को बताएं।' 
+                      : 'Share this 4-digit PIN with the operator upon farm arrival to authorize work start.'}
+                  </p>
+                </div>
+              )}
+
               {/* Machinery & Attachment Summary */}
               <div className={`rounded-2xl p-4 border space-y-2.5 text-xs ${
                 isDark ? 'bg-stone-950/80 border-stone-800' : 'bg-slate-50 border-slate-200'

@@ -11,6 +11,7 @@ import { DEFAULT_FARM_LOCATION } from '../../utils/geoUtils';
 import LiveMap from '../map/LiveMap';
 import SavedLandsModal from './SavedLandsModal';
 import PreBookingsModal from './PreBookingsModal';
+import FarmerBookingHistoryModal from './FarmerBookingHistoryModal';
 import confetti from 'canvas-confetti';
 import { 
   Tractor, 
@@ -54,7 +55,8 @@ import {
   Home,
   Building,
   Store,
-  Warehouse
+  Warehouse,
+  History
 } from 'lucide-react';
 
 // Specialized Farm Cargo Types for Transport
@@ -242,6 +244,7 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
 
   const [isSavedLandsModalOpen, setIsSavedLandsModalOpen] = useState(false);
   const [isPreBookingsModalOpen, setIsPreBookingsModalOpen] = useState(false);
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
 
   // Booking Timing Mode: 'instant' (Now) vs 'schedule' (Pre-Book for Date & Day)
   const [bookingTimingMode, setBookingTimingMode] = useState('instant');
@@ -594,7 +597,19 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
         </div>
 
         {/* Action Buttons */}
-        <div className="relative flex items-center gap-2.5">
+        <div className="relative flex flex-wrap items-center gap-2.5">
+          <button
+            onClick={() => setIsHistoryModalOpen(true)}
+            className={`px-4 py-2.5 rounded-xl border font-bold text-xs flex items-center gap-2 transition-all duration-200 active:scale-95 shadow-md ${
+              isDark 
+                ? 'bg-emerald-950/70 hover:bg-emerald-900/90 text-emerald-300 border-emerald-500/40 hover:border-emerald-500 shadow-emerald-950/30' 
+                : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-200'
+            }`}
+          >
+            <History className="w-3.5 h-3.5 text-emerald-400" />
+            <span>{lang === 'hi' ? 'बुकिंग इतिहास' : 'My History'}</span>
+          </button>
+
           <button
             onClick={() => setIsPreBookingsModalOpen(true)}
             className={`px-4 py-2.5 rounded-xl border font-bold text-xs flex items-center gap-2 transition-all duration-200 active:scale-95 shadow-md ${
@@ -1841,6 +1856,12 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
           </div>
         </div>
       )}
+
+      {/* Farmer Booking History Modal */}
+      <FarmerBookingHistoryModal
+        isOpen={isHistoryModalOpen}
+        onClose={() => setIsHistoryModalOpen(false)}
+      />
 
     </div>
   );
