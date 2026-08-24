@@ -257,17 +257,15 @@ export default function FarmerLiveTracking() {
             </div>
 
             {/* Live Leaflet Map Component */}
-            <div className="flex-1 min-h-[580px] w-full rounded-2xl overflow-hidden relative">
-              <LiveMap
-                farmerLocation={activeBooking.farmerLocation}
-                driverPos={driverCurrentPos}
-                routeWaypoints={isSearching ? [] : routeWaypoints}
-                activeVehicleType={activeBooking.machineryType}
-                showNearbyDrivers={isSearching}
-                bookingStatus={activeBooking.status}
-                className={`h-full w-full rounded-2xl overflow-hidden border ${isDark ? 'border-stone-800' : 'border-slate-200'}`}
-              />
-            </div>
+            <LiveMap
+              farmerLocation={activeBooking.farmerLocation}
+              driverPos={driverCurrentPos}
+              routeWaypoints={isSearching ? [] : routeWaypoints}
+              activeVehicleType={activeBooking.machineryType}
+              showNearbyDrivers={isSearching}
+              bookingStatus={activeBooking.status}
+              className={`h-[580px] min-h-[580px] w-full rounded-2xl overflow-hidden border ${isDark ? 'border-stone-800' : 'border-slate-200'}`}
+            />
           </div>
         </div>
 
