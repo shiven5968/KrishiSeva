@@ -60,7 +60,11 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="font-extrabold text-xl text-white tracking-tight">Krishi<span className="text-emerald-400">Seva</span></span>
-                <span className="text-[10px] px-2 py-0.5 rounded-md bg-stone-900 text-emerald-400 border border-stone-800 font-bold hidden sm:inline-block">कृषि सेवा</span>
+                {lang === 'hi' && (
+                  <span className="text-[10px] px-2 py-0.5 rounded-md bg-stone-900 text-emerald-400 border border-stone-800 font-bold hidden sm:inline-block">
+                    कृषि सेवा
+                  </span>
+                )}
               </div>
               <p className="text-[10px] text-stone-400 font-medium hidden md:block">
                 {lang === 'hi' ? 'ना बिचौलिया, ना इंतज़ार — मशीन सीधा खेत पर' : 'Not a Call, Just a Click — Precision Farm Machinery'}

@@ -103,7 +103,7 @@ const getUnitIcon = (unitId, isSelected) => {
 };
 
 export default function FarmerBookingView({ onOpenAuthModal }) {
-  const { lang, t } = useLanguage();
+  const { lang, t, localize } = useLanguage();
   const { currentUser } = useAuth();
   const { createBookingRequest, activeBooking } = useRealtimeSync();
   const { rates, calculateFare } = usePricing();
@@ -903,7 +903,7 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
                 <span>{lang === 'hi' ? 'खेत लोकेशन व रडार मैप' : 'Farm Location & Radar'}</span>
               </h3>
               <span className="text-xs text-stone-400 font-bold">
-                {selectedLand?.name || (lang === 'hi' ? 'मेरा खेत' : 'My Farm')}
+                {selectedLand ? localize(selectedLand.name) : (lang === 'hi' ? 'मेरा खेत' : 'My Farm')}
               </span>
             </div>
 
@@ -1010,7 +1010,9 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
                 </span>
                 <span>{lang === 'hi' ? 'सक्रिय नजदीकी फ्लीट' : 'Active Nearby Fleet'}</span>
               </span>
-              <span className="text-[10px] text-stone-400 font-bold">मलिहाबाद जोन • 5 km</span>
+              <span className="text-[10px] text-stone-400 font-bold">
+                {lang === 'hi' ? 'मलिहाबाद जोन • 5 km' : 'Malihabad Zone • 5 km'}
+              </span>
             </div>
 
             <div className="space-y-2">
@@ -1021,10 +1023,14 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
                   </div>
                   <div>
                     <span className="font-bold text-white block">Mahindra 575 DI (50 HP)</span>
-                    <span className="text-[10px] text-stone-500">जगजीत सिंह • 1.2 km दूर</span>
+                    <span className="text-[10px] text-stone-500">
+                      {lang === 'hi' ? 'जगजीत सिंह • 1.2 km दूर' : 'Jagjit Singh • 1.2 km away'}
+                    </span>
                   </div>
                 </div>
-                <span className="px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 text-[10px] font-extrabold border border-emerald-800/60">उपलब्ध ✓</span>
+                <span className="px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 text-[10px] font-extrabold border border-emerald-800/60">
+                  {lang === 'hi' ? 'उपलब्ध ✓' : 'Available ✓'}
+                </span>
               </div>
 
               <div className="p-3 rounded-2xl bg-stone-950/60 border border-stone-800/80 flex items-center justify-between text-xs hover:border-amber-700/50 transition">
@@ -1034,10 +1040,14 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
                   </div>
                   <div>
                     <span className="font-bold text-white block">Preet 987 Combine (110 HP)</span>
-                    <span className="text-[10px] text-stone-500">रामपाल शर्मा • 2.8 km दूर</span>
+                    <span className="text-[10px] text-stone-500">
+                      {lang === 'hi' ? 'रामपाल शर्मा • 2.8 km दूर' : 'Rampal Sharma • 2.8 km away'}
+                    </span>
                   </div>
                 </div>
-                <span className="px-2 py-0.5 rounded-full bg-amber-950 text-amber-300 text-[10px] font-extrabold border border-amber-800/60">उपलब्ध ✓</span>
+                <span className="px-2 py-0.5 rounded-full bg-amber-950 text-amber-300 text-[10px] font-extrabold border border-amber-800/60">
+                  {lang === 'hi' ? 'उपलब्ध ✓' : 'Available ✓'}
+                </span>
               </div>
             </div>
           </div>

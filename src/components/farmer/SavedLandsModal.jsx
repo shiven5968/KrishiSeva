@@ -310,7 +310,7 @@ function KhetBoundaryDrawer({ onBoundaryCalculated, initialLocation }) {
 }
 
 export default function SavedLandsModal({ isOpen, onClose }) {
-  const { lang } = useLanguage();
+  const { lang, localize } = useLanguage();
   const { savedLands, selectedLandId, setSelectedLandId, addLand, deleteLand } = useSavedLands();
 
   const [isAddingNew, setIsAddingNew] = useState(false);
@@ -857,7 +857,7 @@ export default function SavedLandsModal({ isOpen, onClose }) {
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <h4 className="font-extrabold text-sm text-stone-900 truncate">
-                          {land.name}
+                          {localize(land.name)}
                         </h4>
                         {isSelected && (
                           <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-600 text-white shrink-0">
@@ -877,12 +877,12 @@ export default function SavedLandsModal({ isOpen, onClose }) {
                         )}
                       </div>
                       <p className="text-[11px] text-stone-500 truncate mt-0.5">
-                        📍 {land.address}
+                        📍 {localize(land.address)}
                       </p>
                       <div className="mt-1 flex items-center gap-3 text-[11px] font-bold text-stone-700">
                         <span className="text-emerald-700 font-black">{land.bigha} {lang === 'hi' ? 'बीघा' : 'Bigha'}</span>
                         <span>•</span>
-                        <span>{land.cropType}</span>
+                        <span>{localize(land.cropType)}</span>
                         {land.areaHectare && (
                           <>
                             <span>•</span>
