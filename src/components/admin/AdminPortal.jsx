@@ -3,7 +3,13 @@ import { useLanguage } from '../../context/LanguageContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import { useRealtimeSync } from '../../context/RealtimeSyncContext';
-import { usePricing } from '../../context/PricingContext';
+import { 
+  usePricing, 
+  REGIONAL_AGRO_ZONES, 
+  SEASONAL_CROP_CYCLES, 
+  calculateDynamicRates,
+  BASELINE_REFERENCE_RATES
+} from '../../context/PricingContext';
 import { 
   ShieldCheck, 
   FileText, 
@@ -205,10 +211,21 @@ export default function AdminPortal() {
     approveApplication, 
     rejectApplication 
   } = useRealtimeSync();
-  const { rates, updateRates, resetToDefaultRates } = usePricing();
+  const { 
+    rates, 
+    updateRates, 
+    resetToDefaultRates, 
+    selectedZoneId, 
+    selectedSeasonId, 
+    applyRegionalAndSeasonalSurge 
+  } = usePricing();
 
-  const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' | 'kyc' | 'directory' | 'pricing' | 'settlements'
+  const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' | 'kyc' | 'directory' | 'pricing'
   const [inspectingApp, setInspectingApp] = useState(null);
+
+  // Regional & Seasonal State
+  const [activeZoneId, setActiveZoneId] = useState(selectedZoneId || 'up_purvanchal');
+  const [activeSeasonId, setActiveSeasonId] = useState(selectedSeasonId || 'normal_cycle');
 
   // Rejection Reason Modal State
   const [rejectingApp, setRejectingApp] = useState(null);
@@ -226,7 +243,30 @@ export default function AdminPortal() {
 
   const [saveSuccessBanner, setSaveSuccessBanner] = useState(false);
   const [fleetSearch, setFleetSearch] = useState('');
-  const [dispatchFilter, setDispatchFilter] = useState('all');
+
+  const handleSelectZone = (zoneId) => {
+    setActiveZoneId(zoneId);
+    const computed = calculateDynamicRates(zoneId, activeSeasonId);
+    setEditableRates({
+      tractorBigha: computed.tractor.ratePerBigha,
+      harvesterBigha: computed.harvester.ratePerBigha,
+      jcbHour: computed.jcb.ratePerHour,
+      truckBase: computed.truck.baseLoadingCharge,
+      truckKm: computed.truck.ratePerKm
+    });
+  };
+
+  const handleSelectSeason = (seasonId) => {
+    setActiveSeasonId(seasonId);
+    const computed = calculateDynamicRates(activeZoneId, seasonId);
+    setEditableRates({
+      tractorBigha: computed.tractor.ratePerBigha,
+      harvesterBigha: computed.harvester.ratePerBigha,
+      jcbHour: computed.jcb.ratePerHour,
+      truckBase: computed.truck.baseLoadingCharge,
+      truckKm: computed.truck.ratePerKm
+    });
+  };
 
   const handleApprove = (app) => {
     approveApplication(app.id, { driverPhone: app.phone, driverName: app.driverName });
@@ -253,6 +293,7 @@ export default function AdminPortal() {
 
   const handleSaveRates = (e) => {
     e.preventDefault();
+    applyRegionalAndSeasonalSurge(activeZoneId, activeSeasonId);
     updateRates({
       tractor: { ...rates.tractor, ratePerBigha: Number(editableRates.tractorBigha) },
       harvester: { ...rates.harvester, ratePerBigha: Number(editableRates.harvesterBigha) },
@@ -269,12 +310,15 @@ export default function AdminPortal() {
 
   const handleResetRates = () => {
     resetToDefaultRates();
+    setActiveZoneId('up_purvanchal');
+    setActiveSeasonId('normal_cycle');
+    const defaultRates = calculateDynamicRates('up_purvanchal', 'normal_cycle');
     setEditableRates({
-      tractorBigha: 1300,
-      harvesterBigha: 1500,
-      jcbHour: 1000,
-      truckBase: 500,
-      truckKm: 50
+      tractorBigha: defaultRates.tractor.ratePerBigha,
+      harvesterBigha: defaultRates.harvester.ratePerBigha,
+      jcbHour: defaultRates.jcb.ratePerHour,
+      truckBase: defaultRates.truck.baseLoadingCharge,
+      truckKm: defaultRates.truck.ratePerKm
     });
     setSaveSuccessBanner(true);
     setTimeout(() => setSaveSuccessBanner(false), 3000);
@@ -993,182 +1037,343 @@ export default function AdminPortal() {
         )}
 
         {/* ═════════════════════════════════════════════ */}
-        {/* TAB 4: DYNAMIC BASE PRICING CONTROLLER        */}
+        {/* TAB 4: DYNAMIC REGIONAL & SEASONAL PRICING    */}
         {/* ═════════════════════════════════════════════ */}
         {activeTab === 'pricing' && (
-          <div className={`p-6 sm:p-8 rounded-3xl border shadow-xl space-y-6 animate-fade-in ${
-            isDark ? 'bg-stone-900/90 border-stone-800' : 'bg-white border-slate-200'
-          }`}>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-stone-800/40 pb-5">
-              <div>
-                <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-emerald-950/80 text-emerald-400 border border-emerald-800/60 text-xs font-black uppercase">
-                  <Sliders className="w-3.5 h-3.5" />
-                  <span>Dynamic Platform Pricing Engine</span>
+          <div className="space-y-6 animate-fade-in">
+            
+            {/* Header Box */}
+            <div className={`p-6 sm:p-8 rounded-3xl border shadow-xl ${
+              isDark ? 'bg-stone-900/90 border-stone-800' : 'bg-white border-slate-200'
+            }`}>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-stone-800/40 pb-5">
+                <div>
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/80 text-emerald-400 border border-emerald-800/60 text-xs font-black uppercase tracking-wider">
+                    <Sliders className="w-3.5 h-3.5" />
+                    <span>Regional Agro-Boom & Seasonal Pricing Engine</span>
+                  </div>
+                  <h2 className={`text-2xl font-black mt-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    {lang === 'hi' ? 'क्षेत्रीय कृषि बूम व मौसमी मांग आधारित दर प्रबंधन' : 'Regional Agro-Boom & Seasonal Demand Rates Management'}
+                  </h2>
+                  <p className={`text-xs sm:text-sm mt-1 ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+                    {lang === 'hi' 
+                      ? 'यूपी पूर्वांचल आधार दर (₹1,300/बीघा) के अनुसार विभिन्न राज्यों के कृषि बूम व कटाई/बुवाई पीक सीजन के आधार पर डायनामिक दरें तय करें।' 
+                      : 'Anchor pricing based on UP Purvanchal (₹1,300/bigha base), scaling dynamically for high-intensity cash-crop boom belts (Maharashtra, Granary) & harvest season surges.'}
+                  </p>
                 </div>
-                <h3 className={`text-2xl font-black mt-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  {lang === 'hi' ? 'कृषि मशीनरी बेस रेट प्रबंधन' : 'Agricultural Machinery Base Rates Management'}
-                </h3>
-                <p className={`text-xs sm:text-sm ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
-                  {lang === 'hi' ? 'यहाँ दरें बदलने पर ऐप में सभी जगह किसानों को नए दाम तुरंत दिखने लगेंगे।' : 'Changes made here will instantly update dynamic pricing calculations across all active farmer booking sessions.'}
-                </p>
+
+                <button
+                  type="button"
+                  onClick={handleResetRates}
+                  className={`px-4 py-2.5 rounded-2xl border font-bold text-xs flex items-center gap-1.5 transition shrink-0 ${
+                    isDark 
+                      ? 'border-stone-700 text-stone-300 hover:bg-stone-800' 
+                      : 'border-slate-300 text-slate-700 hover:bg-slate-100'
+                  }`}
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>Reset to UP Baseline</span>
+                </button>
               </div>
 
-              <button
-                type="button"
-                onClick={handleResetRates}
-                className={`px-4 py-2 rounded-2xl border font-bold text-xs flex items-center gap-1.5 transition ${
-                  isDark 
-                    ? 'border-stone-700 text-stone-300 hover:bg-stone-800' 
-                    : 'border-slate-300 text-slate-700 hover:bg-slate-100'
-                }`}
-              >
-                <RotateCcw className="w-3.5 h-3.5" />
-                <span>Reset to Defaults</span>
-              </button>
+              {/* ══════════════ 1. REGIONAL AGRO-BOOM SELECTOR ══════════════ */}
+              <div className="mt-6 space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className={`text-xs font-black uppercase tracking-wider flex items-center gap-2 ${
+                    isDark ? 'text-emerald-400' : 'text-emerald-700'
+                  }`}>
+                    <Globe className="w-4 h-4" />
+                    <span>1. Select State / Agricultural Zone (राज्य व कृषि बूम क्षेत्र)</span>
+                  </label>
+                  <span className="text-[11px] font-bold text-stone-400">
+                    Active: <span className="text-emerald-400 font-black">{REGIONAL_AGRO_ZONES.find(z => z.id === activeZoneId)?.nameEn}</span>
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                  {REGIONAL_AGRO_ZONES.map(zone => {
+                    const isSelected = activeZoneId === zone.id;
+                    return (
+                      <div
+                        key={zone.id}
+                        onClick={() => handleSelectZone(zone.id)}
+                        className={`p-4 rounded-2xl border cursor-pointer transition-all duration-200 text-left relative overflow-hidden ${
+                          isSelected
+                            ? 'border-emerald-500 bg-emerald-950/40 shadow-lg shadow-emerald-500/15 ring-2 ring-emerald-500/30'
+                            : isDark
+                            ? 'border-stone-800 bg-stone-950 hover:border-stone-700 hover:bg-stone-900/60'
+                            : 'border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-2 mb-1.5">
+                          <span className={`font-black text-xs ${
+                            isSelected ? 'text-emerald-400' : isDark ? 'text-white' : 'text-slate-900'
+                          }`}>
+                            {zone.nameEn}
+                          </span>
+                          <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider shrink-0 ${
+                            zone.multiplier > 1.1
+                              ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
+                              : zone.multiplier < 1.0
+                              ? 'bg-blue-500/20 text-blue-400 border border-blue-500/40'
+                              : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+                          }`}>
+                            {zone.tag}
+                          </span>
+                        </div>
+
+                        <p className={`text-[11px] leading-snug line-clamp-2 ${
+                          isDark ? 'text-stone-400' : 'text-slate-600'
+                        }`}>
+                          {zone.description}
+                        </p>
+
+                        <div className="mt-2.5 pt-2 border-t border-stone-800/40 flex items-center justify-between text-[10px] font-mono">
+                          <span className="text-stone-400">Multiplier:</span>
+                          <span className="font-black text-emerald-400 font-bold">{zone.multiplier}x</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* ══════════════ 2. SEASONAL CROP CYCLE & SURGE SELECTOR ══════════════ */}
+              <div className="mt-8 space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className={`text-xs font-black uppercase tracking-wider flex items-center gap-2 ${
+                    isDark ? 'text-amber-400' : 'text-amber-700'
+                  }`}>
+                    <Zap className="w-4 h-4" />
+                    <span>2. Seasonal Crop Cycle & Demand Surge (फसल चक्र व पीक सीजन मांग)</span>
+                  </label>
+                  <span className="text-[11px] font-bold text-stone-400">
+                    Active Season: <span className="text-amber-400 font-black">{SEASONAL_CROP_CYCLES.find(s => s.id === activeSeasonId)?.nameEn}</span>
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                  {SEASONAL_CROP_CYCLES.map(season => {
+                    const isSelected = activeSeasonId === season.id;
+                    return (
+                      <div
+                        key={season.id}
+                        onClick={() => handleSelectSeason(season.id)}
+                        className={`p-4 rounded-2xl border cursor-pointer transition-all duration-200 text-left relative overflow-hidden ${
+                          isSelected
+                            ? 'border-amber-500 bg-amber-950/40 shadow-lg shadow-amber-500/15 ring-2 ring-amber-500/30'
+                            : isDark
+                            ? 'border-stone-800 bg-stone-950 hover:border-stone-700 hover:bg-stone-900/60'
+                            : 'border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-2 mb-1">
+                          <span className={`font-black text-xs ${
+                            isSelected ? 'text-amber-400' : isDark ? 'text-white' : 'text-slate-900'
+                          }`}>
+                            {season.nameEn}
+                          </span>
+                          <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider shrink-0 ${
+                            season.surgeMultiplier > 1.05
+                              ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
+                              : season.surgeMultiplier < 1.0
+                              ? 'bg-blue-500/20 text-blue-400 border border-blue-500/40'
+                              : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+                          }`}>
+                            {season.surgeMultiplier}x Surge
+                          </span>
+                        </div>
+
+                        <p className={`text-[11px] font-bold text-stone-300 mt-1`}>
+                          🌾 {season.activeCrops}
+                        </p>
+                        <p className={`text-[10px] mt-0.5 ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+                          {season.demandFocus}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* ══════════════ 3. DYNAMIC FORMULA BREAKDOWN BANNER ══════════════ */}
+              {(() => {
+                const currentZone = REGIONAL_AGRO_ZONES.find(z => z.id === activeZoneId) || REGIONAL_AGRO_ZONES[0];
+                const currentSeason = SEASONAL_CROP_CYCLES.find(s => s.id === activeSeasonId) || SEASONAL_CROP_CYCLES[0];
+                const totalMultiplier = (currentZone.multiplier * currentSeason.surgeMultiplier).toFixed(2);
+
+                return (
+                  <div className={`mt-6 p-4 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs ${
+                    isDark ? 'bg-stone-950 border-emerald-500/30 text-stone-200' : 'bg-emerald-50 border-emerald-200 text-slate-800'
+                  }`}>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded bg-emerald-500 text-stone-950 font-black text-[10px] uppercase">
+                          Dynamic Rate Matrix
+                        </span>
+                        <span className="font-mono font-bold text-emerald-400">
+                          {currentZone.nameEn} • {currentSeason.nameEn}
+                        </span>
+                      </div>
+                      <p className="font-mono text-[11px] text-stone-300">
+                        Formula: ₹1,300 (UP Purvanchal Base) × {currentZone.multiplier}x (Agro Boom) × {currentSeason.surgeMultiplier}x (Season Surge) = <span className="text-emerald-400 font-black">₹{editableRates.tractorBigha} / Bigha (Combined Multiplier: {totalMultiplier}x)</span>
+                      </p>
+                    </div>
+
+                    <div className="text-right shrink-0">
+                      <span className="text-[10px] uppercase text-stone-400 block font-bold">Total Effective Factor</span>
+                      <span className="text-xl font-black text-emerald-400 font-mono">{totalMultiplier}x</span>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* ══════════════ 4. EDITABLE RATE FIELDS & SAVE CTA ══════════════ */}
+              <form onSubmit={handleSaveRates} className="mt-6 space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  
+                  {/* Tractor Rate */}
+                  <div className="p-5 rounded-3xl border-2 border-emerald-500/40 bg-emerald-950/20 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl">🚜</span>
+                      <div>
+                        <h4 className={`font-black text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>Tractor + Implements</h4>
+                        <span className="text-[10px] text-emerald-400 font-bold">Dynamic Area Rate (Bigha)</span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className={`block text-[11px] font-bold uppercase mb-1.5 ${isDark ? 'text-stone-300' : 'text-slate-600'}`}>
+                        Rate per Bigha (₹)
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-black text-emerald-500">₹</span>
+                        <input
+                          type="number"
+                          required
+                          value={editableRates.tractorBigha}
+                          onChange={(e) => setEditableRates({ ...editableRates, tractorBigha: e.target.value })}
+                          className={`w-full pl-8 pr-3 py-3 rounded-2xl border font-black text-lg outline-none focus:border-emerald-500 ${
+                            isDark ? 'border-stone-700 bg-stone-950 text-white' : 'border-slate-300 bg-white text-slate-900'
+                          }`}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Harvester Rate */}
+                  <div className="p-5 rounded-3xl border-2 border-amber-500/40 bg-amber-950/20 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl">🌾</span>
+                      <div>
+                        <h4 className={`font-black text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>Combine Harvester</h4>
+                        <span className="text-[10px] text-amber-400 font-bold">Dynamic Area Rate (Bigha)</span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className={`block text-[11px] font-bold uppercase mb-1.5 ${isDark ? 'text-stone-300' : 'text-slate-600'}`}>
+                        Rate per Bigha (₹)
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-black text-amber-500">₹</span>
+                        <input
+                          type="number"
+                          required
+                          value={editableRates.harvesterBigha}
+                          onChange={(e) => setEditableRates({ ...editableRates, harvesterBigha: e.target.value })}
+                          className={`w-full pl-8 pr-3 py-3 rounded-2xl border font-black text-lg outline-none focus:border-amber-500 ${
+                            isDark ? 'border-stone-700 bg-stone-950 text-white' : 'border-slate-300 bg-white text-slate-900'
+                          }`}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* JCB Rate */}
+                  <div className="p-5 rounded-3xl border-2 border-blue-500/40 bg-blue-950/20 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl">🏗️</span>
+                      <div>
+                        <h4 className={`font-black text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>JCB / Earthmovers</h4>
+                        <span className="text-[10px] text-blue-400 font-bold">Dynamic Hourly Rate (Hours)</span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className={`block text-[11px] font-bold uppercase mb-1.5 ${isDark ? 'text-stone-300' : 'text-slate-600'}`}>
+                        Rate per Hour (₹)
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-black text-blue-500">₹</span>
+                        <input
+                          type="number"
+                          required
+                          value={editableRates.jcbHour}
+                          onChange={(e) => setEditableRates({ ...editableRates, jcbHour: e.target.value })}
+                          className={`w-full pl-8 pr-3 py-3 rounded-2xl border font-black text-lg outline-none focus:border-blue-500 ${
+                            isDark ? 'border-stone-700 bg-stone-950 text-white' : 'border-slate-300 bg-white text-slate-900'
+                          }`}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Truck Rate */}
+                  <div className="p-5 rounded-3xl border-2 border-purple-500/40 bg-purple-950/20 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl">🚚</span>
+                      <div>
+                        <h4 className={`font-black text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>Trucks & Trolleys</h4>
+                        <span className="text-[10px] text-purple-400 font-bold">Base + Distance (Km)</span>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className={`block text-[10px] font-bold uppercase mb-1 ${isDark ? 'text-stone-300' : 'text-slate-600'}`}>
+                          Base (₹)
+                        </label>
+                        <input
+                          type="number"
+                          required
+                          value={editableRates.truckBase}
+                          onChange={(e) => setEditableRates({ ...editableRates, truckBase: e.target.value })}
+                          className={`w-full px-3 py-2.5 rounded-xl border font-black text-sm outline-none ${
+                            isDark ? 'border-stone-700 bg-stone-950 text-white' : 'border-slate-300 bg-white text-slate-900'
+                          }`}
+                        />
+                      </div>
+                      <div>
+                        <label className={`block text-[10px] font-bold uppercase mb-1 ${isDark ? 'text-stone-300' : 'text-slate-600'}`}>
+                          Per Km (₹)
+                        </label>
+                        <input
+                          type="number"
+                          required
+                          value={editableRates.truckKm}
+                          onChange={(e) => setEditableRates({ ...editableRates, truckKm: e.target.value })}
+                          className={`w-full px-3 py-2.5 rounded-xl border font-black text-sm outline-none ${
+                            isDark ? 'border-stone-700 bg-stone-950 text-white' : 'border-slate-300 bg-white text-slate-900'
+                          }`}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-stone-950 font-black text-base shadow-xl shadow-emerald-500/25 flex items-center justify-center gap-2 transition active:scale-98"
+                >
+                  <Save className="w-5 h-5 text-stone-950" />
+                  <span>{lang === 'hi' ? 'क्षेत्रीय व मौसमी दरें सुरक्षित करें (Save & Deploy Live Rates)' : 'Save & Deploy Regional & Seasonal Rates Across KrishiSeva Platform'}</span>
+                </button>
+              </form>
+
             </div>
 
-            <form onSubmit={handleSaveRates} className="space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                
-                {/* Tractor Rate */}
-                <div className="p-5 rounded-3xl border-2 border-emerald-500/40 bg-emerald-950/20 space-y-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">🚜</span>
-                    <div>
-                      <h4 className={`font-black text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>Tractor + Implements</h4>
-                      <span className="text-[10px] text-emerald-400 font-bold">Pricing by Area (Bigha)</span>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className={`block text-[11px] font-bold uppercase mb-1.5 ${isDark ? 'text-stone-300' : 'text-slate-600'}`}>
-                      Rate per Bigha (₹)
-                    </label>
-                    <div className="relative">
-                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-black text-emerald-500">₹</span>
-                      <input
-                        type="number"
-                        required
-                        value={editableRates.tractorBigha}
-                        onChange={(e) => setEditableRates({ ...editableRates, tractorBigha: e.target.value })}
-                        className={`w-full pl-8 pr-3 py-3 rounded-2xl border font-black text-lg outline-none focus:border-emerald-500 ${
-                          isDark ? 'border-stone-700 bg-stone-950 text-white' : 'border-slate-300 bg-white text-slate-900'
-                        }`}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Harvester Rate */}
-                <div className="p-5 rounded-3xl border-2 border-amber-500/40 bg-amber-950/20 space-y-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">🌾</span>
-                    <div>
-                      <h4 className={`font-black text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>Combine Harvester</h4>
-                      <span className="text-[10px] text-amber-400 font-bold">Pricing by Area (Bigha)</span>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className={`block text-[11px] font-bold uppercase mb-1.5 ${isDark ? 'text-stone-300' : 'text-slate-600'}`}>
-                      Rate per Bigha (₹)
-                    </label>
-                    <div className="relative">
-                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-black text-amber-500">₹</span>
-                      <input
-                        type="number"
-                        required
-                        value={editableRates.harvesterBigha}
-                        onChange={(e) => setEditableRates({ ...editableRates, harvesterBigha: e.target.value })}
-                        className={`w-full pl-8 pr-3 py-3 rounded-2xl border font-black text-lg outline-none focus:border-amber-500 ${
-                          isDark ? 'border-stone-700 bg-stone-950 text-white' : 'border-slate-300 bg-white text-slate-900'
-                        }`}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* JCB Rate */}
-                <div className="p-5 rounded-3xl border-2 border-blue-500/40 bg-blue-950/20 space-y-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">🏗️</span>
-                    <div>
-                      <h4 className={`font-black text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>JCB / Earthmovers</h4>
-                      <span className="text-[10px] text-blue-400 font-bold">Pricing by Time (Hours)</span>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className={`block text-[11px] font-bold uppercase mb-1.5 ${isDark ? 'text-stone-300' : 'text-slate-600'}`}>
-                      Rate per Hour (₹)
-                    </label>
-                    <div className="relative">
-                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-black text-blue-500">₹</span>
-                      <input
-                        type="number"
-                        required
-                        value={editableRates.jcbHour}
-                        onChange={(e) => setEditableRates({ ...editableRates, jcbHour: e.target.value })}
-                        className={`w-full pl-8 pr-3 py-3 rounded-2xl border font-black text-lg outline-none focus:border-blue-500 ${
-                          isDark ? 'border-stone-700 bg-stone-950 text-white' : 'border-slate-300 bg-white text-slate-900'
-                        }`}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Truck Rate */}
-                <div className="p-5 rounded-3xl border-2 border-purple-500/40 bg-purple-950/20 space-y-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">🚚</span>
-                    <div>
-                      <h4 className={`font-black text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>Trucks & Trolleys</h4>
-                      <span className="text-[10px] text-purple-400 font-bold">Base + Distance (Km)</span>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label className={`block text-[10px] font-bold uppercase mb-1 ${isDark ? 'text-stone-300' : 'text-slate-600'}`}>
-                        Base (₹)
-                      </label>
-                      <input
-                        type="number"
-                        required
-                        value={editableRates.truckBase}
-                        onChange={(e) => setEditableRates({ ...editableRates, truckBase: e.target.value })}
-                        className={`w-full px-3 py-2.5 rounded-xl border font-black text-sm outline-none ${
-                          isDark ? 'border-stone-700 bg-stone-950 text-white' : 'border-slate-300 bg-white text-slate-900'
-                        }`}
-                      />
-                    </div>
-                    <div>
-                      <label className={`block text-[10px] font-bold uppercase mb-1 ${isDark ? 'text-stone-300' : 'text-slate-600'}`}>
-                        Per Km (₹)
-                      </label>
-                      <input
-                        type="number"
-                        required
-                        value={editableRates.truckKm}
-                        onChange={(e) => setEditableRates({ ...editableRates, truckKm: e.target.value })}
-                        className={`w-full px-3 py-2.5 rounded-xl border font-black text-sm outline-none ${
-                          isDark ? 'border-stone-700 bg-stone-950 text-white' : 'border-slate-300 bg-white text-slate-900'
-                        }`}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-
-              <button
-                type="submit"
-                className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-stone-950 font-black text-base shadow-xl shadow-emerald-500/25 flex items-center justify-center gap-2 transition active:scale-98"
-              >
-                <Save className="w-5 h-5 text-stone-950" />
-                <span>{lang === 'hi' ? 'नई दरें सुरक्षित करें (Save & Deploy Live Rates)' : 'Save & Deploy Live Rates'}</span>
-              </button>
-            </form>
           </div>
         )}
 
