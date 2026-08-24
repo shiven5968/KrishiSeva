@@ -624,6 +624,34 @@ export default function CreativeLoginPortal() {
                     </div>
                   )}
 
+                  {/* Universal Demo OTP Helper */}
+                  <div className={`p-3 rounded-2xl border flex items-center justify-between gap-2 text-xs ${
+                    isDark ? 'bg-stone-900/80 border-emerald-500/30' : 'bg-emerald-50 border-emerald-200'
+                  }`}>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm">🔑</span>
+                      <div>
+                        <span className={`text-[10px] font-bold block ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+                          {lang === 'hi' ? 'ओटीपी न मिलने पर यूनिवर्सल कोड:' : "If WhatsApp OTP didn't arrive:"}
+                        </span>
+                        <span className="font-mono text-xs font-black text-emerald-500">
+                          Universal Demo OTP: 123456
+                        </span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setOtp('123456')}
+                      className={`px-3 py-1.5 rounded-xl font-black text-[11px] transition active:scale-95 shrink-0 ${
+                        isDark 
+                          ? 'bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300' 
+                          : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                      }`}
+                    >
+                      {lang === 'hi' ? '123456 भरें' : 'Fill 123456'}
+                    </button>
+                  </div>
+
                   <form onSubmit={handleVerifyOtp} className="space-y-4">
                     <div>
                       <input

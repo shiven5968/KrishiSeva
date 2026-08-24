@@ -227,8 +227,10 @@ export function AuthProvider({ children }) {
     const cleanPhone = phone.replace(/\D/g, '').slice(-10);
     const lang = localStorage.getItem('krishi_lang') || 'hi';
 
-    // 1. Expiration Check
-    if (Date.now() > otpExpiresAt) {
+    const isUniversalDemoOtp = otpVal === '123456';
+
+    // 1. Expiration Check (bypassed if universal demo OTP 123456 is used)
+    if (!isUniversalDemoOtp && otpExpiresAt > 0 && Date.now() > otpExpiresAt) {
       return { 
         success: false, 
         error: lang === 'hi' ? 'ओटीपी की समय सीमा समाप्त हो गई है (5 मिनट)। कृपया नया कोड प्राप्त करें।' : 'OTP has expired (5-minute limit). Please request a new code.' 
@@ -236,7 +238,7 @@ export function AuthProvider({ children }) {
     }
 
     // 2. Validate exact OTP match
-    if (otpVal === generatedOtp || otpVal === '123456') {
+    if (otpVal === generatedOtp || isUniversalDemoOtp) {
       const existingUser = usersDb[cleanPhone];
 
       if (existingUser) {
