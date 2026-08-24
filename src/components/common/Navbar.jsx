@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
+import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import { useRealtimeSync } from '../../context/RealtimeSyncContext';
 import { useSavedLands } from '../../context/SavedLandsContext';
@@ -10,11 +11,14 @@ import {
   ShieldCheck, 
   LogOut,
   LogIn,
-  Bookmark
+  Bookmark,
+  Sun,
+  Moon
 } from 'lucide-react';
 
 export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
   const { lang, toggleLanguage } = useLanguage();
+  const { theme, toggleTheme, isDark } = useTheme();
   const { activeRole, setActiveRole, currentUser, driverProfile, logout } = useAuth();
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
@@ -45,7 +49,9 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-stone-950/95 backdrop-blur-md border-b border-stone-800 shadow-md text-stone-100">
+      <header className={`sticky top-0 z-50 backdrop-blur-md border-b shadow-md transition-colors duration-200 ${
+        isDark ? 'bg-[#0B0F12]/95 border-stone-800 text-stone-100' : 'bg-white/95 border-slate-200 text-slate-900'
+      }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
           
           {/* Brand Logo - Returns to logged-in dashboard */}
@@ -59,14 +65,18 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="font-extrabold text-xl text-white tracking-tight">Krishi<span className="text-emerald-400">Seva</span></span>
+                <span className={`font-extrabold text-xl tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                  Krishi<span className="text-emerald-500">Seva</span>
+                </span>
                 {lang === 'hi' && (
-                  <span className="text-[10px] px-2 py-0.5 rounded-md bg-stone-900 text-emerald-400 border border-stone-800 font-bold hidden sm:inline-block">
+                  <span className={`text-[10px] px-2 py-0.5 rounded-md font-bold hidden sm:inline-block ${
+                    isDark ? 'bg-stone-900 text-emerald-400 border border-stone-800' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                  }`}>
                     कृषि सेवा
                   </span>
                 )}
               </div>
-              <p className="text-[10px] text-stone-400 font-medium hidden md:block">
+              <p className={`text-[10px] font-medium hidden md:block ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
                 {lang === 'hi' ? 'ना बिचौलिया, ना इंतज़ार — मशीन सीधा खेत पर' : 'Not a Call, Just a Click — Precision Farm Machinery'}
               </p>
             </div>
@@ -79,9 +89,13 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
             <div className="hidden sm:flex items-center gap-2">
               <button
                 onClick={() => onOpenSavedLandsModal && onOpenSavedLandsModal()}
-                className="px-3.5 py-1.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-stone-200 border border-stone-800 font-bold text-xs flex items-center gap-1.5 transition shadow-sm"
+                className={`px-3.5 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition shadow-sm ${
+                  isDark 
+                    ? 'bg-stone-900 hover:bg-stone-800 text-stone-200 border border-stone-800' 
+                    : 'bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200'
+                }`}
               >
-                <Bookmark className="w-3.5 h-3.5 text-emerald-400" />
+                <Bookmark className="w-3.5 h-3.5 text-emerald-500" />
                 <span>{lang === 'hi' ? 'सहेजे गए खेत' : 'My Saved Lands'}</span>
               </button>
             </div>
@@ -90,9 +104,11 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
           {/* 2. DRIVER VIEW */}
           {currentUser && currentUser.role === 'driver' && (
             <div className="hidden sm:flex items-center gap-2">
-              <div className="px-3 py-1 rounded-xl bg-stone-900 border border-stone-800 flex items-center gap-2">
-                <span className={`w-2 h-2 rounded-full ${driverProfile.status === 'online' ? 'bg-emerald-500 animate-pulse' : 'bg-stone-500'}`} />
-                <span className="text-xs font-bold text-stone-300">
+              <div className={`px-3 py-1 rounded-xl border flex items-center gap-2 ${
+                isDark ? 'bg-stone-900 border-stone-800' : 'bg-slate-100 border-slate-200'
+              }`}>
+                <span className={`w-2 h-2 rounded-full ${driverProfile.status === 'online' ? 'bg-emerald-500 animate-pulse' : 'bg-stone-400'}`} />
+                <span className={`text-xs font-bold ${isDark ? 'text-stone-300' : 'text-slate-700'}`}>
                   {driverProfile.status === 'online' ? (lang === 'hi' ? 'ड्यूटी पर (Online)' : 'On Duty (Online)') : (lang === 'hi' ? 'ड्यूटी बंद (Offline)' : 'Off Duty (Offline)')}
                 </span>
               </div>
@@ -112,29 +128,64 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
           {/* Right Utility Buttons */}
           <div className="flex items-center gap-2">
             
+            {/* Theme Toggle Button (Dark 🌙 / Light ☀️) */}
+            <button
+              onClick={toggleTheme}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold shadow-sm transition active:scale-95 ${
+                isDark 
+                  ? 'border-stone-800 bg-stone-900 hover:bg-stone-800 text-amber-400 hover:border-amber-500/40' 
+                  : 'border-slate-200 bg-slate-100 hover:bg-slate-200 text-slate-800 hover:border-slate-300'
+              }`}
+              title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            >
+              {isDark ? (
+                <>
+                  <Sun className="w-3.5 h-3.5 text-amber-400" />
+                  <span className="hidden sm:inline">Light</span>
+                </>
+              ) : (
+                <>
+                  <Moon className="w-3.5 h-3.5 text-indigo-600" />
+                  <span className="hidden sm:inline">Dark</span>
+                </>
+              )}
+            </button>
+
             {/* Language Toggle */}
             <button
               onClick={toggleLanguage}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-stone-800 bg-stone-900 hover:bg-stone-800 text-stone-200 text-xs font-bold shadow-sm transition active:scale-95 hover:border-emerald-500/40"
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold shadow-sm transition active:scale-95 ${
+                isDark 
+                  ? 'border-stone-800 bg-stone-900 hover:bg-stone-800 text-stone-200 hover:border-emerald-500/40' 
+                  : 'border-slate-200 bg-slate-100 hover:bg-slate-200 text-slate-800 hover:border-slate-300'
+              }`}
             >
-              <Globe className="w-3.5 h-3.5 text-emerald-400" />
+              <Globe className="w-3.5 h-3.5 text-emerald-500" />
               <span>{lang === 'hi' ? 'English' : 'हिंदी'}</span>
             </button>
 
             {/* User Profile & Explicit Logout */}
             {currentUser && currentUser.isAuthenticated ? (
               <div className="flex items-center gap-2">
-                <div className="px-3 py-1.5 bg-stone-900 rounded-xl border border-stone-700 text-xs font-black text-stone-200 flex items-center gap-1.5">
+                <div className={`px-3 py-1.5 rounded-xl border text-xs font-black flex items-center gap-1.5 ${
+                  isDark ? 'bg-stone-900 border-stone-700 text-stone-200' : 'bg-slate-100 border-slate-200 text-slate-900'
+                }`}>
                   <span>{currentUser.role === 'farmer' ? '🌾' : currentUser.role === 'driver' ? '🚜' : '🛡️'}</span>
                   <span className="max-w-[120px] truncate">{currentUser.name?.split(' ')[0] || currentUser.name || 'User'}</span>
-                  <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-stone-800 text-stone-400 uppercase">
+                  <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded uppercase ${
+                    isDark ? 'bg-stone-800 text-stone-400' : 'bg-slate-200 text-slate-600'
+                  }`}>
                     {currentUser.role}
                   </span>
                 </div>
 
                 <button
                   onClick={() => setIsLogoutModalOpen(true)}
-                  className="px-3 py-1.5 rounded-xl bg-stone-900 hover:bg-red-950 text-stone-300 hover:text-red-400 border border-stone-700 hover:border-red-700 font-bold text-xs flex items-center gap-1.5 transition active:scale-95"
+                  className={`px-3 py-1.5 rounded-xl border font-bold text-xs flex items-center gap-1.5 transition active:scale-95 ${
+                    isDark 
+                      ? 'bg-stone-900 hover:bg-red-950 text-stone-300 hover:text-red-400 border-stone-700 hover:border-red-700' 
+                      : 'bg-slate-100 hover:bg-red-50 text-slate-700 hover:text-red-600 border-slate-200 hover:border-red-200'
+                  }`}
                   title="Log out of this session"
                 >
                   <LogOut className="w-3.5 h-3.5" />
@@ -162,7 +213,6 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
         onClose={() => setIsLogoutModalOpen(false)}
         onConfirmLogout={handleConfirmLogout}
         userName={currentUser?.name}
-        userRole={currentUser?.role}
       />
     </>
   );

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { ThemeProvider, useTheme } from './context/ThemeContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { PricingProvider } from './context/PricingContext';
@@ -20,6 +21,7 @@ import AdminLoginGate from './components/admin/AdminLoginGate';
 function MainContent() {
   const { activeRole, setActiveRole, driverProfile, currentUser } = useAuth();
   const { activeBooking } = useRealtimeSync();
+  const { isDark } = useTheme();
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isSavedLandsModalOpen, setIsSavedLandsModalOpen] = useState(false);
@@ -65,7 +67,7 @@ function MainContent() {
   if (activeRole === 'admin' || currentUser?.role === 'admin') {
     if (currentUser?.role === 'admin') {
       return (
-        <div className="min-h-screen flex flex-col bg-stone-900 text-stone-100">
+        <div className={`min-h-screen flex flex-col transition-colors duration-200 ${isDark ? 'bg-[#090D0B] text-stone-100' : 'bg-slate-50 text-slate-900'}`}>
           <Navbar 
             onOpenAuthModal={() => setIsAuthModalOpen(true)}
             onOpenSavedLandsModal={() => setIsSavedLandsModalOpen(true)}
@@ -88,7 +90,7 @@ function MainContent() {
   const hasActiveBooking = activeBooking && ['searching', 'accepted', 'arrived', 'in_progress'].includes(activeBooking.status);
 
   return (
-    <div className="min-h-screen flex flex-col bg-stone-900 text-stone-100">
+    <div className={`min-h-screen flex flex-col transition-colors duration-200 ${isDark ? 'bg-[#090D0B] text-stone-100' : 'bg-slate-50 text-slate-900'}`}>
       
       {/* Strict Role-Locked Navbar */}
       <Navbar 
@@ -139,18 +141,20 @@ function MainContent() {
 
 export default function App() {
   return (
-    <LanguageProvider>
-      <AuthProvider>
-        <PricingProvider>
-          <SavedLandsProvider>
-            <PreBookingsProvider>
-              <RealtimeSyncProvider>
-                <MainContent />
-              </RealtimeSyncProvider>
-            </PreBookingsProvider>
-          </SavedLandsProvider>
-        </PricingProvider>
-      </AuthProvider>
-    </LanguageProvider>
+    <ThemeProvider>
+      <LanguageProvider>
+        <AuthProvider>
+          <PricingProvider>
+            <SavedLandsProvider>
+              <PreBookingsProvider>
+                <RealtimeSyncProvider>
+                  <MainContent />
+                </RealtimeSyncProvider>
+              </PreBookingsProvider>
+            </SavedLandsProvider>
+          </PricingProvider>
+        </AuthProvider>
+      </LanguageProvider>
+    </ThemeProvider>
   );
 }
