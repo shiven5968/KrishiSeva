@@ -61,6 +61,13 @@ export default function FarmerLiveTracking() {
     }
   }, [activeBooking?.id]);
 
+  // Auto-open rating modal whenever driver marks job completed
+  useEffect(() => {
+    if (activeBooking?.status === 'completed') {
+      setIsRatingModalOpen(true);
+    }
+  }, [activeBooking?.status]);
+
   useEffect(() => {
     let interval = null;
     if (activeBooking && activeBooking.status === 'searching') {
@@ -552,15 +559,25 @@ export default function FarmerLiveTracking() {
                 )}
 
                 {activeBooking.status === 'completed' && (
-                  <button
-                    onClick={() => cancelBooking('Trip Finished', 'farmer')}
-                    className={`w-full py-4 rounded-2xl font-black text-sm flex items-center justify-center gap-2 transition shadow-xl ${
-                      isDark ? 'bg-stone-800 hover:bg-stone-700 text-white' : 'bg-slate-900 hover:bg-slate-800 text-white'
-                    }`}
-                  >
-                    <Sparkles className="w-4 h-4 text-amber-400" />
-                    <span>{lang === 'hi' ? 'नई बुकिंग करें' : 'Book Another Machine'}</span>
-                  </button>
+                  <div className="space-y-2.5">
+                    <button
+                      onClick={() => setIsRatingModalOpen(true)}
+                      className="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-stone-950 font-black text-sm shadow-xl shadow-amber-500/20 flex items-center justify-center gap-2 transition active:scale-98"
+                    >
+                      <Star className="w-4 h-4 fill-stone-950" />
+                      <span>{lang === 'hi' ? '⭐ चालक को 5 स्टार में से रेटिंग दें' : '⭐ Rate Driver Out of 5 Stars'}</span>
+                    </button>
+
+                    <button
+                      onClick={() => cancelBooking('Trip Finished', 'farmer')}
+                      className={`w-full py-3.5 rounded-2xl font-black text-xs flex items-center justify-center gap-2 transition shadow-lg ${
+                        isDark ? 'bg-stone-800 hover:bg-stone-700 text-white' : 'bg-slate-900 hover:bg-slate-800 text-white'
+                      }`}
+                    >
+                      <Sparkles className="w-4 h-4 text-amber-400" />
+                      <span>{lang === 'hi' ? 'नई बुकिंग करें' : 'Book Another Machine'}</span>
+                    </button>
+                  </div>
                 )}
               </div>
 

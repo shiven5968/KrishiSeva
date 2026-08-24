@@ -168,8 +168,17 @@ export default function FarmerRatingModal({
             </div>
 
             {/* Interactive 5-Star Rating Selector */}
-            <div className="text-center space-y-2.5">
-              <div className="flex items-center justify-center gap-2">
+            <div className={`text-center space-y-3 p-4 rounded-2xl border ${
+              isDark ? 'bg-stone-950/60 border-stone-800' : 'bg-slate-50 border-slate-200'
+            }`}>
+              
+              {/* Score Pill Display */}
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-950/70 border border-amber-500/40 text-amber-300 text-xs font-black">
+                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                <span>{hoverRating || rating}.0 / 5.0 {lang === 'hi' ? 'स्टार' : 'Stars'}</span>
+              </div>
+
+              <div className="flex items-center justify-center gap-2 sm:gap-3">
                 {[1, 2, 3, 4, 5].map((star) => {
                   const active = (hoverRating || rating) >= star;
                   return (
@@ -179,23 +188,28 @@ export default function FarmerRatingModal({
                       onClick={() => setRating(star)}
                       onMouseEnter={() => setHoverRating(star)}
                       onMouseLeave={() => setHoverRating(0)}
-                      className="p-1 transition-transform hover:scale-125 active:scale-95 focus:outline-none"
+                      className="p-1.5 transition-all duration-200 hover:scale-125 active:scale-95 focus:outline-none flex flex-col items-center gap-1"
                     >
                       <Star 
-                        className={`w-9 h-9 sm:w-10 sm:h-10 transition-colors duration-150 ${
+                        className={`w-9 h-9 sm:w-10 sm:h-10 transition-all duration-150 ${
                           active 
-                            ? 'fill-amber-400 text-amber-400 drop-shadow-[0_0_12px_rgba(251,191,36,0.5)]' 
-                            : isDark ? 'text-stone-700' : 'text-slate-300'
+                            ? 'fill-amber-400 text-amber-400 drop-shadow-[0_0_15px_rgba(251,191,36,0.6)] scale-110' 
+                            : isDark ? 'text-stone-700 hover:text-stone-500' : 'text-slate-300 hover:text-slate-400'
                         }`} 
                       />
+                      <span className={`text-[10px] font-black ${
+                        active ? 'text-amber-400' : isDark ? 'text-stone-600' : 'text-slate-400'
+                      }`}>
+                        {star}★
+                      </span>
                     </button>
                   );
                 })}
               </div>
 
               {/* Dynamic Rating Feedback Text */}
-              <div className="h-6">
-                <span className="text-xs font-black text-amber-400 tracking-wide animate-fade-in">
+              <div className="h-6 flex items-center justify-center">
+                <span className="text-xs font-black text-amber-400 tracking-wide animate-fade-in bg-amber-500/10 px-3 py-0.5 rounded-lg border border-amber-500/20">
                   {getRatingLabel(hoverRating || rating)}
                 </span>
               </div>
