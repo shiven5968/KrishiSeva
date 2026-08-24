@@ -23,7 +23,11 @@ import {
   Check,
   Building2,
   FileCheck2,
-  AlertCircle
+  AlertCircle,
+  IndianRupee,
+  Zap,
+  ShieldAlert,
+  Award
 } from 'lucide-react';
 
 export default function CreativeLoginPortal() {
@@ -46,6 +50,9 @@ export default function CreativeLoginPortal() {
   const [toastMessage, setToastMessage] = useState('');
   const [activeOtpCode, setActiveOtpCode] = useState('');
   const [waDeliveryDelayed, setWaDeliveryDelayed] = useState(false);
+
+  // Active Role Selector in Login Card ('farmer' | 'driver')
+  const [loginRoleTab, setLoginRoleTab] = useState('farmer');
 
   // Profile Setup States
   const [userName, setUserName] = useState('');
@@ -164,6 +171,7 @@ export default function CreativeLoginPortal() {
 
     if (result.success) {
       if (result.isNewUser) {
+        setSelectedRole(loginRoleTab);
         setStep('profile_setup');
       } else {
         if (result.role === 'farmer') {
@@ -271,7 +279,7 @@ export default function CreativeLoginPortal() {
   };
 
   return (
-    <div className="min-h-screen bg-stone-950 text-stone-100 flex flex-col justify-between selection:bg-amber-500 selection:text-stone-950 font-sans relative overflow-x-hidden">
+    <div className="min-h-screen bg-[#0A0F0D] text-stone-100 flex flex-col justify-between selection:bg-[#D4AF37] selection:text-stone-950 font-sans relative overflow-x-hidden">
       
       {/* ───── Cinematic Hero Background Video (Wheat Field Barley) ───── */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
@@ -281,139 +289,223 @@ export default function CreativeLoginPortal() {
           loop
           playsInline
           preload="auto"
-          className="absolute inset-0 w-full h-full object-cover scale-105 transition-opacity duration-1000 opacity-75"
+          className="absolute inset-0 w-full h-full object-cover scale-105 transition-opacity duration-1000 opacity-70"
           poster="https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=1920&q=80"
         >
           <source src="/videos/hero-wheat-field.mp4" type="video/mp4" />
         </video>
-        {/* Warm golden-toned cinematic overlay for crisp text readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-stone-950/80 via-stone-950/50 to-stone-950/90" />
-        {/* Warm Golden Harvest Amber Glow on top */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(245,158,11,0.18),transparent)]" />
-        {/* Subtle grid pattern overlay */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(to_right,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:64px_64px]" />
+        
+        {/* Rich Forest Emerald + Dark Obsidian Vignette Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#051C14]/90 via-[#0A0F0D]/65 to-[#0A0F0D]/95" />
+        
+        {/* Luxury Gold & Emerald Ambient Glow */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-15%,rgba(212,175,55,0.18),transparent)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_10%_40%,rgba(16,185,129,0.12),transparent)]" />
+        
+        {/* Subtle geometric grid pattern */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(212,175,55,0.02)_1px,transparent_1px),linear-gradient(to_right,rgba(212,175,55,0.02)_1px,transparent_1px)] bg-[size:64px_64px]" />
       </div>
 
-      {/* ═══════════ TOP HEADER ═══════════ */}
-      <header className="relative z-20 flex items-center justify-between px-6 sm:px-10 py-5 max-w-7xl mx-auto w-full">
-        
-        {/* Brand Logo */}
-        <div className="flex items-center gap-3 group">
-          <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-400 via-amber-500 to-yellow-600 flex items-center justify-center text-stone-950 font-black shadow-lg shadow-amber-500/25 group-hover:shadow-amber-500/40 group-hover:scale-105 transition-all duration-300">
-            <Tractor className="w-6 h-6 text-stone-950" />
-          </div>
-          <div>
-            <div className="flex items-center gap-1.5">
-              <span className="font-extrabold text-2xl text-white tracking-tight">Krishi<span className="text-amber-400">Seva</span></span>
-              {lang === 'hi' && (
-                <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-amber-950/80 text-amber-300 border border-amber-600/50 font-bold hidden sm:inline-block backdrop-blur-sm">कृषि सेवा</span>
-              )}
-            </div>
-            <p className="text-[11px] text-stone-400 font-medium hidden md:block">
-              {lang === 'hi' ? 'ना बिचौलिया, ना इंतज़ार — मशीन सीधा खेत पर' : 'Not a Call, Just a Click — Machinery to your Farm'}
-            </p>
-          </div>
-        </div>
-
-        {/* Right Top Header Navigation */}
-        <div className="flex items-center gap-2.5">
-          <a
-            href="#admin"
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-stone-800/80 bg-stone-900/60 hover:bg-stone-800/80 text-stone-300 hover:text-white text-xs font-bold transition-all duration-200 backdrop-blur-md hover:border-amber-500/40"
-            title="Admin Portal Access"
-          >
-            <Lock className="w-3.5 h-3.5 text-amber-400" />
-            <span>{lang === 'hi' ? 'प्रशासक' : 'Admin'}</span>
-          </a>
-
-          <button
-            onClick={toggleLanguage}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-stone-750 bg-stone-900/60 hover:bg-stone-800/80 text-stone-300 hover:text-white text-xs font-bold shadow-sm transition-all duration-200 active:scale-95 backdrop-blur-md hover:border-amber-500/40"
-          >
-            <Globe className="w-3.5 h-3.5 text-amber-400" />
-            <span>{lang === 'hi' ? 'English' : 'हिंदी'}</span>
-          </button>
-        </div>
-
-      </header>
-
-      {/* ═══════════ MAIN CONTENT ═══════════ */}
-      <main className="relative z-10 flex-1 flex items-center max-w-6xl mx-auto w-full px-4 sm:px-6 py-6 sm:py-8">
-        
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center w-full">
+      {/* ═══════════ FLOATING TOP NAVIGATION BAR ═══════════ */}
+      <div className="relative z-20 px-4 sm:px-8 pt-4 sm:pt-6 max-w-7xl mx-auto w-full">
+        <header className="flex items-center justify-between px-5 sm:px-8 py-3.5 rounded-2xl bg-[#0A0F0D]/60 backdrop-blur-xl border border-[#D4AF37]/20 shadow-2xl shadow-black/60">
           
-          {/* ──── LEFT COLUMN: Hero & Fleet Overview ──── */}
-          <div className="lg:col-span-6 space-y-6 text-center lg:text-left">
+          {/* Glowing KrishiSeva Brand Emblem */}
+          <div className="flex items-center gap-3.5 group cursor-pointer">
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#D4AF37] via-amber-500 to-[#10B981] p-[1.5px] shadow-lg shadow-amber-500/20 group-hover:shadow-amber-500/40 group-hover:scale-105 transition-all duration-300">
+              <div className="w-full h-full bg-[#051C14] rounded-2xl flex items-center justify-center">
+                <Tractor className="w-6 h-6 text-[#D4AF37]" />
+              </div>
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-black text-2xl text-white tracking-tight">
+                  Krishi<span className="text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] to-amber-300">Seva</span>
+                </span>
+                {lang === 'hi' && (
+                  <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-[#051C14] text-[#D4AF37] border border-[#D4AF37]/40 font-black hidden sm:inline-block">
+                    कृषि सेवा
+                  </span>
+                )}
+              </div>
+              <p className="text-[11px] text-stone-400 font-medium hidden md:block tracking-wide">
+                {lang === 'hi' ? 'ना बिचौलिया, ना इंतज़ार — मशीन सीधा खेत पर' : 'Not a Call, Just a Click — Precision Farm Machinery'}
+              </p>
+            </div>
+          </div>
+
+          {/* Right Navigation Controls */}
+          <div className="flex items-center gap-3">
             
-            {/* Live Badge */}
-            <div className="animate-fade-in-up inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-950/70 border border-amber-500/40 text-amber-300 text-xs font-black shadow-lg backdrop-blur-md hover:border-amber-500/60 transition-all duration-300 cursor-default">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500" />
+            {/* Admin Portal Quick Link */}
+            <a
+              href="#admin"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-[#D4AF37]/35 hover:border-[#D4AF37] bg-[#051C14]/70 hover:bg-[#051C14] text-[#D4AF37] hover:text-amber-200 text-xs font-black transition-all duration-200 shadow-sm hover:shadow-amber-500/20 active:scale-95"
+              title="Admin Portal Access"
+            >
+              <Lock className="w-3.5 h-3.5 text-[#D4AF37]" />
+              <span>{lang === 'hi' ? 'प्रशासक पोर्टल' : 'Admin Portal'}</span>
+            </a>
+
+            {/* Interactive Language Toggle Pill */}
+            <button
+              onClick={toggleLanguage}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-stone-700/80 bg-stone-900/70 hover:bg-stone-800/80 text-stone-200 hover:text-white text-xs font-black shadow-sm transition-all duration-200 active:scale-95 hover:border-[#D4AF37]/40"
+            >
+              <Globe className="w-3.5 h-3.5 text-[#10B981]" />
+              <span>{lang === 'hi' ? 'English' : 'हिंदी'}</span>
+            </button>
+
+          </div>
+
+        </header>
+      </div>
+
+      {/* ═══════════ HERO & AUTH SECTION ═══════════ */}
+      <main className="relative z-10 flex-1 flex items-center max-w-7xl mx-auto w-full px-4 sm:px-8 py-8 sm:py-12">
+        
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center w-full">
+          
+          {/* ──── LEFT COLUMN: Ultra-Premium Hero & Trust Grid ──── */}
+          <div className="lg:col-span-7 space-y-7 text-center lg:text-left">
+            
+            {/* Floating Live Status Pill */}
+            <div className="animate-fade-in inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#051C14]/85 border border-[#10B981]/40 text-emerald-300 text-xs font-black shadow-xl shadow-black/40 backdrop-blur-md hover:border-[#10B981]/70 transition-all duration-300 cursor-default">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#10B981] opacity-75" />
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#10B981]" />
               </span>
-              <span>{lang === 'hi' ? '🌾 भारत का #1 कृषि मशीनरी नेटवर्क' : "🌾 India's #1 Farm Fleet Network"}</span>
+              <span>
+                {lang === 'hi' 
+                  ? '⚡ 500+ फ्लीट सक्रिय • मलिहाबाद व संपूर्ण उ.प्र.' 
+                  : '⚡ 500+ Fleets Operational across Malihabad & UP'}
+              </span>
             </div>
 
-            {/* Hero Headline */}
-            <h1 className="animate-fade-in-up stagger-2 text-4xl sm:text-5xl lg:text-[3.5rem] font-black text-white tracking-tight leading-[1.1]">
+            {/* Commanding Hero Headline */}
+            <h1 className="text-4xl sm:text-5xl lg:text-[4rem] font-black text-white tracking-tight leading-[1.08]">
               {lang === 'hi' ? (
                 <>
                   खेत आपका, <br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-yellow-500 animate-gradient-shift bg-300%">
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] via-amber-300 to-[#F59E0B]">
                     मशीन हमारी।
                   </span>
                 </>
               ) : (
                 <>
                   Your Field, <br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-yellow-500 animate-gradient-shift bg-300%">
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] via-amber-300 to-[#F59E0B]">
                     Our Power.
                   </span>
                 </>
               )}
             </h1>
 
-            {/* Subtitle */}
-            <p className="animate-fade-in-up stagger-3 text-stone-300 text-sm sm:text-base leading-relaxed max-w-lg mx-auto lg:mx-0 font-medium">
+            {/* Sub-headline */}
+            <p className="text-stone-300 text-sm sm:text-base lg:text-lg leading-relaxed max-w-xl mx-auto lg:mx-0 font-medium">
               {lang === 'hi'
-                ? 'ट्रैक्टर, कंबाइन हार्वेस्टर व जेसीबी की 1-क्लिक ऑन-डिमांड बुकिंग। सत्यापित ऑपरेटर और पारदर्शी दर सीधे खेत की सीमा तक।'
-                : 'On-demand tractors, harvesters, and earthmovers dispatched directly to your farm boundary with transparent fixed rates.'}
+                ? 'ट्रैक्टर, कंबाइन हार्वेस्टर व जेसीबी का भारत का अग्रणी प्रिसिजन नेटवर्क। एग्रीस्टैक UPFR सत्यापन के साथ पारदर्शी दरें सीधे खेत की सीमा तक।'
+                : "India's premier high-precision fleet network for tractors, harvesters, and JCBs. Transparent flat pricing with AgriStack UPFR verification."}
             </p>
 
-            {/* Feature Pills */}
-            <div className="animate-fade-in-up stagger-4 flex flex-wrap gap-2 justify-center lg:justify-start max-w-lg mx-auto lg:mx-0">
-              {[
-                { icon: <ShieldCheck className="w-3 h-3 text-amber-400" />, text: lang === 'hi' ? '100% KYC फ्लीट' : '100% KYC Fleet', color: 'text-amber-300 bg-amber-950/60 border-amber-600/50' },
-                { icon: <LandPlot className="w-3 h-3 text-blue-400" />, text: 'AgriStack UPFR', color: 'text-blue-300 bg-blue-950/60 border-blue-600/50' },
-                { icon: <MessageSquare className="w-3 h-3 text-amber-400" />, text: 'UltraMsg WhatsApp OTP', color: 'text-amber-300 bg-amber-950/60 border-amber-600/50' },
-              ].map((f, i) => (
-                <span key={i} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold border ${f.color} backdrop-blur-sm shadow-sm`}>
-                  {f.icon}
-                  <span>{f.text}</span>
-                </span>
-              ))}
+            {/* ──── Trust Metrics Grid (3 Stat Cards) ──── */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 max-w-xl mx-auto lg:mx-0 pt-1">
+              
+              {/* Stat 1: 15 Min Guarantee */}
+              <div className="p-4 rounded-2xl bg-[#0A0F0D]/60 backdrop-blur-xl border border-[#D4AF37]/20 shadow-lg hover:border-[#D4AF37]/40 transition-all duration-300 text-left">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <div className="w-7 h-7 rounded-xl bg-amber-950/80 border border-amber-500/40 flex items-center justify-center text-amber-400">
+                    <Clock className="w-4 h-4" />
+                  </div>
+                  <span className="text-base font-black text-white tracking-tight">15 Min</span>
+                </div>
+                <p className="text-[11px] text-stone-400 font-bold leading-tight">
+                  {lang === 'hi' ? 'खेत पर डिस्पैच गारंटी' : 'Dispatch Guarantee'}
+                </p>
+              </div>
+
+              {/* Stat 2: Flat Rate */}
+              <div className="p-4 rounded-2xl bg-[#0A0F0D]/60 backdrop-blur-xl border border-[#10B981]/25 shadow-lg hover:border-[#10B981]/50 transition-all duration-300 text-left">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <div className="w-7 h-7 rounded-xl bg-emerald-950/80 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+                    <IndianRupee className="w-4 h-4" />
+                  </div>
+                  <span className="text-base font-black text-white tracking-tight">₹1,300<span className="text-xs text-stone-400 font-normal">/Bigha</span></span>
+                </div>
+                <p className="text-[11px] text-stone-400 font-bold leading-tight">
+                  {lang === 'hi' ? 'पारदर्शी निश्चित दर' : 'Flat Rate Pricing'}
+                </p>
+              </div>
+
+              {/* Stat 3: 100% KYC */}
+              <div className="p-4 rounded-2xl bg-[#0A0F0D]/60 backdrop-blur-xl border border-[#D4AF37]/20 shadow-lg hover:border-[#D4AF37]/40 transition-all duration-300 text-left">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <div className="w-7 h-7 rounded-xl bg-amber-950/80 border border-amber-500/40 flex items-center justify-center text-amber-400">
+                    <ShieldCheck className="w-4 h-4" />
+                  </div>
+                  <span className="text-base font-black text-white tracking-tight">100% KYC</span>
+                </div>
+                <p className="text-[11px] text-stone-400 font-bold leading-tight">
+                  {lang === 'hi' ? 'सत्यापित फ्लीट ऑपरेटर' : 'Verified Fleet Network'}
+                </p>
+              </div>
+
             </div>
+
           </div>
 
-          {/* ──── RIGHT COLUMN: Auth Card ──── */}
-          <div className="lg:col-span-6 flex justify-center lg:justify-end animate-fade-in-up stagger-3">
-            <div className="relative bg-stone-900/85 backdrop-blur-2xl rounded-3xl p-7 sm:p-8 border border-stone-800/90 shadow-2xl shadow-black/50 space-y-6 max-w-md w-full group/card">
+          {/* ──── RIGHT COLUMN: Glassmorphism Login Container ──── */}
+          <div className="lg:col-span-5 flex justify-center lg:justify-end animate-fade-in">
+            <div className="relative bg-[#0A0F0D]/80 backdrop-blur-2xl rounded-3xl p-7 sm:p-8 border border-[#D4AF37]/25 shadow-2xl shadow-black/80 space-y-6 max-w-md w-full group/card ring-1 ring-white/5">
               
-              {/* Glow border effect on hover */}
-              <div className="absolute -inset-[1px] rounded-3xl bg-gradient-to-b from-amber-500/25 via-transparent to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 pointer-events-none" />
+              {/* Ambient Gold Glow behind card */}
+              <div className="absolute -inset-1 rounded-3xl bg-gradient-to-br from-[#D4AF37]/15 via-transparent to-[#10B981]/10 opacity-60 blur-xl pointer-events-none" />
               
-              <div className="relative space-y-6">
+              <div className="relative space-y-5">
 
               {/* STEP 1: Phone Number Input */}
               {step === 'phone' && (
                 <div className="space-y-5">
-                  <div className="space-y-1.5">
-                    <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-tight">
-                      {lang === 'hi' ? 'कृषि सेवा में प्रवेश करें' : 'Get Started with KrishiSeva'}
-                    </h2>
-                    <p className="text-stone-400 text-xs sm:text-sm font-medium leading-relaxed">
-                      {lang === 'hi' ? 'व्हाट्सएप सत्यापन हेतु अपना 10-अंकीय मोबाइल नंबर दर्ज करें' : 'Enter your 10-digit mobile number for WhatsApp verification'}
-                    </p>
+                  
+                  {/* Card Header & Role Selector Tab */}
+                  <div className="space-y-3">
+                    <div className="space-y-1">
+                      <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                        {lang === 'hi' ? 'कृषि सेवा में प्रवेश करें' : 'Get Started with KrishiSeva'}
+                      </h2>
+                      <p className="text-stone-400 text-xs font-medium">
+                        {lang === 'hi' ? 'व्हाट्सएप सत्यापन हेतु अपना मोबाइल नंबर दर्ज करें' : 'Enter your 10-digit mobile number for WhatsApp verification'}
+                      </p>
+                    </div>
+
+                    {/* Role Selector Tab: Farmer vs Fleet Partner */}
+                    <div className="grid grid-cols-2 p-1 rounded-2xl bg-[#051C14]/80 border border-stone-800">
+                      <button
+                        type="button"
+                        onClick={() => setLoginRoleTab('farmer')}
+                        className={`py-2 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 ${
+                          loginRoleTab === 'farmer'
+                            ? 'bg-gradient-to-r from-[#D4AF37] to-amber-500 text-stone-950 shadow-md'
+                            : 'text-stone-400 hover:text-white'
+                        }`}
+                      >
+                        <Tractor className="w-3.5 h-3.5" />
+                        <span>{lang === 'hi' ? 'किसान (Farmer)' : 'Farmer'}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setLoginRoleTab('driver')}
+                        className={`py-2 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 ${
+                          loginRoleTab === 'driver'
+                            ? 'bg-gradient-to-r from-[#D4AF37] to-amber-500 text-stone-950 shadow-md'
+                            : 'text-stone-400 hover:text-white'
+                        }`}
+                      >
+                        <Truck className="w-3.5 h-3.5" />
+                        <span>{lang === 'hi' ? 'फ्लीट पार्टनर' : 'Fleet Partner'}</span>
+                      </button>
+                    </div>
                   </div>
 
                   {error && (
@@ -429,7 +521,7 @@ export default function CreativeLoginPortal() {
                         {lang === 'hi' ? 'मोबाइल नंबर दर्ज करें' : 'Enter Mobile Number'}
                       </label>
                       <div className="relative group">
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-amber-400/90 font-black text-sm flex items-center gap-1.5 pointer-events-none">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#D4AF37] font-black text-sm flex items-center gap-1.5 pointer-events-none">
                           <span>🇮🇳</span>
                           <span>+91</span>
                         </span>
@@ -439,7 +531,7 @@ export default function CreativeLoginPortal() {
                           value={phone}
                           onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
                           placeholder="9236581609"
-                          className="w-full pl-20 pr-4 py-4 rounded-2xl border border-stone-700/80 bg-stone-950/85 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 font-black text-white text-base outline-none transition-all duration-200 hover:border-stone-600 shadow-inner"
+                          className="w-full pl-20 pr-4 py-4 rounded-2xl border border-stone-700/80 bg-[#051C14]/80 focus:border-[#D4AF37] focus:ring-2 focus:ring-amber-500/25 font-black text-white text-base outline-none transition-all duration-200 hover:border-stone-600 shadow-inner"
                           required
                           autoFocus
                         />
@@ -449,7 +541,7 @@ export default function CreativeLoginPortal() {
                     <button
                       type="submit"
                       disabled={isSendingOtp}
-                      className="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-500 hover:from-amber-300 hover:to-amber-400 text-stone-950 font-black text-base shadow-xl shadow-amber-500/20 hover:shadow-amber-500/30 transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98] hover:translate-y-[-1px] disabled:opacity-75"
+                      className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#D4AF37] via-amber-400 to-[#F59E0B] hover:from-amber-300 hover:to-yellow-400 text-stone-950 font-black text-base shadow-xl shadow-amber-500/25 hover:shadow-amber-500/40 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-75"
                     >
                       {isSendingOtp ? (
                         <>
@@ -466,20 +558,20 @@ export default function CreativeLoginPortal() {
                     </button>
                   </form>
 
-                  {/* Security assurance */}
+                  {/* Security Micro-Text & Badges */}
                   <div className="flex items-center justify-center gap-2 text-[10px] text-stone-400 pt-1">
-                    <Lock className="w-3 h-3 text-amber-400" />
-                    <span>{lang === 'hi' ? 'सुरक्षित व्हाट्सएप प्रमाणीकरण • 5 मिनट वैधता' : 'Secure WhatsApp OTP • 5-min Validity'}</span>
+                    <Lock className="w-3 h-3 text-[#D4AF37]" />
+                    <span>{lang === 'hi' ? '256-बिट एन्क्रिप्टेड • फास्ट-ट्रैक सत्यापन • 5 मिनट वैधता' : '256-Bit Encrypted • Fast-Track Verification • 5-min Validity'}</span>
                   </div>
                 </div>
               )}
 
               {/* STEP 2: 6-Digit WhatsApp OTP Verification Screen */}
               {step === 'otp' && (
-                <div className="space-y-5 animate-fade-in-up">
+                <div className="space-y-5 animate-fade-in">
                   <div className="text-center space-y-1.5">
-                    <div className="w-14 h-14 mx-auto rounded-2xl bg-amber-950/80 border border-amber-600/50 flex items-center justify-center mb-3 shadow-inner">
-                      <MessageSquare className="w-7 h-7 text-amber-400" />
+                    <div className="w-14 h-14 mx-auto rounded-2xl bg-[#051C14] border border-[#D4AF37]/50 flex items-center justify-center mb-3 shadow-inner">
+                      <MessageSquare className="w-7 h-7 text-[#D4AF37]" />
                     </div>
                     <h3 className="text-2xl font-black text-white tracking-tight">
                       {lang === 'hi' ? '6-अंकीय ओटीपी दर्ज करें' : 'Enter 6-Digit OTP'}
@@ -490,8 +582,8 @@ export default function CreativeLoginPortal() {
                   </div>
 
                   {toastMessage && (
-                    <div className="p-3.5 rounded-2xl bg-amber-950/90 border border-amber-500/60 text-amber-300 text-xs font-bold text-center flex items-center justify-center gap-2 animate-fade-in shadow-lg shadow-amber-950/50">
-                      <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+                    <div className="p-3.5 rounded-2xl bg-amber-950/90 border border-[#D4AF37]/60 text-amber-300 text-xs font-bold text-center flex items-center justify-center gap-2 animate-fade-in shadow-lg">
+                      <CheckCircle2 className="w-4 h-4 text-[#D4AF37] shrink-0" />
                       <span>{toastMessage}</span>
                     </div>
                   )}
@@ -505,14 +597,14 @@ export default function CreativeLoginPortal() {
 
                   {/* WhatsApp Delayed Fallback Notice */}
                   {waDeliveryDelayed && (
-                    <div className="p-3.5 rounded-2xl bg-amber-950/70 border border-amber-600/60 text-amber-200 text-xs flex items-center justify-between gap-2 shadow-lg animate-fade-in">
+                    <div className="p-3.5 rounded-2xl bg-[#051C14] border border-[#D4AF37]/50 text-amber-200 text-xs flex items-center justify-between gap-2 shadow-lg animate-fade-in">
                       <div className="flex items-center gap-2">
                         <span className="text-base">⚡</span>
                         <div>
                           <span className="text-[10px] text-stone-400 uppercase tracking-wider block font-bold">
-                            {lang === 'hi' ? 'व्हाट्सएप विलंब • फॉलबैक सुरक्षा कोड:' : 'WhatsApp Delayed • Fallback Code:'}
+                            {lang === 'hi' ? 'व्हाट्सएप विलंब • फॉलबैक कोड:' : 'WhatsApp Delayed • Fallback Code:'}
                           </span>
-                          <span className="font-mono text-base font-black text-amber-400 tracking-wider">
+                          <span className="font-mono text-base font-black text-[#D4AF37] tracking-wider">
                             {activeOtpCode}
                           </span>
                         </div>
@@ -520,7 +612,7 @@ export default function CreativeLoginPortal() {
                       <button
                         type="button"
                         onClick={() => setOtp(activeOtpCode)}
-                        className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-black text-[11px] transition-all shadow-md active:scale-95"
+                        className="px-3 py-1.5 rounded-xl bg-[#D4AF37] hover:bg-amber-400 text-stone-950 font-black text-[11px] transition-all shadow-md active:scale-95"
                       >
                         {lang === 'hi' ? 'ओटीपी भरें ✓' : 'Auto Fill ✓'}
                       </button>
@@ -535,7 +627,7 @@ export default function CreativeLoginPortal() {
                         value={otp}
                         onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
                         placeholder="••••••"
-                        className="w-full py-4 text-center tracking-[0.6em] rounded-2xl border border-stone-700/80 bg-stone-950/85 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 font-black text-amber-400 text-3xl outline-none transition-all duration-200 shadow-inner"
+                        className="w-full py-4 text-center tracking-[0.6em] rounded-2xl border border-stone-700/80 bg-[#051C14]/80 focus:border-[#D4AF37] focus:ring-2 focus:ring-amber-500/25 font-black text-[#D4AF37] text-3xl outline-none transition-all duration-200 shadow-inner"
                         required
                         autoFocus
                       />
@@ -545,7 +637,7 @@ export default function CreativeLoginPortal() {
                     <div className="flex items-center justify-between text-xs px-1">
                       <span className="text-stone-400">
                         {resendTimer > 0 ? (
-                          lang === 'hi' ? <span><b className="text-amber-400 tabular-nums">{resendTimer}s</b> में पुनः भेजें</span> : <span>Resend in <b className="text-amber-400 tabular-nums">{resendTimer}s</b></span>
+                          lang === 'hi' ? <span><b className="text-[#D4AF37] tabular-nums">{resendTimer}s</b> में पुनः भेजें</span> : <span>Resend in <b className="text-[#D4AF37] tabular-nums">{resendTimer}s</b></span>
                         ) : (
                           <span>{lang === 'hi' ? 'ओटीपी नहीं मिला?' : "Didn't get code?"}</span>
                         )}
@@ -558,7 +650,7 @@ export default function CreativeLoginPortal() {
                         className={`font-black transition-all duration-200 ${
                           resendTimer > 0 || isSendingOtp
                             ? 'text-stone-600 cursor-not-allowed' 
-                            : 'text-amber-400 hover:text-amber-300 underline underline-offset-2'
+                            : 'text-[#D4AF37] hover:text-amber-300 underline underline-offset-2'
                         }`}
                       >
                         {lang === 'hi' ? 'व्हाट्सएप पर पुनः भेजें' : 'Resend via WhatsApp'}
@@ -577,7 +669,7 @@ export default function CreativeLoginPortal() {
                       <button
                         type="submit"
                         disabled={isVerifyingOtp}
-                        className="w-2/3 py-4 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-500 hover:from-amber-300 hover:to-amber-400 text-stone-950 font-black text-sm shadow-xl shadow-amber-500/20 hover:shadow-amber-500/30 transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98] hover:translate-y-[-1px] disabled:opacity-75"
+                        className="w-2/3 py-4 rounded-2xl bg-gradient-to-r from-[#D4AF37] via-amber-400 to-[#F59E0B] hover:from-amber-300 hover:to-yellow-400 text-stone-950 font-black text-sm shadow-xl shadow-amber-500/25 hover:shadow-amber-500/40 transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98] hover:translate-y-[-1px] disabled:opacity-75"
                       >
                         {isVerifyingOtp ? (
                           <>
@@ -598,10 +690,10 @@ export default function CreativeLoginPortal() {
 
               {/* STEP 3: Profile Setup & Role Selection */}
               {step === 'profile_setup' && (
-                <div className="space-y-5 animate-fade-in-up">
+                <div className="space-y-5 animate-fade-in">
                   <div className="space-y-1.5 text-center">
-                    <div className="w-12 h-12 mx-auto rounded-2xl bg-amber-950/80 border border-amber-600/50 flex items-center justify-center mb-2">
-                      <Sparkles className="w-6 h-6 text-amber-400" />
+                    <div className="w-12 h-12 mx-auto rounded-2xl bg-[#051C14] border border-[#D4AF37]/50 flex items-center justify-center mb-2">
+                      <Sparkles className="w-6 h-6 text-[#D4AF37]" />
                     </div>
                     <h3 className="text-2xl font-black text-white tracking-tight">
                       {lang === 'hi' ? 'अपनी प्रोफाइल बनाएं' : 'Set Up Your Profile'}
@@ -629,7 +721,7 @@ export default function CreativeLoginPortal() {
                           value={userName}
                           onChange={(e) => setUserName(e.target.value)}
                           placeholder={lang === 'hi' ? 'उदा. रामेश्वर सिंह' : 'e.g. Rameshwar Singh'}
-                          className="w-full pl-12 pr-4 py-3.5 rounded-2xl border border-stone-700/80 bg-stone-950/85 font-bold text-white text-sm outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/25 transition-all duration-200 hover:border-stone-600"
+                          className="w-full pl-12 pr-4 py-3.5 rounded-2xl border border-stone-700/80 bg-[#051C14]/80 font-bold text-white text-sm outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-amber-500/25 transition-all duration-200 hover:border-stone-600"
                           required
                           autoFocus
                         />
@@ -646,13 +738,13 @@ export default function CreativeLoginPortal() {
                           onClick={() => setSelectedRole('farmer')}
                           className={`p-4 rounded-2xl border text-left transition-all duration-200 flex flex-col justify-between space-y-2 ${
                             selectedRole === 'farmer'
-                              ? 'border-amber-500 bg-amber-950/50 shadow-lg shadow-amber-500/15 ring-1 ring-amber-500/30'
-                              : 'border-stone-800 bg-stone-950/60 hover:border-stone-700 text-stone-400'
+                              ? 'border-[#D4AF37] bg-gradient-to-br from-[#051C14] to-amber-950/40 shadow-lg shadow-amber-500/15 ring-1 ring-[#D4AF37]/40'
+                              : 'border-stone-800 bg-[#0A0F0D]/60 hover:border-stone-700 text-stone-400'
                           }`}
                         >
                           <div className="flex items-center justify-between">
-                            <Tractor className={`w-6 h-6 ${selectedRole === 'farmer' ? 'text-amber-400' : 'text-stone-500'}`} />
-                            {selectedRole === 'farmer' && <CheckCircle2 className="w-4 h-4 text-amber-400" />}
+                            <Tractor className={`w-6 h-6 ${selectedRole === 'farmer' ? 'text-[#D4AF37]' : 'text-stone-500'}`} />
+                            {selectedRole === 'farmer' && <CheckCircle2 className="w-4 h-4 text-[#D4AF37]" />}
                           </div>
                           <div>
                             <span className="font-black text-white text-sm block">
@@ -669,13 +761,13 @@ export default function CreativeLoginPortal() {
                           onClick={() => setSelectedRole('driver')}
                           className={`p-4 rounded-2xl border text-left transition-all duration-200 flex flex-col justify-between space-y-2 ${
                             selectedRole === 'driver'
-                              ? 'border-amber-500 bg-amber-950/50 shadow-lg shadow-amber-500/15 ring-1 ring-amber-500/30'
-                              : 'border-stone-800 bg-stone-950/60 hover:border-stone-700 text-stone-400'
+                              ? 'border-[#D4AF37] bg-gradient-to-br from-[#051C14] to-amber-950/40 shadow-lg shadow-amber-500/15 ring-1 ring-[#D4AF37]/40'
+                              : 'border-stone-800 bg-[#0A0F0D]/60 hover:border-stone-700 text-stone-400'
                           }`}
                         >
                           <div className="flex items-center justify-between">
-                            <Truck className={`w-6 h-6 ${selectedRole === 'driver' ? 'text-amber-400' : 'text-stone-500'}`} />
-                            {selectedRole === 'driver' && <CheckCircle2 className="w-4 h-4 text-amber-400" />}
+                            <Truck className={`w-6 h-6 ${selectedRole === 'driver' ? 'text-[#D4AF37]' : 'text-stone-500'}`} />
+                            {selectedRole === 'driver' && <CheckCircle2 className="w-4 h-4 text-[#D4AF37]" />}
                           </div>
                           <div>
                             <span className="font-black text-white text-sm block">
@@ -691,7 +783,7 @@ export default function CreativeLoginPortal() {
 
                     <button
                       type="submit"
-                      className="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-500 hover:from-amber-300 hover:to-amber-400 text-stone-950 font-black text-base shadow-xl shadow-amber-500/20 hover:shadow-amber-500/30 transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98] hover:translate-y-[-1px]"
+                      className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#D4AF37] via-amber-400 to-[#F59E0B] hover:from-amber-300 hover:to-yellow-400 text-stone-950 font-black text-base shadow-xl shadow-amber-500/25 hover:shadow-amber-500/40 transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98] hover:translate-y-[-1px]"
                     >
                       <span>{lang === 'hi' ? 'आगे बढ़ें' : 'Continue'}</span>
                       <ArrowRight className="w-5 h-5 text-stone-950" />
@@ -702,16 +794,16 @@ export default function CreativeLoginPortal() {
 
               {/* STEP 4: AgriStack Farmer Registry Verification */}
               {step === 'agristack_verify' && (
-                <div className="space-y-4 animate-fade-in-up">
+                <div className="space-y-4 animate-fade-in">
                   
                   {aadhaarStep === 'input' && (
                     <div className="space-y-4">
                       <div className="text-center space-y-1.5">
-                        <div className="w-12 h-12 mx-auto rounded-2xl bg-blue-950/80 border border-blue-700/50 flex items-center justify-center mb-2">
-                          <Building2 className="w-6 h-6 text-blue-400" />
+                        <div className="w-12 h-12 mx-auto rounded-2xl bg-[#051C14] border border-[#10B981]/50 flex items-center justify-center mb-2">
+                          <Building2 className="w-6 h-6 text-[#10B981]" />
                         </div>
-                        <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-blue-950/60 text-blue-300 border border-blue-800/50 text-[11px] font-bold backdrop-blur-sm">
-                          <LandPlot className="w-3 h-3 text-blue-400" />
+                        <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#051C14] text-emerald-300 border border-[#10B981]/40 text-[11px] font-bold">
+                          <LandPlot className="w-3 h-3 text-[#10B981]" />
                           <span>AgriStack • UPFR (Unified Farmer Registry)</span>
                         </div>
                         <h3 className="text-xl font-black text-white mt-1">
@@ -725,7 +817,7 @@ export default function CreativeLoginPortal() {
                       </div>
 
                       {/* Demo Aadhaar Benchmark Profiles */}
-                      <div className="p-3 rounded-2xl bg-stone-950/80 border border-stone-800/80 space-y-2">
+                      <div className="p-3 rounded-2xl bg-[#051C14]/80 border border-stone-800 space-y-2">
                         <span className="text-[10px] font-black text-stone-400 uppercase tracking-wider block">
                           {lang === 'hi' ? '⚡ पंजीकृत एग्रीस्टैक प्रोफाइल:' : '⚡ Registered AgriStack Benchmark Profiles:'}
                         </span>
@@ -733,25 +825,25 @@ export default function CreativeLoginPortal() {
                           <button
                             type="button"
                             onClick={() => setAadhaarNumber('5544 3322 1100')}
-                            className="p-2.5 rounded-xl bg-amber-950/30 hover:bg-amber-950/60 border border-amber-700/50 hover:border-amber-600 text-left transition-all duration-200 flex items-center justify-between group"
+                            className="p-2.5 rounded-xl bg-amber-950/30 hover:bg-amber-950/60 border border-amber-700/50 hover:border-[#D4AF37] text-left transition-all duration-200 flex items-center justify-between group"
                           >
                             <div>
-                              <span className="text-xs font-black text-amber-300 block">{lang === 'hi' ? '5544 3322 1100 (डेमो आधार 1)' : '5544 3322 1100 (Demo Aadhaar 1)'}</span>
+                              <span className="text-xs font-black text-[#D4AF37] block">{lang === 'hi' ? '5544 3322 1100 (डेमो आधार 1)' : '5544 3322 1100 (Demo Aadhaar 1)'}</span>
                               <span className="text-[10px] text-stone-400">{lang === 'hi' ? 'गाटा #142 (3.0 बीघा), गाटा #74 (4.5 बीघा)' : 'Gata #142 (3.0 Bigha), Gata #74 (4.5 Bigha)'}</span>
                             </div>
-                            <span className="text-[10px] font-bold text-amber-400 px-2 py-0.5 rounded-lg bg-amber-900/50 group-hover:bg-amber-900/80">{lang === 'hi' ? 'पंजीकृत ✓' : 'Registered ✓'}</span>
+                            <span className="text-[10px] font-bold text-[#D4AF37] px-2 py-0.5 rounded-lg bg-amber-900/50 group-hover:bg-amber-900/80">{lang === 'hi' ? 'पंजीकृत ✓' : 'Registered ✓'}</span>
                           </button>
 
                           <button
                             type="button"
                             onClick={() => setAadhaarNumber('8899 4433 2211')}
-                            className="p-2.5 rounded-xl bg-blue-950/30 hover:bg-blue-950/60 border border-blue-800/50 hover:border-blue-700 text-left transition-all duration-200 flex items-center justify-between group"
+                            className="p-2.5 rounded-xl bg-emerald-950/30 hover:bg-emerald-950/60 border border-emerald-800/50 hover:border-[#10B981] text-left transition-all duration-200 flex items-center justify-between group"
                           >
                             <div>
-                              <span className="text-xs font-black text-blue-300 block">{lang === 'hi' ? '8899 4433 2211 (डेमो आधार 2)' : '8899 4433 2211 (Demo Aadhaar 2)'}</span>
+                              <span className="text-xs font-black text-emerald-300 block">{lang === 'hi' ? '8899 4433 2211 (डेमो आधार 2)' : '8899 4433 2211 (Demo Aadhaar 2)'}</span>
                               <span className="text-[10px] text-stone-400">{lang === 'hi' ? 'गाटा #215 (6.0 बीघा)' : 'Gata #215 (6.0 Bigha)'}</span>
                             </div>
-                            <span className="text-[10px] font-bold text-blue-400 px-2 py-0.5 rounded-lg bg-blue-900/50 group-hover:bg-blue-900/80">{lang === 'hi' ? 'पंजीकृत ✓' : 'Registered ✓'}</span>
+                            <span className="text-[10px] font-bold text-emerald-400 px-2 py-0.5 rounded-lg bg-emerald-900/50 group-hover:bg-emerald-900/80">{lang === 'hi' ? 'पंजीकृत ✓' : 'Registered ✓'}</span>
                           </button>
                         </div>
                       </div>
@@ -779,7 +871,7 @@ export default function CreativeLoginPortal() {
                               value={aadhaarNumber}
                               onChange={(e) => setAadhaarNumber(e.target.value)}
                               placeholder="5544 3322 1100"
-                              className="w-full pl-12 pr-4 py-4 rounded-2xl border border-stone-700/80 bg-stone-950/85 font-black text-white tracking-widest text-base outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200 hover:border-stone-600"
+                              className="w-full pl-12 pr-4 py-4 rounded-2xl border border-stone-700/80 bg-[#051C14]/80 font-black text-white tracking-widest text-base outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-amber-500/20 transition-all duration-200 hover:border-stone-600"
                               autoFocus
                             />
                           </div>
@@ -797,7 +889,7 @@ export default function CreativeLoginPortal() {
                           <button
                             type="submit"
                             disabled={isVerifyingAgriStack}
-                            className="w-2/3 py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-black text-xs sm:text-sm shadow-xl shadow-blue-500/10 hover:shadow-blue-500/20 transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98] hover:translate-y-[-1px]"
+                            className="w-2/3 py-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs sm:text-sm shadow-xl shadow-emerald-500/20 transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98] hover:translate-y-[-1px]"
                           >
                             {isVerifyingAgriStack ? (
                               <>
@@ -818,22 +910,22 @@ export default function CreativeLoginPortal() {
 
                   {/* Phase 2: Real Land Records Fetched */}
                   {aadhaarStep === 'result' && agriStackResult && (
-                    <div className="space-y-4 animate-fade-in-up">
+                    <div className="space-y-4 animate-fade-in">
                       
-                      <div className="p-5 rounded-3xl bg-gradient-to-br from-amber-950/80 via-stone-900/90 to-amber-950/80 border-2 border-amber-500/60 shadow-xl shadow-amber-500/10 space-y-3 text-white relative overflow-hidden">
+                      <div className="p-5 rounded-3xl bg-gradient-to-br from-[#051C14] via-[#0A0F0D] to-[#051C14] border-2 border-[#D4AF37]/60 shadow-xl shadow-amber-500/10 space-y-3 text-white relative overflow-hidden">
                         
                         <div className="relative">
                           <div className="flex items-center justify-between border-b border-amber-800/60 pb-2.5">
                             <div className="flex items-center gap-2">
                               <span className="text-xl">🇮🇳</span>
                               <div>
-                                <h4 className="font-black text-xs uppercase tracking-wider text-amber-300">
+                                <h4 className="font-black text-xs uppercase tracking-wider text-[#D4AF37]">
                                   {lang === 'hi' ? 'किसान पहचान पत्र (Kisan Pehchaan Patra)' : 'Digital Farmer Identity Card'}
                                 </h4>
                                 <p className="text-[10px] text-stone-400">{lang === 'hi' ? 'AgriStack UPFR द्वारा सत्यापित' : 'AgriStack UPFR Verified'}</p>
                               </div>
                             </div>
-                            <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-amber-500 text-stone-950 flex items-center gap-1 shadow-lg shadow-amber-500/20">
+                            <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-[#D4AF37] text-stone-950 flex items-center gap-1 shadow-lg shadow-amber-500/20">
                               <Check className="w-3 h-3 stroke-[3]" />
                               <span>{lang === 'hi' ? 'सत्यापित कृषक' : 'Verified Cultivator'}</span>
                             </span>
@@ -846,7 +938,7 @@ export default function CreativeLoginPortal() {
                             </div>
                             <div>
                               <span className="text-[10px] text-stone-400 block">{lang === 'hi' ? 'किसान आईडी' : 'Farmer ID'}</span>
-                              <b className="font-mono text-amber-300">{agriStackResult.farmerProfile.farmerId}</b>
+                              <b className="font-mono text-[#D4AF37]">{agriStackResult.farmerProfile.farmerId}</b>
                             </div>
                             <div>
                               <span className="text-[10px] text-stone-400 block">{lang === 'hi' ? 'ग्राम व तहसील' : 'Village & Tehsil'}</span>
@@ -854,13 +946,13 @@ export default function CreativeLoginPortal() {
                             </div>
                             <div>
                               <span className="text-[10px] text-stone-400 block">{lang === 'hi' ? 'कुल कृषि भूमि' : 'Total Farmland Area'}</span>
-                              <b className="text-amber-400 text-sm">{agriStackResult.farmerProfile.totalLandBigha} {lang === 'hi' ? 'बीघा' : 'Bigha'}</b>
+                              <b className="text-[#D4AF37] text-sm">{agriStackResult.farmerProfile.totalLandBigha} {lang === 'hi' ? 'बीघा' : 'Bigha'}</b>
                             </div>
                           </div>
 
                           <div className="pt-2 border-t border-amber-900/50 space-y-1.5 mt-2">
-                            <span className="text-[10px] font-black uppercase tracking-wider text-amber-300 flex items-center gap-1">
-                              <LandPlot className="w-3 h-3 text-amber-400" />
+                            <span className="text-[10px] font-black uppercase tracking-wider text-[#D4AF37] flex items-center gap-1">
+                              <LandPlot className="w-3 h-3 text-[#D4AF37]" />
                               <span>{lang === 'hi' ? `आधार से प्राप्त खेत (${agriStackResult.farmerProfile.linkedLands.length} प्लॉट):` : `Auto-Fetched Lands (${agriStackResult.farmerProfile.linkedLands.length} Plots):`}</span>
                             </span>
                             
@@ -871,7 +963,7 @@ export default function CreativeLoginPortal() {
                                     <span className="font-bold text-white block">{l.name}</span>
                                     <span className="text-[10px] text-stone-400">{lang === 'hi' ? `गाटा संख्या: #${l.khasraNumber} • ${l.soilType}` : `Gata / Khasra No: #${l.khasraNumber} • ${l.soilType}`}</span>
                                   </div>
-                                  <span className="font-black text-amber-400 text-xs">{l.bigha} {lang === 'hi' ? 'बीघा' : 'Bigha'}</span>
+                                  <span className="font-black text-[#D4AF37] text-xs">{l.bigha} {lang === 'hi' ? 'बीघा' : 'Bigha'}</span>
                                 </div>
                               ))}
                             </div>
@@ -883,7 +975,7 @@ export default function CreativeLoginPortal() {
                       <button
                         type="button"
                         onClick={handleCompleteAgriStackRegistration}
-                        className="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-500 hover:from-amber-300 hover:to-amber-400 text-stone-950 font-black text-sm shadow-xl shadow-amber-500/20 hover:shadow-amber-500/30 transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98] hover:translate-y-[-1px]"
+                        className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#D4AF37] via-amber-400 to-[#F59E0B] hover:from-amber-300 hover:to-yellow-400 text-stone-950 font-black text-sm shadow-xl shadow-amber-500/25 hover:shadow-amber-500/40 transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98] hover:translate-y-[-1px]"
                       >
                         <CheckCircle2 className="w-4 h-4 text-stone-950" />
                         <span>{lang === 'hi' ? 'सत्यापित खेतों के साथ आगे बढ़ें' : 'Proceed with Verified Lands'}</span>
@@ -903,12 +995,12 @@ export default function CreativeLoginPortal() {
       </main>
 
       {/* ═══════════ BOTTOM FOOTER ═══════════ */}
-      <footer className="relative z-10 border-t border-stone-800/80 bg-stone-950/80 backdrop-blur-md px-6 py-4">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-stone-400">
-          <span>© 2026 KrishiSeva • WhatsApp Business Verified Fleet Network & AgriStack UPFR</span>
+      <footer className="relative z-10 border-t border-stone-800/80 bg-[#0A0F0D]/90 backdrop-blur-md px-6 py-4">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-stone-400">
+          <span>© 2026 KrishiSeva • Precision Farm Fleet Network & AgriStack UPFR</span>
           <div className="flex items-center gap-4 text-stone-300">
-            <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5 text-amber-400" /> Malihabad, Lucknow</span>
-            <span className="flex items-center gap-1"><Phone className="w-3.5 h-3.5 text-amber-400" /> 1800-KRISHI-SEVA</span>
+            <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5 text-[#D4AF37]" /> Malihabad, Lucknow</span>
+            <span className="flex items-center gap-1"><Phone className="w-3.5 h-3.5 text-[#D4AF37]" /> 1800-KRISHI-SEVA</span>
           </div>
         </div>
       </footer>
