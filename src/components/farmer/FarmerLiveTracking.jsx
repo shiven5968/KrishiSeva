@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
+import { useTheme } from '../../context/ThemeContext';
 import { useRealtimeSync } from '../../context/RealtimeSyncContext';
 import { calculateDistanceKm } from '../../utils/geoUtils';
 import LiveMap from '../map/LiveMap';
@@ -25,7 +26,8 @@ import {
 } from 'lucide-react';
 
 export default function FarmerLiveTracking() {
-  const { lang, t } = useLanguage();
+  const { lang, t, localize } = useLanguage();
+  const { isDark } = useTheme();
   const { 
     activeBooking, 
     driverCurrentPos, 
@@ -107,38 +109,48 @@ export default function FarmerLiveTracking() {
       case 'searching':
         return {
           title: lang === 'hi' ? 'आस-पास के ड्राइवरों की खोज जारी...' : 'Looking for Nearest Drivers...',
-          subtitle: lang === 'hi' ? 'आपके खेत से 5 किमी के दायरे में उपलब्ध सभी सत्यापित ट्रैक्टर मालिकों को अनुरोध भेजा जा रहा है।' : 'Broadcasting request to verified machinery operators within 5 km of your field.',
-          badgeColor: 'bg-stone-900/90 text-white border-stone-800 shadow-emerald-950/10'
+          subtitle: lang === 'hi' ? 'आपके खेत से 5 किमी के दायरे में उपलब्ध सभी सत्यापित ऑपरेटरों को अनुरोध भेजा जा रहा है।' : 'Broadcasting request to verified machinery operators within 5 km of your field.',
+          badgeColor: isDark 
+            ? 'bg-stone-900/90 text-white border-stone-800 shadow-black/40' 
+            : 'bg-white text-slate-900 border-slate-200 shadow-slate-200/50'
         };
       case 'accepted':
         return {
           title: lang === 'hi' ? 'ड्राइवर ने बुकिंग स्वीकार की!' : 'Driver Accepted Your Booking!',
           subtitle: lang === 'hi' ? `${assignedDriver?.name || 'ड्राइवर'} आपके खेत की ओर रवाना हो चुके हैं।` : `${assignedDriver?.name || 'Operator'} is en route to your field.`,
-          badgeColor: 'bg-emerald-950/80 text-emerald-300 border-emerald-800'
+          badgeColor: isDark 
+            ? 'bg-emerald-950/80 text-emerald-300 border-emerald-800' 
+            : 'bg-emerald-50 text-emerald-900 border-emerald-200'
         };
       case 'arrived':
         return {
-          title: lang === 'hi' ? 'मशीनरी आपके खेत पर पहुंच गई है!' : 'Machinery Has Reached Your Field!',
-          subtitle: lang === 'hi' ? 'कृपया ड्राइवर को खेत का दायरा और कार्य विवरण समझाएं।' : 'Please guide the operator to the specific field boundary.',
-          badgeColor: 'bg-blue-950/80 text-blue-300 border-blue-800'
+          title: lang === 'hi' ? 'चालक खेत पर पहुँच चुके हैं 📍' : 'Driver Arrived at Field 📍',
+          subtitle: lang === 'hi' ? 'मशीन आपके खेत पर उपस्थित है। कार्य प्रारंभ करवाएं।' : 'Machinery is at your field. Ready to commence farm operations.',
+          badgeColor: isDark 
+            ? 'bg-blue-950/80 text-blue-300 border-blue-800' 
+            : 'bg-blue-50 text-blue-900 border-blue-200'
         };
       case 'in_progress':
         return {
-          title: lang === 'hi' ? 'खेत में कार्य प्रगति पर है...' : 'Work in Progress in Field...',
-          subtitle: lang === 'hi' ? `${t(activeBooking.attachment?.nameKey)} द्वारा जुताई/कार्य जारी है।` : `Operation ongoing with ${t(activeBooking.attachment?.nameKey)}.`,
-          badgeColor: 'bg-purple-950/80 text-purple-300 border-purple-800'
+          title: lang === 'hi' ? 'खेत का कार्य प्रगति पर है 🚜' : 'Field Operation in Progress 🚜',
+          subtitle: lang === 'hi' ? 'लाइव कार्य अवधि व टेलीमेट्री ट्रैक की जा रही है।' : 'Live operation telemetry is active.',
+          badgeColor: isDark 
+            ? 'bg-amber-950/80 text-amber-300 border-amber-800' 
+            : 'bg-amber-50 text-amber-900 border-amber-200'
         };
       case 'completed':
         return {
           title: lang === 'hi' ? 'कार्य संपन्न हुआ! धन्यवाद।' : 'Work Completed Successfully!',
           subtitle: lang === 'hi' ? 'कृपया ड्राइवर को तय किराया प्रदान करें।' : 'Please settle the calculated fare with the operator.',
-          badgeColor: 'bg-emerald-950/80 text-emerald-300 border-emerald-800'
+          badgeColor: isDark 
+            ? 'bg-emerald-950/80 text-emerald-300 border-emerald-800' 
+            : 'bg-emerald-50 text-emerald-900 border-emerald-200'
         };
       default:
         return {
           title: 'Booking Active',
           subtitle: '',
-          badgeColor: 'bg-stone-900 text-stone-200 border-stone-800'
+          badgeColor: isDark ? 'bg-stone-900 text-stone-200 border-stone-800' : 'bg-white text-slate-800 border-slate-200'
         };
     }
   };
@@ -146,14 +158,18 @@ export default function FarmerLiveTracking() {
   const statusInfo = getStatusText();
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 transition-colors duration-200 ${
+      isDark ? 'text-stone-100' : 'text-slate-900'
+    }`}>
       
       {/* Top Status Banner */}
-      <div className={`p-6 rounded-3xl border ${statusInfo.badgeColor} shadow-xl backdrop-blur-md flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all`}>
+      <div className={`p-6 rounded-3xl border ${statusInfo.badgeColor} shadow-xl backdrop-blur-md flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all duration-200`}>
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-stone-900 text-emerald-400 flex items-center justify-center text-3xl shadow-inner border border-stone-700">
+          <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shadow-inner border ${
+            isDark ? 'bg-stone-900 text-emerald-400 border-stone-700' : 'bg-emerald-100 text-emerald-700 border-emerald-300'
+          }`}>
             {isSearching ? (
-              <Radio className="w-7 h-7 text-emerald-400 animate-pulse" />
+              <Radio className="w-7 h-7 text-emerald-500 animate-pulse" />
             ) : activeBooking.status === 'completed' ? (
               '🎉'
             ) : (
@@ -162,17 +178,17 @@ export default function FarmerLiveTracking() {
           </div>
           <div>
             <div className="flex items-center gap-2.5">
-              <h2 className="text-2xl font-black text-white">
+              <h2 className={`text-2xl font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
                 {statusInfo.title}
               </h2>
               {isSearching && (
-                <span className="w-3 h-3 rounded-full bg-emerald-400 animate-ping"></span>
+                <span className="w-3 h-3 rounded-full bg-emerald-500 animate-ping"></span>
               )}
               {activeBooking.status === 'accepted' && (
-                <span className="w-3 h-3 rounded-full bg-emerald-400 animate-ping"></span>
+                <span className="w-3 h-3 rounded-full bg-emerald-500 animate-ping"></span>
               )}
             </div>
-            <p className="text-xs sm:text-sm text-stone-300 font-semibold mt-1">
+            <p className={`text-xs sm:text-sm font-semibold mt-1 ${isDark ? 'text-stone-300' : 'text-slate-600'}`}>
               {statusInfo.subtitle}
             </p>
           </div>
@@ -180,13 +196,15 @@ export default function FarmerLiveTracking() {
 
         {/* Live GPS Telemetry Pill (When Accepted) */}
         {!isSearching && activeBooking.status === 'accepted' && (
-          <div className="flex items-center gap-3 bg-stone-900/90 p-3 rounded-2xl border border-stone-700 text-xs font-black text-white">
-            <div className="flex items-center gap-1.5 text-emerald-400">
+          <div className={`flex items-center gap-3 p-3 rounded-2xl border text-xs font-black ${
+            isDark ? 'bg-stone-900/90 border-stone-700 text-white' : 'bg-slate-100 border-slate-200 text-slate-900'
+          }`}>
+            <div className="flex items-center gap-1.5 text-emerald-500">
               <Gauge className="w-4 h-4" />
               <span>Speed: {currentSpeed} km/h</span>
             </div>
-            <span className="text-stone-600">•</span>
-            <div className="flex items-center gap-1.5 text-amber-300">
+            <span className={isDark ? 'text-stone-600' : 'text-slate-400'}>•</span>
+            <div className="flex items-center gap-1.5 text-amber-500">
               <MapPin className="w-4 h-4" />
               <span>Dist: {distanceKm} km</span>
             </div>
@@ -195,8 +213,10 @@ export default function FarmerLiveTracking() {
 
         {/* Searching Timer Pill (When Searching) */}
         {isSearching && (
-          <div className="flex items-center gap-2 bg-stone-900/90 px-4 py-2 rounded-2xl border border-stone-800 text-xs font-black text-emerald-400 shadow-lg shadow-black/10">
-            <Clock className="w-4 h-4 text-emerald-400 animate-spin" />
+          <div className={`flex items-center gap-2 px-4 py-2 rounded-2xl border text-xs font-black shadow-lg ${
+            isDark ? 'bg-stone-900/90 border-stone-800 text-emerald-400 shadow-black/10' : 'bg-emerald-50 border-emerald-200 text-emerald-700'
+          }`}>
+            <Clock className="w-4 h-4 text-emerald-500 animate-spin" />
             <span>Searching: {searchSeconds}s</span>
           </div>
         )}
@@ -206,22 +226,24 @@ export default function FarmerLiveTracking() {
         
         {/* Left Column: Full Live Map */}
         <div className="lg:col-span-8 space-y-4">
-          <div className="bg-stone-900/90 rounded-3xl p-5 border border-stone-800 shadow-2xl space-y-3">
+          <div className={`rounded-3xl p-5 border shadow-2xl space-y-3 transition-colors duration-200 ${
+            isDark ? 'bg-stone-900/90 border-stone-800 shadow-black/40' : 'bg-white border-slate-200 shadow-slate-200/50'
+          }`}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Navigation className="w-5 h-5 text-emerald-400" />
-                <h3 className="font-extrabold text-sm sm:text-base text-white">
+                <Navigation className="w-5 h-5 text-emerald-500" />
+                <h3 className={`font-extrabold text-sm sm:text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>
                   {isSearching 
-                    ? (lang === 'hi' ? 'खेत के पास मशीनरी रडार खोज (Radar Search Active)' : 'Machinery Dispatch Radar Active')
-                    : (lang === 'hi' ? 'लाइव जीपीएस नेविगेशन (Live GPS Tracking to Field)' : 'Live GPS Machinery Dispatch to Field')}
+                    ? (lang === 'hi' ? 'खेत के पास मशीनरी रडार खोज' : 'Machinery Dispatch Radar Active')
+                    : (lang === 'hi' ? 'लाइव जीपीएस नेविगेशन' : 'Live GPS Machinery Dispatch to Field')}
                 </h3>
               </div>
               
               <div className="flex items-center gap-2">
                 <span className={`text-xs font-black px-3.5 py-1.5 rounded-full shadow-sm border ${
                   isSearching 
-                    ? 'bg-stone-950 text-emerald-400 border-stone-800 animate-pulse'
-                    : 'bg-emerald-950 text-emerald-300 border-emerald-700'
+                    ? isDark ? 'bg-stone-950 text-emerald-400 border-stone-800 animate-pulse' : 'bg-emerald-50 text-emerald-700 border-emerald-200 animate-pulse'
+                    : isDark ? 'bg-emerald-950 text-emerald-300 border-emerald-700' : 'bg-emerald-50 text-emerald-800 border-emerald-200'
                 }`}>
                   {isSearching 
                     ? 'Pinging Nearby Operators 📡' 
@@ -242,7 +264,7 @@ export default function FarmerLiveTracking() {
               activeVehicleType={activeBooking.machineryType}
               showNearbyDrivers={isSearching}
               bookingStatus={activeBooking.status}
-              className="h-[460px] w-full rounded-2xl"
+              className={`h-[460px] w-full rounded-2xl overflow-hidden border ${isDark ? 'border-stone-800' : 'border-slate-200'}`}
             />
           </div>
         </div>
@@ -250,87 +272,75 @@ export default function FarmerLiveTracking() {
         {/* Right Column: Dynamic State Display */}
         <div className="lg:col-span-4 space-y-6">
           
-          {/* 1. SEARCHING STATE: Radar Animation & Machinery Request Info */}
+          {/* 1. SEARCHING STATE: Machinery Request Info & Actions */}
           {isSearching && (
-            <div className="bg-stone-900/90 rounded-3xl p-6 border border-stone-850 shadow-2xl space-y-6 text-white animate-fade-in">
+            <div className={`rounded-3xl p-6 border shadow-2xl space-y-5 animate-fade-in transition-colors duration-200 ${
+              isDark ? 'bg-stone-900/90 border-stone-800 text-white shadow-black/40' : 'bg-white border-slate-200 text-slate-900 shadow-slate-200/50'
+            }`}>
               
-              {/* Radar Pulse Box */}
-              <div className="p-6 rounded-2xl bg-stone-950/40 border border-stone-850 text-center space-y-3 relative overflow-hidden">
-                <div className="relative w-20 h-20 mx-auto flex items-center justify-center">
-                  <div className="absolute inset-0 rounded-full bg-emerald-500/10 animate-ping"></div>
-                  <div className="absolute inset-2 rounded-full bg-emerald-500/15 animate-pulse"></div>
-                  <div className="w-12 h-12 rounded-full bg-emerald-500 text-stone-950 font-black flex items-center justify-center text-xl shadow-lg shadow-emerald-500/30 relative z-10">
-                    🚜
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-black text-base text-emerald-400">
-                    {lang === 'hi' ? 'मशीनरी खोजी जा रही है...' : 'Matching with Nearest Driver'}
-                  </h4>
-                  <p className="text-xs text-stone-400 mt-1 font-medium">
-                    {lang === 'hi' ? 'ड्राइवर द्वारा अनुरोध स्वीकार करने पर उनका विवरण व लाइव लोकेशन दिखाई देगी।' : 'Waiting for an available driver to accept your request.'}
-                  </p>
-                </div>
-
-                {/* Progress signal bars */}
-                <div className="flex justify-center gap-1.5 pt-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-bounce"></span>
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-bounce [animation-delay:0.2s]"></span>
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-bounce [animation-delay:0.4s]"></span>
-                </div>
+              <div className="flex items-center justify-between pb-3 border-b border-stone-800/40">
+                <span className="text-xs font-black uppercase tracking-wider text-emerald-500">
+                  {lang === 'hi' ? 'अनुरोधित बुकिंग विवरण' : 'Booking Request Summary'}
+                </span>
+                <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500">
+                  {lang === 'hi' ? 'लाइव प्रसारण' : 'Broadcast Live'}
+                </span>
               </div>
 
               {/* Machinery Requested Summary */}
-              <div className="bg-stone-950/80 rounded-2xl p-4 border border-stone-800 space-y-2.5 text-xs">
+              <div className={`rounded-2xl p-4 border space-y-2.5 text-xs ${
+                isDark ? 'bg-stone-950/80 border-stone-800' : 'bg-slate-50 border-slate-200'
+              }`}>
                 <div className="flex justify-between items-center">
-                  <span className="text-stone-400 font-medium">{lang === 'hi' ? 'अनुरोधित मशीन:' : 'Requested Machinery:'}</span>
-                  <span className="font-bold text-white capitalize">{activeBooking.machineryType}</span>
+                  <span className={`font-medium ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>{lang === 'hi' ? 'अनुरोधित मशीन:' : 'Requested Machinery:'}</span>
+                  <span className={`font-bold capitalize ${isDark ? 'text-white' : 'text-slate-900'}`}>{activeBooking.machineryType}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-stone-400 font-medium">{lang === 'hi' ? 'उपकरण (Attachment):' : 'Implement:'}</span>
-                  <span className="font-extrabold text-emerald-400">{t(activeBooking.attachment?.nameKey)}</span>
+                  <span className={`font-medium ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>{lang === 'hi' ? 'उपकरण (Attachment):' : 'Implement:'}</span>
+                  <span className="font-extrabold text-emerald-500">{t(activeBooking.attachment?.nameKey)}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-stone-400 font-medium">{lang === 'hi' ? 'खेत का आकार:' : 'Farm Size:'}</span>
-                  <span className="font-bold text-white">{activeBooking.landSize} {activeBooking.sizeUnit}</span>
+                  <span className={`font-medium ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>{lang === 'hi' ? 'खेत का आकार:' : 'Farm Size:'}</span>
+                  <span className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{activeBooking.landSize} {activeBooking.sizeUnit}</span>
                 </div>
-                 <div className="flex justify-between items-center pt-2 border-t border-stone-800">
-                   <span className="text-stone-300 font-bold">{lang === 'hi' ? 'अनुमानित किराया:' : 'Estimated Fare:'}</span>
-                   <span className="text-xl font-black text-amber-300">₹{activeBooking.estimatedPrice}</span>
-                 </div>
-                 {activeBooking.paymentMethod && (
-                   <>
-                     <div className="flex justify-between items-center">
-                       <span className="text-stone-400 font-medium">{lang === 'hi' ? 'भुगतान विधि:' : 'Payment Method:'}</span>
-                       <span className="font-bold text-white uppercase">{activeBooking.paymentMethod === 'cod' ? 'COD' : 'Online'}</span>
-                     </div>
-                     <div className="flex justify-between items-center">
-                       <span className="text-stone-400 font-medium">{lang === 'hi' ? 'अग्रिम भुगतान:' : 'Paid Advance:'}</span>
-                       <span className="font-bold text-emerald-400">₹{activeBooking.advancePaid || 0}</span>
-                     </div>
-                     <div className="flex justify-between items-center">
-                       <span className="text-stone-400 font-medium">{lang === 'hi' ? 'शेष देय राशि:' : 'Balance Due:'}</span>
-                       <span className="font-bold text-amber-400">₹{activeBooking.balanceDue || 0}</span>
-                     </div>
-                   </>
-                 )}
+                <div className={`flex justify-between items-center pt-2 border-t ${isDark ? 'border-stone-800' : 'border-slate-200'}`}>
+                  <span className={`font-bold ${isDark ? 'text-stone-300' : 'text-slate-700'}`}>{lang === 'hi' ? 'अनुमानित किराया:' : 'Estimated Fare:'}</span>
+                  <span className="text-xl font-black text-amber-500">₹{activeBooking.estimatedPrice}</span>
+                </div>
+                {activeBooking.paymentMethod && (
+                  <>
+                    <div className="flex justify-between items-center">
+                      <span className={`font-medium ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>{lang === 'hi' ? 'भुगतान विधि:' : 'Payment Method:'}</span>
+                      <span className={`font-bold uppercase ${isDark ? 'text-white' : 'text-slate-900'}`}>{activeBooking.paymentMethod === 'cod' ? 'COD' : 'Online'}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className={`font-medium ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>{lang === 'hi' ? 'अग्रिम भुगतान:' : 'Paid Advance:'}</span>
+                      <span className="font-bold text-emerald-500">₹{activeBooking.advancePaid || 0}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className={`font-medium ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>{lang === 'hi' ? 'शेष देय राशि:' : 'Balance Due:'}</span>
+                      <span className="font-bold text-amber-500">₹{activeBooking.balanceDue || 0}</span>
+                    </div>
+                  </>
+                )}
               </div>
 
               {/* Bargaining / Counter-Offer Section */}
-              <div className="bg-stone-950/80 rounded-2xl p-4 border border-stone-850 space-y-3 animate-fade-in">
-                <div className="flex items-center gap-1.5 text-xs text-emerald-400 font-extrabold uppercase tracking-wider">
+              <div className={`rounded-2xl p-4 border space-y-3 animate-fade-in ${
+                isDark ? 'bg-stone-950/80 border-stone-800' : 'bg-slate-50 border-slate-200'
+              }`}>
+                <div className="flex items-center gap-1.5 text-xs text-emerald-500 font-extrabold uppercase tracking-wider">
                   <Coins className="w-3.5 h-3.5" />
                   <span>{lang === 'hi' ? 'किराया मोल-भाव (Bargain Price)' : 'Want to Bargain?'}</span>
                 </div>
-                <p className="text-[10px] text-stone-400 leading-normal">
+                <p className={`text-[10px] leading-normal ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
                   {lang === 'hi'
                     ? 'अपना नया प्रस्तावित किराया दर्ज करें। आस-पास के ऑपरेटरों को आपका ऑफर तुरंत दिखेगा।'
                     : 'Enter your proposed fare. Nearby operators will see your counter-offer immediately.'}
                 </p>
                 <div className="flex gap-2">
                   <div className="relative flex-1">
-                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 font-bold text-xs">₹</span>
+                    <span className={`absolute left-3.5 top-1/2 -translate-y-1/2 font-bold text-xs ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>₹</span>
                     <input
                       type="number"
                       value={bargainPriceInput}
@@ -339,7 +349,9 @@ export default function FarmerLiveTracking() {
                         setIsBargainSuccess(false);
                       }}
                       placeholder={activeBooking.estimatedPrice}
-                      className="w-full pl-7 pr-3 py-2 bg-stone-900 border border-stone-700 rounded-xl text-xs font-black text-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition"
+                      className={`w-full pl-7 pr-3 py-2 border rounded-xl text-xs font-black focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition ${
+                        isDark ? 'bg-stone-900 border-stone-700 text-white' : 'bg-white border-slate-300 text-slate-900'
+                      }`}
                     />
                   </div>
                   <button
@@ -352,13 +364,13 @@ export default function FarmerLiveTracking() {
                         setTimeout(() => setIsBargainSuccess(false), 3000);
                       }
                     }}
-                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-stone-950 text-xs font-black rounded-xl shadow-lg shadow-emerald-600/10 transition active:scale-95 shrink-0"
+                    className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-stone-950 text-xs font-black rounded-xl shadow-lg shadow-emerald-500/10 transition active:scale-95 shrink-0"
                   >
                     {lang === 'hi' ? 'ऑफर भेजें' : 'Send Offer'}
                   </button>
                 </div>
                 {isBargainSuccess && (
-                  <p className="text-[10px] text-emerald-400 font-black text-center animate-pulse">
+                  <p className="text-[10px] text-emerald-500 font-black text-center animate-pulse">
                     {lang === 'hi' ? '✓ नया काउंटर-ऑफर भेजा गया!' : '✓ Counter-offer sent successfully!'}
                   </p>
                 )}
@@ -367,7 +379,9 @@ export default function FarmerLiveTracking() {
               {/* Cancel Request Button (Opens Reason Modal) */}
               <button
                 onClick={() => setIsCancelModalOpen(true)}
-                className="w-full py-3.5 rounded-2xl border border-red-500/50 text-red-400 hover:bg-red-950/40 font-bold text-xs flex items-center justify-center gap-2 transition active:scale-98"
+                className={`w-full py-3.5 rounded-2xl border border-red-500/50 font-bold text-xs flex items-center justify-center gap-2 transition active:scale-98 ${
+                  isDark ? 'text-red-400 hover:bg-red-950/40' : 'text-red-600 hover:bg-red-50'
+                }`}
               >
                 <XCircle className="w-4 h-4" />
                 <span>{t('cancelBooking')} (अनुरोध रद्द करें)</span>
@@ -378,10 +392,12 @@ export default function FarmerLiveTracking() {
 
           {/* 2. MATCHED STATE: Driver Assigned, Photo, Call Driver & Live GPS Info */}
           {!isSearching && assignedDriver && (
-            <div className="bg-stone-900/90 rounded-3xl p-6 border border-emerald-600/40 shadow-2xl space-y-5 text-white animate-fade-in">
+            <div className={`rounded-3xl p-6 border shadow-2xl space-y-5 animate-fade-in transition-colors duration-200 ${
+              isDark ? 'bg-stone-900/90 border-emerald-600/40 text-white shadow-black/40' : 'bg-white border-emerald-500/30 text-slate-900 shadow-slate-200/50'
+            }`}>
               
               {/* Driver Header Card */}
-              <div className="flex items-center gap-4 pb-4 border-b border-stone-800">
+              <div className={`flex items-center gap-4 pb-4 border-b ${isDark ? 'border-stone-800' : 'border-slate-200'}`}>
                 <img
                   src={assignedDriver.avatar || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80'}
                   alt={assignedDriver.name}
@@ -389,16 +405,18 @@ export default function FarmerLiveTracking() {
                 />
                 <div>
                   <div className="flex items-center gap-1.5">
-                    <h4 className="font-black text-white text-base">
+                    <h4 className={`font-black text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>
                       {assignedDriver.name}
                     </h4>
-                    <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" title="Verified Driver" />
+                    <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" title="Verified Driver" />
                   </div>
-                  <p className="text-xs text-stone-400 font-bold mt-0.5">
+                  <p className={`text-xs font-bold mt-0.5 ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
                     ⭐ {assignedDriver.rating || 5.0} • Verified Operator
                   </p>
                   <div className="mt-1">
-                    <span className="text-[11px] font-mono font-black tracking-wider bg-stone-950 text-emerald-300 px-2.5 py-0.5 rounded-md border border-emerald-900">
+                    <span className={`text-[11px] font-mono font-black tracking-wider px-2.5 py-0.5 rounded-md border ${
+                      isDark ? 'bg-stone-950 text-emerald-300 border-emerald-900' : 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                    }`}>
                       {assignedDriver.vehicleNumber || 'UP-32-BT-9901'}
                     </span>
                   </div>
@@ -406,46 +424,48 @@ export default function FarmerLiveTracking() {
               </div>
 
               {/* Machinery & Attachment Summary */}
-              <div className="bg-stone-950/80 rounded-2xl p-4 border border-stone-800 space-y-2.5 text-xs">
+              <div className={`rounded-2xl p-4 border space-y-2.5 text-xs ${
+                isDark ? 'bg-stone-950/80 border-stone-800' : 'bg-slate-50 border-slate-200'
+              }`}>
                 <div className="flex justify-between items-center">
-                  <span className="text-stone-400 font-medium">{lang === 'hi' ? 'मशीन:' : 'Machinery:'}</span>
-                  <span className="font-bold text-white">{assignedDriver.modelName || 'Mahindra 575 DI (50 HP)'}</span>
+                  <span className={`font-medium ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>{lang === 'hi' ? 'मशीन:' : 'Machinery:'}</span>
+                  <span className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{assignedDriver.modelName || 'Mahindra 575 DI (50 HP)'}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-stone-400 font-medium">{lang === 'hi' ? 'लगाया गया उपकरण:' : 'Implement:'}</span>
-                  <span className="font-extrabold text-emerald-400">{t(activeBooking.attachment?.nameKey)}</span>
+                  <span className={`font-medium ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>{lang === 'hi' ? 'लगाया गया उपकरण:' : 'Implement:'}</span>
+                  <span className="font-extrabold text-emerald-500">{t(activeBooking.attachment?.nameKey)}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-stone-400 font-medium">{lang === 'hi' ? 'खेत का दायरा:' : 'Farm Size:'}</span>
-                  <span className="font-bold text-white">{activeBooking.landSize} {activeBooking.sizeUnit}</span>
+                  <span className={`font-medium ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>{lang === 'hi' ? 'खेत का दायरा:' : 'Farm Size:'}</span>
+                  <span className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{activeBooking.landSize} {activeBooking.sizeUnit}</span>
                 </div>
-                 <div className="flex justify-between items-center pt-2 border-t border-stone-800">
-                   <span className="text-stone-300 font-bold">{lang === 'hi' ? 'कुल नियत किराया:' : 'Total Fixed Fare:'}</span>
-                   <span className="text-2xl font-black text-emerald-400">₹{activeBooking.estimatedPrice}</span>
-                 </div>
-                 {activeBooking.paymentMethod && (
-                   <>
-                     <div className="flex justify-between items-center">
-                       <span className="text-stone-400 font-medium">{lang === 'hi' ? 'भुगतान विधि:' : 'Payment Method:'}</span>
-                       <span className="font-bold text-white uppercase">{activeBooking.paymentMethod === 'cod' ? 'COD' : 'Online'}</span>
-                     </div>
-                     <div className="flex justify-between items-center">
-                       <span className="text-stone-400 font-medium">{lang === 'hi' ? 'अग्रिम भुगतान:' : 'Paid Advance:'}</span>
-                       <span className="font-bold text-emerald-400">₹{activeBooking.advancePaid || 0}</span>
-                     </div>
-                     <div className="flex justify-between items-center">
-                       <span className="text-stone-400 font-medium">{lang === 'hi' ? 'शेष देय राशि:' : 'Balance Due:'}</span>
-                       <span className="font-bold text-amber-400">₹{activeBooking.balanceDue || 0}</span>
-                     </div>
-                   </>
-                 )}
+                <div className={`flex justify-between items-center pt-2 border-t ${isDark ? 'border-stone-800' : 'border-slate-200'}`}>
+                  <span className={`font-bold ${isDark ? 'text-stone-300' : 'text-slate-700'}`}>{lang === 'hi' ? 'कुल नियत किराया:' : 'Total Fixed Fare:'}</span>
+                  <span className="text-2xl font-black text-emerald-500">₹{activeBooking.estimatedPrice}</span>
+                </div>
+                {activeBooking.paymentMethod && (
+                  <>
+                    <div className="flex justify-between items-center">
+                      <span className={`font-medium ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>{lang === 'hi' ? 'भुगतान विधि:' : 'Payment Method:'}</span>
+                      <span className={`font-bold uppercase ${isDark ? 'text-white' : 'text-slate-900'}`}>{activeBooking.paymentMethod === 'cod' ? 'COD' : 'Online'}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className={`font-medium ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>{lang === 'hi' ? 'अग्रिम भुगतान:' : 'Paid Advance:'}</span>
+                      <span className="font-bold text-emerald-500">₹{activeBooking.advancePaid || 0}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className={`font-medium ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>{lang === 'hi' ? 'शेष देय राशि:' : 'Balance Due:'}</span>
+                      <span className="font-bold text-amber-500">₹{activeBooking.balanceDue || 0}</span>
+                    </div>
+                  </>
+                )}
               </div>
 
               {/* Action Buttons: Call Driver & Cancel */}
               <div className="space-y-3">
                 <a
                   href={`tel:${assignedDriver.phone}`}
-                  className="w-full py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-stone-950 font-black text-sm shadow-xl shadow-emerald-950 flex items-center justify-center gap-2 transition active:scale-98"
+                  className="w-full py-4 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-black text-sm shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-2 transition active:scale-98"
                 >
                   <Phone className="w-4 h-4" />
                   <span>Call Driver ({assignedDriver.phone})</span>
@@ -454,7 +474,9 @@ export default function FarmerLiveTracking() {
                 {activeBooking.status !== 'completed' && (
                   <button
                     onClick={() => setIsCancelModalOpen(true)}
-                    className="w-full py-3 rounded-2xl border border-red-500/40 text-red-400 hover:bg-red-950/40 font-bold text-xs flex items-center justify-center gap-1.5 transition"
+                    className={`w-full py-3 rounded-2xl border border-red-500/40 font-bold text-xs flex items-center justify-center gap-1.5 transition ${
+                      isDark ? 'text-red-400 hover:bg-red-950/40' : 'text-red-600 hover:bg-red-50'
+                    }`}
                   >
                     <XCircle className="w-4 h-4" />
                     <span>{t('cancelBooking')}</span>
@@ -464,7 +486,9 @@ export default function FarmerLiveTracking() {
                 {activeBooking.status === 'completed' && (
                   <button
                     onClick={() => cancelBooking('Trip Finished', 'farmer')}
-                    className="w-full py-4 rounded-2xl bg-stone-800 hover:bg-stone-700 text-white font-black text-sm flex items-center justify-center gap-2 transition shadow-xl"
+                    className={`w-full py-4 rounded-2xl font-black text-sm flex items-center justify-center gap-2 transition shadow-xl ${
+                      isDark ? 'bg-stone-800 hover:bg-stone-700 text-white' : 'bg-slate-900 hover:bg-slate-800 text-white'
+                    }`}
                   >
                     <Sparkles className="w-4 h-4 text-amber-400" />
                     <span>{lang === 'hi' ? 'नई बुकिंग करें' : 'Book Another Machine'}</span>
