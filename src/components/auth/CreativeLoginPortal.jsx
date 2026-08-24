@@ -324,7 +324,7 @@ export default function CreativeLoginPortal() {
       isDark ? 'bg-[#090D0B] text-stone-100' : 'bg-slate-50 text-slate-900'
     }`}>
       
-      {/* ───── Background Farm Vignette ───── */}
+      {/* ───── Background Farm Vignette (Wheat Field 4K Video) ───── */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
         <video
           autoPlay
@@ -333,16 +333,16 @@ export default function CreativeLoginPortal() {
           playsInline
           preload="auto"
           className={`absolute inset-0 w-full h-full object-cover scale-105 transition-opacity duration-1000 ${
-            isDark ? 'opacity-35 grayscale-[20%]' : 'opacity-20'
+            isDark ? 'opacity-40 brightness-90' : 'opacity-25'
           }`}
           poster="https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=1920&q=80"
         >
-          <source src="https://videos.pexels.com/video-files/2421545/2421545-hd_1920_1080_30fps.mp4" type="video/mp4" />
+          <source src="/videos/hero_field_bg.mp4" type="video/mp4" />
         </video>
         <div className={`absolute inset-0 transition-colors duration-300 ${
           isDark 
-            ? 'bg-gradient-to-b from-[#090D0B]/85 via-[#090D0B]/70 to-[#090D0B]/95' 
-            : 'bg-gradient-to-b from-slate-50/80 via-slate-50/60 to-slate-50/90'
+            ? 'bg-gradient-to-b from-[#090D0B]/80 via-[#090D0B]/60 to-[#090D0B]/90' 
+            : 'bg-gradient-to-b from-slate-50/80 via-slate-50/50 to-slate-50/85'
         }`} />
       </div>
 

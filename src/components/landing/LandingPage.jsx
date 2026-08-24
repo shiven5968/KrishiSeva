@@ -81,6 +81,22 @@ export default function LandingPage({ onOpenAuthModal }) {
       {/* 1. HERO COCKPIT: What the site actually does — Right above the fold! */}
       <section className="relative overflow-hidden pt-8 pb-16 lg:pt-12 lg:pb-20 border-b border-stone-800 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-emerald-950/40 via-stone-950 to-stone-950">
         
+        {/* Background Farm Video */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            className="absolute inset-0 w-full h-full object-cover opacity-25"
+            poster="https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=1920&q=80"
+          >
+            <source src="/videos/hero_field_bg.mp4" type="video/mp4" />
+          </video>
+          <div className="absolute inset-0 bg-gradient-to-b from-stone-950/80 via-stone-950/60 to-stone-950/95" />
+        </div>
+
         {/* Subtle background grid */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f293715_1px,transparent_1px),linear-gradient(to_bottom,#1f293715_1px,transparent_1px)] bg-[size:3rem_3rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none"></div>
 
