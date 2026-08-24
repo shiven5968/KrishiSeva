@@ -48,8 +48,136 @@ import {
   Copy,
   Smartphone,
   ExternalLink,
-  QrCode
+  QrCode,
+  Package,
+  Boxes,
+  Home,
+  Building,
+  Store,
+  Warehouse
 } from 'lucide-react';
+
+// Specialized Farm Cargo Types for Transport
+export const CARGO_TYPES = [
+  {
+    id: 'grains',
+    nameKey: 'cargoGrains',
+    nameEn: 'Harvested Grains & Crops',
+    nameHi: 'अनाज / फसल (गेहूँ, धान, मक्का)',
+    icon: '🌾',
+    descEn: 'Wheat, Paddy, Mustard, Maize, Pulses',
+    descHi: 'गेहूँ, धान, मक्का, सरसों, दलहन बोरियां'
+  },
+  {
+    id: 'inputs',
+    nameKey: 'cargoInputs',
+    nameEn: 'Fertilizers, Seeds & Compost',
+    nameHi: 'खाद, उर्वरक व बीज',
+    icon: '🌱',
+    descEn: 'DAP, Urea, Organic Manure, Certified Seeds',
+    descHi: 'डीएपी, यूरिया, जैविक खाद, प्रमाणित बीज'
+  },
+  {
+    id: 'fodder',
+    nameKey: 'cargoFodder',
+    nameEn: 'Crop Straw / Bhusa / Fodder',
+    nameHi: 'भूसा, चारा व पुआल',
+    icon: '🪵',
+    descEn: 'Wheat Straw, Cattle Feed, Fodder Bales',
+    descHi: 'गेहूँ का भूसा, पशु चारा, पुआल बंडल'
+  },
+  {
+    id: 'produce',
+    nameKey: 'cargoProduce',
+    nameEn: 'Fresh Fruits & Vegetables',
+    nameHi: 'फल व ताजी सब्जियां',
+    icon: '🥭',
+    descEn: 'Malihabad Mangoes, Potatoes, Tomatoes',
+    descHi: 'मलिहाबादी आम, आलू, टमाटर, हरी सब्जियां'
+  },
+  {
+    id: 'construction',
+    nameKey: 'cargoConstruction',
+    nameEn: 'Sand / Gravel / Bricks',
+    nameHi: 'रेत, मौरंग, गिट्टी व ईंट',
+    icon: '🧱',
+    descEn: 'River Sand, Aggregate, Field Boundary Bricks',
+    descHi: 'नदी की रेत, मौरंग, गिट्टी, खेत बाउंड्री ईंटें'
+  },
+  {
+    id: 'equipment',
+    nameKey: 'cargoEquipment',
+    nameEn: 'Farm Equipment Shifting',
+    nameHi: 'कृषि यंत्र व भारी उपकरण ढुलाई',
+    icon: '⚙️',
+    descEn: 'Threshers, Generators, Pumps, Heavy Implements',
+    descHi: 'थ्रेशर, जनरेटर, सिंचाई पंप, भारी उपकरण'
+  }
+];
+
+// Specialized Transport Destinations
+export const TRANSPORT_DROP_DESTINATIONS = [
+  {
+    id: 'loc_1',
+    nameEn: 'APMC Grain Market (कृषि गल्ला मंडी)',
+    nameHi: 'नवीन कृषि उत्पादन गल्ला मंडी समिति',
+    district: 'Malihabad Mandi',
+    distanceKm: 14,
+    icon: '🏬',
+    tagEn: 'Direct Crop Sale',
+    tagHi: 'फसल बिक्री केंद्र'
+  },
+  {
+    id: 'loc_2',
+    nameEn: 'Regional Cold Storage & Fruit Silo',
+    nameHi: 'कोल्ड स्टोरेज एवं साइलो गोदाम',
+    district: 'Kakori Complex',
+    distanceKm: 22,
+    icon: '🏭',
+    tagEn: 'Perishable Storage',
+    tagHi: 'शीतगृह भंडारण'
+  },
+  {
+    id: 'loc_3',
+    nameEn: 'Central FCI Grain Godown / Depot',
+    nameHi: 'एफसीआई अनाज गोदाम / वेयरहाउस',
+    district: 'Bakshi Ka Talab',
+    distanceKm: 8,
+    icon: '🏢',
+    tagEn: 'Govt Procurement',
+    tagHi: 'सरकारी क्रय केंद्र'
+  },
+  {
+    id: 'loc_4',
+    nameEn: 'Local Flour & Processing Mill',
+    nameHi: 'आटा व राइस प्रोसेसिंग मिल',
+    district: 'Dubagga Industrial Area',
+    distanceKm: 18,
+    icon: '🌾',
+    tagEn: 'Direct Buyer',
+    tagHi: 'सीधा खरीदार'
+  },
+  {
+    id: 'loc_5',
+    nameEn: 'Farmer Residence / Private Godown',
+    nameHi: 'किसान का घर / निजी गोदाम',
+    district: 'Gram Panchayat Rampur',
+    distanceKm: 4,
+    icon: '🏡',
+    tagEn: 'Home Delivery',
+    tagHi: 'घर तक ढुलाई'
+  },
+  {
+    id: 'loc_6',
+    nameEn: 'Custom Destination Address (Enter Custom Km)',
+    nameHi: 'अन्य गंतव्य स्थान (कस्टम दूरी दर्ज करें)',
+    district: 'Custom Location',
+    distanceKm: 12,
+    icon: '📍',
+    tagEn: 'Flexible Distance',
+    tagHi: 'इच्छानुसार दूरी'
+  }
+];
 
 // Refined Vector Icon Helpers
 const getCategoryIcon = (catId, isSelected) => {
@@ -148,10 +276,21 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
   const [customDistanceKm, setCustomDistanceKm] = useState(14);
   const [customDistanceText, setCustomDistanceText] = useState('14');
 
+  // Truck / Logistics Specific States (Cargo & Where to Go)
+  const [selectedCargoId, setSelectedCargoId] = useState('grains');
+  const [customCargoText, setCustomCargoText] = useState('');
+  const [customDropLocationName, setCustomDropLocationName] = useState('');
+  const [cargoWeightTons, setCargoWeightTons] = useState(5);
+
   // Active Unit Metadata
   const currentUnitMeta = useMemo(() => {
     return SUPPORTED_QUANTITY_UNITS.find(u => u.id === selectedUnit) || SUPPORTED_QUANTITY_UNITS[0];
   }, [selectedUnit]);
+
+  // Selected Cargo Object
+  const currentCargo = useMemo(() => {
+    return CARGO_TYPES.find(c => c.id === selectedCargoId) || CARGO_TYPES[0];
+  }, [selectedCargoId]);
 
   // Auto-fill quantity and location when Saved Land changes
   useEffect(() => {
@@ -241,13 +380,13 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
 
   // Active Drop Location for Transport
   const currentDropLocation = useMemo(() => {
-    return MOCK_DROP_LOCATIONS.find(loc => loc.id === selectedDropLocationId) || MOCK_DROP_LOCATIONS[0];
+    return TRANSPORT_DROP_DESTINATIONS.find(loc => loc.id === selectedDropLocationId) || TRANSPORT_DROP_DESTINATIONS[0];
   }, [selectedDropLocationId]);
 
   // Effective Distance in Km
   const effectiveDistanceKm = useMemo(() => {
-    if (selectedDropLocationId === 'loc_5') {
-      return Number(customDistanceKm) || 10;
+    if (selectedDropLocationId === 'loc_6') {
+      return Number(customDistanceKm) || 12;
     }
     return currentDropLocation.distanceKm;
   }, [selectedDropLocationId, customDistanceKm, currentDropLocation]);
@@ -338,9 +477,32 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
         landName: selectedLand?.name,
         landSize: selectedCategoryId === 'truck' ? effectiveDistanceKm : quantityInput,
         sizeUnit: selectedCategoryId === 'truck' ? 'km' : selectedUnit,
-        dropLocation: selectedCategoryId === 'truck' ? currentDropLocation.name : null,
+        dropLocation: selectedCategoryId === 'truck' 
+          ? (selectedDropLocationId === 'loc_6' ? (customDropLocationName || 'Custom Destination') : currentDropLocation.nameEn)
+          : null,
+        cargoName: selectedCategoryId === 'truck' ? (lang === 'hi' ? currentCargo.nameHi : currentCargo.nameEn) : null,
+        cargoDetails: selectedCategoryId === 'truck' ? (customCargoText || currentCargo.descEn) : null,
+        pickupAddress: selectedLand?.address || 'Khet #14, Gram Malihabad',
         estimatedPrice: fareResult.total,
         estimatedETA: lang === 'hi' ? '35-60 मिनट' : '35-60 Mins'
+      };
+    }
+
+    if (selectedCategoryId === 'truck') {
+      const cargoNameStr = lang === 'hi' ? currentCargo.nameHi : currentCargo.nameEn;
+      const dropNameStr = selectedDropLocationId === 'loc_6' 
+        ? (customDropLocationName || (lang === 'hi' ? 'कस्टम गंतव्य स्थान' : 'Custom Destination'))
+        : (lang === 'hi' ? currentDropLocation.nameHi : currentDropLocation.nameEn);
+
+      payload = {
+        ...payload,
+        cargoId: selectedCargoId,
+        cargoName: cargoNameStr,
+        cargoDetails: customCargoText || (lang === 'hi' ? currentCargo.descHi : currentCargo.descEn),
+        pickupAddress: selectedLand?.address || 'Khet #14, Gram Malihabad',
+        dropLocation: dropNameStr,
+        distanceKm: effectiveDistanceKm,
+        cargoWeightTons: cargoWeightTons
       };
     }
 
@@ -694,8 +856,116 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
             </div>
           </div>
 
-          {/* STEP 3: Mandatory Implement/Attachment Selection for Tractors */}
-          {currentCategory.attachments && currentCategory.attachments.length > 0 && (
+          {/* STEP 3: Mandatory Implement/Attachment Selection OR Cargo Selection for Truck */}
+          {selectedCategoryId === 'truck' ? (
+            <div className={`rounded-3xl p-6 sm:p-7 border shadow-2xl space-y-5 animate-fade-in transition-colors duration-200 ${
+              isDark ? 'bg-stone-900/70 backdrop-blur-xl border-stone-800/80 shadow-black/40' : 'bg-white border-slate-200 shadow-slate-200/50'
+            }`}>
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-[11px] font-black uppercase tracking-widest text-emerald-500">{lang === 'hi' ? 'चरण 3' : 'STEP 3'}</span>
+                  <h3 className={`text-lg sm:text-xl font-black tracking-tight mt-0.5 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    {lang === 'hi' ? 'क्या उठाना है? माल / फसल सामग्री का प्रकार' : 'What to Pick Up? (Select Cargo Type)'}
+                  </h3>
+                  <p className={`text-xs ${isDark ? 'text-stone-400' : 'text-slate-500'} mt-0.5`}>
+                    {lang === 'hi' ? 'ट्रक अथवा ट्रैक्टर-ट्रॉली में ढुलाई हेतु फसल/सामग्री का चयन करें' : 'Select agricultural produce or materials to load and transport'}
+                  </p>
+                </div>
+                <span className={`text-xs font-bold px-3 py-1 rounded-full border ${
+                  isDark ? 'text-blue-400 bg-blue-950/70 border-blue-500/30' : 'text-blue-800 bg-blue-50 border-blue-200'
+                }`}>
+                  {lang === 'hi' ? '📦 अनिवार्य माल चयन' : '📦 Mandatory Cargo'}
+                </span>
+              </div>
+
+              {/* 6-Grid of Farm Cargo Types */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {CARGO_TYPES.map(cargo => {
+                  const isSelected = selectedCargoId === cargo.id;
+                  return (
+                    <div
+                      key={cargo.id}
+                      onClick={() => setSelectedCargoId(cargo.id)}
+                      className={`p-4 rounded-2xl border transition-all duration-300 cursor-pointer space-y-2 relative ${
+                        isSelected
+                          ? isDark ? 'border-emerald-500/80 bg-emerald-950/40 shadow-xl shadow-emerald-950/60 ring-1 ring-emerald-500/40' : 'border-emerald-500 bg-emerald-50/80 shadow-md ring-1 ring-emerald-500/40'
+                          : isDark ? 'border-stone-800 bg-stone-950/60 hover:border-stone-700 hover:bg-stone-900/60 text-stone-300' : 'border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100 text-slate-700'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-2xl">{cargo.icon}</span>
+                        <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                          isSelected ? 'border-emerald-400 bg-emerald-400' : isDark ? 'border-stone-700' : 'border-slate-300'
+                        }`}>
+                          {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-stone-950" />}
+                        </div>
+                      </div>
+                      <div>
+                        <h5 className={`font-black text-xs sm:text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                          {lang === 'hi' ? cargo.nameHi : cargo.nameEn}
+                        </h5>
+                        <p className={`text-[11px] font-medium ${isDark ? 'text-stone-400' : 'text-slate-500'} mt-0.5`}>
+                          {lang === 'hi' ? cargo.descHi : cargo.descEn}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Optional Custom Cargo Details Input */}
+              <div className={`p-4 rounded-2xl border space-y-2 ${
+                isDark ? 'bg-stone-950/80 border-stone-800' : 'bg-slate-50 border-slate-200'
+              }`}>
+                <label className={`block text-[11px] font-black uppercase tracking-wider ${
+                  isDark ? 'text-stone-400' : 'text-slate-600'
+                }`}>
+                  {lang === 'hi' ? 'विशिष्ट माल विवरण / मात्रा (वैकल्पिक)' : 'Specific Cargo Quantity / Details (Optional)'}
+                </label>
+                <input
+                  type="text"
+                  value={customCargoText}
+                  onChange={(e) => setCustomCargoText(e.target.value)}
+                  placeholder={lang === 'hi' ? 'उदा. 80 बोरी गेहूं (40 क्विंटल) / 50 कट्टे डीएपी खाद / 1 पूरी ट्रॉली भूसा' : 'e.g. 80 Bags Wheat (40 Quintals) / 50 Bags Fertilizer / 1 Full Trolley'}
+                  className={`w-full px-3.5 py-2.5 rounded-xl border text-xs font-bold outline-none transition ${
+                    isDark ? 'bg-stone-900 border-stone-700 text-white focus:border-emerald-500' : 'bg-white border-slate-300 text-slate-900 focus:border-emerald-500'
+                  }`}
+                />
+              </div>
+
+              {/* Vehicle Body / Trolley Type Selection */}
+              <div className="space-y-2">
+                <label className={`block text-[11px] font-black uppercase tracking-wider ${
+                  isDark ? 'text-stone-400' : 'text-slate-600'
+                }`}>
+                  {lang === 'hi' ? 'वाहन बॉडी व ट्रॉली का प्रकार:' : 'Select Truck / Trolley Body Type:'}
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                  {currentCategory.attachments?.map(att => {
+                    const isSelected = selectedAttachmentId === att.id;
+                    return (
+                      <div
+                        key={att.id}
+                        onClick={() => setSelectedAttachmentId(att.id)}
+                        className={`p-3 rounded-xl border cursor-pointer text-xs flex items-center justify-between ${
+                          isSelected
+                            ? isDark ? 'border-blue-500/80 bg-blue-950/40 text-white font-bold' : 'border-blue-500 bg-blue-50 text-blue-950 font-bold'
+                            : isDark ? 'border-stone-800 bg-stone-950/60 text-stone-300 hover:border-stone-700' : 'border-slate-200 bg-slate-50 text-slate-700'
+                        }`}
+                      >
+                        <span className="flex items-center gap-2">
+                          <span>{att.icon}</span>
+                          <span>{t(att.nameKey)}</span>
+                        </span>
+                        {isSelected && <Check className="w-3.5 h-3.5 text-blue-400" />}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+            </div>
+          ) : currentCategory.attachments && currentCategory.attachments.length > 0 && (
             <div className={`rounded-3xl p-6 sm:p-7 border shadow-2xl space-y-5 animate-fade-in transition-colors duration-200 ${
               isDark ? 'bg-stone-900/70 backdrop-blur-xl border-stone-800/80 shadow-black/40' : 'bg-white border-slate-200 shadow-slate-200/50'
             }`}>
@@ -760,7 +1030,7 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
             </div>
           )}
 
-          {/* STEP 4: Universal Multi-Unit Farmland Size & Quantity Selector */}
+          {/* STEP 4: Farmland Size OR Where to Go (Pickup & Delivery Destination) */}
           <div className={`rounded-3xl p-6 sm:p-7 border shadow-2xl space-y-5 transition-colors duration-200 ${
             isDark ? 'bg-stone-900/70 backdrop-blur-xl border-stone-800/80 shadow-black/40' : 'bg-white border-slate-200 shadow-slate-200/50'
           }`}>
@@ -768,14 +1038,18 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
               <div>
                 <span className="text-[11px] font-black uppercase tracking-widest text-emerald-500">{lang === 'hi' ? 'चरण 4' : 'STEP 4'}</span>
                 <h3 className={`text-lg sm:text-xl font-black tracking-tight mt-0.5 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  {lang === 'hi' ? 'खेत का आकार व मात्रा' : 'Farmland Size & Quantity'}
+                  {selectedCategoryId === 'truck' 
+                    ? (lang === 'hi' ? 'कहाँ ले जाना है? पिकअप व गंतव्य रूट' : 'Where to Go? (Pickup & Delivery Destination)')
+                    : (lang === 'hi' ? 'खेत का आकार व मात्रा' : 'Farmland Size & Quantity')}
                 </h3>
               </div>
               <span className={`text-xs font-black px-3 py-1 rounded-full border flex items-center gap-1.5 ${
-                isDark ? 'text-emerald-400 bg-emerald-950/70 border-emerald-500/30' : 'text-emerald-700 bg-emerald-50 border-emerald-200'
+                selectedCategoryId === 'truck'
+                  ? isDark ? 'text-blue-400 bg-blue-950/70 border-blue-500/30' : 'text-blue-700 bg-blue-50 border-blue-200'
+                  : isDark ? 'text-emerald-400 bg-emerald-950/70 border-emerald-500/30' : 'text-emerald-700 bg-emerald-50 border-emerald-200'
               }`}>
-                <Ruler className="w-3.5 h-3.5" />
-                <span>{lang === 'hi' ? 'सभी इकाइयाँ समर्थित' : 'Multi-Unit Enabled'}</span>
+                {selectedCategoryId === 'truck' ? <Navigation className="w-3.5 h-3.5" /> : <Ruler className="w-3.5 h-3.5" />}
+                <span>{selectedCategoryId === 'truck' ? (lang === 'hi' ? 'दूरी व रूट आधारित दर' : 'Route & Km Based') : (lang === 'hi' ? 'सभी इकाइयाँ समर्थित' : 'Multi-Unit Enabled')}</span>
               </span>
             </div>
 
@@ -926,25 +1200,122 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
               </div>
             )}
 
-            {/* Mode 2: Truck / Trolley (Distance) */}
+            {/* Mode 2: Truck / Trolley Logistics (Where to Go / Pickup & Delivery Route) */}
             {selectedCategoryId === 'truck' && (
-              <div className="space-y-3">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  {MOCK_DROP_LOCATIONS.map(loc => (
-                    <div
-                      key={loc.id}
-                      onClick={() => setSelectedDropLocationId(loc.id)}
-                      className={`p-3.5 rounded-2xl border transition-all cursor-pointer text-xs flex items-center justify-between ${
-                        selectedDropLocationId === loc.id
-                          ? isDark ? 'border-blue-500/80 bg-blue-950/40 text-white font-bold' : 'border-blue-500 bg-blue-50 text-blue-950 font-bold'
-                          : isDark ? 'border-stone-800 bg-stone-950/60 hover:border-stone-700 text-stone-300' : 'border-slate-200 bg-slate-50 hover:border-slate-300 text-slate-700'
-                      }`}
-                    >
-                      <span className={isDark ? 'text-stone-200' : 'text-slate-800'}>{loc.name}</span>
-                      <span className="font-black text-blue-500">~{loc.distanceKm} km</span>
+              <div className="space-y-5 animate-fade-in">
+                
+                {/* 1. Pickup Origin Point (Default: Farm) */}
+                <div className={`p-4 rounded-2xl border flex items-center justify-between gap-3 ${
+                  isDark ? 'bg-stone-950/80 border-stone-800' : 'bg-slate-50 border-slate-200'
+                }`}>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-950 border border-emerald-500/40 text-emerald-400 flex items-center justify-center text-lg shrink-0">
+                      📍
                     </div>
-                  ))}
+                    <div>
+                      <span className="text-[10px] font-black text-emerald-400 uppercase tracking-wider block">
+                        {lang === 'hi' ? 'माल उठाने का स्थान (Pickup Point)' : 'Origin / Pickup Point'}
+                      </span>
+                      <p className={`font-black text-xs sm:text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                        {selectedLand ? localize(selectedLand.name) : (lang === 'hi' ? 'खेत #14, मलिहाबाद' : 'Farm #14, Malihabad')}
+                      </p>
+                    </div>
+                  </div>
+
+                  <span className={`text-[10px] font-bold px-2.5 py-1 rounded-lg border ${
+                    isDark ? 'bg-stone-900 text-stone-300 border-stone-700' : 'bg-white text-slate-700 border-slate-300'
+                  }`}>
+                    {lang === 'hi' ? 'खेत जीपीएस सुरक्षित' : 'Farm GPS Lock'}
+                  </span>
                 </div>
+
+                {/* 2. Destination Selection Grid (Where to go) */}
+                <div className="space-y-2.5">
+                  <label className={`block text-xs font-bold uppercase tracking-wider ${
+                    isDark ? 'text-stone-400' : 'text-slate-600'
+                  }`}>
+                    {lang === 'hi' ? 'गंतव्य स्थान चुनें (Select Delivery Destination):' : 'Select Delivery Destination / Market Yard:'}
+                  </label>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {TRANSPORT_DROP_DESTINATIONS.map(loc => {
+                      const isLocSelected = selectedDropLocationId === loc.id;
+                      return (
+                        <div
+                          key={loc.id}
+                          onClick={() => setSelectedDropLocationId(loc.id)}
+                          className={`p-4 rounded-2xl border transition-all duration-200 cursor-pointer space-y-2 ${
+                            isLocSelected
+                              ? isDark ? 'border-blue-500/80 bg-blue-950/40 text-white shadow-lg ring-1 ring-blue-500/40' : 'border-blue-500 bg-blue-50 text-blue-950 shadow-md ring-1 ring-blue-500/40'
+                              : isDark ? 'border-stone-800 bg-stone-950/60 hover:border-stone-700 text-stone-300' : 'border-slate-200 bg-slate-50 hover:border-slate-300 text-slate-700'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-xl">{loc.icon}</span>
+                            <span className="font-mono font-black text-xs text-blue-400 bg-blue-950/80 px-2 py-0.5 rounded-md border border-blue-800/60">
+                              ~{loc.distanceKm} km
+                            </span>
+                          </div>
+                          <div>
+                            <h5 className={`font-black text-xs sm:text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                              {lang === 'hi' ? loc.nameHi : loc.nameEn}
+                            </h5>
+                            <p className={`text-[10px] font-medium ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+                              {loc.district} • <span className="text-emerald-400 font-bold">{lang === 'hi' ? loc.tagHi : loc.tagEn}</span>
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* 3. If Custom Destination is Selected */}
+                {selectedDropLocationId === 'loc_6' && (
+                  <div className={`p-4 rounded-2xl border space-y-3.5 ${
+                    isDark ? 'bg-stone-950/80 border-stone-800' : 'bg-slate-50 border-slate-200'
+                  }`}>
+                    <div>
+                      <label className={`block text-[11px] font-black uppercase tracking-wider mb-1.5 ${
+                        isDark ? 'text-stone-400' : 'text-slate-600'
+                      }`}>
+                        {lang === 'hi' ? 'कस्टम गंतव्य का नाम व पता:' : 'Custom Destination Address:'}
+                      </label>
+                      <input
+                        type="text"
+                        value={customDropLocationName}
+                        onChange={(e) => setCustomDropLocationName(e.target.value)}
+                        placeholder={lang === 'hi' ? 'उदा. दुबग्गा मंडी / सीतापुर रोड वेयरहाउस' : 'e.g. Dubagga Mandi / Sitapur Road Warehouse'}
+                        className={`w-full px-3.5 py-2.5 rounded-xl border text-xs font-bold outline-none transition ${
+                          isDark ? 'bg-stone-900 border-stone-700 text-white focus:border-blue-500' : 'bg-white border-slate-300 text-slate-900 focus:border-blue-500'
+                        }`}
+                      />
+                    </div>
+
+                    <div>
+                      <div className="flex justify-between items-center mb-1.5">
+                        <label className={`text-[11px] font-black uppercase tracking-wider ${
+                          isDark ? 'text-stone-400' : 'text-slate-600'
+                        }`}>
+                          {lang === 'hi' ? 'खेत से कुल दूरी (किमी):' : 'Total Distance from Farm (Km):'}
+                        </label>
+                        <span className="font-mono font-black text-sm text-blue-400">
+                          {customDistanceKm} Km
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min="2"
+                        max="100"
+                        step="1"
+                        value={customDistanceKm}
+                        onChange={(e) => setCustomDistanceKm(Number(e.target.value))}
+                        className="w-full accent-blue-500 cursor-pointer h-2 rounded-lg bg-stone-800"
+                      />
+                    </div>
+                  </div>
+                )}
+
               </div>
             )}
 
@@ -1003,10 +1374,12 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
 
               <div className="text-right">
                 <span className="text-xs font-black px-3 py-1 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/40">
-                  {t(currentCategory.nameKey)}
+                  {selectedCategoryId === 'truck' ? (lang === 'hi' ? 'ट्रक / ट्रॉली ढुलाई' : 'Truck Logistics') : t(currentCategory.nameKey)}
                 </span>
                 <p className="text-[11px] text-stone-300 mt-1.5 font-medium">
-                  + {t(currentAttachment?.nameKey)}
+                  {selectedCategoryId === 'truck' 
+                    ? `+ ${lang === 'hi' ? currentCargo.nameHi : currentCargo.nameEn}` 
+                    : `+ ${t(currentAttachment?.nameKey)}`}
                 </p>
               </div>
             </div>
@@ -1028,10 +1401,25 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
               </div>
             ) : (
               <div className="p-4 rounded-2xl bg-black/40 border border-white/10 space-y-2 text-xs">
-                <div className="flex justify-between items-center text-stone-200">
-                  <span className="font-medium text-stone-400">{lang === 'hi' ? 'दर गणना:' : 'Calculation Formula:'}</span>
-                  <span className="font-extrabold text-emerald-400">{fareResult.breakdownText}</span>
-                </div>
+                {selectedCategoryId === 'truck' ? (
+                  <>
+                    <div className="flex justify-between items-center text-stone-200">
+                      <span className="font-medium text-stone-400">{lang === 'hi' ? 'परिवहन रूट:' : 'Transport Route:'}</span>
+                      <span className="font-bold text-blue-300 truncate max-w-[200px]">
+                        📍 {selectedLand?.name || 'Farm'} ➔ {selectedDropLocationId === 'loc_6' ? (customDropLocationName || 'Custom') : (lang === 'hi' ? currentDropLocation.nameHi : currentDropLocation.nameEn)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center text-stone-200">
+                      <span className="font-medium text-stone-400">{lang === 'hi' ? 'दर गणना:' : 'Fare Formula:'}</span>
+                      <span className="font-extrabold text-emerald-400">₹500 बेस + ({effectiveDistanceKm} km × ₹50)</span>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex justify-between items-center text-stone-200">
+                    <span className="font-medium text-stone-400">{lang === 'hi' ? 'दर गणना:' : 'Calculation Formula:'}</span>
+                    <span className="font-extrabold text-emerald-400">{fareResult.breakdownText}</span>
+                  </div>
+                )}
                 <div className="flex justify-between items-center text-stone-200">
                   <span className="font-medium text-stone-400">{lang === 'hi' ? 'अनुमानित आगमन समय:' : 'Estimated Farm Arrival:'}</span>
                   <span className="font-bold text-amber-300">{lang === 'hi' ? '~35-60 मिनट (सीधा खेत पर)' : '~35-60 Mins (Direct Dispatch)'}</span>

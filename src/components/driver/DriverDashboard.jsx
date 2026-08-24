@@ -65,10 +65,6 @@ export default function DriverDashboard() {
     acreRate: driverProfile.acreRate || 1300
   });
 
-  // Map floating state triggers
-  const [isSatellite, setIsSatellite] = useState(false);
-  const [recenterKey, setRecenterKey] = useState(0);
-
   const isOnline = driverProfile.status === 'online';
 
   // If driver has accepted an active booking, render the full turn-by-turn Navigation Screen
@@ -363,34 +359,9 @@ export default function DriverDashboard() {
                   </span>
                 </div>
 
-                {/* Map Container with Floating Control Chips */}
+                {/* Map Container */}
                 <div className="relative rounded-2xl overflow-hidden border border-stone-800/80 shadow-inner">
-                  
-                  {/* Floating Action Chips over the map */}
-                  <div className="absolute top-3 right-3 z-[400] flex items-center gap-2">
-                    <button
-                      onClick={() => setIsSatellite(!isSatellite)}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold border backdrop-blur-md shadow-md transition flex items-center gap-1.5 active:scale-95 ${
-                        isSatellite 
-                          ? 'bg-emerald-500 text-stone-950 border-emerald-400 font-black' 
-                          : 'bg-stone-950/80 text-stone-200 border-stone-700 hover:bg-stone-900'
-                      }`}
-                    >
-                      <Layers className="w-3.5 h-3.5" />
-                      <span>{isSatellite ? '🛰️ Satellite On' : '🛰️ Satellite'}</span>
-                    </button>
-
-                    <button
-                      onClick={() => setRecenterKey(prev => prev + 1)}
-                      className="px-3 py-1.5 rounded-xl text-xs font-bold border bg-stone-950/80 hover:bg-stone-900 text-stone-200 border-stone-700 backdrop-blur-md shadow-md transition flex items-center gap-1.5 active:scale-95"
-                    >
-                      <Crosshair className="w-3.5 h-3.5 text-emerald-400" />
-                      <span>🎯 Recenter</span>
-                    </button>
-                  </div>
-
                   <LiveMap
-                    key={recenterKey}
                     farmerLocation={null}
                     driverPos={driverCurrentPos}
                     activeVehicleType={driverProfile.vehicleType}

@@ -85,39 +85,49 @@ export default function IncomingRideModal({ booking, onAccept, onReject }) {
           </div>
         </div>
 
-        {/* Required Machine & Attachment (Requirement 2: machine/attachment needed) */}
+        {/* Required Machine & Attachment / Cargo */}
         <div className="space-y-3 text-xs">
           
           <div className="p-3.5 rounded-2xl bg-stone-50 border border-stone-200 flex items-start gap-3">
             <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center text-xl shrink-0">
-              🚜
+              {booking.machineryType === 'truck' ? '🚛' : '🚜'}
             </div>
             <div>
               <span className="text-[10px] text-stone-400 font-black uppercase">
-                {t('requiredMachine')}
+                {booking.machineryType === 'truck' ? (lang === 'hi' ? 'सामग्री व वाहन प्रकार' : 'Cargo & Vehicle') : t('requiredMachine')}
               </span>
               <p className="font-extrabold text-stone-900 text-sm">
-                {t(booking.machineryType)} + <span className="text-emerald-700">{t(booking.attachment?.nameKey)}</span>
+                {booking.machineryType === 'truck' 
+                  ? (booking.cargoName ? `${booking.cargoName} • ${t(booking.machineryType)}` : `${t(booking.machineryType)} + ${t(booking.attachment?.nameKey)}`)
+                  : `${t(booking.machineryType)} + ${t(booking.attachment?.nameKey)}`}
               </p>
-              <p className="text-stone-500 mt-0.5">
-                {t(booking.attachment?.descKey)}
+              <p className="text-stone-500 mt-0.5 font-medium">
+                {booking.machineryType === 'truck' && booking.cargoDetails
+                  ? `📦 ${booking.cargoDetails}`
+                  : t(booking.attachment?.descKey)}
               </p>
             </div>
           </div>
 
-          {/* Farmer Location (Requirement 2: User's location) */}
+          {/* Farmer Location & Destination (Requirement 2: User's location & Where to Go) */}
           <div className="p-3.5 rounded-2xl bg-stone-50 border border-stone-200 flex items-start gap-3">
             <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
               <MapPin className="w-5 h-5" />
             </div>
-            <div>
+            <div className="w-full">
               <span className="text-[10px] text-stone-400 font-black uppercase">
-                {t('farmerLocation')}
+                {booking.machineryType === 'truck' ? (lang === 'hi' ? 'पिकअप व डिलीवरी रूट' : 'Pickup & Drop Route') : t('farmerLocation')}
               </span>
               <p className="font-bold text-stone-900 text-sm">
-                {booking.farmerLocation?.address || 'Rampur Khet, Malihabad'}
+                {booking.pickupAddress || booking.farmerLocation?.address || 'Rampur Khet, Malihabad'}
               </p>
-              <p className="text-stone-500 font-medium">
+              {booking.machineryType === 'truck' && booking.dropLocation && (
+                <p className="text-blue-700 font-extrabold text-xs mt-1 flex items-center gap-1">
+                  <span>➔</span>
+                  <span>{lang === 'hi' ? 'डिलीवरी गंतव्य:' : 'Delivery Drop:'} {booking.dropLocation} (~{booking.landSize} km)</span>
+                </p>
+              )}
+              <p className="text-stone-500 font-medium mt-0.5">
                 Farmer: {booking.farmerName} • ETA: ~6 Mins (1.8 km)
               </p>
             </div>
