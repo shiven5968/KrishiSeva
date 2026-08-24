@@ -38,19 +38,12 @@ export default function AdminLoginGate({ onAdminLoginSuccess }) {
       quickDemoLogin('admin');
       setError('');
       if (onAdminLoginSuccess) onAdminLoginSuccess();
-    } else {
       setError(
         lang === 'hi' 
-          ? 'अमान्य यूजर आईडी या पासकी। डेमो: User ID: admin_krishi, Passkey: 9999' 
-          : 'Invalid Admin User ID or Passkey. Click "Quick Fill Demo Passkey" below.'
+          ? 'अमान्य यूजर आईडी या पासकी।' 
+          : 'Invalid Admin User ID or Passkey.'
       );
     }
-  };
-
-  const handleQuickFillDemo = () => {
-    setUserId('admin_krishi');
-    setPasskey('9999');
-    setError('');
   };
 
   return (
@@ -189,22 +182,7 @@ export default function AdminLoginGate({ onAdminLoginSuccess }) {
             </button>
           </form>
 
-          {/* ⚡ Interactive Quick Demo Autofill */}
-          <div className="pt-1">
-            <button
-              type="button"
-              onClick={handleQuickFillDemo}
-              className="w-full p-3 rounded-2xl bg-stone-950/80 hover:bg-stone-900 border border-stone-800 hover:border-emerald-500/50 text-stone-400 hover:text-emerald-300 text-xs font-bold transition-all duration-200 flex items-center justify-between group active:scale-95"
-            >
-              <div className="flex items-center gap-2">
-                <Zap className="w-4 h-4 text-amber-400 group-hover:scale-110 transition-transform" />
-                <span>{lang === 'hi' ? '⚡ त्वरित पासकी भरें (डेमो)' : '⚡ Quick Fill Demo Passkey'}</span>
-              </div>
-              <span className="font-mono text-[11px] px-2 py-0.5 rounded-lg bg-emerald-950/80 text-emerald-400 border border-emerald-800/60">
-                admin_krishi • 9999
-              </span>
-            </button>
-          </div>
+
 
         </div>
 
