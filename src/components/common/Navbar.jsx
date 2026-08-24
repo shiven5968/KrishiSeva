@@ -23,7 +23,6 @@ import {
   Menu,
   X,
   Calendar,
-  User,
   ChevronRight
 } from 'lucide-react';
 
@@ -244,12 +243,87 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
                   </div>
                 )}
 
-                {/* 1. 👤 ACCOUNT & PREFERENCES */}
-                <div className="space-y-1.5">
+                {/* 1. 📌 MY FARM DATA & BOOKINGS (Shown for Farmers) */}
+                {currentUser && currentUser.isAuthenticated && currentUser.role === 'farmer' && (
+                  <div className="space-y-1.5">
+                    <span className={`text-[10px] font-black uppercase tracking-wider block px-1 ${
+                      isDark ? 'text-stone-400' : 'text-slate-500'
+                    }`}>
+                      📌 {lang === 'hi' ? 'खेत का डेटा व बुकिंग्स' : 'My Farm Data & Bookings'}
+                    </span>
+
+                    {/* Booking History */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        setIsHistoryModalOpen(true);
+                      }}
+                      className={`w-full p-2.5 rounded-xl border flex items-center justify-between text-xs font-bold transition active:scale-98 ${
+                        isDark 
+                          ? 'bg-stone-900/60 hover:bg-emerald-950/40 border-stone-800/80 hover:border-emerald-500/40 text-stone-200 hover:text-emerald-300' 
+                          : 'bg-slate-50 hover:bg-emerald-50 border-slate-200 hover:border-emerald-200 text-slate-800 hover:text-emerald-800'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <History className="w-4 h-4 text-emerald-400" />
+                        <span>{lang === 'hi' ? 'मेरी बुकिंग इतिहास' : 'My History'}</span>
+                      </div>
+                      <ChevronRight className="w-3.5 h-3.5 text-stone-400" />
+                    </button>
+
+                    {/* Pre-Bookings */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        setIsPreBookingsModalOpen(true);
+                      }}
+                      className={`w-full p-2.5 rounded-xl border flex items-center justify-between text-xs font-bold transition active:scale-98 ${
+                        isDark 
+                          ? 'bg-stone-900/60 hover:bg-blue-950/40 border-stone-800/80 hover:border-blue-500/40 text-stone-200 hover:text-blue-300' 
+                          : 'bg-slate-50 hover:bg-blue-50 border-slate-200 hover:border-blue-200 text-slate-800 hover:text-blue-800'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <Calendar className="w-4 h-4 text-blue-400" />
+                        <span>{lang === 'hi' ? 'अग्रिम बुकिंग' : 'Pre-Bookings'}</span>
+                      </div>
+                      <span className="text-[10px] font-black text-blue-400 bg-blue-950/80 px-2 py-0.5 rounded-md border border-blue-500/30">
+                        {preBookings?.length || 0}
+                      </span>
+                    </button>
+
+                    {/* My Saved Lands */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        setIsSavedLandsModalOpen(true);
+                      }}
+                      className={`w-full p-2.5 rounded-xl border flex items-center justify-between text-xs font-bold transition active:scale-98 ${
+                        isDark 
+                          ? 'bg-stone-900/60 hover:bg-emerald-950/40 border-stone-800/80 hover:border-emerald-500/40 text-stone-200 hover:text-emerald-300' 
+                          : 'bg-slate-50 hover:bg-emerald-50 border-slate-200 hover:border-emerald-200 text-slate-800 hover:text-emerald-800'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <Bookmark className="w-4 h-4 text-emerald-400" />
+                        <span>{lang === 'hi' ? 'मेरे सहेजे गए खेत' : 'My Saved Lands'}</span>
+                      </div>
+                      <span className="text-[10px] font-black text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded-md border border-emerald-500/30">
+                        {savedLands?.length || 0}
+                      </span>
+                    </button>
+                  </div>
+                )}
+
+                {/* 2. ⚙️ PREFERENCES & ACCOUNT */}
+                <div className={`space-y-1.5 ${currentUser?.role === 'farmer' ? 'pt-2 border-t border-white/10' : ''}`}>
                   <span className={`text-[10px] font-black uppercase tracking-wider block px-1 ${
                     isDark ? 'text-stone-400' : 'text-slate-500'
                   }`}>
-                    👤 {lang === 'hi' ? 'खाता व प्राथमिकताएं' : 'Account & Preferences'}
+                    ⚙️ {lang === 'hi' ? 'प्राथमिकताएं व खाता' : 'Preferences & Account'}
                   </span>
 
                   {/* Theme Switcher (Dark / Light) */}
@@ -268,7 +342,7 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
                       ) : (
                         <Sun className="w-4 h-4 text-amber-500" />
                       )}
-                      <span>{lang === 'hi' ? 'थीम मोड' : 'Theme Mode'}</span>
+                      <span>{lang === 'hi' ? 'थीम मोड' : 'Switch Theme Mode'}</span>
                     </div>
                     <span className={`text-[10px] font-black px-2 py-0.5 rounded-lg border ${
                       isDark ? 'bg-stone-800 text-amber-300 border-amber-500/30' : 'bg-white text-indigo-700 border-indigo-200'
@@ -297,93 +371,9 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
                       {lang === 'hi' ? '🇮🇳 हिंदी' : '🌐 English'}
                     </span>
                   </button>
-                </div>
 
-                {/* 2. 📌 NAVIGATION & SAVED DATA (Shown for Logged In Users) */}
-                {currentUser && currentUser.isAuthenticated && currentUser.role === 'farmer' && (
-                  <div className="space-y-1.5">
-                    <span className={`text-[10px] font-black uppercase tracking-wider block px-1 ${
-                      isDark ? 'text-stone-400' : 'text-slate-500'
-                    }`}>
-                      📌 {lang === 'hi' ? 'नेविगेशन व सहेजा गया डेटा' : 'Navigation & Saved Data'}
-                    </span>
-
-                    {/* Booking History */}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsMenuOpen(false);
-                        setIsHistoryModalOpen(true);
-                      }}
-                      className={`w-full p-2.5 rounded-xl border flex items-center justify-between text-xs font-bold transition active:scale-98 ${
-                        isDark 
-                          ? 'bg-stone-900/60 hover:bg-emerald-950/40 border-stone-800/80 hover:border-emerald-500/40 text-stone-200 hover:text-emerald-300' 
-                          : 'bg-slate-50 hover:bg-emerald-50 border-slate-200 hover:border-emerald-200 text-slate-800 hover:text-emerald-800'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <History className="w-4 h-4 text-emerald-400" />
-                        <span>{lang === 'hi' ? 'बुकिंग इतिहास' : 'Booking History'}</span>
-                      </div>
-                      <ChevronRight className="w-3.5 h-3.5 text-stone-400" />
-                    </button>
-
-                    {/* My Saved Lands */}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsMenuOpen(false);
-                        setIsSavedLandsModalOpen(true);
-                      }}
-                      className={`w-full p-2.5 rounded-xl border flex items-center justify-between text-xs font-bold transition active:scale-98 ${
-                        isDark 
-                          ? 'bg-stone-900/60 hover:bg-emerald-950/40 border-stone-800/80 hover:border-emerald-500/40 text-stone-200 hover:text-emerald-300' 
-                          : 'bg-slate-50 hover:bg-emerald-50 border-slate-200 hover:border-emerald-200 text-slate-800 hover:text-emerald-800'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <Bookmark className="w-4 h-4 text-emerald-400" />
-                        <span>{lang === 'hi' ? 'मेरे सहेजे गए खेत' : 'My Saved Lands'}</span>
-                      </div>
-                      <span className="text-[10px] font-black text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded-md border border-emerald-500/30">
-                        {savedLands?.length || 0}
-                      </span>
-                    </button>
-
-                    {/* Pre-Bookings */}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsMenuOpen(false);
-                        setIsPreBookingsModalOpen(true);
-                      }}
-                      className={`w-full p-2.5 rounded-xl border flex items-center justify-between text-xs font-bold transition active:scale-98 ${
-                        isDark 
-                          ? 'bg-stone-900/60 hover:bg-blue-950/40 border-stone-800/80 hover:border-blue-500/40 text-stone-200 hover:text-blue-300' 
-                          : 'bg-slate-50 hover:bg-blue-50 border-slate-200 hover:border-blue-200 text-slate-800 hover:text-blue-800'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <Calendar className="w-4 h-4 text-blue-400" />
-                        <span>{lang === 'hi' ? 'अग्रिम बुकिंग' : 'Pre-Bookings'}</span>
-                      </div>
-                      <span className="text-[10px] font-black text-blue-400 bg-blue-950/80 px-2 py-0.5 rounded-md border border-blue-500/30">
-                        {preBookings?.length || 0}
-                      </span>
-                    </button>
-                  </div>
-                )}
-
-                {/* 3. ⚠️ ACCOUNT ACTIONS */}
-                {currentUser && currentUser.isAuthenticated && (
-                  <div className="space-y-1.5 pt-2 border-t border-white/10">
-                    <span className={`text-[10px] font-black uppercase tracking-wider block px-1 ${
-                      isDark ? 'text-stone-400' : 'text-slate-500'
-                    }`}>
-                      ⚠️ {lang === 'hi' ? 'खाता क्रियाएँ' : 'Account Actions'}
-                    </span>
-
-                    {/* Logout Option */}
+                  {/* Logout Option */}
+                  {currentUser && currentUser.isAuthenticated && (
                     <button
                       type="button"
                       onClick={() => {
@@ -402,30 +392,30 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
                       </div>
                       <span className="text-[10px] text-stone-400">🚪</span>
                     </button>
+                  )}
 
-                    {/* Delete Account Option (For Farmer) */}
-                    {currentUser.role === 'farmer' && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsMenuOpen(false);
-                          setIsDeleteAccountModalOpen(true);
-                        }}
-                        className={`w-full p-2.5 rounded-xl border flex items-center justify-between text-xs font-bold transition active:scale-98 ${
-                          isDark 
-                            ? 'bg-red-950/30 hover:bg-red-950/80 border-red-900/40 hover:border-red-600 text-red-400' 
-                            : 'bg-red-50 hover:bg-red-100 border-red-200 text-red-700'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2.5">
-                          <Trash2 className="w-4 h-4 text-red-500" />
-                          <span>{lang === 'hi' ? 'खाता स्थायी रूप से हटाएं' : 'Delete Account'}</span>
-                        </div>
-                        <span className="text-[10px] text-red-500">⚠️</span>
-                      </button>
-                    )}
-                  </div>
-                )}
+                  {/* Delete Account Option (For Farmer) */}
+                  {currentUser && currentUser.isAuthenticated && currentUser.role === 'farmer' && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        setIsDeleteAccountModalOpen(true);
+                      }}
+                      className={`w-full p-2.5 rounded-xl border flex items-center justify-between text-xs font-bold transition active:scale-98 ${
+                        isDark 
+                          ? 'bg-red-950/30 hover:bg-red-950/80 border-red-900/40 hover:border-red-600 text-red-400' 
+                          : 'bg-red-50 hover:bg-red-100 border-red-200 text-red-700'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <Trash2 className="w-4 h-4 text-red-500" />
+                        <span>{lang === 'hi' ? 'खाता स्थायी रूप से हटाएं' : 'Delete Account'}</span>
+                      </div>
+                      <span className="text-[10px] text-red-500">⚠️</span>
+                    </button>
+                  )}
+                </div>
 
               </div>
             )}

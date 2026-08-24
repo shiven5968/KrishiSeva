@@ -563,58 +563,6 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
             </p>
           </div>
         </div>
-
-        {/* Action Buttons */}
-        <div className="relative flex flex-wrap items-center gap-2.5">
-          <button
-            onClick={() => setIsHistoryModalOpen(true)}
-            className={`px-4 py-2.5 rounded-xl border font-bold text-xs flex items-center gap-2 transition-all duration-200 active:scale-95 shadow-md ${
-              isDark 
-                ? 'bg-emerald-950/70 hover:bg-emerald-900/90 text-emerald-300 border-emerald-500/40 hover:border-emerald-500 shadow-emerald-950/30' 
-                : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-200'
-            }`}
-          >
-            <History className="w-3.5 h-3.5 text-emerald-400" />
-            <span>{lang === 'hi' ? 'बुकिंग इतिहास' : 'My History'}</span>
-          </button>
-
-          <button
-            onClick={() => setIsPreBookingsModalOpen(true)}
-            className={`px-4 py-2.5 rounded-xl border font-bold text-xs flex items-center gap-2 transition-all duration-200 active:scale-95 shadow-md ${
-              isDark 
-                ? 'bg-blue-950/70 hover:bg-blue-900/90 text-blue-300 border-blue-500/30 hover:border-blue-500/60 shadow-blue-950/30' 
-                : 'bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200'
-            }`}
-          >
-            <Calendar className="w-3.5 h-3.5 text-blue-500" />
-            <span>{lang === 'hi' ? 'अग्रिम बुकिंग' : 'Pre-Bookings'} ({preBookings.length})</span>
-          </button>
-
-          <button
-            onClick={() => setIsSavedLandsModalOpen(true)}
-            className={`px-4 py-2.5 rounded-xl border font-bold text-xs flex items-center gap-2 transition-all duration-200 active:scale-95 shadow-md ${
-              isDark 
-                ? 'bg-stone-850/90 hover:bg-stone-800 text-stone-200 border-stone-700/80 hover:border-emerald-500/50 shadow-black/40' 
-                : 'bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-200'
-            }`}
-          >
-            <Bookmark className="w-3.5 h-3.5 text-emerald-500" />
-            <span>{lang === 'hi' ? 'सहेजे गए खेत' : 'My Saved Lands'} ({savedLands.length})</span>
-          </button>
-
-          <button
-            onClick={() => setIsDeleteAccountModalOpen(true)}
-            className={`px-3.5 py-2.5 rounded-xl border font-bold text-xs flex items-center gap-1.5 transition-all duration-200 active:scale-95 shadow-md ${
-              isDark 
-                ? 'bg-stone-900 hover:bg-red-950/80 text-stone-400 hover:text-red-400 border-stone-800 hover:border-red-800/60 shadow-black/40' 
-                : 'bg-slate-100 hover:bg-red-50 text-slate-500 hover:text-red-600 border-slate-200'
-            }`}
-            title={lang === 'hi' ? 'खाता हमेशा के लिए हटाएं' : 'Delete Account Permanently'}
-          >
-            <Trash2 className="w-3.5 h-3.5 text-red-500" />
-            <span>{lang === 'hi' ? 'खाता हटाएं' : 'Delete Account'}</span>
-          </button>
-        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
