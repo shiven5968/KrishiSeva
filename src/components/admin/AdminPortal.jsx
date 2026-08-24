@@ -4,7 +4,6 @@ import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import { useRealtimeSync } from '../../context/RealtimeSyncContext';
 import { usePricing } from '../../context/PricingContext';
-import LiveMap from '../map/LiveMap';
 import { 
   ShieldCheck, 
   FileText, 
@@ -29,7 +28,6 @@ import {
   LogOut,
   Activity,
   Radio,
-  Compass,
   ArrowUpRight,
   ExternalLink,
   ChevronRight,
@@ -40,8 +38,13 @@ import {
   Check,
   Zap,
   Gauge,
-  Navigation,
-  RefreshCw
+  RefreshCw,
+  LandPlot,
+  CreditCard,
+  PhoneCall,
+  CheckCircle,
+  HelpCircle,
+  FileSpreadsheet
 } from 'lucide-react';
 
 const REJECTION_REASON_PRESETS = [
@@ -49,6 +52,78 @@ const REJECTION_REASON_PRESETS = [
   'Number plate does not match vehicle registration details (नंबर प्लेट विवरण मेल नहीं खाता)',
   'Expired driving license document (ड्राइविंग लाइसेंस की वैधता समाप्त हो चुकी है)',
   'Vehicle photo incomplete or implement damaged (गाड़ी की फोटो अधूरी है)'
+];
+
+// Mock Live Platform Dispatches Stream
+const LIVE_DISPATCHES_DATA = [
+  {
+    bookingId: 'KS-8901',
+    farmerName: 'Rameshwar Singh (रामेश्वर सिंह)',
+    village: 'Gram Malihabad',
+    farmPlot: 'Gata #142 (3.0 Bigha)',
+    serviceType: 'Tractor + Rotavator (6 Feet)',
+    vehicleIcon: '🚜',
+    operatorName: 'Jagjit Singh (जगजीत सिंह)',
+    operatorPhone: '+91 9876501234',
+    operatorPlate: 'UP-32-KR-7744',
+    status: 'in_progress', // 'in_progress' | 'en_route' | 'completed' | 'pending'
+    statusText: 'In Progress (Rotavating)',
+    bigha: 3.0,
+    amount: 3900,
+    paymentMode: 'UPI (Paid)',
+    startTime: '11:42 AM'
+  },
+  {
+    bookingId: 'KS-8902',
+    farmerName: 'Balram Singh (बलराम सिंह)',
+    village: 'Gram Malihabad',
+    farmPlot: 'Gata #215 (6.0 Bigha)',
+    serviceType: 'Combine Harvester (Multi-Crop)',
+    vehicleIcon: '🌾',
+    operatorName: 'Gurpreet Brar (गुरप्रीत बराड़)',
+    operatorPhone: '+91 9876588112',
+    operatorPlate: 'PB-10-AZ-1100',
+    status: 'en_route',
+    statusText: 'En Route to Farm (ETA: 8 mins)',
+    bigha: 6.0,
+    amount: 9000,
+    paymentMode: 'UPI (Escrow Held)',
+    startTime: '12:05 PM'
+  },
+  {
+    bookingId: 'KS-8899',
+    farmerName: 'Harish Chandra (हरीश चंद्र)',
+    village: 'Kakori Sector 2',
+    farmPlot: 'Plot #88 (4.5 Bigha)',
+    serviceType: 'JCB 3DX Excavator',
+    vehicleIcon: '🏗️',
+    operatorName: 'Rampal Sharma (रामपाल शर्मा)',
+    operatorPhone: '+91 9811122233',
+    operatorPlate: 'UP-32-BT-9901',
+    status: 'completed',
+    statusText: 'Completed & Verified',
+    bigha: 4.5,
+    amount: 4500,
+    paymentMode: 'Cash on Delivery (Settled)',
+    startTime: '10:15 AM'
+  },
+  {
+    bookingId: 'KS-8898',
+    farmerName: 'Dharmendra Rawat (धर्मेन्द्र रावत)',
+    village: 'Malihabad North',
+    farmPlot: 'Gata #304 (2.0 Bigha)',
+    serviceType: 'Laser Land Leveler',
+    vehicleIcon: '🚜',
+    operatorName: 'Surendra Yadav (सुरेंद्र यादव)',
+    operatorPhone: '+91 9839012445',
+    operatorPlate: 'UP-32-AZ-4421',
+    status: 'completed',
+    statusText: 'Completed & Verified',
+    bigha: 2.0,
+    amount: 2600,
+    paymentMode: 'UPI (Settled)',
+    startTime: '09:30 AM'
+  }
 ];
 
 // Mock Registered Active Fleet Directory for Malihabad Region
@@ -111,19 +186,28 @@ const REGISTERED_FLEET_DATA = [
   }
 ];
 
+// Mock Real-Time System Audit Event Logs
+const AUDIT_LOGS_DATA = [
+  { time: '12:05 PM', type: 'dispatch', text: 'Dispatch #KS-8902 started: Combine Harvester assigned to Balram Singh (6.0 Bigha)' },
+  { time: '11:58 AM', type: 'kyc', text: 'AgriStack UPFR Record verified for Farmer Balram Singh (UPFR-2026-88910)' },
+  { time: '11:42 AM', type: 'payment', text: 'UPI Payment Confirmed: ₹3,900 for Booking #KS-8901 via BharatPay Gateway' },
+  { time: '11:30 AM', type: 'rates', text: 'Dynamic Base Rate updated for Combine Harvester: ₹1,500/bigha by Admin' },
+  { time: '10:45 AM', type: 'driver', text: 'Driver KYC Approved: Jagjit Singh (UP-32-KR-7744 • Mahindra 575 DI)' },
+  { time: '09:15 AM', type: 'system', text: 'Vahan & Sarathi API Gateway Sync completed: 0 document rejections' }
+];
+
 export default function AdminPortal() {
-  const { lang, t, toggleLanguage } = useLanguage();
-  const { isDark, toggleTheme } = useTheme();
-  const { setDriverVerification, logout, setActiveRole } = useAuth();
+  const { lang, t } = useLanguage();
+  const { isDark } = useTheme();
+  const { setDriverVerification, setActiveRole } = useAuth();
   const { 
     pendingApplications, 
     approveApplication, 
-    rejectApplication,
-    onlineFleet 
+    rejectApplication 
   } = useRealtimeSync();
   const { rates, updateRates, resetToDefaultRates } = usePricing();
 
-  const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' | 'kyc' | 'directory' | 'pricing'
+  const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' | 'kyc' | 'directory' | 'pricing' | 'settlements'
   const [inspectingApp, setInspectingApp] = useState(null);
 
   // Rejection Reason Modal State
@@ -142,6 +226,7 @@ export default function AdminPortal() {
 
   const [saveSuccessBanner, setSaveSuccessBanner] = useState(false);
   const [fleetSearch, setFleetSearch] = useState('');
+  const [dispatchFilter, setDispatchFilter] = useState('all');
 
   const handleApprove = (app) => {
     approveApplication(app.id, { driverPhone: app.phone, driverName: app.driverName });
@@ -219,7 +304,7 @@ export default function AdminPortal() {
               }`}
             >
               <Activity className="w-3.5 h-3.5" />
-              <span>{lang === 'hi' ? 'कमांड सेंटर' : 'Command Center'}</span>
+              <span>{lang === 'hi' ? 'संचालन एवं डिस्पैच' : 'Operations & Dispatches'}</span>
             </button>
 
             <button
@@ -248,7 +333,7 @@ export default function AdminPortal() {
               }`}
             >
               <Users className="w-3.5 h-3.5" />
-              <span>{lang === 'hi' ? 'फ्लीट डायरेक्टरी' : 'Fleet Directory'}</span>
+              <span>{lang === 'hi' ? 'फ्लीट इन्वेंटरी' : 'Fleet Inventory'}</span>
             </button>
 
             <button
@@ -303,7 +388,7 @@ export default function AdminPortal() {
         )}
 
         {/* ═════════════════════════════════════════════ */}
-        {/* TAB 1: COMMAND CENTER & REAL-TIME DISPATCH    */}
+        {/* TAB 1: OPERATIONS, DISPATCHES & AUDIT LEDGER  */}
         {/* ═════════════════════════════════════════════ */}
         {activeTab === 'dashboard' && (
           <div className="space-y-6 animate-fade-in">
@@ -317,7 +402,7 @@ export default function AdminPortal() {
               }`}>
                 <div className="flex items-center justify-between mb-3">
                   <span className={`text-[11px] font-black uppercase tracking-wider ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
-                    Active Bookings
+                    Active Field Dispatches
                   </span>
                   <div className="w-9 h-9 rounded-xl bg-emerald-950/80 border border-emerald-500/40 text-emerald-400 flex items-center justify-center">
                     <Activity className="w-4 h-4" />
@@ -325,7 +410,7 @@ export default function AdminPortal() {
                 </div>
                 <div className="space-y-1">
                   <h3 className={`text-3xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                    42 Dispatches
+                    42 Orders
                   </h3>
                   <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-500">
                     <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-emerald-500/10 text-[10px]">
@@ -342,7 +427,7 @@ export default function AdminPortal() {
               }`}>
                 <div className="flex items-center justify-between mb-3">
                   <span className={`text-[11px] font-black uppercase tracking-wider ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
-                    Live Fleets in Range
+                    Operational Machinery
                   </span>
                   <div className="w-9 h-9 rounded-xl bg-blue-950/80 border border-blue-500/40 text-blue-400 flex items-center justify-center">
                     <Tractor className="w-4 h-4" />
@@ -350,7 +435,7 @@ export default function AdminPortal() {
                 </div>
                 <div className="space-y-1">
                   <h3 className={`text-3xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                    18 Units Online
+                    18 Units Ready
                   </h3>
                   <div className="flex items-center gap-1.5 text-xs font-bold text-blue-500">
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
@@ -390,7 +475,7 @@ export default function AdminPortal() {
               }`}>
                 <div className="flex items-center justify-between mb-3">
                   <span className={`text-[11px] font-black uppercase tracking-wider ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
-                    Network & Payouts
+                    Gross GMV & Disbursals
                   </span>
                   <div className="w-9 h-9 rounded-xl bg-purple-950/80 border border-purple-500/40 text-purple-400 flex items-center justify-center font-black">
                     ₹
@@ -404,115 +489,227 @@ export default function AdminPortal() {
                     <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-purple-500/10 text-[10px]">
                       🟢 99.98%
                     </span>
-                    <span className={isDark ? 'text-stone-400' : 'text-slate-500'}>Uptime • Direct Disbursal</span>
+                    <span className={isDark ? 'text-stone-400' : 'text-slate-500'}>Direct Driver Payouts</span>
                   </div>
                 </div>
               </div>
 
             </div>
 
-            {/* REAL-TIME DISPATCH CONTROL & LIVE GPS FLEET MAP */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              
-              {/* Left 8 Cols: Live Interactive Map */}
-              <div className={`lg:col-span-8 p-5 sm:p-6 rounded-3xl border shadow-xl space-y-4 ${
-                isDark ? 'bg-stone-900/90 border-stone-800 shadow-black/50' : 'bg-white border-slate-200 shadow-slate-200/60'
-              }`}>
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-stone-800/40">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-3 h-3 rounded-full bg-emerald-400 animate-ping" />
-                    <div>
-                      <h4 className={`text-base font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                        {lang === 'hi' ? 'लाइव फ्लीट डिस्पैच व जीपीएस टेलीमेट्री' : 'Live Fleet Dispatch & GPS Telemetry'}
-                      </h4>
-                      <p className={`text-xs ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
-                        Real-time GPS coordinates of active tractors, harvesters & earthmovers across Malihabad
-                      </p>
-                    </div>
+            {/* ══════════════ LIVE PLATFORM DISPATCHES PIPELINE ══════════════ */}
+            <div className={`p-6 rounded-3xl border shadow-xl space-y-4 ${
+              isDark ? 'bg-stone-900/90 border-stone-800' : 'bg-white border-slate-200'
+            }`}>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-stone-800/40">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-3 h-3 rounded-full bg-emerald-400 animate-ping" />
+                  <div>
+                    <h3 className={`text-lg font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                      {lang === 'hi' ? 'लाइव प्लेटफॉर्म बुकिंग एवं डिस्पैच मॉनिटर' : 'Live Bookings & Field Dispatch Monitor'}
+                    </h3>
+                    <p className={`text-xs ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+                      Real-time machinery dispatch ledger across farm plots in Malihabad
+                    </p>
                   </div>
-
-                  <span className="px-2.5 py-1 rounded-xl bg-emerald-950/80 border border-emerald-500/40 text-emerald-400 text-[10px] font-black uppercase tracking-wider self-start sm:self-auto">
-                    Live Broadcast • 1.2s Sync
-                  </span>
                 </div>
 
-                <div className="rounded-2xl overflow-hidden border border-stone-800/80 shadow-inner">
-                  <LiveMap 
-                    farmerLocation={{ lat: 26.9200, lng: 80.7100 }}
-                    showNearbyDrivers={true}
-                    className="h-[420px] w-full rounded-2xl"
-                  />
+                <div className="flex items-center gap-2">
+                  <span className="px-3 py-1 rounded-xl bg-emerald-950/80 text-emerald-400 border border-emerald-800/60 text-xs font-black">
+                    ⚡ Live Broadcast Stream
+                  </span>
                 </div>
               </div>
 
-              {/* Right 4 Cols: Live Telemetry Stream */}
-              <div className={`lg:col-span-4 p-5 sm:p-6 rounded-3xl border shadow-xl flex flex-col justify-between space-y-4 ${
-                isDark ? 'bg-stone-900/90 border-stone-800 shadow-black/50' : 'bg-white border-slate-200 shadow-slate-200/60'
-              }`}>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between pb-2 border-b border-stone-800/40">
-                    <div className="flex items-center gap-2">
-                      <Radio className="w-4 h-4 text-emerald-400 animate-pulse" />
-                      <h4 className={`text-sm font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                        {lang === 'hi' ? 'सक्रिय फ्लीट सिग्नल्स' : 'Live Fleet Signals'}
-                      </h4>
-                    </div>
-                    <span className="text-[10px] font-mono text-emerald-400 font-bold">4 ONLINE</span>
-                  </div>
-
-                  <div className="space-y-2.5 max-h-[350px] overflow-y-auto pr-1">
-                    {REGISTERED_FLEET_DATA.map(fleet => (
-                      <div 
-                        key={fleet.id}
-                        className={`p-3 rounded-2xl border transition-all duration-200 hover:border-emerald-500/50 ${
-                          isDark ? 'bg-stone-950 border-stone-800' : 'bg-slate-50 border-slate-200'
-                        }`}
-                      >
-                        <div className="flex items-start justify-between">
-                          <div className="flex items-center gap-2">
-                            <span className="text-lg">
-                              {fleet.vehicleType === 'tractor' ? '🚜' : fleet.vehicleType === 'harvester' ? '🌾' : '🏗️'}
-                            </span>
+              {/* Data Table for Live Dispatches */}
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className={`border-b uppercase font-black tracking-wider text-[10px] ${
+                    isDark ? 'bg-stone-950/80 border-stone-800 text-stone-400' : 'bg-slate-100 border-slate-200 text-slate-600'
+                  }`}>
+                    <tr>
+                      <th className="py-3.5 px-4">Booking ID & Farmer</th>
+                      <th className="py-3.5 px-4">Service & Plot Size</th>
+                      <th className="py-3.5 px-4">Assigned Operator & Vehicle</th>
+                      <th className="py-3.5 px-4">Live Dispatch State</th>
+                      <th className="py-3.5 px-4">Billing & Escrow</th>
+                      <th className="py-3.5 px-4 text-right">Time</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-stone-800/40">
+                    {LIVE_DISPATCHES_DATA.map(dispatch => (
+                      <tr key={dispatch.bookingId} className={`hover:bg-emerald-500/5 transition-colors ${
+                        isDark ? 'text-stone-200' : 'text-slate-800'
+                      }`}>
+                        <td className="py-4 px-4">
+                          <div className="flex items-center gap-2.5">
+                            <span className="text-xl">{dispatch.vehicleIcon}</span>
                             <div>
-                              <h5 className={`font-black text-xs ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                                {fleet.driverName}
-                              </h5>
-                              <p className={`text-[10px] ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
-                                {fleet.modelName}
-                              </p>
+                              <span className="font-black text-sm block">{dispatch.farmerName}</span>
+                              <span className="text-[10px] text-stone-400 font-mono">
+                                #{dispatch.bookingId} • {dispatch.village}
+                              </span>
                             </div>
                           </div>
+                        </td>
 
-                          <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider ${
-                            fleet.status === 'dispatch'
-                              ? 'bg-amber-950/80 text-amber-400 border border-amber-800/50'
-                              : 'bg-emerald-950/80 text-emerald-400 border border-emerald-800/50'
+                        <td className="py-4 px-4">
+                          <div>
+                            <span className="font-bold text-xs block">{dispatch.serviceType}</span>
+                            <span className="text-[10px] text-emerald-400 font-mono font-bold">
+                              {dispatch.farmPlot}
+                            </span>
+                          </div>
+                        </td>
+
+                        <td className="py-4 px-4">
+                          <div>
+                            <span className="font-bold text-xs block">{dispatch.operatorName}</span>
+                            <span className="text-[10px] text-stone-400 font-mono">
+                              {dispatch.operatorPlate} • {dispatch.operatorPhone}
+                            </span>
+                          </div>
+                        </td>
+
+                        <td className="py-4 px-4">
+                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider inline-flex items-center gap-1.5 ${
+                            dispatch.status === 'in_progress'
+                              ? 'bg-emerald-950 text-emerald-400 border border-emerald-800/80'
+                              : dispatch.status === 'en_route'
+                              ? 'bg-amber-950 text-amber-400 border border-amber-800/80'
+                              : 'bg-blue-950 text-blue-400 border border-blue-800/80'
                           }`}>
-                            {fleet.status === 'dispatch' ? 'ON DISPATCH' : 'AVAILABLE'}
+                            <span className={`w-1.5 h-1.5 rounded-full ${
+                              dispatch.status === 'in_progress' ? 'bg-emerald-400 animate-ping' : 'bg-current'
+                            }`} />
+                            <span>{dispatch.statusText}</span>
                           </span>
-                        </div>
+                        </td>
 
-                        <div className="flex items-center justify-between text-[10px] mt-2 pt-2 border-t border-stone-800/50">
-                          <span className={isDark ? 'text-stone-400' : 'text-slate-500'}>
-                            📍 {fleet.location}
+                        <td className="py-4 px-4">
+                          <div>
+                            <span className="font-black text-sm text-emerald-400 font-mono block">
+                              ₹{dispatch.amount.toLocaleString()}
+                            </span>
+                            <span className="text-[10px] text-stone-400">
+                              {dispatch.paymentMode}
+                            </span>
+                          </div>
+                        </td>
+
+                        <td className="py-4 px-4 text-right">
+                          <span className="font-mono text-xs font-bold text-stone-400">
+                            {dispatch.startTime}
                           </span>
-                          <span className="font-mono font-bold text-emerald-400">
-                            {fleet.vehicleNumber}
-                          </span>
-                        </div>
-                      </div>
+                        </td>
+                      </tr>
                     ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* ══════════════ 2-COLUMN OPERATIONAL AUDIT & FLEET HEALTH ══════════════ */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              
+              {/* Left 7 Cols: Real-Time Audit Event Log */}
+              <div className={`lg:col-span-7 p-6 rounded-3xl border shadow-xl space-y-4 ${
+                isDark ? 'bg-stone-900/90 border-stone-800' : 'bg-white border-slate-200'
+              }`}>
+                <div className="flex items-center justify-between pb-3 border-b border-stone-800/40">
+                  <div className="flex items-center gap-2">
+                    <Radio className="w-4 h-4 text-emerald-400 animate-pulse" />
+                    <h4 className={`text-base font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                      {lang === 'hi' ? 'सिस्टम ऑडिट एवं सुरक्षा लॉग्स' : 'System Audit & Activity Logs'}
+                    </h4>
+                  </div>
+                  <span className="text-[10px] font-mono text-emerald-400 font-bold">REAL-TIME FEED</span>
+                </div>
+
+                <div className="space-y-3">
+                  {AUDIT_LOGS_DATA.map((log, idx) => (
+                    <div 
+                      key={idx}
+                      className={`p-3 rounded-2xl border flex items-start gap-3 text-xs ${
+                        isDark ? 'bg-stone-950 border-stone-800' : 'bg-slate-50 border-slate-200'
+                      }`}
+                    >
+                      <span className="font-mono text-[11px] font-bold text-emerald-400 px-2 py-0.5 rounded-lg bg-emerald-950/80 border border-emerald-800/60 shrink-0">
+                        {log.time}
+                      </span>
+                      <p className={`font-medium ${isDark ? 'text-stone-300' : 'text-slate-700'}`}>
+                        {log.text}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Right 5 Cols: Machinery Availability Breakdown */}
+              <div className={`lg:col-span-5 p-6 rounded-3xl border shadow-xl space-y-4 flex flex-col justify-between ${
+                isDark ? 'bg-stone-900/90 border-stone-800' : 'bg-white border-slate-200'
+              }`}>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between pb-3 border-b border-stone-800/40">
+                    <div className="flex items-center gap-2">
+                      <Gauge className="w-4 h-4 text-emerald-400" />
+                      <h4 className={`text-base font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                        {lang === 'hi' ? 'मशीनरी उपलब्धता अनुपात' : 'Fleet Availability Ratio'}
+                      </h4>
+                    </div>
+                    <span className="text-xs font-black text-emerald-400">98.4% Health</span>
+                  </div>
+
+                  <div className="space-y-3 text-xs">
+                    <div>
+                      <div className="flex justify-between font-bold mb-1">
+                        <span>🚜 Tractors & Implements</span>
+                        <span className="text-emerald-400">18 / 24 Available</span>
+                      </div>
+                      <div className="w-full h-2 rounded-full bg-stone-800 overflow-hidden">
+                        <div className="h-full bg-emerald-500 rounded-full" style={{ width: '75%' }} />
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="flex justify-between font-bold mb-1">
+                        <span>🌾 Combine Harvesters</span>
+                        <span className="text-amber-400">5 / 8 Available</span>
+                      </div>
+                      <div className="w-full h-2 rounded-full bg-stone-800 overflow-hidden">
+                        <div className="h-full bg-amber-500 rounded-full" style={{ width: '62.5%' }} />
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="flex justify-between font-bold mb-1">
+                        <span>🏗️ Earthmovers (JCB)</span>
+                        <span className="text-blue-400">4 / 6 Available</span>
+                      </div>
+                      <div className="w-full h-2 rounded-full bg-stone-800 overflow-hidden">
+                        <div className="h-full bg-blue-500 rounded-full" style={{ width: '66.7%' }} />
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="flex justify-between font-bold mb-1">
+                        <span>🚚 Agri Transport Trucks</span>
+                        <span className="text-purple-400">8 / 10 Available</span>
+                      </div>
+                      <div className="w-full h-2 rounded-full bg-stone-800 overflow-hidden">
+                        <div className="h-full bg-purple-500 rounded-full" style={{ width: '80%' }} />
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <div className={`p-3 rounded-2xl border flex items-center justify-between text-xs ${
-                  isDark ? 'bg-emerald-950/20 border-emerald-500/30 text-emerald-300' : 'bg-emerald-50 border-emerald-200 text-emerald-800'
+                <div className={`p-3.5 rounded-2xl border flex items-center justify-between text-xs ${
+                  isDark ? 'bg-emerald-950/30 border-emerald-500/30 text-emerald-300' : 'bg-emerald-50 border-emerald-200 text-emerald-800'
                 }`}>
                   <div className="flex items-center gap-2">
-                    <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
-                    <span className="text-[11px] font-bold">AgriStack Vahan Bridge Active</span>
+                    <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span className="font-bold">AgriStack Vahan Auto-Audit Node</span>
                   </div>
-                  <span className="text-[10px] font-mono font-black">100% OK</span>
+                  <span className="font-mono font-black text-[10px]">ALL ACTIVE</span>
                 </div>
               </div>
 
@@ -678,17 +875,17 @@ export default function AdminPortal() {
         )}
 
         {/* ═════════════════════════════════════════════ */}
-        {/* TAB 3: FLEET DIRECTORY & DATA TABLE           */}
+        {/* TAB 3: FLEET INVENTORY & DATA TABLE           */}
         {/* ═════════════════════════════════════════════ */}
         {activeTab === 'directory' && (
           <div className="space-y-6 animate-fade-in">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-stone-800/40">
               <div>
                 <h2 className={`text-xl font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  {lang === 'hi' ? 'पंजीकृत फ्लीट डायरेक्टरी' : 'Registered Fleet Directory'}
+                  {lang === 'hi' ? 'पंजीकृत फ्लीट एवं मशीनरी इन्वेंटरी' : 'Registered Fleet & Machinery Inventory'}
                 </h2>
                 <p className={`text-xs ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
-                  Directory of all authorized drivers, machinery specs and verification states
+                  Directory of all authorized drivers, machinery specs, implements and verification states
                 </p>
               </div>
 
