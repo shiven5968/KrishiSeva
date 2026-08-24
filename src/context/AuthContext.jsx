@@ -505,6 +505,67 @@ export function AuthProvider({ children }) {
     setDriverProfile(prev => ({ ...prev, verificationStatus: status, rejectionReason: reason }));
   };
 
+  // Record Driver Job Earnings and increment completed rides count
+  const recordDriverJobPayout = (amount, driverPhone = '') => {
+    const targetPhone = driverPhone || driverProfile?.phone || '9876501234';
+    const addedAmount = Number(amount) || 0;
+
+    // Update driverProfile state
+    setDriverProfile(prev => ({
+      ...prev,
+      totalEarnings: (Number(prev.totalEarnings) || 0) + addedAmount,
+      completedRides: (Number(prev.completedRides) || 0) + 1
+    }));
+
+    // Update usersDb
+    setUsersDb(prev => {
+      const user = prev[targetPhone] || MOCK_USER_DATABASE[targetPhone];
+      if (!user) return prev;
+      return {
+        ...prev,
+        [targetPhone]: {
+          ...user,
+          totalEarnings: (Number(user.totalEarnings) || 0) + addedAmount,
+          completedRides: (Number(user.completedRides) || 0) + 1
+        }
+      };
+    });
+  };
+
+  // Record Driver Rating out of 5
+  const recordDriverRating = (newRatingStars, driverPhone = '') => {
+    const targetPhone = driverPhone || driverProfile?.phone || '9876501234';
+    const stars = Math.min(5, Math.max(1, Number(newRatingStars) || 5));
+
+    setDriverProfile(prev => {
+      const currentRides = Math.max(1, Number(prev.completedRides) || 1);
+      const currentRating = Number(prev.rating) || 4.95;
+      // Rolling average calculation
+      const computed = (((currentRating * (currentRides > 1 ? currentRides - 1 : 1)) + stars) / currentRides);
+      const updatedRating = Number(computed.toFixed(2));
+      return {
+        ...prev,
+        rating: Math.min(5.0, Math.max(1.0, updatedRating))
+      };
+    });
+
+    setUsersDb(prev => {
+      const user = prev[targetPhone] || MOCK_USER_DATABASE[targetPhone];
+      if (!user) return prev;
+      const currentRides = Math.max(1, Number(user.completedRides) || 1);
+      const currentRating = Number(user.rating) || 4.95;
+      const computed = (((currentRating * (currentRides > 1 ? currentRides - 1 : 1)) + stars) / currentRides);
+      const updatedRating = Number(computed.toFixed(2));
+      return {
+        ...prev,
+        [targetPhone]: {
+          ...user,
+          rating: Math.min(5.0, Math.max(1.0, updatedRating))
+        }
+      };
+    });
+  };
+
   const logout = () => {
     setCurrentUser(null);
     setActiveRole('landing');
@@ -528,6 +589,8 @@ export function AuthProvider({ children }) {
         registerDriverKyc,
         toggleDriverDuty,
         setDriverVerification,
+        recordDriverJobPayout,
+        recordDriverRating,
         loginWithPhone,
         loginWithPhoneSuccess,
         requestOtp,

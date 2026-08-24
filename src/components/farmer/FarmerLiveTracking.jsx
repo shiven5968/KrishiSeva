@@ -5,6 +5,7 @@ import { useRealtimeSync } from '../../context/RealtimeSyncContext';
 import { calculateDistanceKm } from '../../utils/geoUtils';
 import LiveMap from '../map/LiveMap';
 import CancelReasonModal from '../common/CancelReasonModal';
+import FarmerRatingModal from './FarmerRatingModal';
 import { 
   Tractor, 
   Phone, 
@@ -22,7 +23,8 @@ import {
   Radio,
   Wifi,
   Search,
-  Coins
+  Coins,
+  Star
 } from 'lucide-react';
 
 export default function FarmerLiveTracking() {
@@ -34,10 +36,14 @@ export default function FarmerLiveTracking() {
     routeWaypoints, 
     cancelBooking,
     updateBookingStatus,
+    submitDriverRating,
     updateBookingPrice,
     isHardwareGpsActive,
     hardwareGpsTelemetry
   } = useRealtimeSync();
+
+  // Rating modal open state
+  const [isRatingModalOpen, setIsRatingModalOpen] = useState(true);
 
   // Simulated radar searching timer
   const [searchSeconds, setSearchSeconds] = useState(1);
@@ -572,6 +578,14 @@ export default function FarmerLiveTracking() {
         onConfirmCancel={handleConfirmCancelWithReason}
         role="farmer"
         partnerName={assignedDriver?.name || 'चालक (Driver)'}
+      />
+
+      {/* 5-Star Driver Rating Pop-up Modal when Job is Completed */}
+      <FarmerRatingModal
+        isOpen={activeBooking.status === 'completed' && isRatingModalOpen}
+        booking={activeBooking}
+        onSubmitRating={submitDriverRating}
+        onClose={() => setIsRatingModalOpen(false)}
       />
 
     </div>

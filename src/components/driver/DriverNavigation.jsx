@@ -24,12 +24,13 @@ import {
 
 export default function DriverNavigation() {
   const { lang, t } = useLanguage();
-  const { driverProfile } = useAuth();
+  const { driverProfile, recordDriverJobPayout } = useAuth();
   const { 
     activeBooking, 
     driverCurrentPos, 
     routeWaypoints, 
     updateBookingStatus,
+    completeJobAndPayout,
     cancelBooking,
     isHardwareGpsActive,
     hardwareGpsTelemetry,
@@ -38,6 +39,15 @@ export default function DriverNavigation() {
   } = useRealtimeSync();
 
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [isJobFinished, setIsJobFinished] = useState(false);
+
+  const handleCompleteJob = () => {
+    setIsJobFinished(true);
+    completeJobAndPayout(activeBooking);
+    if (recordDriverJobPayout) {
+      recordDriverJobPayout(activeBooking.estimatedPrice, driverProfile?.phone);
+    }
+  };
 
   if (!activeBooking) return null;
 
@@ -226,8 +236,8 @@ export default function DriverNavigation() {
             {/* Step 3: Complete Field Work */}
             {isWorking && (
               <button
-                onClick={() => updateBookingStatus('completed')}
-                className="w-full py-4 rounded-2xl bg-green-500 hover:bg-green-400 text-stone-950 font-black text-base shadow-xl shadow-green-950 transition flex items-center justify-center gap-2 active:scale-98"
+                onClick={handleCompleteJob}
+                className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-400 hover:to-green-400 text-stone-950 font-black text-base shadow-xl shadow-green-950 transition flex items-center justify-center gap-2 active:scale-98"
               >
                 <CheckCircle2 className="w-5 h-5" />
                 <span>{lang === 'hi' ? 'कार्य संपन्न व बिल बनाएं' : 'Complete Job & Generate Bill'}</span>

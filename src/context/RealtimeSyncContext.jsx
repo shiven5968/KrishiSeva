@@ -282,6 +282,39 @@ export function RealtimeSyncProvider({ children }) {
             showToast(`✅ खेत कार्य संपन्न हुआ!`, 'success');
             audioHelper.playBookingConfirmed();
           }
+        } else if (type === 'JOB_COMPLETED_PAYOUT') {
+          // Update driver's total earnings and completed rides in onlineFleet
+          setOnlineFleet(prev => prev.map(d => {
+            if (d.phone === payload.driverPhone) {
+              return {
+                ...d,
+                totalEarnings: (Number(d.totalEarnings) || 0) + Number(payload.payout),
+                completedRides: (Number(d.completedRides) || 0) + 1
+              };
+            }
+            return d;
+          }));
+
+          if (session.role === 'driver') {
+            showToast(`💰 कार्य संपन्न! ₹${payload.payout} आपके वॉलेट में जुड़ गए`, 'success');
+            audioHelper.playBookingConfirmed();
+          }
+        } else if (type === 'DRIVER_RATING_SUBMITTED') {
+          // Update driver rating in onlineFleet
+          setOnlineFleet(prev => prev.map(d => {
+            if (d.phone === payload.driverPhone) {
+              return {
+                ...d,
+                rating: payload.newRating || d.rating
+              };
+            }
+            return d;
+          }));
+
+          if (session.role === 'driver') {
+            showToast(`⭐ किसान ने आपको ${payload.rating}/5 रेटिंग दी! नई रेटिंग: ${payload.newRating} / 5.0`, 'success');
+            audioHelper.playBookingConfirmed();
+          }
         } else if (type === 'DRIVER_LOCATION_UPDATE') {
           setDriverCurrentPos(payload.pos);
           if (payload.isRealHardwareGps) {
@@ -483,9 +516,121 @@ export function RealtimeSyncProvider({ children }) {
     const updated = { ...activeBooking, status };
     setActiveBooking(updated);
     broadcast('BOOKING_STATUS_CHANGED', updated);
-    if (status === 'completed' || status === 'arrived') {
+    if (status === 'arrived') {
       audioHelper.playBookingConfirmed();
+    } else if (status === 'completed') {
+      completeJobAndPayout(updated);
     }
+  };
+
+  // Complete Job and disburse payout to driver
+  const completeJobAndPayout = (targetBooking = null) => {
+    const booking = targetBooking || activeBooking;
+    if (!booking) return;
+
+    const payout = Number(booking.estimatedPrice) || 0;
+    const driverPhone = booking.assignedDriver?.phone || '9876501234';
+
+    // 1. Update driverProfile & usersDb in localStorage
+    try {
+      const savedDriver = localStorage.getItem('krishi_driver_profile');
+      if (savedDriver) {
+        const parsed = JSON.parse(savedDriver);
+        const updated = {
+          ...parsed,
+          totalEarnings: (Number(parsed.totalEarnings) || 0) + payout,
+          completedRides: (Number(parsed.completedRides) || 0) + 1
+        };
+        localStorage.setItem('krishi_driver_profile', JSON.stringify(updated));
+      }
+
+      const savedUsersDb = localStorage.getItem('krishi_users_db');
+      if (savedUsersDb) {
+        const parsedUsers = JSON.parse(savedUsersDb);
+        if (parsedUsers[driverPhone]) {
+          parsedUsers[driverPhone] = {
+            ...parsedUsers[driverPhone],
+            totalEarnings: (Number(parsedUsers[driverPhone].totalEarnings) || 0) + payout,
+            completedRides: (Number(parsedUsers[driverPhone].completedRides) || 0) + 1
+          };
+          localStorage.setItem('krishi_users_db', JSON.stringify(parsedUsers));
+        }
+      }
+    } catch (err) {
+      console.warn('Error updating payout to local storage:', err);
+    }
+
+    const updatedBooking = { ...booking, status: 'completed' };
+    setActiveBooking(updatedBooking);
+
+    // Broadcast status change and payout
+    broadcast('BOOKING_STATUS_CHANGED', updatedBooking);
+    broadcast('JOB_COMPLETED_PAYOUT', {
+      driverPhone,
+      payout,
+      bookingId: booking.id
+    });
+
+    showToast(`✅ खेत कार्य संपन्न हुआ! ₹${payout} ड्राइवर को हस्तांतरित`, 'success');
+    audioHelper.playBookingConfirmed();
+  };
+
+  // Farmer submits driver rating (1-5 stars)
+  const submitDriverRating = (ratingData) => {
+    const { rating, tags, comment, driverPhone } = ratingData;
+    const targetPhone = driverPhone || activeBooking?.assignedDriver?.phone || '9876501234';
+    const stars = Math.min(5, Math.max(1, Number(rating) || 5));
+
+    let newAvgRating = 5.0;
+
+    // Update localStorage
+    try {
+      const savedDriver = localStorage.getItem('krishi_driver_profile');
+      if (savedDriver) {
+        const parsed = JSON.parse(savedDriver);
+        const currentRides = Math.max(1, Number(parsed.completedRides) || 1);
+        const currentRating = Number(parsed.rating) || 4.95;
+        const computed = (((currentRating * (currentRides > 1 ? currentRides - 1 : 1)) + stars) / currentRides);
+        newAvgRating = Number(computed.toFixed(2));
+        const updated = {
+          ...parsed,
+          rating: newAvgRating
+        };
+        localStorage.setItem('krishi_driver_profile', JSON.stringify(updated));
+      }
+
+      const savedUsersDb = localStorage.getItem('krishi_users_db');
+      if (savedUsersDb) {
+        const parsedUsers = JSON.parse(savedUsersDb);
+        if (parsedUsers[targetPhone]) {
+          const currentRides = Math.max(1, Number(parsedUsers[targetPhone].completedRides) || 1);
+          const currentRating = Number(parsedUsers[targetPhone].rating) || 4.95;
+          const computed = (((currentRating * (currentRides > 1 ? currentRides - 1 : 1)) + stars) / currentRides);
+          newAvgRating = Number(computed.toFixed(2));
+          parsedUsers[targetPhone] = {
+            ...parsedUsers[targetPhone],
+            rating: newAvgRating
+          };
+          localStorage.setItem('krishi_users_db', JSON.stringify(parsedUsers));
+        }
+      }
+    } catch (err) {
+      console.warn('Error updating driver rating in local storage:', err);
+    }
+
+    // Broadcast rating
+    broadcast('DRIVER_RATING_SUBMITTED', {
+      driverPhone: targetPhone,
+      rating: stars,
+      tags,
+      comment,
+      newRating: newAvgRating
+    });
+
+    // Clear active booking from active radar after rating
+    localStorage.removeItem('krishi_active_booking');
+    setActiveBooking(null);
+    showToast(`⭐ रेटिंग (${stars}/5) सफलतापूर्वक दर्ज की गई!`, 'success');
   };
 
   const cancelBooking = (reason = 'Plan Changed', cancelledByRole = 'farmer', cancelledByName = '') => {
@@ -575,6 +720,8 @@ export function RealtimeSyncProvider({ children }) {
         acceptBooking,
         rejectBooking,
         updateBookingStatus,
+        completeJobAndPayout,
+        submitDriverRating,
         cancelBooking,
         updateBookingPrice,
         broadcastDriverDuty,
