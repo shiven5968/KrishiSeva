@@ -212,7 +212,7 @@ export default function AdminLoginGate({ onAdminLoginSuccess }) {
 
       {/* Footer */}
       <div className="relative z-10 text-center text-xs text-stone-500 pb-2">
-        <span>© 2026 KrishiSeva Enterprise Command • Malihabad</span>
+        <span>© 2026 KrishiSeva Enterprise Command</span>
       </div>
 
     </div>

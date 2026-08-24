@@ -1302,7 +1302,7 @@ export default function CreativeLoginPortal() {
         isDark ? 'border-stone-800/80 bg-[#090D0B] text-stone-400' : 'border-slate-200 bg-white text-slate-500'
       }`}>
         <div className="max-w-7xl mx-auto flex items-center justify-center text-center text-xs">
-          <span>© 2026 KrishiSeva • Precision Farm Fleet Network • Malihabad</span>
+          <span>© 2026 KrishiSeva • Precision Farm Fleet Network</span>
         </div>
       </footer>
 
