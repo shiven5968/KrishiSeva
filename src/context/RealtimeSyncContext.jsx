@@ -300,19 +300,21 @@ export function RealtimeSyncProvider({ children }) {
             audioHelper.playBookingConfirmed();
           }
         } else if (type === 'DRIVER_RATING_SUBMITTED') {
-          // Update driver rating in onlineFleet
+          // Update driver rating and earnings in onlineFleet
           setOnlineFleet(prev => prev.map(d => {
             if (d.phone === payload.driverPhone) {
               return {
                 ...d,
-                rating: payload.newRating || d.rating
+                rating: payload.newRating || d.rating,
+                totalEarnings: (Number(d.totalEarnings) || 0) + (Number(payload.payout) || 0),
+                completedRides: (Number(d.completedRides) || 0) + 1
               };
             }
             return d;
           }));
 
           if (session.role === 'driver') {
-            showToast(`⭐ किसान ने आपको ${payload.rating}/5 रेटिंग दी! नई रेटिंग: ${payload.newRating} / 5.0`, 'success');
+            showToast(`⭐ किसान से नई रेटिंग व समीक्षा प्राप्त हुई! कुल रेटिंग: ${payload.newRating} / 5.0`, 'success');
             audioHelper.playBookingConfirmed();
           }
         } else if (type === 'DRIVER_LOCATION_UPDATE') {
@@ -600,13 +602,14 @@ export function RealtimeSyncProvider({ children }) {
 
   // Farmer submits driver rating (1-5 stars)
   const submitDriverRating = (ratingData) => {
-    const { rating, tags, comment, driverPhone } = ratingData;
+    const { rating, tags, comment, driverPhone, amountPaid, paymentMethod } = ratingData;
     const targetPhone = driverPhone || activeBooking?.assignedDriver?.phone || '9876501234';
     const stars = Math.min(5, Math.max(1, Number(rating) || 5));
+    const paid = Number(amountPaid) || activeBooking?.estimatedPrice || 0;
 
     let newAvgRating = 5.0;
 
-    // Update localStorage
+    // Update localStorage for driver profile & usersDb
     try {
       const savedDriver = localStorage.getItem('krishi_driver_profile');
       if (savedDriver) {
@@ -617,7 +620,9 @@ export function RealtimeSyncProvider({ children }) {
         newAvgRating = Number(computed.toFixed(2));
         const updated = {
           ...parsed,
-          rating: newAvgRating
+          rating: Math.min(5.0, Math.max(1.0, newAvgRating)),
+          totalEarnings: (Number(parsed.totalEarnings) || 0) + paid,
+          completedRides: (Number(parsed.completedRides) || 0) + 1
         };
         localStorage.setItem('krishi_driver_profile', JSON.stringify(updated));
       }
@@ -632,7 +637,9 @@ export function RealtimeSyncProvider({ children }) {
           newAvgRating = Number(computed.toFixed(2));
           parsedUsers[targetPhone] = {
             ...parsedUsers[targetPhone],
-            rating: newAvgRating
+            rating: Math.min(5.0, Math.max(1.0, newAvgRating)),
+            totalEarnings: (Number(parsedUsers[targetPhone].totalEarnings) || 0) + paid,
+            completedRides: (Number(parsedUsers[targetPhone].completedRides) || 0) + 1
           };
           localStorage.setItem('krishi_users_db', JSON.stringify(parsedUsers));
         }
@@ -645,8 +652,8 @@ export function RealtimeSyncProvider({ children }) {
         if (b.id === ratingData.bookingId || (activeBooking && b.id === activeBooking.id)) {
           return {
             ...b,
-            paidAmount: ratingData.amountPaid || b.paidAmount || b.estimatedPrice,
-            paymentMethod: ratingData.paymentMethod || b.paymentMethod || 'cash',
+            paidAmount: paid,
+            paymentMethod: paymentMethod || b.paymentMethod || 'cash',
             farmerRating: stars,
             feedbackTags: tags,
             feedbackComment: comment
@@ -655,23 +662,30 @@ export function RealtimeSyncProvider({ children }) {
         return b;
       });
       localStorage.setItem(historyKey, JSON.stringify(updatedHistory));
+
+      // Dispatch in-tab custom event for immediate UI reflection
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('krishi_driver_profile_updated', {
+          detail: { newRating: newAvgRating, payout: paid }
+        }));
+      }
     } catch (err) {
       console.warn('Error updating driver rating in local storage:', err);
     }
 
-    // Broadcast rating
+    // Broadcast rating and payout across tabs/devices
     broadcast('DRIVER_RATING_SUBMITTED', {
       driverPhone: targetPhone,
-      rating: stars,
+      payout: paid,
+      newRating: newAvgRating,
       tags,
-      comment,
-      newRating: newAvgRating
+      comment
     });
 
     // Clear active booking from active radar after rating
     localStorage.removeItem('krishi_active_booking');
     setActiveBooking(null);
-    showToast(`⭐ रेटिंग (${stars}/5) सफलतापूर्वक दर्ज की गई!`, 'success');
+    showToast('⭐ रेटिंग व प्रतिक्रिया सफलतापूर्वक दर्ज की गई!', 'success');
   };
 
   const cancelBooking = (reason = 'Plan Changed', cancelledByRole = 'farmer', cancelledByName = '') => {

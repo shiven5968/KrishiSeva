@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useTheme } from '../../context/ThemeContext';
 import { 
@@ -171,12 +171,12 @@ export default function FarmerRatingModal({
             </div>
             <div className="space-y-1">
               <h3 className="text-xl font-black text-emerald-400">
-                {lang === 'hi' ? 'रेटिंग सफलतापूर्वक दर्ज की गई!' : 'Rating Successfully Submitted!'}
+                {lang === 'hi' ? 'प्रतिक्रिया व भुगतान दर्ज!' : 'Transaction & Feedback Complete!'}
               </h3>
               <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                 {lang === 'hi' 
-                  ? `चालक के पोर्टल में ${rating}/5 रेटिंग व ₹${paidAmount} अपडेट कर दिया गया है।` 
-                  : `Driver rating (${rating}/5) & ₹${paidAmount} payout recorded.`}
+                  ? `आपकी प्रतिक्रिया व ₹${paidAmount} का भुगतान सुरक्षित रूप से दर्ज कर लिया गया है।` 
+                  : `Your review and payout of ₹${paidAmount} have been securely processed.`}
               </p>
             </div>
           </div>
@@ -417,7 +417,7 @@ export default function FarmerRatingModal({
               >
                 <span>
                   {lang === 'hi' 
-                    ? `पूर्ण लेनदेन व रेटिंग (${rating}★) • ₹${paidAmount}` 
+                    ? `पूर्ण लेनदेन व रेटिंग दर्ज करें • ₹${paidAmount}` 
                     : `Complete Transaction • ₹${paidAmount}`}
                 </span>
                 <ArrowRight className="w-4 h-4" />

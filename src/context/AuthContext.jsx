@@ -144,10 +144,24 @@ export function AuthProvider({ children }) {
     localStorage.setItem('krishi_driver_profile', JSON.stringify(driverProfile));
   }, [driverProfile]);
 
-  // Real-time listener for driver verification changes across tabs
+  // Real-time listener for driver verification, rating updates, and payouts across tabs & sessions
   useEffect(() => {
+    const handleProfileUpdate = () => {
+      try {
+        const saved = localStorage.getItem('krishi_driver_profile');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          setDriverProfile(parsed);
+        }
+      } catch (e) {}
+    };
+
+    window.addEventListener('krishi_driver_profile_updated', handleProfileUpdate);
+    window.addEventListener('storage', handleProfileUpdate);
+
+    let channel = null;
     if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
-      const channel = new BroadcastChannel('krishi_realtime_network');
+      channel = new BroadcastChannel('krishi_realtime_network');
       channel.onmessage = (event) => {
         const { type, payload } = event.data;
         if (type === 'DRIVER_VERIFIED') {
@@ -170,10 +184,37 @@ export function AuthProvider({ children }) {
             verificationStatus: 'rejected',
             rejectionReason: payload.reason || 'Document blurry or vehicle number mismatch'
           }));
+        } else if (type === 'DRIVER_RATING_SUBMITTED') {
+          setDriverProfile(prev => {
+            const nextRating = Number(payload.newRating) || prev.rating;
+            const updated = {
+              ...prev,
+              rating: nextRating,
+              totalEarnings: (Number(prev.totalEarnings) || 0) + (Number(payload.payout) || 0),
+              completedRides: (Number(prev.completedRides) || 0) + 1
+            };
+            localStorage.setItem('krishi_driver_profile', JSON.stringify(updated));
+            return updated;
+          });
+        } else if (type === 'JOB_COMPLETED_PAYOUT') {
+          setDriverProfile(prev => {
+            const updated = {
+              ...prev,
+              totalEarnings: (Number(prev.totalEarnings) || 0) + Number(payload.payout || 0),
+              completedRides: (Number(prev.completedRides) || 0) + 1
+            };
+            localStorage.setItem('krishi_driver_profile', JSON.stringify(updated));
+            return updated;
+          });
         }
       };
-      return () => channel.close();
     }
+
+    return () => {
+      window.removeEventListener('krishi_driver_profile_updated', handleProfileUpdate);
+      window.removeEventListener('storage', handleProfileUpdate);
+      if (channel) channel.close();
+    };
   }, []);
 
   // Request 6-Digit OTP with 15-Minute Rate Limiting (Max 3 requests / 15 mins)
