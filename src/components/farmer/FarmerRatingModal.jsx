@@ -13,7 +13,10 @@ import {
   Heart,
   ArrowRight,
   IndianRupee,
-  MessageSquare
+  MessageSquare,
+  Edit2,
+  QrCode,
+  Banknote
 } from 'lucide-react';
 
 const FEEDBACK_TAGS = [
@@ -38,6 +41,9 @@ export default function FarmerRatingModal({
   const [hoverRating, setHoverRating] = useState(0);
   const [selectedTags, setSelectedTags] = useState(['punctual', 'clean', 'skilled']);
   const [comment, setComment] = useState('');
+  const [paidAmount, setPaidAmount] = useState(booking?.estimatedPrice || 0);
+  const [isEditingAmount, setIsEditingAmount] = useState(false);
+  const [paymentMode, setPaymentMode] = useState('cash'); // 'cash' | 'upi'
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
@@ -63,14 +69,17 @@ export default function FarmerRatingModal({
     e.preventDefault();
     setIsSubmitting(true);
     
+    const finalAmount = Number(paidAmount) || booking.estimatedPrice || 0;
+
     // Call parent submit handler
     onSubmitRating({
       rating,
       tags: selectedTags,
       comment,
+      paymentMethod: paymentMode,
       driverPhone: driver.phone || '9876501234',
       bookingId: booking.id,
-      amountPaid: booking.estimatedPrice || 0
+      amountPaid: finalAmount
     });
 
     setSubmitted(true);
@@ -142,28 +151,119 @@ export default function FarmerRatingModal({
             </div>
 
             {/* Driver Identity Card & Completed Amount */}
-            <div className={`p-4 rounded-2xl border flex items-center justify-between gap-3 ${
+            <div className={`p-4 rounded-2xl border space-y-3 ${
               isDark ? 'bg-stone-950/80 border-stone-800' : 'bg-slate-50 border-slate-200'
             }`}>
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-950/80 border border-emerald-500/40 text-emerald-400 flex items-center justify-center text-2xl font-bold">
-                  🚜
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-950/80 border border-emerald-500/40 text-emerald-400 flex items-center justify-center text-2xl font-bold">
+                    🚜
+                  </div>
+                  <div>
+                    <h4 className="font-black text-sm">{driver.name}</h4>
+                    <p className={`text-xs font-bold ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+                      {driver.modelName} • <span className="font-mono text-emerald-400">{driver.vehicleNumber}</span>
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="font-black text-sm">{driver.name}</h4>
-                  <p className={`text-xs font-bold ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
-                    {driver.modelName} • <span className="font-mono text-emerald-400">{driver.vehicleNumber}</span>
-                  </p>
+
+                <div className="text-right">
+                  <span className={`text-[10px] uppercase font-bold block ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+                    {lang === 'hi' ? 'देय राशि (Fare Due)' : 'Fare Due'}
+                  </span>
+                  {isEditingAmount ? (
+                    <div className="flex items-center gap-1 justify-end mt-0.5">
+                      <span className="text-emerald-400 font-black text-sm">₹</span>
+                      <input
+                        type="number"
+                        value={paidAmount}
+                        onChange={(e) => setPaidAmount(e.target.value)}
+                        className="w-20 px-1.5 py-0.5 rounded bg-stone-900 border border-emerald-500 text-white font-black text-sm text-right outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setIsEditingAmount(false)}
+                        className="text-[10px] bg-emerald-500 text-stone-950 px-1.5 py-0.5 rounded font-black"
+                      >
+                        ✓
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1 justify-end">
+                      <span className="text-lg font-black text-emerald-400">
+                        ₹{paidAmount}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setIsEditingAmount(true)}
+                        className="p-1 text-stone-400 hover:text-emerald-400 transition"
+                        title="Adjust Settled Fare"
+                      >
+                        <Edit2 className="w-3 h-3" />
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
 
-              <div className="text-right">
-                <span className={`text-[10px] uppercase font-bold block ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
-                  {lang === 'hi' ? 'कुल भुगतान' : 'Paid Fare'}
+              {/* Payment Mode Selection (Cash / UPI Direct) */}
+              <div className="pt-2 border-t border-white/10 space-y-2">
+                <span className={`text-[11px] font-bold block ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+                  {lang === 'hi' ? '💳 भुगतान का तरीका चुनें:' : '💳 Select Payment Mode:'}
                 </span>
-                <span className="text-base font-black text-emerald-400">
-                  ₹{booking.estimatedPrice}
-                </span>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMode('cash')}
+                    className={`py-2 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 transition ${
+                      paymentMode === 'cash'
+                        ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300 ring-1 ring-emerald-500/50'
+                        : isDark ? 'bg-stone-900 border-stone-800 text-stone-400' : 'bg-white border-slate-300 text-slate-600'
+                    }`}
+                  >
+                    <Banknote className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>{lang === 'hi' ? 'नकद (Cash to Driver)' : 'Cash to Driver'}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMode('upi')}
+                    className={`py-2 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 transition ${
+                      paymentMode === 'upi'
+                        ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300 ring-1 ring-emerald-500/50'
+                        : isDark ? 'bg-stone-900 border-stone-800 text-stone-400' : 'bg-white border-slate-300 text-slate-600'
+                    }`}
+                  >
+                    <QrCode className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>{lang === 'hi' ? 'यूपीआई / ऑनलाइन QR' : 'UPI / Online QR'}</span>
+                  </button>
+                </div>
+
+                {paymentMode === 'upi' && (
+                  <div className="p-3 rounded-xl bg-stone-900 border border-emerald-500/30 text-center space-y-2 animate-fade-in">
+                    <span className="text-[11px] text-stone-300 font-medium block">
+                      {lang === 'hi' ? `चालक को ₹${paidAmount} का UPI भुगतान करें:` : `Pay ₹${paidAmount} directly to Driver UPI:`}
+                    </span>
+                    <div className="w-28 h-28 bg-white rounded-lg mx-auto p-1.5 border border-emerald-500">
+                      <svg viewBox="0 0 200 200" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="10" y="10" width="50" height="50" rx="4" fill="none" stroke="#1e293b" strokeWidth="6"/>
+                        <rect x="20" y="20" width="30" height="30" rx="2" fill="#1e293b"/>
+                        <rect x="140" y="10" width="50" height="50" rx="4" fill="none" stroke="#1e293b" strokeWidth="6"/>
+                        <rect x="150" y="20" width="30" height="30" rx="2" fill="#1e293b"/>
+                        <rect x="10" y="140" width="50" height="50" rx="4" fill="none" stroke="#1e293b" strokeWidth="6"/>
+                        <rect x="20" y="150" width="30" height="30" rx="2" fill="#1e293b"/>
+                        {[70,80,90,100,110,120].map(x => [70,80,90,100,110,120,130,140,150,160].map(y => (
+                          (x + y) % 30 < 15 && <rect key={`${x}-${y}`} x={x} y={y} width="8" height="8" rx="1" fill="#1e293b" opacity={0.8}/>
+                        )))}
+                        <rect x="75" y="75" width="50" height="50" rx="8" fill="white" stroke="#e2e8f0" strokeWidth="2"/>
+                        <text x="100" y="105" textAnchor="middle" fontSize="18" fontWeight="bold" fill="#059669">UPI</text>
+                      </svg>
+                    </div>
+                    <code className="text-[10px] text-emerald-400 font-mono bg-stone-950 px-2 py-0.5 rounded border border-stone-800">
+                      driver.{driver.vehicleNumber?.toLowerCase().replace(/-/g, '') || 'up32kr7744'}@upi
+                    </code>
+                  </div>
+                )}
               </div>
             </div>
 

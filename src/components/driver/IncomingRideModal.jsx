@@ -65,23 +65,44 @@ export default function IncomingRideModal({ booking, onAccept, onReject }) {
         </div>
 
         {/* Big Payout & Distance Banner */}
-        <div className="my-5 bg-gradient-to-br from-emerald-600 to-green-700 text-white rounded-2xl p-5 shadow-lg shadow-emerald-600/20 flex items-center justify-between">
-          <div>
-            <span className="text-xs text-emerald-100 font-bold uppercase tracking-wider">
-              {lang === 'hi' ? 'अनुमानित कुल किराया (Estimated Fare)' : 'Guaranteed Payout'}
-            </span>
-            <h3 className="text-3xl sm:text-4xl font-black text-white mt-0.5">
-              ₹{booking.estimatedPrice}
-            </h3>
+        <div className="my-5 bg-gradient-to-br from-emerald-600 to-green-700 text-white rounded-2xl p-5 shadow-lg shadow-emerald-600/20 space-y-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <span className="text-xs text-emerald-100 font-bold uppercase tracking-wider">
+                {booking.isBargained 
+                  ? (lang === 'hi' ? '🤝 किसान का ऑफर किराया' : '🤝 Farmer Counter Offer') 
+                  : (lang === 'hi' ? 'अनुमानित कुल किराया (Estimated Fare)' : 'Guaranteed Payout')}
+              </span>
+              <div className="flex items-baseline gap-2 mt-0.5">
+                <h3 className="text-3xl sm:text-4xl font-black text-white">
+                  ₹{booking.estimatedPrice}
+                </h3>
+                {booking.isBargained && booking.originalStandardPrice && (
+                  <span className="text-xs text-emerald-200 line-through">
+                    ₹{booking.originalStandardPrice}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div className="text-right">
+              <span className="text-xs text-emerald-100 font-bold uppercase">
+                {lang === 'hi' ? 'खेत का आकार' : 'Work Area'}
+              </span>
+              <p className="text-xl font-black text-white">
+                {booking.landSize} {booking.sizeUnit}
+              </p>
+            </div>
           </div>
 
-          <div className="text-right">
-            <span className="text-xs text-emerald-100 font-bold uppercase">
-              {lang === 'hi' ? 'खेत का आकार' : 'Work Area'}
+          <div className="pt-2 border-t border-white/20 flex items-center justify-between text-[11px] text-emerald-100">
+            <span className="flex items-center gap-1 font-bold">
+              <span>🔒</span>
+              <span>{lang === 'hi' ? 'भुगतान: कार्य पूरा होने के बाद किसान द्वारा देय' : 'Payment: Due directly after work'}</span>
             </span>
-            <p className="text-xl font-black text-white">
-              {booking.landSize} {booking.sizeUnit}
-            </p>
+            <span className="bg-white/20 px-2 py-0.5 rounded font-black text-[10px] text-white">
+              0% Advance
+            </span>
           </div>
         </div>
 

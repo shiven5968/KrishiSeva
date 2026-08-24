@@ -256,13 +256,8 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
   const [specialNotes, setSpecialNotes] = useState('');
   const [scheduledSuccessData, setScheduledSuccessData] = useState(null);
 
-  // Payment Flow States
-  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-  const [paymentStep, setPaymentStep] = useState('select'); // 'select' | 'upi'
-  const [paymentMethod, setPaymentMethod] = useState('cod'); // 'cod' | 'online'
-  const [pendingBookingData, setPendingBookingData] = useState(null);
-  const [isSimulatingPayment, setIsSimulatingPayment] = useState(false);
-  const [copiedUpi, setCopiedUpi] = useState(false);
+  // Pre-Booking Bargain / Counter-Offer State
+  const [customBargainPrice, setCustomBargainPrice] = useState(null);
 
   // Selected Machine Category (default 'tractor')
   const [selectedCategoryId, setSelectedCategoryId] = useState('tractor');
@@ -449,6 +444,10 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
       return;
     }
 
+    const finalPrice = (customBargainPrice !== null && customBargainPrice > 0) 
+      ? Number(customBargainPrice) 
+      : fareResult.total;
+
     let payload = {};
     if (bookingTimingMode === 'schedule') {
       const selectedSlotObj = timeSlotOptions.find(s => s.id === scheduledTimeSlot) || timeSlotOptions[0];
@@ -463,9 +462,19 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
         scheduledDate: scheduledDate,
         scheduledDay: computedDayOfWeek,
         timeSlot: lang === 'hi' ? selectedSlotObj.labelHi : selectedSlotObj.labelEn,
-        estimatedPrice: fareResult.total,
+        estimatedPrice: finalPrice,
+        originalStandardPrice: fareResult.total,
+        isBargained: finalPrice !== fareResult.total,
+        paymentMethod: 'pay_after_work',
+        advancePaid: 0,
+        balanceDue: finalPrice,
         specialNotes: specialNotes
       };
+      const newPreBooking = addPreBooking(payload);
+      setScheduledSuccessData(newPreBooking);
+      try {
+        confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 } });
+      } catch (e) {}
     } else {
       payload = {
         farmerName: currentUser.name,
@@ -486,79 +495,35 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
         cargoName: selectedCategoryId === 'truck' ? (lang === 'hi' ? currentCargo.nameHi : currentCargo.nameEn) : null,
         cargoDetails: selectedCategoryId === 'truck' ? (customCargoText || currentCargo.descEn) : null,
         pickupAddress: selectedLand?.address || 'Khet #14, Gram Malihabad',
-        estimatedPrice: fareResult.total,
+        estimatedPrice: finalPrice,
+        originalStandardPrice: fareResult.total,
+        isBargained: finalPrice !== fareResult.total,
+        paymentMethod: 'pay_after_work',
+        advancePaid: 0,
+        balanceDue: finalPrice,
         estimatedETA: lang === 'hi' ? '35-60 मिनट' : '35-60 Mins'
       };
+
+      if (selectedCategoryId === 'truck') {
+        const cargoNameStr = lang === 'hi' ? currentCargo.nameHi : currentCargo.nameEn;
+        const dropNameStr = selectedDropLocationId === 'loc_6' 
+          ? (customDropLocationName || (lang === 'hi' ? 'कस्टम गंतव्य स्थान' : 'Custom Destination'))
+          : (lang === 'hi' ? currentDropLocation.nameHi : currentDropLocation.nameEn);
+
+        payload = {
+          ...payload,
+          cargoId: selectedCargoId,
+          cargoName: cargoNameStr,
+          cargoDetails: customCargoText || (lang === 'hi' ? currentCargo.descHi : currentCargo.descEn),
+          pickupAddress: selectedLand?.address || 'Khet #14, Gram Malihabad',
+          dropLocation: dropNameStr,
+          distanceKm: effectiveDistanceKm,
+          cargoWeightTons: cargoWeightTons
+        };
+      }
+
+      createBookingRequest(payload);
     }
-
-    if (selectedCategoryId === 'truck') {
-      const cargoNameStr = lang === 'hi' ? currentCargo.nameHi : currentCargo.nameEn;
-      const dropNameStr = selectedDropLocationId === 'loc_6' 
-        ? (customDropLocationName || (lang === 'hi' ? 'कस्टम गंतव्य स्थान' : 'Custom Destination'))
-        : (lang === 'hi' ? currentDropLocation.nameHi : currentDropLocation.nameEn);
-
-      payload = {
-        ...payload,
-        cargoId: selectedCargoId,
-        cargoName: cargoNameStr,
-        cargoDetails: customCargoText || (lang === 'hi' ? currentCargo.descHi : currentCargo.descEn),
-        pickupAddress: selectedLand?.address || 'Khet #14, Gram Malihabad',
-        dropLocation: dropNameStr,
-        distanceKm: effectiveDistanceKm,
-        cargoWeightTons: cargoWeightTons
-      };
-    }
-
-    setPendingBookingData(payload);
-    setIsPaymentModalOpen(true);
-    setPaymentStep('select');
-    setPaymentMethod('cod');
-  };
-
-  const handleExecuteBookingWithPayment = (method, paidAmount) => {
-    if (!pendingBookingData) return;
-
-    const finalPayload = {
-      ...pendingBookingData,
-      paymentMethod: method,
-      advancePaid: Math.round(paidAmount),
-      balanceDue: Math.round(pendingBookingData.estimatedPrice - paidAmount)
-    };
-
-    if (bookingTimingMode === 'schedule') {
-      const newPreBooking = addPreBooking(finalPayload);
-      setScheduledSuccessData(newPreBooking);
-    } else {
-      createBookingRequest(finalPayload);
-    }
-
-    setIsPaymentModalOpen(false);
-    setPendingBookingData(null);
-  };
-
-  const handleCopyUpi = () => {
-    try {
-      navigator.clipboard.writeText('krishiseva@ybl');
-      setCopiedUpi(true);
-      setTimeout(() => setCopiedUpi(false), 2500);
-    } catch (e) {}
-  };
-
-  const handleSimulateInstantPayment = () => {
-    if (!pendingBookingData || isSimulatingPayment) return;
-    setIsSimulatingPayment(true);
-    setTimeout(() => {
-      setIsSimulatingPayment(false);
-      try {
-        confetti({
-          particleCount: 80,
-          spread: 70,
-          origin: { y: 0.6 }
-        });
-      } catch (e) {}
-      const paidAmount = paymentMethod === 'cod' ? Math.round(pendingBookingData.estimatedPrice * 0.3) : pendingBookingData.estimatedPrice;
-      handleExecuteBookingWithPayment(paymentMethod, paidAmount);
-    }, 1200);
   };
 
   return (
@@ -1378,12 +1343,17 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
               <div>
                 <span className="text-xs text-emerald-400 font-black uppercase tracking-wider flex items-center gap-1.5">
                   <Calculator className="w-4 h-4" />
-                  <span>{t('estimatedPrice')}</span>
+                  <span>{customBargainPrice && customBargainPrice !== fareResult.total ? (lang === 'hi' ? 'आपका प्रस्तावित किराया' : 'Your Counter Offer') : t('estimatedPrice')}</span>
                 </span>
-                <div className="flex items-baseline gap-1 mt-1.5">
+                <div className="flex items-baseline gap-2 mt-1.5">
                   <span className="text-4xl sm:text-5xl font-black text-white tracking-tight">
-                    ₹{fareResult.total}
+                    ₹{(customBargainPrice !== null && customBargainPrice > 0) ? customBargainPrice : fareResult.total}
                   </span>
+                  {customBargainPrice && customBargainPrice !== fareResult.total && (
+                    <span className="text-sm font-bold text-stone-400 line-through">
+                      ₹{fareResult.total}
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -1397,6 +1367,91 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
                     : `+ ${t(currentAttachment?.nameKey)}`}
                 </p>
               </div>
+            </div>
+
+            {/* PRE-BOOKING BARGAIN / COUNTER-OFFER TOOL (WITHOUT SENDING MONEY) */}
+            <div className="p-4 rounded-2xl bg-black/50 border border-emerald-500/30 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5 text-xs font-black text-amber-300">
+                  <span>🤝</span>
+                  <span>{lang === 'hi' ? 'मनपसंद किराया ऑफर / मोलभाव (Bargain Price)' : 'Bargain / Make a Price Offer'}</span>
+                </div>
+                {customBargainPrice && customBargainPrice !== fareResult.total && (
+                  <span className="text-[10px] font-black text-emerald-400 bg-emerald-950/80 px-2.5 py-0.5 rounded-full border border-emerald-500/40 animate-pulse">
+                    {lang === 'hi' ? 'ऑफर सक्रिय ✓' : 'Custom Offer Active ✓'}
+                  </span>
+                )}
+              </div>
+
+              {/* Quick Adjustment Buttons & Custom Input */}
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="relative flex-1 min-w-[130px]">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-400 font-bold text-base">₹</span>
+                  <input
+                    type="number"
+                    value={customBargainPrice !== null ? customBargainPrice : fareResult.total}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value, 10);
+                      setCustomBargainPrice(isNaN(val) ? '' : Math.max(100, val));
+                    }}
+                    placeholder={String(fareResult.total)}
+                    className="w-full pl-8 pr-3 py-2.5 rounded-xl bg-stone-950 border border-emerald-500/40 text-white font-black text-base outline-none focus:border-emerald-400 shadow-inner"
+                  />
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setCustomBargainPrice(Math.max(100, (customBargainPrice || fareResult.total) - 100))}
+                  className="px-3 py-2.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-black border border-stone-700 transition active:scale-95 shrink-0"
+                  title="Reduce ₹100"
+                >
+                  -₹100
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setCustomBargainPrice(Math.max(100, (customBargainPrice || fareResult.total) - 200))}
+                  className="px-3 py-2.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-black border border-stone-700 transition active:scale-95 shrink-0"
+                  title="Reduce ₹200"
+                >
+                  -₹200
+                </button>
+
+                {customBargainPrice && customBargainPrice !== fareResult.total && (
+                  <button
+                    type="button"
+                    onClick={() => setCustomBargainPrice(null)}
+                    className="px-3 py-2.5 rounded-xl bg-red-950/70 hover:bg-red-900 text-red-300 text-xs font-bold border border-red-800 transition active:scale-95 shrink-0"
+                    title="Reset to standard rate"
+                  >
+                    ↺ {lang === 'hi' ? 'रीसेट' : 'Reset'}
+                  </button>
+                )}
+              </div>
+
+              {/* Status Indicator */}
+              <div className="flex items-center justify-between text-[11px] text-stone-300">
+                <span>
+                  {lang === 'hi' ? 'मानक सिस्टम दर:' : 'Standard System Rate:'} <b className="text-white">₹{fareResult.total}</b>
+                </span>
+                {customBargainPrice && customBargainPrice !== fareResult.total && (
+                  <span className="text-emerald-400 font-bold">
+                    {Number(customBargainPrice) < fareResult.total 
+                      ? (lang === 'hi' ? `₹${fareResult.total - Number(customBargainPrice)} का डिस्काउंट ऑफर` : `₹${fareResult.total - Number(customBargainPrice)} counter offer`)
+                      : (lang === 'hi' ? `₹${Number(customBargainPrice) - fareResult.total} प्रीमियम ऑफर` : `₹${Number(customBargainPrice) - fareResult.total} priority offer`)}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Zero Advance Required Guarantee Banner */}
+            <div className="p-3.5 rounded-2xl bg-emerald-950/70 border border-emerald-500/40 text-emerald-300 text-xs flex items-center gap-2.5 shadow-lg">
+              <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+              <p className="font-bold leading-tight">
+                {lang === 'hi' 
+                  ? '🔒 शून्य अग्रिम राशि — बुकिंग हेतु अभी कोई पैसा नहीं देना है। कार्य पूरा होने के बाद ही चालक को भुगतान करें।' 
+                  : '🔒 ₹0 Advance Required — No money needed to book. Pay driver only after field work is completed.'}
+              </p>
             </div>
 
             {/* Pre-Booking Timing Banner */}
@@ -1442,14 +1497,6 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
               </div>
             )}
 
-            {/* DISCLAIMER NOTE */}
-            <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs flex items-start gap-2.5">
-              <Info className="w-4 h-4 shrink-0 mt-0.5 text-amber-400" />
-              <p className="font-medium leading-relaxed text-stone-200">
-                {t('priceDisclaimer')}
-              </p>
-            </div>
-
             {/* Confirm Booking Button */}
             <button
               onClick={handleConfirmBooking}
@@ -1462,7 +1509,7 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
               <span>
                 {bookingTimingMode === 'schedule'
                   ? (lang === 'hi' ? `तारीख ${scheduledDate} के लिए अग्रिम आरक्षित करें` : `Confirm Pre-Booking for ${scheduledDate}`)
-                  : t('confirmBooking')}
+                  : (lang === 'hi' ? `मशीनरी तुरंत बुक करें (₹${(customBargainPrice !== null && customBargainPrice > 0) ? customBargainPrice : fareResult.total})` : `Request Machinery Now (₹${(customBargainPrice !== null && customBargainPrice > 0) ? customBargainPrice : fareResult.total})`)}
               </span>
               <ChevronRight className="w-5 h-5" />
             </button>
@@ -1622,240 +1669,6 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
         isOpen={isPreBookingsModalOpen}
         onClose={() => setIsPreBookingsModalOpen(false)}
       />
-
-      {/* PAYMENT METHOD & UPI QR DEMO MODAL */}
-      {isPaymentModalOpen && pendingBookingData && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-stone-950/85 backdrop-blur-md animate-fade-in">
-          <div className="bg-stone-900 text-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-stone-800 relative space-y-5 max-h-[90vh] overflow-y-auto">
-            
-            {/* Header */}
-            <div className="text-center space-y-1">
-              <h3 className="text-xl font-black text-white">
-                {lang === 'hi' ? 'भुगतान विधि चुनें' : 'Choose Payment Method'}
-              </h3>
-              <p className="text-xs text-stone-400 font-medium">
-                {lang === 'hi' ? 'बुकिंग की पुष्टि करने के लिए भुगतान विकल्प चुनें' : 'Select a payment option to confirm your booking'}
-              </p>
-            </div>
-
-            {paymentStep === 'select' ? (
-              <div className="space-y-4">
-                {/* Order Summary */}
-                <div className="p-4 rounded-2xl bg-stone-950/80 border border-stone-800 flex justify-between items-center">
-                  <div>
-                    <p className="text-[10px] text-stone-500 font-black uppercase tracking-wider">
-                      {lang === 'hi' ? 'कुल राशि' : 'Total Amount'}
-                    </p>
-                    <p className="text-xl font-black text-white">
-                      ₹{pendingBookingData.estimatedPrice}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-[10px] text-stone-500 font-black uppercase tracking-wider">
-                      {lang === 'hi' ? 'मशीन प्रकार' : 'Machinery'}
-                    </p>
-                    <p className="text-xs font-bold text-emerald-400 capitalize">
-                      {pendingBookingData.machineryType === 'truck' ? 'Trolley' : pendingBookingData.machineryType}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Option 1: COD with 30% Advance */}
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod('cod')}
-                  className={`w-full text-left p-4 rounded-2xl border transition-all duration-200 ${
-                    paymentMethod === 'cod'
-                      ? 'border-emerald-500/80 bg-emerald-950/40 shadow-xl shadow-emerald-950/50 ring-1 ring-emerald-500/40'
-                      : 'border-stone-800 bg-stone-950/60 hover:border-stone-700'
-                  }`}
-                >
-                  <div className="flex items-start gap-3">
-                    <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 mt-0.5 ${
-                      paymentMethod === 'cod' ? 'border-emerald-500 bg-emerald-500' : 'border-stone-700 bg-stone-900'
-                    }`}>
-                      {paymentMethod === 'cod' && <div className="w-2 h-2 rounded-full bg-stone-950" />}
-                    </div>
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-extrabold text-sm text-white">
-                          {lang === 'hi' ? 'कैश ऑन डिलीवरी (COD)' : 'Cash on Delivery (COD)'}
-                        </span>
-                        <span className="text-[10px] font-bold text-amber-400 bg-amber-950/60 border border-amber-500/30 px-2 py-0.5 rounded-full">
-                          30% {lang === 'hi' ? 'अग्रिम' : 'Advance'}
-                        </span>
-                      </div>
-                      <p className="text-xs text-stone-400 leading-normal">
-                        {lang === 'hi'
-                          ? `बुकिंग के लिए अभी ₹${Math.round(pendingBookingData.estimatedPrice * 0.3)} का ऑनलाइन भुगतान करें। बाकी ₹${Math.round(pendingBookingData.estimatedPrice * 0.7)} काम के बाद चालक को नकद दें।`
-                          : `Pay ₹${Math.round(pendingBookingData.estimatedPrice * 0.3)} (30% booking advance) online now. Pay the remaining ₹${Math.round(pendingBookingData.estimatedPrice * 0.7)} in cash after work.`}
-                      </p>
-                    </div>
-                  </div>
-                </button>
-
-                {/* Option 2: 100% Online Payment */}
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod('online')}
-                  className={`w-full text-left p-4 rounded-2xl border transition-all duration-200 ${
-                    paymentMethod === 'online'
-                      ? 'border-emerald-500/80 bg-emerald-950/40 shadow-xl shadow-emerald-950/50 ring-1 ring-emerald-500/40'
-                      : 'border-stone-800 bg-stone-950/60 hover:border-stone-700'
-                  }`}
-                >
-                  <div className="flex items-start gap-3">
-                    <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 mt-0.5 ${
-                      paymentMethod === 'online' ? 'border-emerald-500 bg-emerald-500' : 'border-stone-700 bg-stone-900'
-                    }`}>
-                      {paymentMethod === 'online' && <div className="w-2 h-2 rounded-full bg-stone-950" />}
-                    </div>
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-extrabold text-sm text-white">
-                          {lang === 'hi' ? 'पूर्ण ऑनलाइन भुगतान' : 'Pay Full Amount Online'}
-                        </span>
-                        <span className="text-[10px] font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded-full">
-                          100% {lang === 'hi' ? 'सुरक्षित' : 'Secure'}
-                        </span>
-                      </div>
-                      <p className="text-xs text-stone-400 leading-normal">
-                        {lang === 'hi'
-                          ? `अभी पूरा ₹${pendingBookingData.estimatedPrice} भुगतान करें। काम पूरा होने पर कोई अतिरिक्त शुल्क नहीं देना होगा।`
-                          : `Pay the full amount of ₹${pendingBookingData.estimatedPrice} now. No cash hassle after work is completed.`}
-                      </p>
-                    </div>
-                  </div>
-                </button>
-
-                {/* CTA Buttons */}
-                <div className="flex gap-3 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => { setIsPaymentModalOpen(false); setPendingBookingData(null); }}
-                    className="w-1/3 py-3.5 rounded-xl border border-stone-700 text-stone-300 text-sm font-bold hover:bg-stone-800 transition"
-                  >
-                    {lang === 'hi' ? 'रद्द करें' : 'Cancel'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPaymentStep('upi')}
-                    className="w-2/3 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 text-sm font-black shadow-lg shadow-emerald-500/20 transition flex items-center justify-center gap-1.5"
-                  >
-                    <span>{lang === 'hi' ? 'भुगतान के लिए आगे बढ़ें' : 'Proceed to Pay'}</span>
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            ) : (
-              /* Live Working UPI QR Screen */
-              <div className="space-y-4 animate-fade-in">
-                {(() => {
-                  const payableAmount = paymentMethod === 'cod' 
-                    ? Math.round(pendingBookingData.estimatedPrice * 0.3) 
-                    : pendingBookingData.estimatedPrice;
-                  const upiPayload = `upi://pay?pa=krishiseva@ybl&pn=KrishiSeva&am=${payableAmount}&cu=INR&tn=KrishiSeva%20Machinery%20Booking`;
-                  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiPayload)}`;
-
-                  return (
-                    <>
-                      <div className="p-4 rounded-2xl bg-stone-950/90 border border-stone-800 space-y-3 text-center">
-                        <div>
-                          <span className="text-[10px] font-black text-stone-400 uppercase tracking-widest block">
-                            {lang === 'hi' ? 'भुगतान की जाने वाली राशि' : 'Amount to Pay'}
-                          </span>
-                          <span className="text-3xl font-black text-emerald-400">
-                            ₹{payableAmount}
-                          </span>
-                          {paymentMethod === 'cod' && (
-                            <span className="text-[11px] text-stone-400 block mt-0.5">
-                              (30% {lang === 'hi' ? 'बुकिंग अग्रिम' : 'Booking Advance'})
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Live Generated QR Code with High-Quality Display */}
-                        <div className="w-44 h-44 bg-white rounded-2xl mx-auto flex items-center justify-center p-2 shadow-xl relative group border-2 border-emerald-500/40 overflow-hidden">
-                          <img 
-                            src={qrUrl}
-                            alt="UPI QR Code" 
-                            className="w-full h-full object-contain"
-                            onError={(e) => {
-                              // Fallback inline rendering if offline
-                              e.target.style.display = 'none';
-                              e.target.nextSibling.style.display = 'block';
-                            }}
-                          />
-                          <div style={{ display: 'none' }} className="w-full h-full">
-                            <svg viewBox="0 0 200 200" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-                              <rect x="10" y="10" width="50" height="50" rx="4" fill="none" stroke="#1e293b" strokeWidth="6"/>
-                              <rect x="20" y="20" width="30" height="30" rx="2" fill="#1e293b"/>
-                              <rect x="140" y="10" width="50" height="50" rx="4" fill="none" stroke="#1e293b" strokeWidth="6"/>
-                              <rect x="150" y="20" width="30" height="30" rx="2" fill="#1e293b"/>
-                              <rect x="10" y="140" width="50" height="50" rx="4" fill="none" stroke="#1e293b" strokeWidth="6"/>
-                              <rect x="20" y="150" width="30" height="30" rx="2" fill="#1e293b"/>
-                              {[70,80,90,100,110,120].map(x => [70,80,90,100,110,120,130,140,150,160].map(y => (
-                                (x + y) % 30 < 15 && <rect key={`${x}-${y}`} x={x} y={y} width="8" height="8" rx="1" fill="#1e293b" opacity={0.8}/>
-                              )))}
-                              <rect x="75" y="75" width="50" height="50" rx="8" fill="white" stroke="#e2e8f0" strokeWidth="2"/>
-                              <text x="100" y="105" textAnchor="middle" fontSize="18" fontWeight="bold" fill="#059669">UPI</text>
-                            </svg>
-                          </div>
-                        </div>
-
-                        {/* UPI ID & Quick Copy */}
-                        <div className="flex items-center justify-center gap-2 text-xs">
-                          <span className="text-stone-400">UPI ID:</span>
-                          <code className="font-bold text-emerald-300 bg-stone-900 px-2 py-0.5 rounded-lg border border-stone-700">krishiseva@ybl</code>
-                          <button
-                            type="button"
-                            onClick={handleCopyUpi}
-                            className="text-stone-400 hover:text-white p-1 rounded hover:bg-stone-800 transition"
-                            title="Copy UPI ID"
-                          >
-                            <Copy className="w-3.5 h-3.5" />
-                          </button>
-                          {copiedUpi && <span className="text-[10px] text-emerald-400 font-bold">Copied!</span>}
-                        </div>
-
-                        <p className="text-[11px] text-stone-400 font-medium">
-                          {lang === 'hi'
-                            ? 'PhonePe, Google Pay, Paytm या किसी भी UPI ऐप से स्कैन करके भुगतान करें।'
-                            : 'Scan with PhonePe, Google Pay, Paytm or any UPI app to pay.'}
-                        </p>
-                      </div>
-
-                      {/* Modal Action Buttons */}
-                      <div className="flex gap-2.5 pt-1">
-                        <button
-                          type="button"
-                          onClick={() => setPaymentStep('select')}
-                          className="w-1/3 py-3 rounded-xl border border-stone-700 text-stone-300 text-xs font-bold hover:bg-stone-800 transition"
-                        >
-                          {lang === 'hi' ? 'पीछे जाएँ' : 'Back'}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleExecuteBookingWithPayment(
-                            paymentMethod,
-                            paymentMethod === 'cod' ? Math.round(pendingBookingData.estimatedPrice * 0.3) : pendingBookingData.estimatedPrice
-                          )}
-                          className="w-2/3 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 text-xs font-black shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-1.5 transition active:scale-95"
-                        >
-                          <CheckCircle2 className="w-4 h-4 text-stone-950" />
-                          <span>
-                            {lang === 'hi' ? 'मैंने भुगतान कर दिया है ✓' : 'I Have Paid & Confirm ✓'}
-                          </span>
-                        </button>
-                      </div>
-                    </>
-                  );
-                })()}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
 
       {/* Farmer Booking History Modal */}
       <FarmerBookingHistoryModal

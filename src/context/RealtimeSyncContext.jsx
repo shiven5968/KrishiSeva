@@ -645,6 +645,8 @@ export function RealtimeSyncProvider({ children }) {
         if (b.id === ratingData.bookingId || (activeBooking && b.id === activeBooking.id)) {
           return {
             ...b,
+            paidAmount: ratingData.amountPaid || b.paidAmount || b.estimatedPrice,
+            paymentMethod: ratingData.paymentMethod || b.paymentMethod || 'cash',
             farmerRating: stars,
             feedbackTags: tags,
             feedbackComment: comment

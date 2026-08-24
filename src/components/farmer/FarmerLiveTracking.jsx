@@ -549,22 +549,10 @@ export default function FarmerLiveTracking() {
                   <span className={`font-bold ${isDark ? 'text-stone-300' : 'text-slate-700'}`}>{lang === 'hi' ? 'कुल नियत किराया:' : 'Total Fixed Fare:'}</span>
                   <span className="text-2xl font-black text-emerald-500">₹{activeBooking.estimatedPrice}</span>
                 </div>
-                {activeBooking.paymentMethod && (
-                  <>
-                    <div className="flex justify-between items-center">
-                      <span className={`font-medium ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>{lang === 'hi' ? 'भुगतान विधि:' : 'Payment Method:'}</span>
-                      <span className={`font-bold uppercase ${isDark ? 'text-white' : 'text-slate-900'}`}>{activeBooking.paymentMethod === 'cod' ? 'COD' : 'Online'}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className={`font-medium ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>{lang === 'hi' ? 'अग्रिम भुगतान:' : 'Paid Advance:'}</span>
-                      <span className="font-bold text-emerald-500">₹{activeBooking.advancePaid || 0}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className={`font-medium ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>{lang === 'hi' ? 'शेष देय राशि:' : 'Balance Due:'}</span>
-                      <span className="font-bold text-amber-500">₹{activeBooking.balanceDue || 0}</span>
-                    </div>
-                  </>
-                )}
+                <div className="flex justify-between items-center">
+                  <span className={`font-medium ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>{lang === 'hi' ? 'भुगतान स्थिति:' : 'Payment Status:'}</span>
+                  <span className="font-bold text-emerald-400">{lang === 'hi' ? 'कार्य समाप्ति पर देय (₹0 अग्रिम)' : 'Pay after work (₹0 Advance)'}</span>
+                </div>
               </div>
 
               {/* Action Buttons: Call Driver & Cancel */}
