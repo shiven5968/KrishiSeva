@@ -332,17 +332,20 @@ export default function CreativeLoginPortal() {
           loop
           playsInline
           preload="auto"
-          className={`absolute inset-0 w-full h-full object-cover scale-105 transition-opacity duration-1000 ${
-            isDark ? 'opacity-40 brightness-90' : 'opacity-25'
+          className={`absolute inset-0 w-full h-full object-cover scale-105 transition-all duration-700 ${
+            isDark 
+              ? 'opacity-45 brightness-90 contrast-105' 
+              : 'opacity-85 brightness-95 contrast-105 saturate-110'
           }`}
           poster="https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=1920&q=80"
         >
           <source src="/videos/hero_field_bg.mp4" type="video/mp4" />
         </video>
+        {/* Soft Vignette Overlay for Crisp Readability */}
         <div className={`absolute inset-0 transition-colors duration-300 ${
           isDark 
-            ? 'bg-gradient-to-b from-[#090D0B]/80 via-[#090D0B]/60 to-[#090D0B]/90' 
-            : 'bg-gradient-to-b from-slate-50/80 via-slate-50/50 to-slate-50/85'
+            ? 'bg-gradient-to-b from-[#090D0B]/85 via-[#090D0B]/55 to-[#090D0B]/90' 
+            : 'bg-gradient-to-b from-white/35 via-white/10 to-white/40'
         }`} />
       </div>
 
@@ -428,27 +431,27 @@ export default function CreativeLoginPortal() {
             
             <div className="space-y-4">
               <h1 className={`text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.08] ${
-                isDark ? 'text-white' : 'text-slate-900'
+                isDark ? 'text-white' : 'text-stone-950 drop-shadow-sm'
               }`}>
                 {lang === 'hi' ? (
                   <>
                     मांग पर मशीनें।<br />
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-green-500">
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 via-teal-500 to-green-600">
                       सीधे आपके खेत पर।
                     </span>
                   </>
                 ) : (
                   <>
                     Machinery on Demand.<br />
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-green-500">
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 via-teal-500 to-green-600">
                       Directly to Your Farm.
                     </span>
                   </>
                 )}
               </h1>
 
-              <p className={`text-base sm:text-lg max-w-xl font-medium leading-relaxed ${
-                isDark ? 'text-stone-300' : 'text-slate-600'
+              <p className={`text-base sm:text-lg max-w-xl font-bold leading-relaxed ${
+                isDark ? 'text-stone-300' : 'text-stone-900 drop-shadow-xs'
               }`}>
                 {lang === 'hi'
                   ? 'ट्रैक्टर, हार्वेस्टर एवं अर्थमूवर की तत्काल 1-क्लिक बुकिंग। वास्तविक समय में अपने खेत तक लाइव जीपीएस ट्रैक करें।'
@@ -458,24 +461,24 @@ export default function CreativeLoginPortal() {
 
             {/* Feature Badges */}
             <div className="flex flex-wrap items-center gap-2.5 pt-2">
-              <span className={`px-3.5 py-2 rounded-xl border text-xs font-black flex items-center gap-2 ${
-                isDark ? 'bg-stone-900/70 border-stone-800 text-stone-200' : 'bg-white border-slate-200 text-slate-800 shadow-sm'
+              <span className={`px-3.5 py-2 rounded-xl border text-xs font-black flex items-center gap-2 backdrop-blur-md ${
+                isDark ? 'bg-stone-900/80 border-stone-800 text-stone-200' : 'bg-white/90 border-white/80 text-stone-900 shadow-md'
               }`}>
-                <Tractor className="w-4 h-4 text-emerald-500" />
+                <Tractor className="w-4 h-4 text-emerald-600" />
                 <span>{lang === 'hi' ? 'सत्यापित कृषि उपकरण' : 'Verified Equipment'}</span>
               </span>
 
-              <span className={`px-3.5 py-2 rounded-xl border text-xs font-black flex items-center gap-2 ${
-                isDark ? 'bg-stone-900/70 border-stone-800 text-stone-200' : 'bg-white border-slate-200 text-slate-800 shadow-sm'
+              <span className={`px-3.5 py-2 rounded-xl border text-xs font-black flex items-center gap-2 backdrop-blur-md ${
+                isDark ? 'bg-stone-900/80 border-stone-800 text-stone-200' : 'bg-white/90 border-white/80 text-stone-900 shadow-md'
               }`}>
                 <Zap className="w-4 h-4 text-amber-500" />
                 <span>{lang === 'hi' ? 'त्वरित 1-क्लिक वाहन सेवा' : 'Instant Dispatch'}</span>
               </span>
 
-              <span className={`px-3.5 py-2 rounded-xl border text-xs font-black flex items-center gap-2 ${
-                isDark ? 'bg-stone-900/70 border-stone-800 text-stone-200' : 'bg-white border-slate-200 text-slate-800 shadow-sm'
+              <span className={`px-3.5 py-2 rounded-xl border text-xs font-black flex items-center gap-2 backdrop-blur-md ${
+                isDark ? 'bg-stone-900/80 border-stone-800 text-stone-200' : 'bg-white/90 border-white/80 text-stone-900 shadow-md'
               }`}>
-                <ShieldCheck className="w-4 h-4 text-blue-500" />
+                <ShieldCheck className="w-4 h-4 text-blue-600" />
                 <span>{lang === 'hi' ? 'एग्रीस्टैक भूलेख सत्यापित' : 'AgriStack Verified'}</span>
               </span>
             </div>
