@@ -361,19 +361,6 @@ export default function CreativeLoginPortal() {
           {/* ──── LEFT COLUMN: Uber-Style Hero Headline & Quick Specs ──── */}
           <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
             
-            {/* Floating Compact Chip */}
-            <div className="animate-fade-in inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-stone-900/90 border border-emerald-500/30 text-emerald-300 text-xs font-bold shadow-lg backdrop-blur-md cursor-default">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-              </span>
-              <span>
-                {lang === 'hi' 
-                  ? '⚡ रियल-टाइम फ्लीट नेटवर्क • मलिहाबाद' 
-                  : '⚡ Real-Time Fleet Network • Malihabad'}
-              </span>
-            </div>
-
             {/* Bold, Ultra-Clean Uber-Style Headline */}
             <h1 className="text-4xl sm:text-5xl lg:text-[4.2rem] font-black text-white tracking-tight leading-[1.08]">
               {lang === 'hi' ? (
