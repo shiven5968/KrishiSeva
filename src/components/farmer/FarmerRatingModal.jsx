@@ -1,31 +1,28 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useTheme } from '../../context/ThemeContext';
 import { 
   Star, 
-  Sparkles, 
-  ShieldCheck, 
   CheckCircle2, 
   Tractor, 
-  ThumbsUp, 
   Zap, 
-  Award,
-  Heart,
   ArrowRight,
   IndianRupee,
-  MessageSquare,
   Edit2,
   QrCode,
-  Banknote
+  Banknote,
+  Copy,
+  Check,
+  X
 } from 'lucide-react';
 
 const FEEDBACK_TAGS = [
-  { id: 'punctual', labelHi: '⚡ समय पर आगमन (On Time)', labelEn: '⚡ On Time Arrival' },
-  { id: 'skilled', labelHi: '🚜 कुशल चालक (Skilled Work)', labelEn: '🚜 Skilled Driver' },
-  { id: 'clean', labelHi: '🌾 सटीक व गहरी जुताई (Perfect Tillage)', labelEn: '🌾 Perfect Tillage' },
-  { id: 'fair_price', labelHi: '💰 पारदर्शी व उचित दर (Fair Price)', labelEn: '💰 Fair & Transparent' },
-  { id: 'polite', labelHi: '🤝 विनम्र व्यवहार (Polite & Helpful)', labelEn: '🤝 Polite & Helpful' },
-  { id: 'safe', labelHi: '🛡️ सुरक्षित संचालन (Safe Operation)', labelEn: '🛡️ Safe Operation' }
+  { id: 'punctual', labelHi: '⚡ समय पर आगमन', labelEn: '⚡ On Time Arrival' },
+  { id: 'skilled', labelHi: '🚜 कुशल चालक', labelEn: '🚜 Skilled Driver' },
+  { id: 'clean', labelHi: '🌾 सटीक जुताई', labelEn: '🌾 Perfect Tillage' },
+  { id: 'fair_price', labelHi: '💰 पारदर्शी दर', labelEn: '💰 Fair & Transparent' },
+  { id: 'polite', labelHi: '🤝 विनम्र व्यवहार', labelEn: '🤝 Polite & Helpful' },
+  { id: 'safe', labelHi: '🛡️ सुरक्षित कार्य', labelEn: '🛡️ Safe Operation' }
 ];
 
 export default function FarmerRatingModal({ 
@@ -46,6 +43,7 @@ export default function FarmerRatingModal({
   const [paymentMode, setPaymentMode] = useState('cash'); // 'cash' | 'upi'
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [copiedUpi, setCopiedUpi] = useState(false);
 
   if (!isOpen || !booking) return null;
 
@@ -57,6 +55,14 @@ export default function FarmerRatingModal({
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80'
   };
 
+  const upiHandle = `driver.${driver.vehicleNumber?.toLowerCase().replace(/[^a-z0-9]/g, '') || 'up32kr7744'}@upi`;
+
+  const handleCopyUpi = () => {
+    navigator.clipboard?.writeText(upiHandle);
+    setCopiedUpi(true);
+    setTimeout(() => setCopiedUpi(false), 2000);
+  };
+
   const toggleTag = (tagId) => {
     if (selectedTags.includes(tagId)) {
       setSelectedTags(selectedTags.filter(t => t !== tagId));
@@ -66,12 +72,11 @@ export default function FarmerRatingModal({
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+    e?.preventDefault();
     setIsSubmitting(true);
     
     const finalAmount = Number(paidAmount) || booking.estimatedPrice || 0;
 
-    // Call parent submit handler
     onSubmitRating({
       rating,
       tags: selectedTags,
@@ -85,119 +90,148 @@ export default function FarmerRatingModal({
     setSubmitted(true);
     setTimeout(() => {
       onClose();
-    }, 1600);
+    }, 1500);
   };
 
-  const getRatingLabel = (stars) => {
+  const getRatingStatus = (stars) => {
     switch (stars) {
       case 5:
-        return lang === 'hi' ? '🌟 उत्कृष्ट अनुभव! (Outstanding Service)' : '🌟 Outstanding Service (5.0)';
+        return {
+          text: lang === 'hi' ? '🌟 उत्कृष्ट सेवा (5.0)' : '🌟 Outstanding Service (5.0)',
+          color: 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+        };
       case 4:
-        return lang === 'hi' ? '👍 बहुत अच्छा काम (Very Good)' : '👍 Very Good Service (4.0)';
+        return {
+          text: lang === 'hi' ? '👍 बहुत अच्छा काम (4.0)' : '👍 Great Experience (4.0)',
+          color: 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+        };
       case 3:
-        return lang === 'hi' ? '👌 संतोषजनक कार्य (Good)' : '👌 Satisfactory Work (3.0)';
+        return {
+          text: lang === 'hi' ? '👌 संतोषजनक कार्य (3.0)' : '👌 Good Experience (3.0)',
+          color: 'bg-amber-500/10 border-amber-500/30 text-amber-400'
+        };
       case 2:
-        return lang === 'hi' ? '⚠️ सुधार की आवश्यकता (Needs Improvement)' : '⚠️ Needs Improvement (2.0)';
+        return {
+          text: lang === 'hi' ? '⚠️ सुधार की आवश्यकता (2.0)' : '⚠️ Average Experience (2.0)',
+          color: 'bg-orange-500/10 border-orange-500/30 text-orange-400'
+        };
       case 1:
-        return lang === 'hi' ? '❌ असंतोषजनक सेवा (Poor Experience)' : '❌ Poor Experience (1.0)';
+        return {
+          text: lang === 'hi' ? '❌ असंतोषजनक सेवा (1.0)' : '❌ Poor Experience (1.0)',
+          color: 'bg-red-500/10 border-red-500/30 text-red-400'
+        };
       default:
-        return '';
+        return {
+          text: '5.0 Rating',
+          color: 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+        };
     }
   };
 
+  const currentStatus = getRatingStatus(hoverRating || rating);
+
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
-      <div className={`rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border relative overflow-hidden transition-all duration-300 ${
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+      <div className={`w-full max-w-md max-h-[85vh] flex flex-col rounded-3xl shadow-2xl border overflow-hidden relative transition-all duration-300 ${
         isDark 
-          ? 'bg-[#0F1713] border-emerald-500/30 text-white shadow-emerald-950/40' 
+          ? 'bg-slate-900 border-slate-800 text-white shadow-black/80' 
           : 'bg-white border-slate-200 text-slate-900 shadow-2xl'
       }`}>
         
-        {/* Subtle Ambient Glow Background */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+        {/* Subtle Ambient Glows */}
+        <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        {/* Modal Top Header with Close Button */}
+        <div className={`p-4 sm:p-5 border-b flex items-center justify-between shrink-0 ${
+          isDark ? 'border-slate-800 bg-slate-900/90' : 'border-slate-100 bg-slate-50/90'
+        }`}>
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] font-black uppercase tracking-wider">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              <span>{lang === 'hi' ? 'कार्य संपन्न' : 'Job Completed'}</span>
+            </span>
+          </div>
+
+          <button
+            type="button"
+            onClick={onClose}
+            className={`p-1.5 rounded-xl transition ${
+              isDark ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
+            }`}
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
 
         {submitted ? (
-          <div className="py-12 text-center space-y-4 animate-fade-in">
-            <div className="w-20 h-20 mx-auto rounded-3xl bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center text-4xl shadow-inner animate-bounce">
+          <div className="py-16 px-6 text-center space-y-4 animate-fade-in flex-1 flex flex-col items-center justify-center">
+            <div className="w-16 h-16 rounded-2xl bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center text-3xl shadow-inner animate-bounce">
               ⭐
             </div>
             <div className="space-y-1">
-              <h3 className="text-2xl font-black text-emerald-400">
+              <h3 className="text-xl font-black text-emerald-400">
                 {lang === 'hi' ? 'रेटिंग सफलतापूर्वक दर्ज की गई!' : 'Rating Successfully Submitted!'}
               </h3>
-              <p className={`text-xs font-medium ${isDark ? 'text-stone-300' : 'text-slate-600'}`}>
+              <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                 {lang === 'hi' 
-                  ? `चालक के पोर्टल में ${rating}/5 रेटिंग व ₹${booking.estimatedPrice} का भुगतान तुरंत अपडेट कर दिया गया है।` 
-                  : `Driver rating (${rating}/5) & payout (₹${booking.estimatedPrice}) have been updated in driver cockpit.`}
+                  ? `चालक के पोर्टल में ${rating}/5 रेटिंग व ₹${paidAmount} अपडेट कर दिया गया है।` 
+                  : `Driver rating (${rating}/5) & ₹${paidAmount} payout recorded.`}
               </p>
             </div>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
-            
-            {/* Header: Job Completion Badge & Driver Card */}
-            <div className="text-center space-y-2">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/80 border border-emerald-500/40 text-emerald-400 text-xs font-black uppercase tracking-wider">
-                <CheckCircle2 className="w-3.5 h-3.5" />
-                <span>{lang === 'hi' ? 'खेत कार्य सफलतापूर्वक संपन्न' : 'Farm Tillage Completed'}</span>
-              </div>
-              <h2 className="text-xl sm:text-2xl font-black tracking-tight">
-                {lang === 'hi' ? 'चालक पार्टनर को रेटिंग दें' : 'Rate Your Driver Partner'}
-              </h2>
-              <p className={`text-xs ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
-                {lang === 'hi' ? 'आपकी रेटिंग से ऑपरेटर की गुणवत्ता व सेवा में सुधार होता है।' : 'Your feedback helps maintain high fleet quality across KrishiSeva.'}
-              </p>
-            </div>
-
-            {/* Driver Identity Card & Completed Amount */}
-            <div className={`p-4 rounded-2xl border space-y-3 ${
-              isDark ? 'bg-stone-950/80 border-stone-800' : 'bg-slate-50 border-slate-200'
-            }`}>
-              <div className="flex items-center justify-between gap-3">
+          <>
+            {/* Scrollable Modal Body */}
+            <div className="overflow-y-auto p-5 sm:p-6 space-y-5 scrollbar-thin scrollbar-thumb-slate-700 flex-1">
+              
+              {/* Driver & Due Fare Card */}
+              <div className={`p-4 rounded-2xl border flex items-center justify-between gap-3 ${
+                isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'
+              }`}>
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-emerald-950/80 border border-emerald-500/40 text-emerald-400 flex items-center justify-center text-2xl font-bold">
+                  <div className="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-xl font-bold shrink-0">
                     🚜
                   </div>
-                  <div>
-                    <h4 className="font-black text-sm">{driver.name}</h4>
-                    <p className={`text-xs font-bold ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+                  <div className="min-w-0">
+                    <h4 className="font-black text-xs sm:text-sm truncate">{driver.name}</h4>
+                    <p className={`text-[11px] font-bold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                       {driver.modelName} • <span className="font-mono text-emerald-400">{driver.vehicleNumber}</span>
                     </p>
                   </div>
                 </div>
 
-                <div className="text-right">
-                  <span className={`text-[10px] uppercase font-bold block ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
-                    {lang === 'hi' ? 'देय राशि (Fare Due)' : 'Fare Due'}
+                <div className="text-right shrink-0">
+                  <span className={`text-[10px] uppercase font-bold block ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                    {lang === 'hi' ? 'देय राशि' : 'Fare Due'}
                   </span>
                   {isEditingAmount ? (
                     <div className="flex items-center gap-1 justify-end mt-0.5">
-                      <span className="text-emerald-400 font-black text-sm">₹</span>
+                      <span className="text-emerald-400 font-black text-xs">₹</span>
                       <input
                         type="number"
                         value={paidAmount}
                         onChange={(e) => setPaidAmount(e.target.value)}
-                        className="w-20 px-1.5 py-0.5 rounded bg-stone-900 border border-emerald-500 text-white font-black text-sm text-right outline-none"
+                        className="w-16 px-1 py-0.5 rounded bg-slate-900 border border-emerald-500 text-white font-black text-xs text-right outline-none"
                       />
                       <button
                         type="button"
                         onClick={() => setIsEditingAmount(false)}
-                        className="text-[10px] bg-emerald-500 text-stone-950 px-1.5 py-0.5 rounded font-black"
+                        className="text-[10px] bg-emerald-500 text-slate-950 px-1.5 py-0.5 rounded font-black"
                       >
                         ✓
                       </button>
                     </div>
                   ) : (
                     <div className="flex items-center gap-1 justify-end">
-                      <span className="text-lg font-black text-emerald-400">
+                      <span className="text-base font-black text-emerald-400">
                         ₹{paidAmount}
                       </span>
                       <button
                         type="button"
                         onClick={() => setIsEditingAmount(true)}
-                        className="p-1 text-stone-400 hover:text-emerald-400 transition"
-                        title="Adjust Settled Fare"
+                        className="p-1 text-slate-500 hover:text-emerald-400 transition"
+                        title="Edit Amount"
                       >
                         <Edit2 className="w-3 h-3" />
                       </button>
@@ -206,45 +240,52 @@ export default function FarmerRatingModal({
                 </div>
               </div>
 
-              {/* Payment Mode Selection (Cash / UPI Direct) */}
-              <div className="pt-2 border-t border-white/10 space-y-2">
-                <span className={`text-[11px] font-bold block ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
-                  {lang === 'hi' ? '💳 भुगतान का तरीका चुनें:' : '💳 Select Payment Mode:'}
+              {/* 2. Payment Mode: Sleek Segmented Pill Control */}
+              <div className="space-y-3">
+                <span className={`text-xs font-black uppercase tracking-wider block ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                  💳 {lang === 'hi' ? 'भुगतान का तरीका' : 'Select Payment Mode'}
                 </span>
-                <div className="grid grid-cols-2 gap-2">
+
+                <div className={`p-1.5 rounded-2xl border flex items-center gap-1.5 ${
+                  isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-100 border-slate-200'
+                }`}>
                   <button
                     type="button"
                     onClick={() => setPaymentMode('cash')}
-                    className={`py-2 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 transition ${
+                    className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all duration-200 active:scale-95 ${
                       paymentMode === 'cash'
-                        ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300 ring-1 ring-emerald-500/50'
-                        : isDark ? 'bg-stone-900 border-stone-800 text-stone-400' : 'bg-white border-slate-300 text-slate-600'
+                        ? 'bg-emerald-500/10 border border-emerald-500/40 text-emerald-400 shadow-sm'
+                        : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
-                    <Banknote className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>{lang === 'hi' ? 'नकद (Cash to Driver)' : 'Cash to Driver'}</span>
+                    <Banknote className="w-4 h-4 text-emerald-400" />
+                    <span>{lang === 'hi' ? 'नकद (Cash)' : 'Cash to Driver'}</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setPaymentMode('upi')}
-                    className={`py-2 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 transition ${
+                    className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all duration-200 active:scale-95 ${
                       paymentMode === 'upi'
-                        ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300 ring-1 ring-emerald-500/50'
-                        : isDark ? 'bg-stone-900 border-stone-800 text-stone-400' : 'bg-white border-slate-300 text-slate-600'
+                        ? 'bg-emerald-500/10 border border-emerald-500/40 text-emerald-400 shadow-sm'
+                        : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
-                    <QrCode className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>{lang === 'hi' ? 'यूपीआई / ऑनलाइन QR' : 'UPI / Online QR'}</span>
+                    <QrCode className="w-4 h-4 text-emerald-400" />
+                    <span>{lang === 'hi' ? 'ऑनलाइन QR' : 'UPI / Online QR'}</span>
                   </button>
                 </div>
 
+                {/* QR Code Inside Rounded White Card */}
                 {paymentMode === 'upi' && (
-                  <div className="p-3 rounded-xl bg-stone-900 border border-emerald-500/30 text-center space-y-2 animate-fade-in">
-                    <span className="text-[11px] text-stone-300 font-medium block">
+                  <div className={`p-4 rounded-2xl border flex flex-col items-center justify-center space-y-3 animate-fade-in ${
+                    isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'
+                  }`}>
+                    <span className="text-[11px] font-bold text-slate-400">
                       {lang === 'hi' ? `चालक को ₹${paidAmount} का UPI भुगतान करें:` : `Pay ₹${paidAmount} directly to Driver UPI:`}
                     </span>
-                    <div className="w-28 h-28 bg-white rounded-lg mx-auto p-1.5 border border-emerald-500">
+
+                    <div className="p-3 bg-white rounded-2xl shadow-lg border border-slate-200 flex items-center justify-center w-36 h-36">
                       <svg viewBox="0 0 200 200" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
                         <rect x="10" y="10" width="50" height="50" rx="4" fill="none" stroke="#1e293b" strokeWidth="6"/>
                         <rect x="20" y="20" width="30" height="30" rx="2" fill="#1e293b"/>
@@ -259,137 +300,130 @@ export default function FarmerRatingModal({
                         <text x="100" y="105" textAnchor="middle" fontSize="18" fontWeight="bold" fill="#059669">UPI</text>
                       </svg>
                     </div>
-                    <code className="text-[10px] text-emerald-400 font-mono bg-stone-950 px-2 py-0.5 rounded border border-stone-800">
-                      driver.{driver.vehicleNumber?.toLowerCase().replace(/-/g, '') || 'up32kr7744'}@upi
-                    </code>
+
+                    <button
+                      type="button"
+                      onClick={handleCopyUpi}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-850 border border-slate-700 text-emerald-400 text-xs font-mono font-bold transition active:scale-95"
+                      title="Click to Copy UPI ID"
+                    >
+                      <span>{upiHandle}</span>
+                      {copiedUpi ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
+                    </button>
                   </div>
                 )}
               </div>
+
+              {/* 3. Overhauled Star Rating UI */}
+              <div className={`text-center space-y-3 p-4 rounded-2xl border ${
+                isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'
+              }`}>
+                {/* Dynamic Top Rating Pill */}
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-black">
+                  <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                  <span>⭐ {(hoverRating || rating).toFixed(1)} / 5.0 Rating</span>
+                </div>
+
+                {/* 5 Large Interactive Stars */}
+                <div className="flex items-center justify-center gap-2 sm:gap-3 py-1">
+                  {[1, 2, 3, 4, 5].map((star) => {
+                    const active = (hoverRating || rating) >= star;
+                    return (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() => setRating(star)}
+                        onMouseEnter={() => setHoverRating(star)}
+                        onMouseLeave={() => setHoverRating(0)}
+                        className="p-1 transition-all duration-200 hover:scale-110 active:scale-95 focus:outline-none"
+                      >
+                        <Star 
+                          className={`w-9 h-9 sm:w-10 sm:h-10 transition-all duration-150 ${
+                            active 
+                              ? 'fill-amber-400 text-amber-400 drop-shadow-[0_0_12px_rgba(251,191,36,0.5)]' 
+                              : isDark ? 'text-slate-700 hover:text-slate-500' : 'text-slate-300 hover:text-slate-400'
+                          }`} 
+                        />
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Single Clean Status Pill Below Stars */}
+                <div className="flex items-center justify-center">
+                  <span className={`text-xs font-black tracking-wide px-3 py-0.5 rounded-lg border transition-colors ${currentStatus.color}`}>
+                    {currentStatus.text}
+                  </span>
+                </div>
+              </div>
+
+              {/* 4. Refined Feedback Feature Tags */}
+              <div className="space-y-2.5">
+                <label className={`block text-xs font-black uppercase tracking-wider ${
+                  isDark ? 'text-slate-400' : 'text-slate-600'
+                }`}>
+                  {lang === 'hi' ? 'सेवा के बारे में क्या पसंद आया?' : 'WHAT DID YOU LIKE ABOUT THE SERVICE?'}
+                </label>
+
+                <div className="flex flex-wrap gap-2">
+                  {FEEDBACK_TAGS.map((tag) => {
+                    const isSelected = selectedTags.includes(tag.id);
+                    return (
+                      <button
+                        key={tag.id}
+                        type="button"
+                        onClick={() => toggleTag(tag.id)}
+                        className={`rounded-xl px-3.5 py-2 text-xs font-medium border transition-all duration-150 active:scale-95 cursor-pointer ${
+                          isSelected
+                            ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-400 shadow-sm'
+                            : isDark
+                            ? 'bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-700'
+                            : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'
+                        }`}
+                      >
+                        {lang === 'hi' ? tag.labelHi : tag.labelEn}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Optional Comment */}
+              <div className="space-y-1.5">
+                <textarea
+                  rows={2}
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder={lang === 'hi' ? 'अतिरिक्त टिप्पणी लिखें (वैकल्पिक)...' : 'Add optional feedback note...'}
+                  className={`w-full p-3 rounded-2xl border text-xs outline-none transition resize-none ${
+                    isDark 
+                      ? 'bg-slate-950 border-slate-800 text-white focus:border-emerald-500' 
+                      : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-emerald-500'
+                  }`}
+                />
+              </div>
+
             </div>
 
-            {/* Interactive 5-Star Rating Selector */}
-            <div className={`text-center space-y-3 p-4 rounded-2xl border ${
-              isDark ? 'bg-stone-950/60 border-stone-800' : 'bg-slate-50 border-slate-200'
+            {/* 5. Sticky Primary CTA Button at Bottom */}
+            <div className={`p-4 border-t shrink-0 ${
+              isDark ? 'border-slate-800 bg-slate-900/95' : 'border-slate-100 bg-white/95'
             }`}>
-              
-              {/* Score Pill Display */}
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-950/70 border border-amber-500/40 text-amber-300 text-xs font-black">
-                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                <span>{hoverRating || rating}.0 / 5.0 {lang === 'hi' ? 'स्टार' : 'Stars'}</span>
-              </div>
-
-              <div className="flex items-center justify-center gap-2 sm:gap-3">
-                {[1, 2, 3, 4, 5].map((star) => {
-                  const active = (hoverRating || rating) >= star;
-                  return (
-                    <button
-                      key={star}
-                      type="button"
-                      onClick={() => setRating(star)}
-                      onMouseEnter={() => setHoverRating(star)}
-                      onMouseLeave={() => setHoverRating(0)}
-                      className="p-1.5 transition-all duration-200 hover:scale-125 active:scale-95 focus:outline-none flex flex-col items-center gap-1"
-                    >
-                      <Star 
-                        className={`w-9 h-9 sm:w-10 sm:h-10 transition-all duration-150 ${
-                          active 
-                            ? 'fill-amber-400 text-amber-400 drop-shadow-[0_0_15px_rgba(251,191,36,0.6)] scale-110' 
-                            : isDark ? 'text-stone-700 hover:text-stone-500' : 'text-slate-300 hover:text-slate-400'
-                        }`} 
-                      />
-                      <span className={`text-[10px] font-black ${
-                        active ? 'text-amber-400' : isDark ? 'text-stone-600' : 'text-slate-400'
-                      }`}>
-                        {star}★
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Dynamic Rating Feedback Text */}
-              <div className="h-6 flex items-center justify-center">
-                <span className="text-xs font-black text-amber-400 tracking-wide animate-fade-in bg-amber-500/10 px-3 py-0.5 rounded-lg border border-amber-500/20">
-                  {getRatingLabel(hoverRating || rating)}
-                </span>
-              </div>
-            </div>
-
-            {/* Quick Complement Feedback Tags */}
-            <div className="space-y-2">
-              <label className={`block text-[11px] font-black uppercase tracking-wider ${
-                isDark ? 'text-stone-400' : 'text-slate-500'
-              }`}>
-                {lang === 'hi' ? 'चालक की क्या खूबी पसंद आई?' : 'What did you like about the service?'}
-              </label>
-
-              <div className="flex flex-wrap gap-2">
-                {FEEDBACK_TAGS.map((tag) => {
-                  const isSelected = selectedTags.includes(tag.id);
-                  return (
-                    <button
-                      key={tag.id}
-                      type="button"
-                      onClick={() => toggleTag(tag.id)}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all duration-150 active:scale-95 ${
-                        isSelected
-                          ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300 shadow-sm'
-                          : isDark
-                          ? 'bg-stone-900 border-stone-800 text-stone-400 hover:border-stone-700'
-                          : 'bg-slate-100 border-slate-200 text-slate-600 hover:bg-slate-200'
-                      }`}
-                    >
-                      {lang === 'hi' ? tag.labelHi : tag.labelEn}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Optional Comment Input */}
-            <div className="space-y-1.5">
-              <label className={`block text-[11px] font-black uppercase tracking-wider ${
-                isDark ? 'text-stone-400' : 'text-slate-500'
-              }`}>
-                {lang === 'hi' ? 'अतिरिक्त टिप्पणी (वैकल्पिक)' : 'Add Optional Comment'}
-              </label>
-              <textarea
-                rows={2}
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                placeholder={lang === 'hi' ? 'उदा. बहुत बढ़िया जुताई की, समय से पहले कार्य पूरा किया...' : 'e.g. Very fast and precise rotavator tilling...'}
-                className={`w-full p-3 rounded-2xl border text-xs outline-none transition resize-none ${
-                  isDark 
-                    ? 'bg-stone-950 border-stone-800 text-white focus:border-emerald-500' 
-                    : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-emerald-500'
-                }`}
-              />
-            </div>
-
-            {/* Submit Rating Action Button */}
-            <div className="space-y-2 pt-1">
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-stone-950 font-black text-sm shadow-xl shadow-emerald-500/20 hover:shadow-emerald-500/30 transition-all duration-200 flex items-center justify-center gap-2 active:scale-98 disabled:opacity-75"
-              >
-                <Star className="w-4 h-4 fill-stone-950" />
-                <span>{lang === 'hi' ? `रेटिंग दर्ज करें (${rating} / 5 ⭐)` : `Submit Rating (${rating} / 5 ⭐)`}</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-
               <button
                 type="button"
-                onClick={onClose}
-                className={`w-full py-2 text-center text-xs font-bold transition ${
-                  isDark ? 'text-stone-400 hover:text-white' : 'text-slate-500 hover:text-slate-800'
-                }`}
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className="w-full py-3.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-2xl shadow-lg shadow-emerald-500/10 active:scale-95 transition flex items-center justify-center gap-2 text-sm disabled:opacity-70"
               >
-                {lang === 'hi' ? 'अभी छोड़ें (Skip for now)' : 'Skip for now'}
+                <span>
+                  {lang === 'hi' 
+                    ? `पूर्ण लेनदेन व रेटिंग (${rating}★) • ₹${paidAmount}` 
+                    : `Complete Transaction • ₹${paidAmount}`}
+                </span>
+                <ArrowRight className="w-4 h-4" />
               </button>
             </div>
-
-          </form>
+          </>
         )}
 
       </div>
