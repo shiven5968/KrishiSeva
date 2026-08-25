@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useTheme } from '../../context/ThemeContext';
 import { 
@@ -44,6 +44,17 @@ export default function FarmerRatingModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [copiedUpi, setCopiedUpi] = useState(false);
+
+  useEffect(() => {
+    if (booking) {
+      if (booking.advancePaid) {
+        const remaining = booking.estimatedPrice - (booking.advancePaidAmount || Math.round(booking.estimatedPrice * 0.2));
+        setPaidAmount(remaining);
+      } else {
+        setPaidAmount(booking.estimatedPrice);
+      }
+    }
+  }, [booking]);
 
   if (!isOpen || !booking) return null;
 
@@ -203,8 +214,17 @@ export default function FarmerRatingModal({
 
                 <div className="text-right shrink-0">
                   <span className={`text-[10px] uppercase font-bold block ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                    {lang === 'hi' ? 'देय राशि' : 'Fare Due'}
+                    {booking.advancePaid 
+                      ? (lang === 'hi' ? 'शेष देय राशि (80%)' : 'Remaining Fare Due (80%)') 
+                      : (lang === 'hi' ? 'देय राशि' : 'Fare Due')}
                   </span>
+                  {booking.advancePaid && (
+                    <span className="text-[9px] text-amber-500 font-black block">
+                      {lang === 'hi' 
+                        ? `₹${Math.round(booking.estimatedPrice * 0.2)} एडवांस जमा` 
+                        : `₹${Math.round(booking.estimatedPrice * 0.2)} advance paid`}
+                    </span>
+                  )}
                   {isEditingAmount ? (
                     <div className="flex items-center gap-1 justify-end mt-0.5">
                       <span className="text-emerald-400 font-black text-xs">₹</span>

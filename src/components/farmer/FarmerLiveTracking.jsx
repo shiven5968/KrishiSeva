@@ -498,34 +498,74 @@ export default function FarmerLiveTracking() {
                 </div>
               </div>
 
-              {/* Start Job Security OTP PIN (Shown prominently to farmer until completed) */}
+              {/* Start Job Security OTP PIN / 20% Advance Payment Flow */}
               {activeBooking.status !== 'completed' && (
-                <div className={`p-4 rounded-2xl border text-center space-y-2 relative overflow-hidden shadow-xl transition-all ${
-                  isDark 
-                    ? 'bg-gradient-to-r from-emerald-950/80 via-stone-950 to-emerald-950/80 border-emerald-500/50 shadow-emerald-950/50' 
-                    : 'bg-gradient-to-r from-emerald-50 via-white to-emerald-50 border-emerald-300 shadow-emerald-200/40'
-                }`}>
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-emerald-500 flex items-center gap-1">
-                      <span>🔐</span>
-                      <span>{lang === 'hi' ? 'खेत कार्य प्रारंभ पिन (Start OTP)' : 'Start Job Security PIN'}</span>
-                    </span>
-                    <span className="text-[10px] font-bold text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/30 animate-pulse">
-                      {lang === 'hi' ? 'ड्राइवर को बताएं' : 'Share with Driver'}
-                    </span>
-                  </div>
+                <div className="w-full">
+                  {activeBooking.status === 'arrived' && !activeBooking.advancePaid ? (
+                    <div className={`p-5 rounded-2xl border text-center space-y-3.5 relative overflow-hidden shadow-xl transition-all ${
+                      isDark 
+                        ? 'bg-gradient-to-r from-amber-950/40 via-stone-950 to-amber-950/40 border-amber-500/50 shadow-black/80' 
+                        : 'bg-gradient-to-r from-amber-50 via-white to-amber-50 border-amber-300 shadow-amber-200/40'
+                    }`}>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-amber-500 flex items-center gap-1">
+                          <span>💸</span>
+                          <span>{lang === 'hi' ? '20% अग्रिम भुगतान आवश्यक' : '20% Advance Payment Required'}</span>
+                        </span>
+                        <span className="text-[10px] font-bold text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/30">
+                          {lang === 'hi' ? 'अग्रिम भुगतान' : 'Pay Advance'}
+                        </span>
+                      </div>
 
-                  <div className="flex items-center justify-center gap-2 py-1">
-                    <div className="font-mono text-3xl sm:text-4xl font-black tracking-widest text-emerald-400 bg-black/40 px-6 py-1.5 rounded-2xl border border-emerald-500/40 shadow-inner">
-                      {activeBooking.startOtp || '4821'}
+                      <div className="space-y-1">
+                        <p className={`text-xs font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                          {lang === 'hi' 
+                            ? `कार्य शुरू करने हेतु ₹${Math.round(activeBooking.estimatedPrice * 0.2)} का अग्रिम भुगतान करें` 
+                            : `Pay ₹${Math.round(activeBooking.estimatedPrice * 0.2)} advance to initiate field operations`}
+                        </p>
+                        <p className="text-[10px] text-stone-400">
+                          {lang === 'hi' ? 'अग्रिम भुगतान के बाद ही कार्य प्रारंभ पिन (Start OTP) प्रदर्शित होगा।' : 'Start Job Security PIN will be revealed once the advance is paid.'}
+                        </p>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={payBookingAdvance}
+                        className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-stone-950 font-black rounded-xl shadow-md transition flex items-center justify-center gap-1.5 text-xs active:scale-95 cursor-pointer"
+                      >
+                        <span>{lang === 'hi' ? `₹${Math.round(activeBooking.estimatedPrice * 0.2)} एडवांस का भुगतान करें` : `Pay ₹${Math.round(activeBooking.estimatedPrice * 0.2)} Advance`}</span>
+                        <ArrowRight className="w-3.5 h-3.5 text-stone-950" />
+                      </button>
                     </div>
-                  </div>
+                  ) : (
+                    <div className={`p-4 rounded-2xl border text-center space-y-2 relative overflow-hidden shadow-xl transition-all ${
+                      isDark 
+                        ? 'bg-gradient-to-r from-emerald-950/80 via-stone-950 to-emerald-950/80 border-emerald-500/50 shadow-emerald-950/50' 
+                        : 'bg-gradient-to-r from-emerald-50 via-white to-emerald-50 border-emerald-300 shadow-emerald-200/40'
+                    }`}>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-emerald-500 flex items-center gap-1">
+                          <span>🔐</span>
+                          <span>{lang === 'hi' ? 'खेत कार्य प्रारंभ पिन (Start OTP)' : 'Start Job Security PIN'}</span>
+                        </span>
+                        <span className="text-[10px] font-bold text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/30 animate-pulse">
+                          {lang === 'hi' ? 'ड्राइवर को बताएं' : 'Share with Driver'}
+                        </span>
+                      </div>
 
-                  <p className={`text-[11px] font-medium leading-tight ${isDark ? 'text-stone-300' : 'text-slate-600'}`}>
-                    {lang === 'hi' 
-                      ? 'ड्राइवर के आपके खेत पर पहुँचने के बाद ही यह 4-अंकों का पिन चालक को बताएं।' 
-                      : 'Share this 4-digit PIN with the operator upon farm arrival to authorize work start.'}
-                  </p>
+                      <div className="flex items-center justify-center gap-2 py-1">
+                        <div className="font-mono text-3xl sm:text-4xl font-black tracking-widest text-emerald-400 bg-black/40 px-6 py-1.5 rounded-2xl border border-emerald-500/40 shadow-inner">
+                          {activeBooking.startOtp || '4821'}
+                        </div>
+                      </div>
+
+                      <p className={`text-[11px] font-medium leading-tight ${isDark ? 'text-stone-300' : 'text-slate-600'}`}>
+                        {lang === 'hi' 
+                          ? 'ड्राइवर के आपके खेत पर पहुँचने और 20% एडवांस प्राप्त करने के बाद ही यह पिन चालक को बताएं।' 
+                          : 'Share this 4-digit PIN with the operator upon farm arrival and advance payout verification.'}
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
 

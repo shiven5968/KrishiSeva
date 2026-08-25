@@ -241,19 +241,79 @@ export default function DriverNavigation() {
               </button>
             )}
 
-            {/* Step 2: Start Field Work (Requires Farmer's 4-Digit OTP PIN) */}
+            {/* Step 2: Start Field Work (Requires Farmer's 4-Digit OTP PIN after paying 20% Advance) */}
             {hasArrived && (
-              <button
-                onClick={() => {
-                  setStartOtpInput('');
-                  setOtpError('');
-                  setIsOtpModalOpen(true);
-                }}
-                className="w-full py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-black text-sm shadow-xl shadow-blue-950 transition flex items-center justify-center gap-2 active:scale-98"
-              >
-                <Clock className="w-5 h-5" />
-                <span>{lang === 'hi' ? '🔐 ओटीपी दर्ज कर जुताई शुरू करें' : '🔐 Enter Farmer OTP to Start Work'}</span>
-              </button>
+              <div className="space-y-4 w-full">
+                {!activeBooking.advancePaid ? (
+                  <div className="bg-stone-900 border border-stone-800 rounded-3xl p-5 text-center space-y-4 shadow-xl w-full">
+                    <div className="text-xs text-amber-400 font-black uppercase tracking-wider flex items-center justify-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
+                      <span>⚠️ {lang === 'hi' ? '20% अग्रिम भुगतान लंबित' : '20% Advance Payment Pending'}</span>
+                    </div>
+                    <p className="text-[11px] text-stone-400">
+                      {lang === 'hi' 
+                        ? `किसान को कार्य शुरू करने से पहले ₹${Math.round(activeBooking.estimatedPrice * 0.2)} (20% एडवांस) का भुगतान करना होगा।` 
+                        : `Farmer must scan and pay ₹${Math.round(activeBooking.estimatedPrice * 0.2)} (20% advance) to activate booking.`}
+                    </p>
+                    
+                    {/* 20% QR Code */}
+                    <div className="p-3 bg-white rounded-2xl shadow-lg border border-slate-200 flex items-center justify-center w-36 h-36 mx-auto">
+                      <svg viewBox="0 0 200 200" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="10" y="10" width="50" height="50" rx="4" fill="none" stroke="#1e293b" strokeWidth="6"/>
+                        <rect x="22" y="22" width="26" height="26" rx="2" fill="#1e293b"/>
+                        <rect x="140" y="10" width="50" height="50" rx="4" fill="none" stroke="#1e293b" strokeWidth="6"/>
+                        <rect x="152" y="22" width="26" height="26" rx="2" fill="#1e293b"/>
+                        <rect x="10" y="140" width="50" height="50" rx="4" fill="none" stroke="#1e293b" strokeWidth="6"/>
+                        <rect x="22" y="152" width="26" height="26" rx="2" fill="#1e293b"/>
+                        {Array.from({ length: 15 }).map((_, colIndex) => {
+                          const x = 15 + colIndex * 12;
+                          return Array.from({ length: 15 }).map((_, rowIndex) => {
+                            const y = 15 + rowIndex * 12;
+                            if (x < 70 && y < 70) return null;
+                            if (x > 130 && y < 70) return null;
+                            if (x < 70 && y > 130) return null;
+                            if (x > 65 && x < 135 && y > 65 && y < 135) return null;
+                            const hash = (colIndex * 9 + rowIndex * 17) % 10;
+                            if (hash < 6) return <rect key={`${colIndex}-${rowIndex}`} x={x} y={y} width="9" height="9" rx="1.5" fill="#1e293b" />;
+                            return null;
+                          });
+                        })}
+                        <rect x="75" y="75" width="50" height="50" rx="8" fill="white" stroke="#e2e8f0" strokeWidth="2"/>
+                        <text x="100" y="105" textAnchor="middle" fontSize="18" fontWeight="black" fill="#059669">UPI</text>
+                      </svg>
+                    </div>
+                    <div className="text-[10px] text-stone-400 font-mono select-all">
+                      upi://pay?pa=krishiseva.advance@ybl&am={Math.round(activeBooking.estimatedPrice * 0.2)}
+                    </div>
+                    <div className="text-xs text-stone-400 font-black">
+                      {lang === 'hi' ? 'स्कैन करें या किसान के भुगतान करने की प्रतीक्षा करें' : 'Scan code or wait for Farmer to complete payment'}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3 w-full">
+                    <div className="p-4 rounded-2xl bg-emerald-950/60 border border-emerald-500/30 text-center text-emerald-400 flex items-center justify-center gap-2">
+                      <CheckCircle2 className="w-5 h-5 shrink-0" />
+                      <span className="text-xs font-black">
+                        {lang === 'hi' 
+                          ? `₹${Math.round(activeBooking.estimatedPrice * 0.2)} अग्रिम भुगतान प्राप्त हुआ! कार्य शुरू करें।` 
+                          : `₹${Math.round(activeBooking.estimatedPrice * 0.2)} Advance Received! Ready to start.`}
+                      </span>
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        setStartOtpInput('');
+                        setOtpError('');
+                        setIsOtpModalOpen(true);
+                      }}
+                      className="w-full py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-black text-sm shadow-xl shadow-blue-950 transition flex items-center justify-center gap-2 active:scale-98"
+                    >
+                      <Clock className="w-5 h-5" />
+                      <span>{lang === 'hi' ? '🔐 ओटीपी दर्ज कर जुताई शुरू करें' : '🔐 Enter Farmer OTP to Start Work'}</span>
+                    </button>
+                  </div>
+                )}
+              </div>
             )}
 
             {/* Step 3: Complete Field Work */}

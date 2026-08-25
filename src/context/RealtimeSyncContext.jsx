@@ -282,6 +282,10 @@ export function RealtimeSyncProvider({ children }) {
             showToast(`✅ खेत कार्य संपन्न हुआ!`, 'success');
             audioHelper.playBookingConfirmed();
           }
+        } else if (type === 'ADVANCE_PAID') {
+          setActiveBooking(payload);
+          showToast(`💸 20% अग्रिम भुगतान प्राप्त हुआ! (₹${Math.round(payload.estimatedPrice * 0.2)})`, 'success');
+          audioHelper.playBookingConfirmed();
         } else if (type === 'JOB_COMPLETED_PAYOUT') {
           // Update driver's total earnings and completed rides in onlineFleet
           setOnlineFleet(prev => prev.map(d => {
@@ -526,6 +530,21 @@ export function RealtimeSyncProvider({ children }) {
     } else if (status === 'completed') {
       completeJobAndPayout(updated);
     }
+  };
+
+  const payBookingAdvance = () => {
+    if (!activeBooking) return;
+    const advanceAmount = Math.round(activeBooking.estimatedPrice * 0.2);
+    const updatedBooking = {
+      ...activeBooking,
+      advancePaid: true,
+      advancePaidAmount: advanceAmount
+    };
+    setActiveBooking(updatedBooking);
+    localStorage.setItem('krishi_active_booking', JSON.stringify(updatedBooking));
+    broadcast('ADVANCE_PAID', updatedBooking);
+    showToast(`💸 अग्रिम भुगतान (₹${advanceAmount}) दर्ज किया गया!`, 'success');
+    audioHelper.playBookingConfirmed();
   };
 
   // Complete Job and disburse payout to driver
@@ -782,6 +801,7 @@ export function RealtimeSyncProvider({ children }) {
         acceptBooking,
         rejectBooking,
         updateBookingStatus,
+        payBookingAdvance,
         completeJobAndPayout,
         submitDriverRating,
         cancelBooking,
