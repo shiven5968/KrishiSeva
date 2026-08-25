@@ -92,6 +92,7 @@ export function generateRouteWaypoints(start, end, numPoints = 25) {
 // Generate random nearby driver positions around farmer's field
 export function generateNearbyDrivers(centerLat, centerLng) {
   const drivers = [
+    // Tractors (3 drivers)
     {
       id: 'drv_1',
       name: 'Ramesh Singh (रमेश सिंह)',
@@ -111,6 +112,44 @@ export function generateNearbyDrivers(centerLat, centerLng) {
       ratePerAcre: 850
     },
     {
+      id: 'drv_1_2',
+      name: 'Sukhdev Singh (सुखदेव सिंह)',
+      phone: '+91 98765 00123',
+      vehicleType: 'tractor',
+      modelName: 'Sonalika Tiger DI 50',
+      vehicleNumber: 'UP-32-ST-1994',
+      rating: 4.8,
+      experienceYears: 5,
+      status: 'online',
+      verified: true,
+      lat: centerLat - 0.0062,
+      lng: centerLng + 0.0075,
+      heading: 120,
+      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
+      ratePerHour: 800,
+      ratePerAcre: 900
+    },
+    {
+      id: 'drv_1_3',
+      name: 'Harpreet Singh (हरप्रीत सिंह)',
+      phone: '+91 98765 99887',
+      vehicleType: 'tractor',
+      modelName: 'John Deere 5050 D',
+      vehicleNumber: 'UP-32-JD-2026',
+      rating: 4.95,
+      experienceYears: 10,
+      status: 'online',
+      verified: true,
+      lat: centerLat + 0.0071,
+      lng: centerLng - 0.0089,
+      heading: 310,
+      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80',
+      ratePerHour: 850,
+      ratePerAcre: 950
+    },
+
+    // Harvesters (2 drivers)
+    {
       id: 'drv_2',
       name: 'Gurpreet Brar (गुरप्रीत सिंह)',
       phone: '+91 98123 77410',
@@ -128,6 +167,26 @@ export function generateNearbyDrivers(centerLat, centerLng) {
       ratePerHour: 1600,
       ratePerAcre: 1800
     },
+    {
+      id: 'drv_2_2',
+      name: 'Jaswant Singh (जसवंत सिंह)',
+      phone: '+91 98123 99990',
+      vehicleType: 'harvester',
+      modelName: 'Kartar 4000 Combine',
+      vehicleNumber: 'PB-10-KS-8899',
+      rating: 4.9,
+      experienceYears: 15,
+      status: 'online',
+      verified: true,
+      lat: centerLat + 0.0112,
+      lng: centerLng - 0.0068,
+      heading: 90,
+      avatar: 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=150&auto=format&fit=crop&q=80',
+      ratePerHour: 1700,
+      ratePerAcre: 1950
+    },
+
+    // JCB / Earthmovers (2 drivers)
     {
       id: 'drv_3',
       name: 'Mukesh Yadav (मुकेश यादव)',
@@ -147,6 +206,26 @@ export function generateNearbyDrivers(centerLat, centerLng) {
       ratePerAcre: 1400
     },
     {
+      id: 'drv_3_2',
+      name: 'Sunil Paswan (सुनील पासवान)',
+      phone: '+91 94550 00022',
+      vehicleType: 'jcb',
+      modelName: 'JCB 3DX EcoXcellence',
+      vehicleNumber: 'UP-32-SP-4433',
+      rating: 4.75,
+      experienceYears: 4,
+      status: 'online',
+      verified: true,
+      lat: centerLat - 0.0095,
+      lng: centerLng + 0.0115,
+      heading: 240,
+      avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&auto=format&fit=crop&q=80',
+      ratePerHour: 1100,
+      ratePerAcre: 1300
+    },
+
+    // Trucks / Transport (2 drivers)
+    {
       id: 'drv_4',
       name: 'Balwinder Dhillon (बलविंदर)',
       phone: '+91 97788 12345',
@@ -163,6 +242,24 @@ export function generateNearbyDrivers(centerLat, centerLng) {
       avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&auto=format&fit=crop&q=80',
       ratePerHour: 950,
       ratePerAcre: 600
+    },
+    {
+      id: 'drv_4_2',
+      name: 'Manish Rawat (मनीष रावत)',
+      phone: '+91 97788 99911',
+      vehicleType: 'truck',
+      modelName: 'Mahindra Blazo X 28',
+      vehicleNumber: 'UP-32-MR-8877',
+      rating: 4.85,
+      experienceYears: 9,
+      status: 'online',
+      verified: true,
+      lat: centerLat + 0.0105,
+      lng: centerLng + 0.0055,
+      heading: 15,
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+      ratePerHour: 1000,
+      ratePerAcre: 700
     }
   ];
   return drivers;

@@ -259,9 +259,14 @@ export default function LiveMap({
 
     // 3. SHOW NEARBY DRIVERS ACROSS THE FLEET ON FARMER VIEW
     if (showNearbyDrivers && (bookingStatus === 'idle' || bookingStatus === 'searching')) {
-      const fleetToRender = (onlineFleet && onlineFleet.length > 0) 
+      let fleetToRender = (onlineFleet && onlineFleet.length > 0) 
         ? onlineFleet.filter(d => d.status === 'online') 
         : generateNearbyDrivers(center.lat, center.lng);
+
+      // Filter drivers by selected vehicle type
+      if (activeVehicleType) {
+        fleetToRender = fleetToRender.filter(d => d.vehicleType === activeVehicleType);
+      }
 
       fleetToRender.forEach(drv => {
         const iconEmoji = drv.vehicleType === 'tractor' ? '🚜' : drv.vehicleType === 'jcb' ? '🏗️' : drv.vehicleType === 'harvester' ? '🌾' : '🚚';
