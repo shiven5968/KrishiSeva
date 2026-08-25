@@ -287,17 +287,53 @@ export default function FarmerRatingModal({
 
                     <div className="p-3 bg-white rounded-2xl shadow-lg border border-slate-200 flex items-center justify-center w-36 h-36">
                       <svg viewBox="0 0 200 200" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                        {/* QR Corner markers */}
+                        {/* Top-Left */}
                         <rect x="10" y="10" width="50" height="50" rx="4" fill="none" stroke="#1e293b" strokeWidth="6"/>
-                        <rect x="20" y="20" width="30" height="30" rx="2" fill="#1e293b"/>
+                        <rect x="22" y="22" width="26" height="26" rx="2" fill="#1e293b"/>
+                        
+                        {/* Top-Right */}
                         <rect x="140" y="10" width="50" height="50" rx="4" fill="none" stroke="#1e293b" strokeWidth="6"/>
-                        <rect x="150" y="20" width="30" height="30" rx="2" fill="#1e293b"/>
+                        <rect x="152" y="22" width="26" height="26" rx="2" fill="#1e293b"/>
+                        
+                        {/* Bottom-Left */}
                         <rect x="10" y="140" width="50" height="50" rx="4" fill="none" stroke="#1e293b" strokeWidth="6"/>
-                        <rect x="20" y="150" width="30" height="30" rx="2" fill="#1e293b"/>
-                        {[70,80,90,100,110,120].map(x => [70,80,90,100,110,120,130,140,150,160].map(y => (
-                          (x + y) % 30 < 15 && <rect key={`${x}-${y}`} x={x} y={y} width="8" height="8" rx="1" fill="#1e293b" opacity={0.8}/>
-                        )))}
+                        <rect x="22" y="152" width="26" height="26" rx="2" fill="#1e293b"/>
+                        
+                        {/* Detailed Data Grid Modules */}
+                        {Array.from({ length: 15 }).map((_, colIndex) => {
+                          const x = 15 + colIndex * 12;
+                          return Array.from({ length: 15 }).map((_, rowIndex) => {
+                            const y = 15 + rowIndex * 12;
+                            // Skip corner patterns
+                            if (x < 70 && y < 70) return null;
+                            if (x > 130 && y < 70) return null;
+                            if (x < 70 && y > 130) return null;
+                            // Skip center logo area
+                            if (x > 65 && x < 135 && y > 65 && y < 135) return null;
+                            
+                            // Deterministic module placement
+                            const hash = (colIndex * 9 + rowIndex * 17) % 10;
+                            if (hash < 6) {
+                              return (
+                                <rect 
+                                  key={`${colIndex}-${rowIndex}`} 
+                                  x={x} 
+                                  y={y} 
+                                  width="9" 
+                                  height="9" 
+                                  rx="1.5" 
+                                  fill="#1e293b" 
+                                />
+                              );
+                            }
+                            return null;
+                          });
+                        })}
+                        
+                        {/* Center UPI logo area */}
                         <rect x="75" y="75" width="50" height="50" rx="8" fill="white" stroke="#e2e8f0" strokeWidth="2"/>
-                        <text x="100" y="105" textAnchor="middle" fontSize="18" fontWeight="bold" fill="#059669">UPI</text>
+                        <text x="100" y="105" textAnchor="middle" fontSize="18" fontWeight="black" fill="#059669">UPI</text>
                       </svg>
                     </div>
 
