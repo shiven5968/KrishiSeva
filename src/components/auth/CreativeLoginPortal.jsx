@@ -443,7 +443,7 @@ export default function CreativeLoginPortal() {
           preload="auto"
           className={`absolute inset-0 w-full h-full object-cover scale-105 transition-all duration-700 ${
             isDark 
-              ? 'opacity-45 brightness-90 contrast-105' 
+              ? 'opacity-70 brightness-95 contrast-100' 
               : 'opacity-85 brightness-95 contrast-105 saturate-110'
           }`}
           poster="https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=1920&q=80"
@@ -453,7 +453,7 @@ export default function CreativeLoginPortal() {
         {/* Soft Vignette Overlay for Crisp Readability */}
         <div className={`absolute inset-0 backdrop-blur-[2px] transition-colors duration-300 ${
           isDark 
-            ? 'bg-gradient-to-br from-black via-slate-950/95 to-emerald-950/40' 
+            ? 'bg-gradient-to-br from-stone-950/85 via-stone-950/60 to-emerald-950/35' 
             : 'bg-gradient-to-br from-white/80 via-white/70 to-emerald-50/45'
         }`} />
       </div>
