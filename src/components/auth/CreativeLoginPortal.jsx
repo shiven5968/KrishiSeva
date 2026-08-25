@@ -501,34 +501,7 @@ export default function CreativeLoginPortal() {
       isDark ? 'bg-[#05080C] text-stone-100' : 'bg-slate-50 text-slate-900'
     }`}>
       
-      {/* ───── Background Farm Vignette (Wheat Field 4K Video) ───── */}
-      <div className="absolute top-0 left-0 w-full h-screen pointer-events-none overflow-hidden z-0">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-          className={`absolute inset-0 w-full h-full object-cover scale-105 transition-all duration-700 ${
-            isDark 
-              ? 'opacity-70 brightness-95 contrast-100' 
-              : 'opacity-85 brightness-95 contrast-105 saturate-110'
-          }`}
-          poster="https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=1920&q=80"
-        >
-          <source src="/videos/hero_field_bg.mp4" type="video/mp4" />
-        </video>
-        {/* Soft Vignette Overlay for Crisp Readability */}
-        <div className={`absolute inset-0 backdrop-blur-[2px] transition-colors duration-300 ${
-          isDark 
-            ? 'bg-gradient-to-br from-stone-950/85 via-stone-950/60 to-emerald-950/35' 
-            : 'bg-gradient-to-br from-white/80 via-white/70 to-emerald-50/45'
-        }`} />
-        {/* Smooth gradient fade transition at the bottom of the hero */}
-        <div className={`absolute bottom-0 inset-x-0 h-40 bg-gradient-to-t pointer-events-none transition-colors duration-300 ${
-          isDark ? 'from-[#05080C] to-transparent' : 'from-slate-50 to-transparent'
-        }`} />
-      </div>
+
 
       {/* ═══════════ SEAMLESS FULL-WIDTH NAVBAR ═══════════ */}
       <header className={`w-full fixed top-0 left-0 right-0 z-50 px-8 pt-6 pb-4 flex items-center justify-between border-b shadow-sm transition-colors duration-200 ${
@@ -606,8 +579,36 @@ export default function CreativeLoginPortal() {
       </header>
 
       {/* ═══════════ HERO & AUTH CONTAINER ═══════════ */}
-      <main className="relative z-10 max-w-7xl mx-auto w-full px-4 sm:px-6 min-h-[calc(100vh-80px)] flex items-center py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center w-full">
+      <main className="relative w-full min-h-screen flex flex-col justify-between overflow-hidden z-10">
+        
+        {/* ───── Background Farm Vignette (Wheat Field 4K Video) ───── */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden -z-10">
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            className={`absolute inset-0 w-full h-full object-cover scale-105 transition-all duration-700 ${
+              isDark 
+                ? 'opacity-70 brightness-95 contrast-100' 
+                : 'opacity-85 brightness-95 contrast-105 saturate-110'
+            }`}
+            poster="https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=1920&q=80"
+          >
+            <source src="/videos/hero_field_bg.mp4" type="video/mp4" />
+          </video>
+          {/* Soft Vignette Overlay for Crisp Readability */}
+          <div className={`absolute inset-0 backdrop-blur-[2px] transition-colors duration-300 ${
+            isDark 
+              ? 'bg-gradient-to-b from-black/50 via-transparent to-black/40' 
+              : 'bg-gradient-to-b from-white/40 via-transparent to-white/30'
+          }`} />
+        </div>
+
+        {/* Content alignment wrapper */}
+        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 flex-1 flex items-center pt-28 pb-12">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center w-full">
           
           {/* LEFT COLUMN: Commanding Headlines */}
           <div className="lg:col-span-7 space-y-6 text-left">
@@ -663,7 +664,7 @@ export default function CreativeLoginPortal() {
           </div>
 
           {/* RIGHT COLUMN: WhatsApp OTP & Role Onboarding Card */}
-          <div className="lg:col-span-5 w-full relative mt-8 lg:mt-0">
+          <div className="lg:col-span-5 w-full relative mt-10 lg:mt-16">
             {/* Subtle emerald radial ambient light glow behind the card */}
             <div className="absolute -inset-10 bg-emerald-500/10 blur-[120px] pointer-events-none rounded-full z-0" />
             
@@ -1585,8 +1586,8 @@ export default function CreativeLoginPortal() {
           </div>
 
         </div>
-
-      </main>
+      </div>
+    </main>
 
       {/* ═══════════ FARMER FAQ SECTION ═══════════ */}
       <div 
