@@ -311,7 +311,7 @@ export default function DriverDashboard() {
             </div>
             <div className="space-y-1">
               <h3 className={`text-3xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                {driverProfile.rating || '5.0'} / 5.0
+                {Number(driverProfile.rating || 5.0).toFixed(1)} / 5.0
               </h3>
               <div className="flex items-center gap-1 text-xs font-bold text-amber-400">
                 <span>★★★★★</span>

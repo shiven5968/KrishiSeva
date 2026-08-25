@@ -263,7 +263,7 @@ export default function FarmerBookingHistoryModal({ isOpen, onClose }) {
                       <div className="text-right">
                         <span className="text-[10px] text-amber-400 font-black flex items-center gap-0.5 justify-end">
                           <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                          <span>{item.farmerRating ? `${item.farmerRating}.0 / 5.0` : '5.0 / 5.0'}</span>
+                          <span>{Number(item.farmerRating || 5.0).toFixed(1)} / 5.0</span>
                         </span>
                         <span className={`text-[9px] ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
                           {lang === 'hi' ? 'आपकी रेटिंग' : 'Your Rating'}
