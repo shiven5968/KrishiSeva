@@ -588,6 +588,13 @@ export function RealtimeSyncProvider({ children }) {
       console.warn('Error saving booking history:', e);
     }
 
+    // Dispatch in-tab custom event for immediate UI reflection in the same tab
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('krishi_driver_profile_updated', {
+        detail: { payout: payout }
+      }));
+    }
+
     // Broadcast status change and payout
     broadcast('BOOKING_STATUS_CHANGED', updatedBooking);
     broadcast('JOB_COMPLETED_PAYOUT', {
