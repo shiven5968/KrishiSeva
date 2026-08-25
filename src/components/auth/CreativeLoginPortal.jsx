@@ -459,7 +459,7 @@ export default function CreativeLoginPortal() {
       </div>
 
       {/* ═══════════ SEAMLESS FULL-WIDTH NAVBAR ═══════════ */}
-      <header className={`w-full fixed top-0 left-0 right-0 z-50 px-6 sm:px-8 py-4 flex items-center justify-between border-b shadow-sm transition-colors duration-200 ${
+      <header className={`w-full fixed top-0 left-0 right-0 z-50 px-8 pt-6 pb-4 flex items-center justify-between border-b shadow-sm transition-colors duration-200 ${
         isDark 
           ? 'bg-black/20 backdrop-blur-xl border-white/10' 
           : 'bg-white/60 backdrop-blur-xl border-slate-200/80'
