@@ -538,16 +538,18 @@ export default function CreativeLoginPortal() {
       }`}>
         {/* Brand Logo (Far Left) */}
         <div className="flex items-center gap-3 group cursor-pointer">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center text-stone-950 font-black shadow-lg shadow-emerald-500/25 transition-all group-hover:scale-105 group-hover:shadow-emerald-500/40">
-            <Tractor className="w-4.5 h-4.5 text-stone-950" />
+          <div className="p-1 bg-white rounded-xl shadow-md border border-white/20 transition-transform duration-200 hover:scale-105">
+            <img 
+              src="/images/logo.png" 
+              alt="KrishiSeva Logo" 
+              className="h-8 w-auto object-contain" 
+            />
           </div>
-          <div>
-            <span className={`text-lg font-black tracking-tight transition-all duration-300 group-hover:text-emerald-450 group-hover:drop-shadow-[0_0_8px_rgba(52,211,153,0.5)] ${
-              isDark ? 'text-white' : 'text-slate-900'
-            }`}>
-              KrishiSeva
-            </span>
-          </div>
+          <span className={`text-xl font-extrabold tracking-tight transition-all duration-300 group-hover:text-emerald-450 ${
+            isDark ? 'text-white' : 'text-slate-900'
+          }`}>
+            KrishiSeva
+          </span>
         </div>
 
         {/* Actions & Controls (Far Right) */}

@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
@@ -99,13 +99,17 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
             className="flex items-center gap-3 cursor-pointer group"
             title={currentUser ? "Go to Dashboard" : "Return to Home"}
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center text-stone-950 font-black shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition">
-              <Tractor className="w-5 h-5 animate-pulse-slow text-stone-950" />
+            <div className="p-1 bg-white rounded-xl shadow-md border border-white/20 transition-transform duration-200 hover:scale-105">
+              <img 
+                src="/images/logo.png" 
+                alt="KrishiSeva Logo" 
+                className="h-8 w-auto object-contain" 
+              />
             </div>
             <div>
               <div className="flex items-center gap-1.5">
                 <span className={`font-extrabold text-xl tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  Krishi<span className="text-emerald-500">Seva</span>
+                  KrishiSeva
                 </span>
                 {lang === 'hi' && (
                   <span className={`text-[10px] px-2 py-0.5 rounded-md font-bold hidden sm:inline-block ${
