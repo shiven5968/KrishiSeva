@@ -498,11 +498,11 @@ export default function CreativeLoginPortal() {
 
   return (
     <div className={`min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-stone-950 font-sans relative overflow-x-hidden transition-colors duration-200 ${
-      isDark ? 'bg-[#090D0B] text-stone-100' : 'bg-slate-50 text-slate-900'
+      isDark ? 'bg-[#05080C] text-stone-100' : 'bg-slate-50 text-slate-900'
     }`}>
       
       {/* ───── Background Farm Vignette (Wheat Field 4K Video) ───── */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+      <div className="absolute top-0 left-0 w-full h-screen pointer-events-none overflow-hidden z-0">
         <video
           autoPlay
           muted
@@ -523,6 +523,10 @@ export default function CreativeLoginPortal() {
           isDark 
             ? 'bg-gradient-to-br from-stone-950/85 via-stone-950/60 to-emerald-950/35' 
             : 'bg-gradient-to-br from-white/80 via-white/70 to-emerald-50/45'
+        }`} />
+        {/* Smooth gradient fade transition at the bottom of the hero */}
+        <div className={`absolute bottom-0 inset-x-0 h-40 bg-gradient-to-t pointer-events-none transition-colors duration-300 ${
+          isDark ? 'from-[#05080C] to-transparent' : 'from-slate-50 to-transparent'
         }`} />
       </div>
 
@@ -600,8 +604,8 @@ export default function CreativeLoginPortal() {
       </header>
 
       {/* ═══════════ HERO & AUTH CONTAINER ═══════════ */}
-      <main className="relative z-10 max-w-7xl mx-auto w-full px-4 sm:px-6 pt-24 pb-8 md:py-14 my-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+      <main className="relative z-10 max-w-7xl mx-auto w-full px-4 sm:px-6 min-h-[calc(100vh-80px)] flex items-center py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center w-full">
           
           {/* LEFT COLUMN: Commanding Headlines */}
           <div className="lg:col-span-7 space-y-6 text-left">
@@ -657,14 +661,14 @@ export default function CreativeLoginPortal() {
           </div>
 
           {/* RIGHT COLUMN: WhatsApp OTP & Role Onboarding Card */}
-          <div className="lg:col-span-5 w-full relative">
+          <div className="lg:col-span-5 w-full relative mt-8 lg:mt-0">
             {/* Subtle emerald radial ambient light glow behind the card */}
             <div className="absolute -inset-10 bg-emerald-500/10 blur-[120px] pointer-events-none rounded-full z-0" />
             
-            <div className={`border backdrop-blur-2xl rounded-3xl p-6 sm:p-8 transition-all duration-300 relative z-10 ${
+            <div className={`border backdrop-blur-xl rounded-3xl p-6 sm:p-8 transition-all duration-300 relative z-10 ${
               isDark 
-                ? 'bg-[#0A0E13] border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.8)]' 
-                : 'bg-white/85 border-slate-200 shadow-[0_20px_60px_rgba(15,23,42,0.15)] text-slate-800'
+                ? 'bg-[#0A0E13]/90 border-white/10 shadow-[0_25px_60px_rgba(0,0,0,0.9)]' 
+                : 'bg-white/90 border-slate-200 shadow-[0_25px_60px_rgba(15,23,42,0.12)] text-slate-800'
             }`}>
 
               {/* STEP 1: Phone Number Input & Send WhatsApp OTP */}
@@ -1649,7 +1653,7 @@ export default function CreativeLoginPortal() {
       {/* ═══════════ MINIMALIST FOOTER ═══════════ */}
       <footer className={`relative z-10 border-t px-6 py-4 transition-colors duration-200 ${
         isDark 
-          ? 'border-stone-800/80 bg-[#090D0B] text-stone-400' 
+          ? 'border-stone-800/80 bg-[#05080C] text-stone-400' 
           : 'border-slate-200 bg-white/40 backdrop-blur-md text-slate-505'
       }`}>
         <div className="max-w-7xl mx-auto flex items-center justify-center text-center text-xs">
