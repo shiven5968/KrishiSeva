@@ -24,7 +24,8 @@ import {
   Wifi,
   Search,
   Coins,
-  Star
+  Star,
+  ArrowRight
 } from 'lucide-react';
 
 export default function FarmerLiveTracking() {
