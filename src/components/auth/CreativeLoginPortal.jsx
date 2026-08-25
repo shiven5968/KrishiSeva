@@ -33,7 +33,8 @@ import {
   Wrench,
   Camera,
   Upload,
-  RefreshCw
+  RefreshCw,
+  ChevronDown
 } from 'lucide-react';
 
 export default function CreativeLoginPortal() {
@@ -83,6 +84,30 @@ export default function CreativeLoginPortal() {
   const [faceAuthStatus, setFaceAuthStatus] = useState('idle'); // 'idle' | 'scanning' | 'success'
   const videoRef = useRef(null);
   const [cameraStream, setCameraStream] = useState(null);
+
+  // FAQ accordion and scroll-reveal states
+  const faqRef = useRef(null);
+  const [faqVisible, setFaqVisible] = useState(false);
+  const [openFaqIndex, setOpenFaqIndex] = useState(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setFaqVisible(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+    if (faqRef.current) {
+      observer.observe(faqRef.current);
+    }
+    return () => {
+      if (faqRef.current) {
+        observer.unobserve(faqRef.current);
+      }
+    };
+  }, []);
 
   // 60-Second Resend Countdown Timer
   useEffect(() => {
@@ -427,6 +452,49 @@ export default function CreativeLoginPortal() {
       }, 3000);
     }
   };
+
+  const faqs = [
+    {
+      q: lang === 'hi' 
+        ? 'ट्रैक्टर या हार्वेस्टर मेरे खेत पर कितनी जल्दी पहुंचेगा?' 
+        : 'How fast will the tractor or harvester reach my farm?',
+      a: lang === 'hi'
+        ? '1-क्लिक इंस्टेंट डिस्पैच के साथ, मलीहाबाद/लखनऊ में आपके खेत के 5 किमी के दायरे में सत्यापित चालकों को तुरंत अलर्ट प्राप्त होता है। मशीनें आमतौर पर 15 से 45 मिनट के भीतर पहुंच जाती हैं।'
+        : 'With 1-Click Instant Dispatch, verified drivers within a 5 km radius of your field in Malihabad/Lucknow receive alerts instantly. Machinery usually arrives within 15 to 45 minutes.'
+    },
+    {
+      q: lang === 'hi'
+        ? 'किराये की गणना कैसे की जाती है? क्या कोई छिपे हुए शुल्क हैं?'
+        : 'How is the price calculated? Are there hidden charges?',
+      a: lang === 'hi'
+        ? 'आपके द्वारा पुष्टि करने से पहले प्रति-बीघा या प्रति-घंटा दरें पारदर्शी रूप से प्रदर्शित की जाती हैं। कोई छिपे हुए शुल्क या अप्रत्याशित सर्ज चार्ज नहीं हैं।'
+        : 'Rates are transparently displayed per-bigha or hourly before you confirm. There are zero hidden fees or unexpected surge costs.'
+    },
+    {
+      q: lang === 'hi'
+        ? 'क्या मैं नकद भुगतान कर सकता हूँ या ऑनलाइन भुगतान अनिवार्य है?'
+        : 'Can I pay in cash or is online payment mandatory?',
+      a: lang === 'hi'
+        ? 'आप कार्य पूरा होने के बाद सीधे चालक को नकद भुगतान कर सकते हैं या ऐप में उनका यूपीआई क्यूआर कोड स्कैन कर सकते हैं।'
+        : 'You can pay cash directly to the driver after work completion or scan their UPI QR code in the app.'
+    },
+    {
+      q: lang === 'hi'
+        ? 'क्या होगा यदि मेरा खेत औपचारिक पते के बिना किसी आंतरिक गाँव में है?'
+        : 'What if my field is in an interior village without a formal address?',
+      a: lang === 'hi'
+        ? 'कृषिसेवा एग्रीस्टैक भूलेख भूमि अभिलेखों के साथ एकीकृत उच्च-सटीक जीपीएस रडार का उपयोग करता है। बस हमारे सैटेलाइट मानचित्र पर सीधे अपने खेत का चयन करें।'
+        : 'KrishiSeva uses high-precision GPS radar integrated with AgriStack UPFR land records. Simply select your field directly on our satellite map.'
+    },
+    {
+      q: lang === 'hi'
+        ? 'क्या चालक और मशीनरी सत्यापित हैं?'
+        : 'Are drivers and machinery verified?',
+      a: lang === 'hi'
+        ? 'हाँ! प्रत्येक बेड़े के मालिक और ऑपरेटर का 100% केवाईसी सत्यापन, ड्राइविंग लाइसेंस प्रमाणीकरण और वाहन की स्थिति की जांच की जाती है।'
+        : 'Yes! Every fleet owner and operator undergoes strict 100% KYC verification, driving license authentication, and vehicle condition checks.'
+    }
+  ];
 
   return (
     <div className={`min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-stone-950 font-sans relative overflow-x-hidden transition-colors duration-200 ${
@@ -1513,6 +1581,70 @@ export default function CreativeLoginPortal() {
         </div>
 
       </main>
+
+      {/* ═══════════ FARMER FAQ SECTION ═══════════ */}
+      <div 
+        ref={faqRef}
+        className={`relative w-full py-20 px-6 border-t transition-all duration-700 ease-out transform ${
+          isDark 
+            ? 'bg-[#05080C] border-white/5 text-stone-100' 
+            : 'bg-slate-50 border-slate-200 text-slate-900'
+        } ${
+          faqVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
+        }`}
+      >
+        <div className="max-w-4xl mx-auto space-y-8 text-center mb-12">
+          <span className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs px-3.5 py-1.5 rounded-full inline-block font-semibold">
+            ❓ {lang === 'hi' ? 'किसान सहायता केंद्र' : 'FARMER HELP CENTER'}
+          </span>
+          <h2 className={`text-3xl md:text-4xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+            {lang === 'hi' ? 'बुकिंग करने से पहले सब कुछ जानें' : 'Everything You Should Know Before Booking'}
+          </h2>
+          <p className={`text-sm md:text-base max-w-2xl mx-auto ${isDark ? 'text-slate-400' : 'text-slate-650'}`}>
+            {lang === 'hi' 
+              ? 'सत्यापित ट्रैक्टरों और हार्वेस्टरों को 100% भरोसे के साथ बुक करने में आपकी सहायता के लिए स्पष्ट उत्तर।' 
+              : 'Clear, transparent answers to help you book tractors and harvesters with 100% confidence.'}
+          </p>
+        </div>
+
+        <div className="max-w-3xl mx-auto">
+          {faqs.map((faq, index) => (
+            <div
+              key={index}
+              onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
+              className={`transition-all duration-300 shadow-xl cursor-pointer text-left mb-4 rounded-2xl p-6 border ${
+                openFaqIndex === index 
+                  ? isDark
+                    ? 'border-l-4 border-l-emerald-500 border-emerald-500/40 bg-[#0A0E13]' 
+                    : 'border-l-4 border-l-emerald-500 border-emerald-500/30 bg-slate-100'
+                  : isDark
+                    ? 'bg-[#0A0E13] border-white/10 hover:border-emerald-500/40' 
+                    : 'bg-white border-slate-200 hover:border-emerald-500/40'
+              }`}
+            >
+              <div className="flex justify-between items-center gap-4">
+                <span className={`font-bold text-sm md:text-base ${
+                  openFaqIndex === index 
+                    ? 'text-emerald-500 font-extrabold' 
+                    : isDark ? 'text-white' : 'text-slate-800'
+                }`}>
+                  {faq.q}
+                </span>
+                <ChevronDown className={`w-5 h-5 shrink-0 text-emerald-450 transition-transform duration-300 ${
+                  openFaqIndex === index ? 'rotate-180' : 'rotate-0'
+                }`} />
+              </div>
+              <div className={`overflow-hidden transition-all duration-300 ${
+                openFaqIndex === index ? 'max-h-40 mt-4 opacity-100' : 'max-h-0 opacity-0'
+              }`}>
+                <p className={`text-xs md:text-sm leading-relaxed ${isDark ? 'text-stone-300' : 'text-slate-600'}`}>
+                  {faq.a}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* ═══════════ MINIMALIST FOOTER ═══════════ */}
       <footer className={`relative z-10 border-t px-6 py-4 transition-colors duration-200 ${
