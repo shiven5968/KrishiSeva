@@ -511,13 +511,11 @@ export default function CreativeLoginPortal() {
       }`}>
         {/* Brand Logo (Far Left) */}
         <div className="flex items-center gap-3 group cursor-pointer">
-          <div className="p-1 bg-white rounded-xl shadow-md border border-white/20 transition-transform duration-200 hover:scale-105">
-            <img 
-              src="/images/logo.png" 
-              alt="KrishiSeva Logo" 
-              className="h-8 w-auto object-contain" 
-            />
-          </div>
+          <img 
+            src="/images/logo.png" 
+            alt="KrishiSeva Logo" 
+            className="h-9 w-auto object-contain transition-transform duration-200 hover:scale-105 rounded-xl" 
+          />
           <span className={`text-xl font-extrabold tracking-tight transition-all duration-300 group-hover:text-emerald-450 ${
             isDark ? 'text-white' : 'text-slate-900'
           }`}>

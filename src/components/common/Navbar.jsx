@@ -99,13 +99,11 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
             className="flex items-center gap-3 cursor-pointer group"
             title={currentUser ? "Go to Dashboard" : "Return to Home"}
           >
-            <div className="p-1 bg-white rounded-xl shadow-md border border-white/20 transition-transform duration-200 hover:scale-105">
-              <img 
-                src="/images/logo.png" 
-                alt="KrishiSeva Logo" 
-                className="h-8 w-auto object-contain" 
-              />
-            </div>
+            <img 
+              src="/images/logo.png" 
+              alt="KrishiSeva Logo" 
+              className="h-9 w-auto object-contain transition-transform duration-200 hover:scale-105 rounded-xl" 
+            />
             <div>
               <div className="flex items-center gap-1.5">
                 <span className={`font-extrabold text-xl tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
