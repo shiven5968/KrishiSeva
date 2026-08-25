@@ -30,6 +30,7 @@ export default function DriverNavigation() {
     driverCurrentPos, 
     routeWaypoints, 
     updateBookingStatus,
+    payBookingAdvance,
     completeJobAndPayout,
     cancelBooking,
     isHardwareGpsActive,
@@ -288,6 +289,15 @@ export default function DriverNavigation() {
                     <div className="text-xs text-stone-400 font-black">
                       {lang === 'hi' ? 'स्कैन करें या किसान के भुगतान करने की प्रतीक्षा करें' : 'Scan code or wait for Farmer to complete payment'}
                     </div>
+
+                    {/* Cash / COD Receipt Confirmation Option */}
+                    <button
+                      type="button"
+                      onClick={payBookingAdvance}
+                      className="w-full py-3 mt-1.5 bg-stone-850 hover:bg-stone-800 text-amber-400 border border-amber-500/25 hover:border-amber-400/50 font-black rounded-2xl shadow-lg transition-all duration-200 flex items-center justify-center gap-1.5 text-xs active:scale-95 cursor-pointer"
+                    >
+                      <span>💵 {lang === 'hi' ? 'नकद (COD) अग्रिम भुगतान प्राप्त हुआ' : 'Confirm Cash Received (COD)'}</span>
+                    </button>
                   </div>
                 ) : (
                   <div className="space-y-3 w-full">
