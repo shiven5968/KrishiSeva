@@ -189,9 +189,7 @@ export function AuthProvider({ children }) {
             const nextRating = Number(payload.newRating) || prev.rating;
             const updated = {
               ...prev,
-              rating: nextRating,
-              totalEarnings: (Number(prev.totalEarnings) || 0) + (Number(payload.payout) || 0),
-              completedRides: (Number(prev.completedRides) || 0) + 1
+              rating: nextRating
             };
             localStorage.setItem('krishi_driver_profile', JSON.stringify(updated));
             return updated;

@@ -615,14 +615,14 @@ export function RealtimeSyncProvider({ children }) {
       if (savedDriver) {
         const parsed = JSON.parse(savedDriver);
         const currentRides = Math.max(1, Number(parsed.completedRides) || 1);
-        const currentRating = Number(parsed.rating) || 4.95;
-        const computed = (((currentRating * (currentRides > 1 ? currentRides - 1 : 1)) + stars) / currentRides);
+        const currentRating = Number(parsed.rating) || 5.0;
+        const computed = currentRides > 1
+          ? (((currentRating * (currentRides - 1)) + stars) / currentRides)
+          : stars;
         newAvgRating = Number(computed.toFixed(2));
         const updated = {
           ...parsed,
-          rating: Math.min(5.0, Math.max(1.0, newAvgRating)),
-          totalEarnings: (Number(parsed.totalEarnings) || 0) + paid,
-          completedRides: (Number(parsed.completedRides) || 0) + 1
+          rating: Math.min(5.0, Math.max(1.0, newAvgRating))
         };
         localStorage.setItem('krishi_driver_profile', JSON.stringify(updated));
       }
@@ -632,14 +632,14 @@ export function RealtimeSyncProvider({ children }) {
         const parsedUsers = JSON.parse(savedUsersDb);
         if (parsedUsers[targetPhone]) {
           const currentRides = Math.max(1, Number(parsedUsers[targetPhone].completedRides) || 1);
-          const currentRating = Number(parsedUsers[targetPhone].rating) || 4.95;
-          const computed = (((currentRating * (currentRides > 1 ? currentRides - 1 : 1)) + stars) / currentRides);
+          const currentRating = Number(parsedUsers[targetPhone].rating) || 5.0;
+          const computed = currentRides > 1
+            ? (((currentRating * (currentRides - 1)) + stars) / currentRides)
+            : stars;
           newAvgRating = Number(computed.toFixed(2));
           parsedUsers[targetPhone] = {
             ...parsedUsers[targetPhone],
-            rating: Math.min(5.0, Math.max(1.0, newAvgRating)),
-            totalEarnings: (Number(parsedUsers[targetPhone].totalEarnings) || 0) + paid,
-            completedRides: (Number(parsedUsers[targetPhone].completedRides) || 0) + 1
+            rating: Math.min(5.0, Math.max(1.0, newAvgRating))
           };
           localStorage.setItem('krishi_users_db', JSON.stringify(parsedUsers));
         }

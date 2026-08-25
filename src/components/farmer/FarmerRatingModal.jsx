@@ -131,7 +131,7 @@ export default function FarmerRatingModal({
   const currentStatus = getRatingStatus(hoverRating || rating);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
       <div className={`w-full max-w-md max-h-[85vh] flex flex-col rounded-3xl shadow-2xl border overflow-hidden relative transition-all duration-300 ${
         isDark 
           ? 'bg-slate-900 border-slate-800 text-white shadow-black/80' 
