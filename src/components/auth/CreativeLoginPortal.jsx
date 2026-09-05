@@ -531,29 +531,6 @@ export default function CreativeLoginPortal() {
 
         {/* Actions & Controls (Far Right) */}
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* Header Login Action */}
-          <button
-            onClick={() => setPortalView(prev => prev === 'landing' ? 'login' : 'landing')}
-            className={`text-xs px-4 py-1.5 rounded-full font-bold transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer ${
-              portalView === 'landing'
-                ? 'bg-emerald-500 hover:bg-emerald-400 text-stone-950 shadow-[0_2px_12px_rgba(16,185,129,0.35)]'
-                : (isDark 
-                    ? 'bg-stone-900/90 hover:bg-stone-800/90 border border-stone-800/80 text-stone-300 hover:border-emerald-500/30 hover:text-white' 
-                    : 'bg-white/90 hover:bg-slate-50 border border-slate-200 text-slate-700 hover:border-emerald-500/40 hover:text-slate-900 shadow-sm')
-            }`}
-          >
-            {portalView === 'landing' ? (
-              <>
-                <User className="w-3.5 h-3.5 text-stone-950" />
-                <span>{lang === 'hi' ? 'लॉगिन' : 'Login'}</span>
-              </>
-            ) : (
-              <>
-                <span>{lang === 'hi' ? '← मुख्य पृष्ठ' : '← Home'}</span>
-              </>
-            )}
-          </button>
-
           {/* Admin Login Quick Link */}
           <button
             onClick={() => setActiveRole('admin')}
