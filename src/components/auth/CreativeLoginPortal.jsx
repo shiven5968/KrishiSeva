@@ -686,24 +686,6 @@ export default function CreativeLoginPortal() {
               </span>
             </div>
 
-            {/* State 1: Primary Action Button */}
-            {portalView === 'landing' && (
-              <div className="pt-4 animate-fade-in">
-                <div className="relative inline-block group">
-                  {/* Subtle Matte Ambient Shadow */}
-                  <div className="absolute -inset-1 bg-emerald-900/50 rounded-3xl blur-2xl opacity-0 group-hover:opacity-40 transition duration-700 pointer-events-none" />
-
-                  <button
-                    type="button"
-                    onClick={() => setPortalView('login')}
-                    className="relative group inline-flex items-center gap-4 px-9 py-4.5 rounded-2xl bg-emerald-600 hover:bg-emerald-550 text-white font-bold text-lg tracking-tight shadow-[0_4px_20px_rgba(0,0,0,0.25)] hover:shadow-[0_6px_28px_rgba(0,0,0,0.35)] hover:scale-[1.01] active:scale-[0.98] transition-all duration-300 cursor-pointer border border-emerald-500/20"
-                  >
-                    <span>{lang === 'hi' ? 'लॉगिन' : 'Login'}</span>
-                    <ArrowRight className="w-5 h-5 text-white/80 group-hover:translate-x-1 transition-transform duration-300" />
-                  </button>
-                </div>
-              </div>
-            )}
 
           </div>
 
