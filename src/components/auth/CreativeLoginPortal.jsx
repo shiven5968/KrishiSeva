@@ -698,7 +698,7 @@ export default function CreativeLoginPortal() {
                     onClick={() => setPortalView('login')}
                     className="relative group inline-flex items-center gap-4 px-9 py-4.5 rounded-2xl bg-emerald-600 hover:bg-emerald-550 text-white font-bold text-lg tracking-tight shadow-[0_4px_20px_rgba(0,0,0,0.25)] hover:shadow-[0_6px_28px_rgba(0,0,0,0.35)] hover:scale-[1.01] active:scale-[0.98] transition-all duration-300 cursor-pointer border border-emerald-500/20"
                   >
-                    <span>{lang === 'hi' ? 'लॉगिन / शुरू करें' : 'Login / Get Started'}</span>
+                    <span>{lang === 'hi' ? 'लॉगिन' : 'Login'}</span>
                     <ArrowRight className="w-5 h-5 text-white/80 group-hover:translate-x-1 transition-transform duration-300" />
                   </button>
                 </div>
