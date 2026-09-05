@@ -531,6 +531,23 @@ export default function CreativeLoginPortal() {
 
         {/* Actions & Controls (Far Right) */}
         <div className="flex items-center gap-2 sm:gap-3">
+          {/* Top Navigation Bar Login Pill */}
+          <button
+            onClick={() => setPortalView(prev => prev === 'landing' ? 'login' : 'landing')}
+            className="px-5 py-2.5 rounded-full bg-slate-900/80 hover:bg-emerald-500/10 border border-emerald-500/40 text-emerald-400 hover:text-emerald-300 font-bold text-sm backdrop-blur-xl shadow-lg hover:border-emerald-400 transition-all active:scale-95 cursor-pointer flex items-center gap-2"
+          >
+            {portalView === 'landing' ? (
+              <>
+                <User className="w-4 h-4 text-emerald-400" />
+                <span>{lang === 'hi' ? 'लॉगिन' : 'Login'}</span>
+              </>
+            ) : (
+              <>
+                <span>{lang === 'hi' ? '← मुख्य पृष्ठ' : '← Home'}</span>
+              </>
+            )}
+          </button>
+
           {/* Admin Login Quick Link */}
           <button
             onClick={() => setActiveRole('admin')}
@@ -672,13 +689,19 @@ export default function CreativeLoginPortal() {
             {/* State 1: Primary Action Button */}
             {portalView === 'landing' && (
               <div className="pt-4 animate-fade-in">
-                <button
-                  type="button"
-                  onClick={() => setPortalView('login')}
-                  className="px-8 py-4 bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-xl rounded-2xl shadow-[0_10px_35px_rgba(16,185,129,0.4)] transition-all cursor-pointer inline-flex items-center gap-3 active:scale-[0.98] duration-300"
-                >
-                  <span>{lang === 'hi' ? 'लॉगिन / शुरू करें →' : 'Login / Get Started →'}</span>
-                </button>
+                <div className="relative inline-block group">
+                  {/* Visual Depth & Ambient Glow */}
+                  <div className="absolute -inset-1 bg-gradient-to-r from-emerald-600 to-teal-500 rounded-3xl blur-lg opacity-30 group-hover:opacity-60 transition duration-500 pointer-events-none" />
+
+                  <button
+                    type="button"
+                    onClick={() => setPortalView('login')}
+                    className="relative group inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-400 text-slate-950 font-extrabold text-lg tracking-wide shadow-[0_0_35px_rgba(16,185,129,0.4)] hover:shadow-[0_0_50px_rgba(16,185,129,0.6)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 cursor-pointer overflow-hidden border-t border-white/40"
+                  >
+                    <span>{lang === 'hi' ? 'लॉगिन / शुरू करें' : 'Login / Get Started'}</span>
+                    <ArrowRight className="w-5 h-5 text-slate-950 group-hover:translate-x-1.5 transition-transform duration-300" />
+                  </button>
+                </div>
               </div>
             )}
 
