@@ -1627,69 +1627,71 @@ export default function CreativeLoginPortal() {
       </div>
     </main>
 
-      {/* ═══════════ FARMER FAQ SECTION ═══════════ */}
-      <div 
-        ref={faqRef}
-        className={`relative w-full py-20 px-6 border-t transition-all duration-700 ease-out transform ${
-          isDark 
-            ? 'bg-[#05080C] border-white/5 text-stone-100' 
-            : 'bg-slate-50 border-slate-200 text-slate-900'
-        } ${
-          faqVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
-        }`}
-      >
-        <div className="max-w-4xl mx-auto space-y-8 text-center mb-12">
-          <span className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs px-3.5 py-1.5 rounded-full inline-block font-semibold">
-            ❓ {lang === 'hi' ? 'किसान सहायता केंद्र' : 'FARMER HELP CENTER'}
-          </span>
-          <h2 className={`text-3xl md:text-4xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-            {lang === 'hi' ? 'बुकिंग करने से पहले सब कुछ जानें' : 'Everything You Should Know Before Booking'}
-          </h2>
-          <p className={`text-sm md:text-base max-w-2xl mx-auto ${isDark ? 'text-slate-400' : 'text-slate-650'}`}>
-            {lang === 'hi' 
-              ? 'सत्यापित ट्रैक्टरों और हार्वेस्टरों को 100% भरोसे के साथ बुक करने में आपकी सहायता के लिए स्पष्ट उत्तर।' 
-              : 'Clear, transparent answers to help you book tractors and harvesters with 100% confidence.'}
-          </p>
-        </div>
+      {/* ═══════════ FARMER FAQ SECTION (Landing View Only) ═══════════ */}
+      {portalView === 'landing' && (
+        <div 
+          ref={faqRef}
+          className={`relative w-full py-20 px-6 border-t transition-all duration-700 ease-out transform ${
+            isDark 
+              ? 'bg-[#05080C] border-white/5 text-stone-100' 
+              : 'bg-slate-50 border-slate-200 text-slate-900'
+          } ${
+            faqVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
+          }`}
+        >
+          <div className="max-w-4xl mx-auto space-y-8 text-center mb-12">
+            <span className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs px-3.5 py-1.5 rounded-full inline-block font-semibold">
+              ❓ {lang === 'hi' ? 'किसान सहायता केंद्र' : 'FARMER HELP CENTER'}
+            </span>
+            <h2 className={`text-3xl md:text-4xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+              {lang === 'hi' ? 'बुकिंग करने से पहले सब कुछ जानें' : 'Everything You Should Know Before Booking'}
+            </h2>
+            <p className={`text-sm md:text-base max-w-2xl mx-auto ${isDark ? 'text-slate-400' : 'text-slate-650'}`}>
+              {lang === 'hi' 
+                ? 'सत्यापित ट्रैक्टरों और हार्वेस्टरों को 100% भरोसे के साथ बुक करने में आपकी सहायता के लिए स्पष्ट उत्तर।' 
+                : 'Clear, transparent answers to help you book tractors and harvesters with 100% confidence.'}
+            </p>
+          </div>
 
-        <div className="max-w-3xl mx-auto">
-          {faqs.map((faq, index) => (
-            <div
-              key={index}
-              onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
-              className={`transition-all duration-300 shadow-xl cursor-pointer text-left mb-4 rounded-2xl p-6 border ${
-                openFaqIndex === index 
-                  ? isDark
-                    ? 'border-l-4 border-l-emerald-500 border-emerald-500/40 bg-[#0A0E13]' 
-                    : 'border-l-4 border-l-emerald-500 border-emerald-500/30 bg-slate-100'
-                  : isDark
-                    ? 'bg-[#0A0E13] border-white/10 hover:border-emerald-500/40' 
-                    : 'bg-white border-slate-200 hover:border-emerald-500/40'
-              }`}
-            >
-              <div className="flex justify-between items-center gap-4">
-                <span className={`font-bold text-sm md:text-base ${
+          <div className="max-w-3xl mx-auto">
+            {faqs.map((faq, index) => (
+              <div
+                key={index}
+                onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
+                className={`transition-all duration-300 shadow-xl cursor-pointer text-left mb-4 rounded-2xl p-6 border ${
                   openFaqIndex === index 
-                    ? 'text-emerald-500 font-extrabold' 
-                    : isDark ? 'text-white' : 'text-slate-800'
+                    ? isDark
+                      ? 'border-l-4 border-l-emerald-500 border-emerald-500/40 bg-[#0A0E13]' 
+                      : 'border-l-4 border-l-emerald-500 border-emerald-500/30 bg-slate-100'
+                    : isDark
+                      ? 'bg-[#0A0E13] border-white/10 hover:border-emerald-500/40' 
+                      : 'bg-white border-slate-200 hover:border-emerald-500/40'
+                }`}
+              >
+                <div className="flex justify-between items-center gap-4">
+                  <span className={`font-bold text-sm md:text-base ${
+                    openFaqIndex === index 
+                      ? 'text-emerald-500 font-extrabold' 
+                      : isDark ? 'text-white' : 'text-slate-800'
+                  }`}>
+                    {faq.q}
+                  </span>
+                  <ChevronDown className={`w-5 h-5 shrink-0 text-emerald-450 transition-transform duration-300 ${
+                    openFaqIndex === index ? 'rotate-180' : 'rotate-0'
+                  }`} />
+                </div>
+                <div className={`overflow-hidden transition-all duration-300 ${
+                  openFaqIndex === index ? 'max-h-40 mt-4 opacity-100' : 'max-h-0 opacity-0'
                 }`}>
-                  {faq.q}
-                </span>
-                <ChevronDown className={`w-5 h-5 shrink-0 text-emerald-450 transition-transform duration-300 ${
-                  openFaqIndex === index ? 'rotate-180' : 'rotate-0'
-                }`} />
+                  <p className={`text-xs md:text-sm leading-relaxed ${isDark ? 'text-stone-300' : 'text-slate-600'}`}>
+                    {faq.a}
+                  </p>
+                </div>
               </div>
-              <div className={`overflow-hidden transition-all duration-300 ${
-                openFaqIndex === index ? 'max-h-40 mt-4 opacity-100' : 'max-h-0 opacity-0'
-              }`}>
-                <p className={`text-xs md:text-sm leading-relaxed ${isDark ? 'text-stone-300' : 'text-slate-600'}`}>
-                  {faq.a}
-                </p>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* ═══════════ MINIMALIST FOOTER ═══════════ */}
       <footer className={`relative z-10 border-t px-6 py-4 transition-colors duration-200 ${
