@@ -690,16 +690,18 @@ export default function CreativeLoginPortal() {
             {portalView === 'landing' && (
               <div className="pt-4 animate-fade-in">
                 <div className="relative inline-block group">
-                  {/* Visual Depth & Ambient Glow */}
-                  <div className="absolute -inset-1 bg-gradient-to-r from-emerald-600 to-teal-500 rounded-3xl blur-lg opacity-30 group-hover:opacity-60 transition duration-500 pointer-events-none" />
+                  {/* Luxury Pearl & Emerald Halo Glow */}
+                  <div className="absolute -inset-1.5 bg-gradient-to-r from-emerald-500/40 via-white/30 to-emerald-400/40 rounded-3xl blur-xl opacity-50 group-hover:opacity-85 transition duration-500 pointer-events-none" />
 
                   <button
                     type="button"
                     onClick={() => setPortalView('login')}
-                    className="relative group inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-400 text-slate-950 font-extrabold text-lg tracking-wide shadow-[0_0_35px_rgba(16,185,129,0.4)] hover:shadow-[0_0_50px_rgba(16,185,129,0.6)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 cursor-pointer overflow-hidden border-t border-white/40"
+                    className="relative group inline-flex items-center gap-3.5 px-8 py-4 rounded-2xl bg-white hover:bg-stone-50 text-stone-950 font-black text-lg tracking-wide shadow-[0_20px_45px_rgba(0,0,0,0.6),0_0_35px_rgba(255,255,255,0.25)] hover:shadow-[0_25px_55px_rgba(0,0,0,0.75),0_0_45px_rgba(255,255,255,0.45)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 cursor-pointer overflow-hidden border border-white/90"
                   >
                     <span>{lang === 'hi' ? 'लॉगिन / शुरू करें' : 'Login / Get Started'}</span>
-                    <ArrowRight className="w-5 h-5 text-slate-950 group-hover:translate-x-1.5 transition-transform duration-300" />
+                    <span className="w-8 h-8 rounded-xl bg-emerald-500 text-stone-950 flex items-center justify-center transition-transform duration-300 group-hover:translate-x-1 shadow-sm">
+                      <ArrowRight className="w-4 h-4 font-black" />
+                    </span>
                   </button>
                 </div>
               </div>
