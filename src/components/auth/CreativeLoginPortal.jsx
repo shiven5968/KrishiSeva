@@ -48,6 +48,9 @@ export default function CreativeLoginPortal() {
     quickDemoLogin
   } = useAuth();
 
+  // Portal View State: State 1 (landing) vs State 2 (login)
+  const [portalView, setPortalView] = useState('landing'); // 'landing' | 'login'
+
   // Authentication States
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
@@ -510,7 +513,10 @@ export default function CreativeLoginPortal() {
           : 'bg-white/60 backdrop-blur-xl border-slate-200/80'
       }`}>
         {/* Brand Logo (Far Left) */}
-        <div className="flex items-center gap-3 group cursor-pointer">
+        <div 
+          onClick={() => setPortalView('landing')}
+          className="flex items-center gap-3 group cursor-pointer"
+        >
           <img 
             src="/images/logo.png" 
             alt="KrishiSeva Logo" 
@@ -525,6 +531,29 @@ export default function CreativeLoginPortal() {
 
         {/* Actions & Controls (Far Right) */}
         <div className="flex items-center gap-2 sm:gap-3">
+          {/* Header Login Action */}
+          <button
+            onClick={() => setPortalView(prev => prev === 'landing' ? 'login' : 'landing')}
+            className={`text-xs px-4 py-1.5 rounded-full font-bold transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer ${
+              portalView === 'landing'
+                ? 'bg-emerald-500 hover:bg-emerald-400 text-stone-950 shadow-[0_2px_12px_rgba(16,185,129,0.35)]'
+                : (isDark 
+                    ? 'bg-stone-900/90 hover:bg-stone-800/90 border border-stone-800/80 text-stone-300 hover:border-emerald-500/30 hover:text-white' 
+                    : 'bg-white/90 hover:bg-slate-50 border border-slate-200 text-slate-700 hover:border-emerald-500/40 hover:text-slate-900 shadow-sm')
+            }`}
+          >
+            {portalView === 'landing' ? (
+              <>
+                <User className="w-3.5 h-3.5 text-stone-950" />
+                <span>{lang === 'hi' ? 'लॉगिन' : 'Login'}</span>
+              </>
+            ) : (
+              <>
+                <span>{lang === 'hi' ? '← मुख्य पृष्ठ' : '← Home'}</span>
+              </>
+            )}
+          </button>
+
           {/* Admin Login Quick Link */}
           <button
             onClick={() => setActiveRole('admin')}
@@ -609,7 +638,11 @@ export default function CreativeLoginPortal() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center w-full">
           
           {/* LEFT COLUMN: Commanding Headlines */}
-          <div className="lg:col-span-7 space-y-6 text-left">
+          <div className={`transition-all duration-500 ease-out text-left ${
+            portalView === 'landing'
+              ? 'lg:col-span-12 max-w-3xl space-y-8 py-6'
+              : 'lg:col-span-7 space-y-6'
+          }`}>
             {/* Top Live Status Pill */}
             <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/35 text-emerald-450 text-[10px] font-black uppercase tracking-wider animate-pulse mb-1">
               <span>⚡ 100% VERIFIED FLEET • DISPATCH ACTIVE</span>
@@ -659,18 +692,42 @@ export default function CreativeLoginPortal() {
               </span>
             </div>
 
+            {/* State 1: Primary Action Button */}
+            {portalView === 'landing' && (
+              <div className="pt-4 animate-fade-in">
+                <button
+                  type="button"
+                  onClick={() => setPortalView('login')}
+                  className="px-8 py-4 bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-xl rounded-2xl shadow-[0_10px_35px_rgba(16,185,129,0.4)] transition-all cursor-pointer inline-flex items-center gap-3 active:scale-[0.98] duration-300"
+                >
+                  <span>{lang === 'hi' ? 'लॉगिन / शुरू करें →' : 'Login / Get Started →'}</span>
+                </button>
+              </div>
+            )}
+
           </div>
 
-          {/* RIGHT COLUMN: WhatsApp OTP & Role Onboarding Card */}
-          <div className="lg:col-span-5 w-full relative mt-10 lg:mt-16">
-            {/* Subtle emerald radial ambient light glow behind the card */}
-            <div className="absolute -inset-10 bg-emerald-500/10 blur-[120px] pointer-events-none rounded-full z-0" />
-            
-            <div className={`border backdrop-blur-xl rounded-3xl p-6 sm:p-8 transition-all duration-300 relative z-10 ${
-              isDark 
-                ? 'bg-[#0A0E13]/90 border-white/10 shadow-[0_25px_60px_rgba(0,0,0,0.9)]' 
-                : 'bg-white/90 border-slate-200 shadow-[0_25px_60px_rgba(15,23,42,0.12)] text-slate-800'
-            }`}>
+          {/* RIGHT COLUMN: WhatsApp OTP & Role Onboarding Card (State 2) */}
+          {portalView === 'login' && (
+            <div className="lg:col-span-5 w-full relative mt-10 lg:mt-16 animate-fade-in">
+              {/* Subtle emerald radial ambient light glow behind the card */}
+              <div className="absolute -inset-10 bg-emerald-500/10 blur-[120px] pointer-events-none rounded-full z-0" />
+              
+              <div className={`border backdrop-blur-xl rounded-3xl p-6 sm:p-8 transition-all duration-300 relative z-10 ${
+                isDark 
+                  ? 'bg-[#0A0E13]/90 border-white/10 shadow-[0_25px_60px_rgba(0,0,0,0.9)]' 
+                  : 'bg-white/90 border-slate-200 shadow-[0_25px_60px_rgba(15,23,42,0.12)] text-slate-800'
+              }`}>
+
+                {/* Subtle Back to Home Link */}
+                <button
+                  type="button"
+                  onClick={() => setPortalView('landing')}
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-stone-400 hover:text-emerald-400 transition-colors mb-4 group cursor-pointer"
+                >
+                  <span className="transition-transform duration-200 group-hover:-translate-x-1 font-bold">←</span>
+                  <span>{lang === 'hi' ? 'मुख्य पृष्ठ पर वापस' : 'Back to Home'}</span>
+                </button>
 
               {/* STEP 1: Phone Number Input & Send WhatsApp OTP */}
               {step === 'phone' && (
@@ -1582,6 +1639,7 @@ export default function CreativeLoginPortal() {
 
             </div>
           </div>
+        )}
 
         </div>
       </div>
