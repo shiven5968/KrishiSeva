@@ -690,17 +690,17 @@ export default function CreativeLoginPortal() {
             {portalView === 'landing' && (
               <div className="pt-4 animate-fade-in">
                 <div className="relative inline-block group">
-                  {/* Luxury Pearl & Emerald Halo Glow */}
-                  <div className="absolute -inset-1.5 bg-gradient-to-r from-emerald-500/40 via-white/30 to-emerald-400/40 rounded-3xl blur-xl opacity-50 group-hover:opacity-85 transition duration-500 pointer-events-none" />
+                  {/* Rich Emerald Depth Glow */}
+                  <div className="absolute -inset-1 bg-gradient-to-r from-emerald-600 via-green-500 to-emerald-700 rounded-3xl blur-xl opacity-40 group-hover:opacity-70 transition duration-500 pointer-events-none" />
 
                   <button
                     type="button"
                     onClick={() => setPortalView('login')}
-                    className="relative group inline-flex items-center gap-3.5 px-8 py-4 rounded-2xl bg-white hover:bg-stone-50 text-stone-950 font-black text-lg tracking-wide shadow-[0_20px_45px_rgba(0,0,0,0.6),0_0_35px_rgba(255,255,255,0.25)] hover:shadow-[0_25px_55px_rgba(0,0,0,0.75),0_0_45px_rgba(255,255,255,0.45)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 cursor-pointer overflow-hidden border border-white/90"
+                    className="relative group inline-flex items-center gap-3.5 px-8 py-4 rounded-2xl bg-gradient-to-r from-emerald-600 via-emerald-500 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white font-extrabold text-lg tracking-wide shadow-[0_12px_35px_rgba(5,150,105,0.35)] hover:shadow-[0_16px_45px_rgba(5,150,105,0.55)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 cursor-pointer overflow-hidden border-t border-emerald-300/40 border-b border-emerald-800/50 border-x border-emerald-500/30"
                   >
-                    <span>{lang === 'hi' ? 'लॉगिन / शुरू करें' : 'Login / Get Started'}</span>
-                    <span className="w-8 h-8 rounded-xl bg-emerald-500 text-stone-950 flex items-center justify-center transition-transform duration-300 group-hover:translate-x-1 shadow-sm">
-                      <ArrowRight className="w-4 h-4 font-black" />
+                    <span className="drop-shadow-sm">{lang === 'hi' ? 'लॉगिन / शुरू करें' : 'Login / Get Started'}</span>
+                    <span className="w-8 h-8 rounded-xl bg-white/15 backdrop-blur-md text-white flex items-center justify-center transition-transform duration-300 group-hover:translate-x-1 border border-white/20 shadow-sm">
+                      <ArrowRight className="w-4 h-4 text-white font-bold" />
                     </span>
                   </button>
                 </div>
