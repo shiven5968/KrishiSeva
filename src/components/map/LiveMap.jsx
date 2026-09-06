@@ -147,6 +147,12 @@ export default function LiveMap({
     return () => clearTimeout(t);
   }, [activeLayerType, isDark]);
 
+  // Pan map smoothly when farmerLocation changes
+  useEffect(() => {
+    if (!mapInstanceRef.current || !farmerLocation?.lat || !farmerLocation?.lng) return;
+    mapInstanceRef.current.setView([farmerLocation.lat, farmerLocation.lng], 15, { animate: true });
+  }, [farmerLocation?.lat, farmerLocation?.lng]);
+
   // Switch Tile Layers (Standard vs Satellite)
   const toggleMapLayer = () => {
     setActiveLayerType(prev => prev === 'standard' ? 'satellite' : 'standard');

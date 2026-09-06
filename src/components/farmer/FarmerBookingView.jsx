@@ -58,7 +58,11 @@ import {
   Building,
   Store,
   Warehouse,
-  History
+  History,
+  Search,
+  Globe,
+  Compass,
+  Crosshair
 } from 'lucide-react';
 
 // Specialized Farm Cargo Types for Transport
@@ -240,9 +244,77 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
   const { isDark } = useTheme();
   const { currentUser } = useAuth();
   const { createBookingRequest, activeBooking } = useRealtimeSync();
-  const { rates, calculateFare } = usePricing();
+  const { 
+    rates, 
+    calculateFare, 
+    activeLocation, 
+    allPanIndiaRegions, 
+    searchableHubs, 
+    resolveAndSetLocation 
+  } = usePricing();
   const { savedLands, selectedLand, selectedLandId, setSelectedLandId } = useSavedLands();
   const { preBookings, addPreBooking } = usePreBookings();
+
+  // Pan-India Agro Location Search & Zone Filter State
+  const [locationSearchQuery, setLocationSearchQuery] = useState('');
+  const [isSearchingLocation, setIsSearchingLocation] = useState(false);
+  const [selectedZoneFilter, setSelectedZoneFilter] = useState('all');
+  const [isLocationDropdownOpen, setIsLocationDropdownOpen] = useState(false);
+
+  // Filtered agro locations based on search query and zone filter
+  const filteredAgroLocations = useMemo(() => {
+    let list = searchableHubs || [];
+    if (selectedZoneFilter !== 'all') {
+      const regionIdsInZone = (allPanIndiaRegions || [])
+        .filter(r => r.zoneGroup.toLowerCase().includes(selectedZoneFilter.toLowerCase()))
+        .map(r => r.id);
+      list = list.filter(h => regionIdsInZone.includes(h.regionId));
+    }
+    if (!locationSearchQuery.trim()) {
+      return list.slice(0, 8);
+    }
+    const q = locationSearchQuery.toLowerCase().trim();
+    return (searchableHubs || []).filter(h => 
+      h.name.toLowerCase().includes(q) ||
+      h.city.toLowerCase().includes(q) ||
+      h.state.toLowerCase().includes(q) ||
+      (h.pincode && h.pincode.includes(q))
+    ).slice(0, 10);
+  }, [searchableHubs, allPanIndiaRegions, locationSearchQuery, selectedZoneFilter]);
+
+  const handleSelectLocationHub = (hub) => {
+    resolveAndSetLocation(hub.name);
+    setLocationSearchQuery('');
+    setIsLocationDropdownOpen(false);
+  };
+
+  const handleCustomLocationSearch = (e) => {
+    e?.preventDefault();
+    if (!locationSearchQuery.trim()) return;
+    resolveAndSetLocation(locationSearchQuery);
+    setIsLocationDropdownOpen(false);
+  };
+
+  const handleBrowserGPSDetect = () => {
+    if (!navigator.geolocation) {
+      alert(lang === 'hi' ? 'आपके ब्राउज़र में जीपीएस सुविधा समर्थित नहीं है।' : 'Geolocation is not supported in this browser.');
+      return;
+    }
+    setIsSearchingLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setIsSearchingLocation(false);
+        const { latitude, longitude } = pos.coords;
+        resolveAndSetLocation({ lat: latitude, lng: longitude });
+        setIsLocationDropdownOpen(false);
+      },
+      (err) => {
+        setIsSearchingLocation(false);
+        console.warn('GPS location error:', err);
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
 
   const [isSavedLandsModalOpen, setIsSavedLandsModalOpen] = useState(false);
   const [isPreBookingsModalOpen, setIsPreBookingsModalOpen] = useState(false);
@@ -577,35 +649,232 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
         </div>
       </div>
 
-      {/* ═══════════════ SECTION 1 (TOP): Full-Width GPS Farm Location & Radar Map (320px) ═══════════════ */}
-      <div className={`rounded-3xl p-6 sm:p-7 border shadow-2xl space-y-4 transition-colors duration-200 ${
+      {/* ═══════════════ SECTION 1 (TOP): Complete All-28-States Pan-India Agro-Pricing Engine & GPS Matching ═══════════════ */}
+      <div className={`rounded-3xl p-6 sm:p-7 border shadow-2xl space-y-5 transition-colors duration-200 ${
         isDark ? 'bg-[#0A0E13] border-white/10 shadow-black/40' : 'bg-white border-slate-200 shadow-slate-200/50'
       }`}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-              <MapPin className="w-4 h-4 text-emerald-400" />
+        
+        {/* Section Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+              <Globe className="w-5 h-5 text-emerald-400" />
             </div>
             <div>
-              <h3 className={`font-black text-base sm:text-lg ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                {lang === 'hi' ? 'खेत लोकेशन व लाइव रडार मैप' : 'Farm Location & Live GPS Radar'}
-              </h3>
+              <div className="flex items-center gap-2">
+                <h3 className={`font-black text-base sm:text-lg tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                  {lang === 'hi' ? 'सर्व-भारत खेत लोकेशन व एग्रो-प्राइसिंग इंजन' : 'Pan-India Farm Location & Agro-Pricing Engine'}
+                </h3>
+                <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
+                  28 STATES & UTS
+                </span>
+              </div>
               <p className={`text-xs ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
-                {lang === 'hi' ? 'वास्तविक समय में नजदीकी मशीनरी व ड्राइवरों की लोकेशन देखें' : 'Real-time satellite tracking of nearby active machinery fleet'}
+                {lang === 'hi' ? 'पिनकोड, जिला या जीपीएस द्वारा वास्तविक समय क्षेत्रीय दर व फ्लीट रडार' : 'Universal Pincode / District search & dynamic regional baseline rate matching'}
               </p>
             </div>
           </div>
-          <span className={`text-xs font-bold px-3.5 py-1.5 rounded-full border ${
-            isDark ? 'bg-emerald-950/80 border-emerald-500/40 text-emerald-400' : 'bg-emerald-50 border-emerald-200 text-emerald-700'
-          }`}>
-            {selectedLand ? localize(selectedLand.name) : (lang === 'hi' ? 'खेत (नदी के पास)' : 'Khet near River')}
-          </span>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleBrowserGPSDetect}
+              disabled={isSearchingLocation}
+              className="px-3.5 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:text-emerald-300 text-xs font-black transition flex items-center gap-2 active:scale-95 shadow-sm cursor-pointer"
+              title="Detect current GPS location"
+            >
+              <Crosshair className={`w-3.5 h-3.5 ${isSearchingLocation ? 'animate-spin' : ''}`} />
+              <span>{isSearchingLocation ? (lang === 'hi' ? 'जीपीएस खोज रहे हैं...' : 'Detecting GPS...') : (lang === 'hi' ? '🎯 मेरा जीपीएस' : '🎯 Detect My GPS')}</span>
+            </button>
+          </div>
         </div>
 
+        {/* Universal Search Bar & Pincode Resolver Form */}
+        <div className="relative space-y-3">
+          <form onSubmit={handleCustomLocationSearch} className="relative flex items-center gap-2">
+            <div className="relative flex-1">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-500">
+                <Search className="w-4 h-4 text-emerald-500" />
+              </span>
+              <input
+                type="text"
+                value={locationSearchQuery}
+                onFocus={() => setIsLocationDropdownOpen(true)}
+                onChange={(e) => {
+                  setLocationSearchQuery(e.target.value);
+                  setIsLocationDropdownOpen(true);
+                }}
+                placeholder={lang === 'hi' 
+                  ? 'भारत का कोई भी जिला, लैंडमार्क या 6-अंकों का पिनकोड खोजें (उदा. ABES Ghaziabad, Phoenix Palassio, Kothrud Pune, Ludhiana, 201009)...' 
+                  : 'Search ANY District, Landmark or PIN across 28 states (e.g. ABES Ghaziabad, Phoenix Palassio Lucknow, Kothrud Pune, Ludhiana Mandi, 201009)...'}
+                className={`w-full pl-11 pr-10 py-3.5 rounded-2xl border font-bold text-xs sm:text-sm outline-none transition shadow-inner ${
+                  isDark 
+                    ? 'bg-stone-900/90 border-stone-800 text-white placeholder:text-stone-500 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/40' 
+                    : 'bg-slate-50 border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600/40'
+                }`}
+              />
+              {locationSearchQuery && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLocationSearchQuery('');
+                    setIsLocationDropdownOpen(false);
+                  }}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-white cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              className="px-5 py-3.5 bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-black text-xs sm:text-sm rounded-2xl shadow-lg shadow-emerald-500/20 hover:scale-[1.02] active:scale-95 transition flex items-center gap-1.5 shrink-0 cursor-pointer"
+            >
+              <Search className="w-4 h-4 stroke-[2.5]" />
+              <span>{lang === 'hi' ? 'खोजें' : 'Search'}</span>
+            </button>
+          </form>
+
+          {/* Quick Zone Filter Chips */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs font-bold">
+            <span className="text-[11px] text-stone-400 mr-1 shrink-0">{lang === 'hi' ? 'जोन:' : 'Zone:'}</span>
+            {[
+              { id: 'all', label: lang === 'hi' ? '🇮🇳 सर्व भारत (28 राज्य)' : '🇮🇳 All India (28 States)' },
+              { id: 'north', label: lang === 'hi' ? 'उत्तर भारत (North)' : 'North India' },
+              { id: 'west', label: lang === 'hi' ? 'पश्चिम भारत (West)' : 'West India' },
+              { id: 'central', label: lang === 'hi' ? 'मध्य भारत (Central)' : 'Central India' },
+              { id: 'east', label: lang === 'hi' ? 'पूर्व भारत (East)' : 'East India' },
+              { id: 'south', label: lang === 'hi' ? 'दक्षिण भारत (South)' : 'South India' },
+              { id: 'north-east', label: lang === 'hi' ? 'पूर्वोत्तर व यूटी (NE/UTs)' : 'North-East & UTs' }
+            ].map(zone => (
+              <button
+                key={zone.id}
+                type="button"
+                onClick={() => {
+                  setSelectedZoneFilter(zone.id);
+                  setIsLocationDropdownOpen(true);
+                }}
+                className={`px-3 py-1.5 rounded-xl border whitespace-nowrap transition-all cursor-pointer ${
+                  selectedZoneFilter === zone.id
+                    ? isDark ? 'bg-emerald-950/80 border-emerald-500/50 text-emerald-300 shadow-sm' : 'bg-emerald-100 border-emerald-400 text-emerald-900 shadow-sm'
+                    : isDark ? 'bg-stone-900/60 border-stone-800 text-stone-400 hover:text-stone-200' : 'bg-slate-100 border-slate-200 text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                {zone.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Autocomplete Dropdown List */}
+          {isLocationDropdownOpen && (
+            <div className={`absolute top-full left-0 right-0 z-30 mt-1 max-h-64 overflow-y-auto rounded-2xl border shadow-2xl backdrop-blur-xl p-2 space-y-1 animate-fade-in ${
+              isDark ? 'bg-stone-950/95 border-emerald-500/30' : 'bg-white/95 border-slate-300'
+            }`}>
+              <div className="flex items-center justify-between px-3 py-1.5 text-[10px] font-black text-emerald-400 uppercase tracking-wider border-b border-white/5">
+                <span>{lang === 'hi' ? 'प्रमुख कृषि हब व जिले' : 'Prominent Agro Hubs & Districts'}</span>
+                <button
+                  type="button"
+                  onClick={() => setIsLocationDropdownOpen(false)}
+                  className="text-stone-400 hover:text-white cursor-pointer"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              {filteredAgroLocations.length > 0 ? (
+                filteredAgroLocations.map((hub, idx) => (
+                  <div
+                    key={`${hub.name}-${idx}`}
+                    onClick={() => handleSelectLocationHub(hub)}
+                    className={`p-2.5 rounded-xl cursor-pointer flex items-center justify-between transition-all ${
+                      isDark ? 'hover:bg-stone-900 text-white' : 'hover:bg-emerald-50 text-slate-900'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-xs text-emerald-400 shrink-0">
+                        📍
+                      </div>
+                      <div>
+                        <span className="font-bold text-xs block">{hub.name}</span>
+                        <span className="text-[10px] text-stone-400">{hub.city}, {hub.state} • PIN {hub.pincode}</span>
+                      </div>
+                    </div>
+                    <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-500/40 shrink-0">
+                      {hub.state}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <div className="p-4 text-center text-xs text-stone-400">
+                  <span>{lang === 'hi' ? 'कोई सीधा मैच नहीं मिला। Enter दबाकर खोजें।' : 'No direct preset found. Press Search to auto-resolve.'}</span>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* ═══════════ UI Feedback Pill: Active Location & Dynamic Agro Rate Indicator ═══════════ */}
+        <div className={`p-4 sm:p-5 rounded-2xl border flex flex-col lg:flex-row lg:items-center justify-between gap-4 transition-all duration-300 ${
+          isDark 
+            ? 'bg-gradient-to-r from-emerald-950/40 via-stone-950/60 to-emerald-950/30 border-emerald-500/40 shadow-xl shadow-emerald-950/40' 
+            : 'bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-100/50 border-emerald-300 shadow-sm'
+        }`}>
+          <div className="flex items-start sm:items-center gap-3.5">
+            <div className="w-11 h-11 rounded-2xl bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center text-emerald-400 shadow-lg shadow-emerald-500/10 shrink-0">
+              <MapPin className="w-6 h-6 text-emerald-400" />
+            </div>
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className={`font-black text-sm sm:text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                  📍 Location: {activeLocation?.district || 'Lucknow'}, {activeLocation?.state || 'Uttar Pradesh'}
+                </span>
+                <span className="text-xs font-black px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-500/40">
+                  {activeLocation?.region?.regionNameEn || activeLocation?.regionName || 'Central Plains'} Zone ({activeLocation?.multiplier || 1.0}x Rate)
+                </span>
+              </div>
+              <p className={`text-xs font-medium mt-1 ${isDark ? 'text-stone-300' : 'text-slate-700'}`}>
+                {lang === 'hi' ? '🌾 प्रमुख फसल चक्र: ' : '🌾 Active Crop System: '}
+                <span className="text-emerald-400 font-bold">{activeLocation?.crops || 'Wheat, Paddy, Sugarcane, Mango'}</span>
+              </p>
+            </div>
+          </div>
+
+          {/* Dynamic Rates Quick Matrix */}
+          <div className="flex items-center gap-3 overflow-x-auto pb-1 lg:pb-0 text-xs font-bold">
+            <div className={`px-3 py-1.5 rounded-xl border flex flex-col ${
+              isDark ? 'bg-stone-900/80 border-stone-800 text-stone-200' : 'bg-white border-slate-200 text-slate-800'
+            }`}>
+              <span className="text-[9px] text-stone-400 uppercase font-black">{lang === 'hi' ? 'ट्रैक्टर दर' : 'Tractor Rate'}</span>
+              <span className="text-emerald-400 font-black">₹{rates.tractor?.ratePerBigha}/{lang === 'hi' ? 'बीघा' : 'bigha'}</span>
+            </div>
+            <div className={`px-3 py-1.5 rounded-xl border flex flex-col ${
+              isDark ? 'bg-stone-900/80 border-stone-800 text-stone-200' : 'bg-white border-slate-200 text-slate-800'
+            }`}>
+              <span className="text-[9px] text-stone-400 uppercase font-black">{lang === 'hi' ? 'हार्वेस्टर दर' : 'Combine Rate'}</span>
+              <span className="text-emerald-400 font-black">₹{rates.harvester?.ratePerBigha}/{lang === 'hi' ? 'बीघा' : 'bigha'}</span>
+            </div>
+            <div className={`px-3 py-1.5 rounded-xl border flex flex-col ${
+              isDark ? 'bg-stone-900/80 border-stone-800 text-stone-200' : 'bg-white border-slate-200 text-slate-800'
+            }`}>
+              <span className="text-[9px] text-stone-400 uppercase font-black">{lang === 'hi' ? 'जेसीबी दर' : 'JCB Rate'}</span>
+              <span className="text-emerald-400 font-black">₹{rates.jcb?.ratePerHour}/{lang === 'hi' ? 'घंटा' : 'hr'}</span>
+            </div>
+            <div className={`px-3 py-1.5 rounded-xl border flex flex-col ${
+              isDark ? 'bg-stone-900/80 border-stone-800 text-stone-200' : 'bg-white border-slate-200 text-slate-800'
+            }`}>
+              <span className="text-[9px] text-stone-400 uppercase font-black">{lang === 'hi' ? 'ट्रॉली/किमी' : 'Trolley/Km'}</span>
+              <span className="text-emerald-400 font-black">₹{rates.truck?.ratePerKm}/km</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Live Interactive Satellite Map with 5 km Driver Radar */}
         <LiveMap
           farmerLocation={{
-            lat: selectedLand?.lat || DEFAULT_FARM_LOCATION.lat,
-            lng: selectedLand?.lng || DEFAULT_FARM_LOCATION.lng
+            lat: activeLocation?.lat || selectedLand?.lat || DEFAULT_FARM_LOCATION.lat,
+            lng: activeLocation?.lng || selectedLand?.lng || DEFAULT_FARM_LOCATION.lng,
+            bigha: selectedLand?.bigha || quantityInput || 4.5
           }}
           activeVehicleType={selectedCategoryId}
           showNearbyDrivers={true}

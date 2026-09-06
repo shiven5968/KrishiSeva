@@ -1,6 +1,13 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { 
+  PAN_INDIA_REGIONS, 
+  SEARCHABLE_AGRO_HUBS, 
+  resolveLocationToAgroZone 
+} from '../utils/panIndiaAgroPricing';
 
 const PricingContext = createContext();
+
+export { PAN_INDIA_REGIONS, SEARCHABLE_AGRO_HUBS, resolveLocationToAgroZone };
 
 export const UNIT_CONVERSIONS_TO_BIGHA = {
   bigha: 1.0,
@@ -20,7 +27,7 @@ export const SUPPORTED_QUANTITY_UNITS = [
   { id: 'kanal', labelEn: 'Kanal', labelHi: 'कनाल', icon: '🌾', step: 1, defaultMin: 1, defaultMax: 24, presets: [1, 2, 4, 8, 12, 16] }
 ];
 
-// Baseline Reference Rates (UP Purvanchal / Central UP Baseline)
+// Baseline Reference Rates (UP Purvanchal / Central UP Baseline = 1.0x)
 export const BASELINE_REFERENCE_RATES = {
   tractor: {
     ratePerBigha: 1300,
@@ -48,79 +55,16 @@ export const BASELINE_REFERENCE_RATES = {
   }
 };
 
-// Regional Agricultural Boom Configurations
-export const REGIONAL_AGRO_ZONES = [
-  {
-    id: 'up_purvanchal',
-    nameEn: 'UP Purvanchal & Central (Baseline)',
-    nameHi: 'उत्तर प्रदेश पूर्वांचल व मध्य (आधार ₹1300)',
-    state: 'Uttar Pradesh',
-    agroBoomLevel: 'baseline',
-    multiplier: 1.0,
-    tag: 'Baseline (₹1,300/Bigha)',
-    description: 'Wheat, Paddy, Mango & Sugarcane plains (Malihabad / Varanasi / Gorakhpur)'
-  },
-  {
-    id: 'maharashtra_boom',
-    nameEn: 'Maharashtra (Sugarcane & Cash Crop Boom)',
-    nameHi: 'महाराष्ट्र (गन्ना व नकदी फसल बूम +18%)',
-    state: 'Maharashtra',
-    agroBoomLevel: 'high_boom',
-    multiplier: 1.18,
-    tag: 'High Boom (+18%)',
-    description: 'Pune, Kolhapur, Solapur, Vidarbha - Heavy mechanization & high cash yield'
-  },
-  {
-    id: 'punjab_haryana',
-    nameEn: 'Punjab & Haryana (Granary Belt)',
-    nameHi: 'पंजाब व हरियाणा (अन्न भंडार बेल्ट +15%)',
-    state: 'Punjab / Haryana',
-    agroBoomLevel: 'high_boom',
-    multiplier: 1.15,
-    tag: 'Granary Boom (+15%)',
-    description: 'Ludhiana, Karnal - Intensive multi-crop harvester & turbo tractor demand'
-  },
-  {
-    id: 'gujarat_commercial',
-    nameEn: 'Gujarat (Commercial Cotton & Groundnut)',
-    nameHi: 'गुजरात (व्यावसायिक कपास व मूंगफली +12%)',
-    state: 'Gujarat',
-    agroBoomLevel: 'moderate_boom',
-    multiplier: 1.12,
-    tag: 'Agro Boom (+12%)',
-    description: 'Saurashtra, Rajkot - High capital commercial farm machinery'
-  },
-  {
-    id: 'mp_central',
-    nameEn: 'Madhya Pradesh (Soybean & Wheat Plateau)',
-    nameHi: 'मध्य प्रदेश (सोयाबीन व गेहूं पठार +2%)',
-    state: 'Madhya Pradesh',
-    agroBoomLevel: 'moderate',
-    multiplier: 1.02,
-    tag: 'Steady Normal (1.02x)',
-    description: 'Malwa plateau - Steady tractor & combine availability'
-  },
-  {
-    id: 'bundelkhand_relief',
-    nameEn: 'Bundelkhand & Dryland (Relief Zone)',
-    nameHi: 'बुंदेलखंड व शुष्क क्षेत्र (राहत दर -10%)',
-    state: 'UP/MP Border',
-    agroBoomLevel: 'low_intensity',
-    multiplier: 0.90,
-    tag: 'Relief Pricing (-10%)',
-    description: 'Rainfed pulses & coarse grains - Subsidized farmer friendly rates'
-  },
-  {
-    id: 'bihar_eastern',
-    nameEn: 'Bihar & Eastern Gangetic Plains',
-    nameHi: 'बिहार व पूर्वी गंगा मैदान (-8%)',
-    state: 'Bihar',
-    agroBoomLevel: 'low_intensity',
-    multiplier: 0.92,
-    tag: 'Affordable Plains (-8%)',
-    description: 'Smallholder high-density farms - High accessibility lower rates'
-  }
-];
+// Aliased for legacy compatibility with any legacy imports
+export const REGIONAL_AGRO_ZONES = PAN_INDIA_REGIONS.map(r => ({
+  id: r.id,
+  nameEn: `${r.state} - ${r.regionNameEn}`,
+  nameHi: `${r.stateHi} - ${r.regionNameHi}`,
+  state: r.state,
+  multiplier: r.multiplier,
+  tag: r.tag,
+  description: r.crops
+}));
 
 // Seasonal Crop Cycle & Demand Surge Configurations
 export const SEASONAL_CROP_CYCLES = [
@@ -163,11 +107,11 @@ export const SEASONAL_CROP_CYCLES = [
 ];
 
 // Helper function to calculate dynamically adjusted rates based on zone and season
-export function calculateDynamicRates(zoneId = 'up_purvanchal', seasonId = 'normal_cycle') {
-  const zone = REGIONAL_AGRO_ZONES.find(z => z.id === zoneId) || REGIONAL_AGRO_ZONES[0];
+export function calculateDynamicRates(zoneId = 'up_central_purvanchal', seasonId = 'normal_cycle') {
+  const zone = PAN_INDIA_REGIONS.find(z => z.id === zoneId) || PAN_INDIA_REGIONS[1];
   const season = SEASONAL_CROP_CYCLES.find(s => s.id === seasonId) || SEASONAL_CROP_CYCLES[0];
   
-  const combinedMultiplier = zone.multiplier * season.surgeMultiplier;
+  const combinedMultiplier = Number((zone.multiplier * season.surgeMultiplier).toFixed(3));
 
   return {
     tractor: {
@@ -182,7 +126,8 @@ export function calculateDynamicRates(zoneId = 'up_purvanchal', seasonId = 'norm
     },
     jcb: {
       ...BASELINE_REFERENCE_RATES.jcb,
-      ratePerHour: Math.round(BASELINE_REFERENCE_RATES.jcb.ratePerHour * combinedMultiplier)
+      ratePerHour: Math.round(BASELINE_REFERENCE_RATES.jcb.ratePerHour * combinedMultiplier),
+      ratePerBigha: Math.round(BASELINE_REFERENCE_RATES.jcb.ratePerBigha * combinedMultiplier)
     },
     truck: {
       ...BASELINE_REFERENCE_RATES.truck,
@@ -197,11 +142,22 @@ export function calculateDynamicRates(zoneId = 'up_purvanchal', seasonId = 'norm
 
 export function PricingProvider({ children }) {
   const [selectedZoneId, setSelectedZoneId] = useState(() => {
-    return localStorage.getItem('krishi_selected_zone') || 'up_purvanchal';
+    return localStorage.getItem('krishi_selected_zone') || 'up_central_purvanchal';
   });
 
   const [selectedSeasonId, setSelectedSeasonId] = useState(() => {
     return localStorage.getItem('krishi_selected_season') || 'normal_cycle';
+  });
+
+  // Active Pan-India Location with full state and micro-region context
+  const [activeLocation, setActiveLocation] = useState(() => {
+    const savedLoc = localStorage.getItem('krishi_active_location');
+    if (savedLoc) {
+      try {
+        return JSON.parse(savedLoc);
+      } catch (e) {}
+    }
+    return resolveLocationToAgroZone('Lucknow, Uttar Pradesh');
   });
 
   const [rates, setRates] = useState(() => {
@@ -223,13 +179,40 @@ export function PricingProvider({ children }) {
   }, [selectedSeasonId]);
 
   useEffect(() => {
+    localStorage.setItem('krishi_active_location', JSON.stringify(activeLocation));
+  }, [activeLocation]);
+
+  useEffect(() => {
     localStorage.setItem('krishi_pricing_rates', JSON.stringify(rates));
   }, [rates]);
 
+  // Universal Location Resolver Hook method
+  const resolveAndSetLocation = (queryOrCoords) => {
+    const resolved = resolveLocationToAgroZone(queryOrCoords);
+    setActiveLocation(resolved);
+    setSelectedZoneId(resolved.region.id);
+    const computedRates = calculateDynamicRates(resolved.region.id, selectedSeasonId);
+    setRates(computedRates);
+    return resolved;
+  };
+
   // Apply Region & Season Preset with single trigger
-  const applyRegionalAndSeasonalSurge = (zoneId, seasonId) => {
+  const applyRegionalAndSeasonalSurge = (zoneId, seasonId = selectedSeasonId) => {
     setSelectedZoneId(zoneId);
     setSelectedSeasonId(seasonId);
+    const targetRegion = PAN_INDIA_REGIONS.find(r => r.id === zoneId) || PAN_INDIA_REGIONS[1];
+    setActiveLocation(prev => ({
+      ...prev,
+      region: targetRegion,
+      state: targetRegion.state,
+      district: targetRegion.sampleDistricts[0],
+      multiplier: targetRegion.multiplier,
+      tag: targetRegion.tag,
+      zoneGroup: targetRegion.zoneGroup,
+      crops: targetRegion.crops,
+      lat: targetRegion.center.lat,
+      lng: targetRegion.center.lng
+    }));
     const computed = calculateDynamicRates(zoneId, seasonId);
     setRates(computed);
   };
@@ -244,14 +227,17 @@ export function PricingProvider({ children }) {
 
   // Reset to default
   const resetToDefaultRates = () => {
-    setSelectedZoneId('up_purvanchal');
+    setSelectedZoneId('up_central_purvanchal');
     setSelectedSeasonId('normal_cycle');
-    const defaultRates = calculateDynamicRates('up_purvanchal', 'normal_cycle');
+    const defaultLoc = resolveLocationToAgroZone('Lucknow, Uttar Pradesh');
+    setActiveLocation(defaultLoc);
+    const defaultRates = calculateDynamicRates('up_central_purvanchal', 'normal_cycle');
     setRates(defaultRates);
   };
 
   /**
    * Universal Dynamic Fare Calculator supporting any land unit or time metric
+   * Formula: Rate = Baseline Rate × Regional Multiplier × Selected Farmland Area
    */
   const calculateFare = ({
     machineryType = 'tractor',
@@ -275,6 +261,7 @@ export function PricingProvider({ children }) {
         quantity: km,
         ratePerUnit: perKm,
         baseCharge: base,
+        regionalMultiplier: rates.combinedMultiplier || 1.0,
         breakdownText: `₹${base} (Base) + (${km} Km × ₹${perKm})`,
         formulaText: `Estimated Price = ₹${base} + (${km} Km × ₹${perKm})`
       };
@@ -289,6 +276,7 @@ export function PricingProvider({ children }) {
         unitName: 'Hours',
         quantity: effectiveQty,
         ratePerUnit: baseHourlyRate,
+        regionalMultiplier: rates.combinedMultiplier || 1.0,
         breakdownText: `${effectiveQty} Hours × ₹${baseHourlyRate}/hr`,
         formulaText: `Estimated Price = ${effectiveQty} Hours × ₹${baseHourlyRate}`
       };
@@ -314,6 +302,7 @@ export function PricingProvider({ children }) {
       quantity: effectiveQty,
       ratePerUnit: ratePerChosenUnit,
       equivBigha: equivBigha,
+      regionalMultiplier: rates.combinedMultiplier || 1.0,
       breakdownText: `${effectiveQty} ${unitMeta.labelEn} × ₹${ratePerChosenUnit}`,
       formulaText: `Estimated Price = ${effectiveQty} ${unitMeta.labelEn} × ₹${ratePerChosenUnit} (≈ ${equivBigha} Bigha)`
     };
@@ -324,6 +313,10 @@ export function PricingProvider({ children }) {
       rates, 
       selectedZoneId,
       selectedSeasonId,
+      activeLocation,
+      allPanIndiaRegions: PAN_INDIA_REGIONS,
+      searchableHubs: SEARCHABLE_AGRO_HUBS,
+      resolveAndSetLocation,
       applyRegionalAndSeasonalSurge,
       updateRates, 
       resetToDefaultRates, 
