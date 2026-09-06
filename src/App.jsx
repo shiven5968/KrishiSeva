@@ -67,7 +67,7 @@ function MainContent() {
   if (activeRole === 'admin' || currentUser?.role === 'admin') {
     if (currentUser?.role === 'admin') {
       return (
-        <div className={`min-h-screen flex flex-col transition-colors duration-200 ${isDark ? 'bg-[#090D0B] text-stone-100' : 'bg-slate-50 text-slate-900'}`}>
+        <div className={`min-h-screen flex flex-col transition-colors duration-200 ${isDark ? 'bg-[#090D0B] text-stone-100' : 'bg-[#F2F8F4] text-[#0F172A]'}`}>
           <Navbar 
             onOpenAuthModal={() => setIsAuthModalOpen(true)}
             onOpenSavedLandsModal={() => setIsSavedLandsModalOpen(true)}
@@ -90,7 +90,7 @@ function MainContent() {
   const hasActiveBooking = activeBooking && ['searching', 'accepted', 'arrived', 'in_progress', 'completed'].includes(activeBooking.status);
 
   return (
-    <div className={`min-h-screen flex flex-col transition-colors duration-200 ${isDark ? 'bg-[#090D0B] text-stone-100' : 'bg-slate-50 text-slate-900'}`}>
+    <div className={`min-h-screen flex flex-col transition-colors duration-200 ${isDark ? 'bg-[#090D0B] text-stone-100' : 'bg-[#F2F8F4] text-[#0F172A]'}`}>
       
       {/* Strict Role-Locked Navbar */}
       <Navbar 

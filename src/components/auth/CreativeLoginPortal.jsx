@@ -60,8 +60,6 @@ export default function CreativeLoginPortal() {
   const [isSendingOtp, setIsSendingOtp] = useState(false);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
-  const [activeOtpCode, setActiveOtpCode] = useState('');
-  const [waDeliveryDelayed, setWaDeliveryDelayed] = useState(false);
 
   // Profile Setup States (Role chosen AFTER OTP verification)
   const [userName, setUserName] = useState('');
@@ -154,11 +152,9 @@ export default function CreativeLoginPortal() {
     }
 
     const code = otpResult.code;
-    setActiveOtpCode(code);
     setResendTimer(60);
     setStep('otp');
     setOtp('');
-    setWaDeliveryDelayed(false);
 
     setToastMessage(lang === 'hi' ? `व्हाट्सएप पर ओटीपी भेज दिया गया है (+91 ${cleanPhone})` : `OTP Sent via WhatsApp (+91 ${cleanPhone})`);
     setTimeout(() => setToastMessage(''), 6000);
@@ -168,12 +164,8 @@ export default function CreativeLoginPortal() {
       const waRes = await sendRealWhatsAppOtp(cleanPhone, code, lang);
       setIsSendingOtp(false);
 
-      if (!waRes.success) {
-        setWaDeliveryDelayed(true);
-      }
     } catch (err) {
       setIsSendingOtp(false);
-      setWaDeliveryDelayed(true);
     }
   };
 
@@ -192,9 +184,7 @@ export default function CreativeLoginPortal() {
     }
 
     const code = otpResult.code;
-    setActiveOtpCode(code);
     setResendTimer(60);
-    setWaDeliveryDelayed(false);
 
     setToastMessage(lang === 'hi' ? `नया ओटीपी व्हाट्सएप पर भेज दिया गया है (+91 ${cleanPhone})` : `New OTP Sent via WhatsApp (+91 ${cleanPhone})`);
     setTimeout(() => setToastMessage(''), 6000);
@@ -202,12 +192,8 @@ export default function CreativeLoginPortal() {
     try {
       const waRes = await sendRealWhatsAppOtp(cleanPhone, code, lang);
       setIsSendingOtp(false);
-      if (!waRes.success) {
-        setWaDeliveryDelayed(true);
-      }
     } catch (err) {
       setIsSendingOtp(false);
-      setWaDeliveryDelayed(true);
     }
   };
 
@@ -462,55 +448,53 @@ export default function CreativeLoginPortal() {
         ? 'ट्रैक्टर या हार्वेस्टर मेरे खेत पर कितनी जल्दी पहुंचेगा?' 
         : 'How fast will the tractor or harvester reach my farm?',
       a: lang === 'hi'
-        ? '1-क्लिक इंस्टेंट डिस्पैच के साथ, मलीहाबाद/लखनऊ में आपके खेत के 5 किमी के दायरे में सत्यापित चालकों को तुरंत अलर्ट प्राप्त होता है। मशीनें आमतौर पर 15 से 45 मिनट के भीतर पहुंच जाती हैं।'
+        ? '1-क्लिक इंस्टेंट डिस्पैच के साथ, मलीहाबाद/लखनऊ क्षेत्र में आपके खेत से 5 किमी के दायरे में सभी उपलब्ध ऑपरेटरों को तुरंत अलर्ट भेजा जाता है। मशीनरी आमतौर पर 15 से 45 मिनट के भीतर पहुंच जाती है।'
         : 'With 1-Click Instant Dispatch, verified drivers within a 5 km radius of your field in Malihabad/Lucknow receive alerts instantly. Machinery usually arrives within 15 to 45 minutes.'
     },
     {
       q: lang === 'hi'
-        ? 'किराये की गणना कैसे की जाती है? क्या कोई छिपे हुए शुल्क हैं?'
+        ? 'किराया कैसे तय होता है? क्या कोई छिपा हुआ शुल्क है?'
         : 'How is the price calculated? Are there hidden charges?',
       a: lang === 'hi'
-        ? 'आपके द्वारा पुष्टि करने से पहले प्रति-बीघा या प्रति-घंटा दरें पारदर्शी रूप से प्रदर्शित की जाती हैं। कोई छिपे हुए शुल्क या अप्रत्याशित सर्ज चार्ज नहीं हैं।'
+        ? 'सभी कीमतें पारदर्शी रूप से प्रति-बीघा या प्रति-घंटे पहले ही दिखाई जाती हैं। कोई छुपा हुआ शुल्क या अप्रत्याशित सर्ज प्राइसिंग नहीं है।'
         : 'Rates are transparently displayed per-bigha or hourly before you confirm. There are zero hidden fees or unexpected surge costs.'
     },
     {
       q: lang === 'hi'
-        ? 'क्या मैं नकद भुगतान कर सकता हूँ या ऑनलाइन भुगतान अनिवार्य है?'
+        ? 'क्या मैं नकद भुगतान कर सकता हूँ या ऑनलाइन अनिवार्य है?'
         : 'Can I pay in cash or is online payment mandatory?',
       a: lang === 'hi'
-        ? 'आप कार्य पूरा होने के बाद सीधे चालक को नकद भुगतान कर सकते हैं या ऐप में उनका यूपीआई क्यूआर कोड स्कैन कर सकते हैं।'
+        ? 'हाँ! आप कार्य पूर्ण होने के बाद सीधे ड्राइवर को नकद भुगतान कर सकते हैं या ऐप में उनके यूपीआई क्यूआर को स्कैन कर सकते हैं।'
         : 'You can pay cash directly to the driver after work completion or scan their UPI QR code in the app.'
     },
     {
       q: lang === 'hi'
-        ? 'क्या होगा यदि मेरा खेत औपचारिक पते के बिना किसी आंतरिक गाँव में है?'
+        ? 'यदि मेरा खेत किसी गांव के आंतरिक क्षेत्र में है जिसका पता नहीं है?'
         : 'What if my field is in an interior village without a formal address?',
       a: lang === 'hi'
-        ? 'कृषिसेवा एग्रीस्टैक भूलेख भूमि अभिलेखों के साथ एकीकृत उच्च-सटीक जीपीएस रडार का उपयोग करता है। बस हमारे सैटेलाइट मानचित्र पर सीधे अपने खेत का चयन करें।'
+        ? 'कृषिसेवा एग्रीस्टैक भू-अभिलेख और उच्च-सटीक जीपीएस रडार से लैस है। बस अपने खेत का चयन सीधे हमारे सैटेलाइट मैप पर करें।'
         : 'KrishiSeva uses high-precision GPS radar integrated with AgriStack UPFR land records. Simply select your field directly on our satellite map.'
     },
     {
       q: lang === 'hi'
-        ? 'क्या चालक और मशीनरी सत्यापित हैं?'
+        ? 'क्या ड्राइवर और मशीनरी सत्यापित हैं?'
         : 'Are drivers and machinery verified?',
       a: lang === 'hi'
-        ? 'हाँ! प्रत्येक बेड़े के मालिक और ऑपरेटर का 100% केवाईसी सत्यापन, ड्राइविंग लाइसेंस प्रमाणीकरण और वाहन की स्थिति की जांच की जाती है।'
+        ? 'बिल्कुल! प्रत्येक फ्लीट ओनर और ऑपरेटर का 100% बायोमेट्रिक सत्यापन, ड्राइविंग लाइसेंस प्रमाणीकरण और वाहन की स्थिति की जांच की जाती है।'
         : 'Yes! Every fleet owner and operator undergoes strict 100% KYC verification, driving license authentication, and vehicle condition checks.'
     }
   ];
 
   return (
     <div className={`min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-stone-950 font-sans relative overflow-x-hidden transition-colors duration-200 ${
-      isDark ? 'bg-[#05080C] text-stone-100' : 'bg-slate-50 text-slate-900'
+      isDark ? 'bg-[#05080C] text-stone-100' : 'bg-[#F2F8F4] text-[#0F172A]'
     }`}>
       
-
-
       {/* ═══════════ SEAMLESS FULL-WIDTH NAVBAR ═══════════ */}
       <header className={`w-full fixed top-0 left-0 right-0 z-50 px-8 pt-6 pb-4 flex items-center justify-between border-b shadow-sm transition-colors duration-200 ${
         isDark 
           ? 'bg-black/20 backdrop-blur-xl border-white/10' 
-          : 'bg-white/60 backdrop-blur-xl border-slate-200/80'
+          : 'bg-[#F2F8F4]/80 backdrop-blur-xl border-b border-emerald-900/10 text-[#0F172A]'
       }`}>
         {/* Brand Logo (Far Left) */}
         <div 
@@ -522,8 +506,8 @@ export default function CreativeLoginPortal() {
             alt="KrishiSeva Logo" 
             className="h-9 w-auto object-contain transition-transform duration-200 hover:scale-105 rounded-xl" 
           />
-          <span className={`text-xl font-extrabold tracking-tight transition-all duration-300 group-hover:text-emerald-450 ${
-            isDark ? 'text-white' : 'text-slate-900'
+          <span className={`text-xl font-extrabold tracking-tight transition-all duration-300 group-hover:text-emerald-500 ${
+            isDark ? 'text-white' : 'text-[#0F172A]'
           }`}>
             KrishiSeva
           </span>
@@ -551,23 +535,23 @@ export default function CreativeLoginPortal() {
           {/* Admin Login Quick Link */}
           <button
             onClick={() => setActiveRole('admin')}
-            className={`text-xs px-3.5 py-1.5 rounded-full border transition-all active:scale-95 flex items-center gap-1.5 ${
+            className={`text-xs px-3.5 py-1.5 rounded-full border transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer ${
               isDark 
                 ? 'bg-stone-900/90 hover:bg-stone-800/90 border-stone-800/80 text-stone-300 hover:border-emerald-500/30 hover:text-white' 
-                : 'bg-white/90 hover:bg-slate-50 border-slate-200 text-slate-700 hover:border-emerald-500/40 hover:text-slate-900 shadow-sm'
+                : 'bg-white/90 hover:bg-emerald-50/80 border-emerald-900/15 text-[#0F172A] hover:border-emerald-500/40 shadow-sm'
             }`}
           >
-            <Lock className={`w-3.5 h-3.5 ${isDark ? 'text-stone-400' : 'text-slate-550'}`} />
+            <Lock className={`w-3.5 h-3.5 ${isDark ? 'text-stone-400' : 'text-emerald-600'}`} />
             <span>{lang === 'hi' ? 'एडमिन लॉगिन' : 'Admin Login'}</span>
           </button>
 
           {/* Dark / Light Theme Switcher */}
           <button
             onClick={toggleTheme}
-            className={`text-xs px-3.5 py-1.5 rounded-full border transition-all active:scale-95 flex items-center gap-1.5 ${
+            className={`text-xs px-3.5 py-1.5 rounded-full border transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer ${
               isDark 
                 ? 'bg-stone-900/90 hover:bg-stone-800/90 border-stone-800/80 text-stone-300 hover:border-emerald-500/30 hover:text-white' 
-                : 'bg-white/90 hover:bg-slate-50 border-slate-200 text-slate-700 hover:border-emerald-500/40 hover:text-slate-900 shadow-sm'
+                : 'bg-white/90 hover:bg-emerald-50/80 border-emerald-900/15 text-[#0F172A] hover:border-emerald-500/40 shadow-sm'
             }`}
             title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
           >
@@ -578,7 +562,7 @@ export default function CreativeLoginPortal() {
               </>
             ) : (
               <>
-                <Moon className="w-3.5 h-3.5 text-indigo-500" />
+                <Moon className="w-3.5 h-3.5 text-indigo-600" />
                 <span>Dark</span>
               </>
             )}
@@ -587,13 +571,13 @@ export default function CreativeLoginPortal() {
           {/* Language Switcher */}
           <button
             onClick={toggleLanguage}
-            className={`text-xs px-3.5 py-1.5 rounded-full border transition-all active:scale-95 flex items-center gap-1.5 ${
+            className={`text-xs px-3.5 py-1.5 rounded-full border transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer ${
               isDark 
                 ? 'bg-stone-900/90 hover:bg-stone-800/90 border-stone-800/80 text-stone-300 hover:border-emerald-500/30 hover:text-white' 
-                : 'bg-white/90 hover:bg-slate-50 border-slate-200 text-slate-700 hover:border-emerald-500/40 hover:text-slate-900 shadow-sm'
+                : 'bg-white/90 hover:bg-emerald-50/80 border-emerald-900/15 text-[#0F172A] hover:border-emerald-500/40 shadow-sm'
             }`}
           >
-            <Globe className="w-3.5 h-3.5 text-emerald-550" />
+            <Globe className="w-3.5 h-3.5 text-emerald-500" />
             <span>{lang === 'hi' ? 'English' : 'हिंदी'}</span>
           </button>
         </div>
@@ -619,11 +603,11 @@ export default function CreativeLoginPortal() {
           >
             <source src="/videos/hero_field_bg.mp4" type="video/mp4" />
           </video>
-          {/* Soft Vignette Overlay for Crisp Readability */}
+          {/* Subtle Dark Mint/Slate Vignette Gradient Overlay for Crisp Legibility */}
           <div className={`absolute inset-0 backdrop-blur-[2px] transition-colors duration-300 ${
             isDark 
-              ? 'bg-gradient-to-b from-black/50 via-transparent to-black/40' 
-              : 'bg-gradient-to-b from-white/40 via-transparent to-white/30'
+              ? 'bg-gradient-to-r from-slate-950/80 via-slate-950/50 to-slate-950/30' 
+              : 'bg-gradient-to-r from-slate-950/75 via-slate-950/45 to-transparent'
           }`} />
         </div>
 
@@ -886,30 +870,7 @@ export default function CreativeLoginPortal() {
                     </div>
                   )}
 
-                  {/* WhatsApp Delayed Fallback Notice */}
-                  {waDeliveryDelayed && (
-                    <div className="p-3.5 rounded-2xl bg-emerald-950/70 border border-emerald-600/50 text-emerald-200 text-xs flex items-center justify-between gap-2 shadow-lg animate-fade-in">
-                      <div className="flex items-center gap-2">
-                        <span className="text-base">⚡</span>
-                        <div>
-                          <span className="text-[10px] text-stone-400 uppercase tracking-wider block font-bold">
-                            {lang === 'hi' ? 'व्हाट्सएप विलंब • फॉलबैक कोड:' : 'WhatsApp Delayed • Fallback Code:'}
-                          </span>
-                          <span className="font-mono text-base font-black text-emerald-400 tracking-wider">
-                            {activeOtpCode}
-                          </span>
-                        </div>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => setOtp(activeOtpCode)}
-                        className="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-black text-[11px] transition-all shadow-md active:scale-95"
-                      >
-                        {lang === 'hi' ? 'ओटीपी भरें ✓' : 'Auto Fill ✓'}
-                      </button>
-                    </div>
-                  )}
-
+                  
                   <form onSubmit={handleVerifyOtp} className="space-y-4">
                     <div>
                       <input
@@ -951,7 +912,7 @@ export default function CreativeLoginPortal() {
                     <div className="flex gap-2 pt-1">
                       <button
                         type="button"
-                        onClick={() => { setStep('phone'); setOtp(''); setError(''); setWaDeliveryDelayed(false); }}
+                        onClick={() => { setStep('phone'); setOtp(''); setError(''); }}
                         className="w-1/3 py-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 text-slate-350 font-bold text-xs transition-all duration-200 hover:border-emerald-500/40 hover:text-white"
                       >
                         {lang === 'hi' ? 'नंबर बदलें' : 'Change Number'}

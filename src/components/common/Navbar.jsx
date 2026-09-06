@@ -88,8 +88,8 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
 
   return (
     <>
-      <header className={`sticky top-0 z-50 backdrop-blur-md border-b shadow-md transition-colors duration-200 ${
-        isDark ? 'bg-[#0B0F12]/95 border-stone-800 text-stone-100' : 'bg-white/95 border-slate-200 text-slate-900'
+      <header className={`sticky top-0 z-50 backdrop-blur-md border-b shadow-sm transition-colors duration-200 ${
+        isDark ? 'bg-[#0B0F12]/95 border-stone-800 text-stone-100' : 'bg-[#F2F8F4]/85 backdrop-blur-md border-emerald-900/10 text-[#0F172A]'
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
           
@@ -160,31 +160,31 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
                     ? 'border-emerald-500/80 bg-emerald-950/40 text-white ring-2 ring-emerald-500/30' 
                     : isDark 
                       ? 'bg-stone-900/90 hover:bg-stone-850 border-stone-800 text-stone-200 hover:border-emerald-500/40' 
-                      : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-900 shadow-sm'
+                      : 'bg-white/90 hover:bg-emerald-50/60 border-emerald-900/10 text-[#0F172A] shadow-sm'
                 }`}
                 title="Open Profile & Settings Menu"
               >
                 {/* User Avatar */}
-                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center text-stone-950 font-bold text-sm shadow-inner shrink-0">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center text-stone-950 font-bold text-sm shadow-inner shrink-0">
                   {currentUser.role === 'farmer' ? '🌾' : currentUser.role === 'driver' ? '🚜' : '🛡️'}
                 </div>
 
                 {/* User Name & Role Tag */}
                 <div className="text-left hidden sm:block">
-                  <div className="font-extrabold text-xs leading-tight max-w-[110px] truncate">
+                  <div className="font-extrabold text-xs leading-tight max-w-[110px] truncate text-inherit">
                     {currentUser.name?.split(' ')[0] || currentUser.name || 'Balram'}
                   </div>
-                  <div className="text-[9px] uppercase font-black text-emerald-400 tracking-wider leading-none mt-0.5">
+                  <div className="text-[9px] uppercase font-black text-emerald-600 dark:text-emerald-400 tracking-wider leading-none mt-0.5">
                     {currentUser.role}
                   </div>
                 </div>
 
                 {/* Hamburger Icon (☰) */}
                 <div className={`w-6 h-6 rounded-lg flex items-center justify-center transition-colors ml-0.5 ${
-                  isDark ? 'bg-stone-800 text-stone-200' : 'bg-slate-100 text-slate-700'
+                  isDark ? 'bg-stone-800 text-stone-200' : 'bg-emerald-50 text-emerald-800'
                 }`}>
                   {isMenuOpen ? (
-                    <X className="w-4 h-4 text-emerald-400" />
+                    <X className="w-4 h-4 text-emerald-500" />
                   ) : (
                     <Menu className="w-4 h-4" />
                   )}
@@ -206,11 +206,11 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
                   type="button"
                   onClick={() => setIsMenuOpen(prev => !prev)}
                   className={`p-2 rounded-xl border transition active:scale-95 ${
-                    isDark ? 'bg-stone-900 border-stone-800 text-stone-200' : 'bg-slate-100 border-slate-200 text-slate-700'
+                    isDark ? 'bg-stone-900 border-stone-800 text-stone-200' : 'bg-white/90 border-emerald-900/10 text-[#0F172A]'
                   }`}
                   title="Preferences"
                 >
-                  {isMenuOpen ? <X className="w-4 h-4 text-emerald-400" /> : <Menu className="w-4 h-4" />}
+                  {isMenuOpen ? <X className="w-4 h-4 text-emerald-500" /> : <Menu className="w-4 h-4" />}
                 </button>
               </div>
             )}
@@ -220,13 +220,13 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
               <div className={`absolute right-0 mt-2.5 w-72 sm:w-80 rounded-3xl p-4 border shadow-2xl z-50 animate-fade-in space-y-4 backdrop-blur-2xl transition-all ${
                 isDark 
                   ? 'bg-stone-950/95 border-emerald-500/30 text-white shadow-black/80' 
-                  : 'bg-white/98 border-slate-200 text-slate-900 shadow-2xl shadow-slate-300/60'
+                  : 'bg-white/95 border-emerald-900/10 text-[#0F172A] shadow-2xl shadow-emerald-950/10'
               }`}>
                 
                 {/* Profile Header (If Authenticated) */}
                 {currentUser && currentUser.isAuthenticated && (
                   <div className={`p-3.5 rounded-2xl border flex items-center gap-3 ${
-                    isDark ? 'bg-stone-900/80 border-stone-800' : 'bg-slate-50 border-slate-200'
+                    isDark ? 'bg-stone-900/80 border-stone-800' : 'bg-[#F2F8F4] border-emerald-900/10'
                   }`}>
                     <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center text-stone-950 font-bold text-base shadow-md shrink-0">
                       {currentUser.role === 'farmer' ? '🌾' : currentUser.role === 'driver' ? '🚜' : '🛡️'}
@@ -261,14 +261,14 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
                         setIsMenuOpen(false);
                         setIsHistoryModalOpen(true);
                       }}
-                      className={`w-full p-2.5 rounded-xl border flex items-center justify-between text-xs font-bold transition active:scale-98 ${
+                      className={`w-full p-2.5 rounded-xl border flex items-center justify-between text-xs font-bold transition active:scale-98 cursor-pointer ${
                         isDark 
                           ? 'bg-stone-900/60 hover:bg-emerald-950/40 border-stone-800/80 hover:border-emerald-500/40 text-stone-200 hover:text-emerald-300' 
-                          : 'bg-slate-50 hover:bg-emerald-50 border-slate-200 hover:border-emerald-200 text-slate-800 hover:text-emerald-800'
+                          : 'bg-[#F2F8F4] hover:bg-emerald-50/80 border-emerald-900/10 hover:border-emerald-500/30 text-[#0F172A] hover:text-emerald-900'
                       }`}
                     >
                       <div className="flex items-center gap-2.5">
-                        <History className="w-4 h-4 text-emerald-400" />
+                        <History className="w-4 h-4 text-emerald-500" />
                         <span>{lang === 'hi' ? 'मेरी बुकिंग इतिहास' : 'My History'}</span>
                       </div>
                       <ChevronRight className="w-3.5 h-3.5 text-stone-400" />
@@ -281,17 +281,17 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
                         setIsMenuOpen(false);
                         setIsPreBookingsModalOpen(true);
                       }}
-                      className={`w-full p-2.5 rounded-xl border flex items-center justify-between text-xs font-bold transition active:scale-98 ${
+                      className={`w-full p-2.5 rounded-xl border flex items-center justify-between text-xs font-bold transition active:scale-98 cursor-pointer ${
                         isDark 
                           ? 'bg-stone-900/60 hover:bg-blue-950/40 border-stone-800/80 hover:border-blue-500/40 text-stone-200 hover:text-blue-300' 
-                          : 'bg-slate-50 hover:bg-blue-50 border-slate-200 hover:border-blue-200 text-slate-800 hover:text-blue-800'
+                          : 'bg-[#F2F8F4] hover:bg-emerald-50/80 border-emerald-900/10 hover:border-emerald-500/30 text-[#0F172A] hover:text-emerald-900'
                       }`}
                     >
                       <div className="flex items-center gap-2.5">
-                        <Calendar className="w-4 h-4 text-blue-400" />
+                        <Calendar className="w-4 h-4 text-emerald-600" />
                         <span>{lang === 'hi' ? 'अग्रिम बुकिंग' : 'Pre-Bookings'}</span>
                       </div>
-                      <span className="text-[10px] font-black text-blue-400 bg-blue-950/80 px-2 py-0.5 rounded-md border border-blue-500/30">
+                      <span className="text-[10px] font-black text-emerald-700 dark:text-blue-400 bg-emerald-100/80 dark:bg-blue-950/80 px-2 py-0.5 rounded-md border border-emerald-300 dark:border-blue-500/30">
                         {preBookings?.length || 0}
                       </span>
                     </button>
@@ -303,17 +303,17 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
                         setIsMenuOpen(false);
                         setIsSavedLandsModalOpen(true);
                       }}
-                      className={`w-full p-2.5 rounded-xl border flex items-center justify-between text-xs font-bold transition active:scale-98 ${
+                      className={`w-full p-2.5 rounded-xl border flex items-center justify-between text-xs font-bold transition active:scale-98 cursor-pointer ${
                         isDark 
                           ? 'bg-stone-900/60 hover:bg-emerald-950/40 border-stone-800/80 hover:border-emerald-500/40 text-stone-200 hover:text-emerald-300' 
-                          : 'bg-slate-50 hover:bg-emerald-50 border-slate-200 hover:border-emerald-200 text-slate-800 hover:text-emerald-800'
+                          : 'bg-[#F2F8F4] hover:bg-emerald-50/80 border-emerald-900/10 hover:border-emerald-500/30 text-[#0F172A] hover:text-emerald-900'
                       }`}
                     >
                       <div className="flex items-center gap-2.5">
-                        <Bookmark className="w-4 h-4 text-emerald-400" />
+                        <Bookmark className="w-4 h-4 text-emerald-500" />
                         <span>{lang === 'hi' ? 'मेरे सहेजे गए खेत' : 'My Saved Lands'}</span>
                       </div>
-                      <span className="text-[10px] font-black text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded-md border border-emerald-500/30">
+                      <span className="text-[10px] font-black text-emerald-700 dark:text-emerald-400 bg-emerald-100/80 dark:bg-emerald-950/80 px-2 py-0.5 rounded-md border border-emerald-300 dark:border-emerald-500/30">
                         {savedLands?.length || 0}
                       </span>
                     </button>
@@ -321,9 +321,9 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
                 )}
 
                 {/* 2. ⚙️ PREFERENCES & ACCOUNT */}
-                <div className={`space-y-1.5 ${currentUser?.role === 'farmer' ? 'pt-2 border-t border-white/10' : ''}`}>
+                <div className={`space-y-1.5 ${currentUser?.role === 'farmer' ? 'pt-2 border-t border-emerald-900/10 dark:border-white/10' : ''}`}>
                   <span className={`text-[10px] font-black uppercase tracking-wider block px-1 ${
-                    isDark ? 'text-stone-400' : 'text-slate-500'
+                    isDark ? 'text-stone-400' : 'text-[#1E293B]'
                   }`}>
                     ⚙️ {lang === 'hi' ? 'प्राथमिकताएं व खाता' : 'Preferences & Account'}
                   </span>
@@ -332,10 +332,10 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
                   <button
                     type="button"
                     onClick={toggleTheme}
-                    className={`w-full p-2.5 rounded-xl border flex items-center justify-between text-xs font-bold transition active:scale-98 ${
+                    className={`w-full p-2.5 rounded-xl border flex items-center justify-between text-xs font-bold transition active:scale-98 cursor-pointer ${
                       isDark 
                         ? 'bg-stone-900/60 hover:bg-stone-900 border-stone-800/80 text-stone-200' 
-                        : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-800'
+                        : 'bg-[#F2F8F4] hover:bg-emerald-50/80 border-emerald-900/10 text-[#0F172A]'
                     }`}
                   >
                     <div className="flex items-center gap-2.5">
@@ -347,7 +347,7 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
                       <span>{lang === 'hi' ? 'थीम मोड' : 'Switch Theme Mode'}</span>
                     </div>
                     <span className={`text-[10px] font-black px-2 py-0.5 rounded-lg border ${
-                      isDark ? 'bg-stone-800 text-amber-300 border-amber-500/30' : 'bg-white text-indigo-700 border-indigo-200'
+                      isDark ? 'bg-stone-800 text-amber-300 border-amber-500/30' : 'bg-white text-emerald-800 border-emerald-200'
                     }`}>
                       {isDark ? '🌙 Dark' : '☀️ Light'}
                     </span>
@@ -357,10 +357,10 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
                   <button
                     type="button"
                     onClick={toggleLanguage}
-                    className={`w-full p-2.5 rounded-xl border flex items-center justify-between text-xs font-bold transition active:scale-98 ${
+                    className={`w-full p-2.5 rounded-xl border flex items-center justify-between text-xs font-bold transition active:scale-98 cursor-pointer ${
                       isDark 
                         ? 'bg-stone-900/60 hover:bg-stone-900 border-stone-800/80 text-stone-200' 
-                        : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-800'
+                        : 'bg-[#F2F8F4] hover:bg-emerald-50/80 border-emerald-900/10 text-[#0F172A]'
                     }`}
                   >
                     <div className="flex items-center gap-2.5">
@@ -368,9 +368,9 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
                       <span>{lang === 'hi' ? 'भाषा (Language)' : 'Language'}</span>
                     </div>
                     <span className={`text-[10px] font-black px-2 py-0.5 rounded-lg border ${
-                      isDark ? 'bg-stone-800 text-emerald-300 border-emerald-500/30' : 'bg-white text-emerald-700 border-emerald-200'
+                      isDark ? 'bg-stone-800 text-emerald-300 border-emerald-500/30' : 'bg-white text-emerald-800 border-emerald-200'
                     }`}>
-                      {lang === 'hi' ? '🇮🇳 हिंदी' : '🌐 English'}
+                      {lang === 'hi' ? 'हिंदी' : 'English'}
                     </span>
                   </button>
 
