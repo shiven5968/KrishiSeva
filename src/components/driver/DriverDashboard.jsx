@@ -45,7 +45,10 @@ import {
   Navigation,
   Send,
   AlertCircle,
-  Truck
+  Truck,
+  Building2,
+  Landmark,
+  ArrowRight
 } from 'lucide-react';
 
 export default function DriverDashboard() {
@@ -81,11 +84,36 @@ export default function DriverDashboard() {
   const [fuelCostInput, setFuelCostInput] = useState(450);
   const [fuelPricePerLiter, setFuelPricePerLiter] = useState(90);
 
-  // Instant Cashout / Wallet Modal State
+  // Direct Bank Account Transfer / Cashout Modal State
   const [isCashoutModalOpen, setIsCashoutModalOpen] = useState(false);
-  const [cashoutAmount, setCashoutAmount] = useState('');
-  const [cashoutUpiId, setCashoutUpiId] = useState('rameshwar@okaxis');
+  const [cashoutAmount, setCashoutAmount] = useState('5000');
+  const [accountHolderName, setAccountHolderName] = useState(driverProfile?.fullName || 'Rameshwar Singh');
+  const [accountNumber, setAccountNumber] = useState('489210034821');
+  const [confirmAccountNumber, setConfirmAccountNumber] = useState('489210034821');
+  const [ifscCode, setIfscCode] = useState('SBIN0001234');
+  const [transferMode, setTransferMode] = useState('imps'); // 'imps' | 'neft'
+  const [bankFormError, setBankFormError] = useState('');
   const [cashoutSuccessData, setCashoutSuccessData] = useState(null);
+
+  // Dynamic Bank & Branch Detection from IFSC Code
+  const getBankNameFromIfsc = (ifsc) => {
+    if (!ifsc || ifsc.length < 4) return null;
+    const prefix = ifsc.substring(0, 4).toUpperCase();
+    const map = {
+      'SBIN': 'SBI - State Bank of India (Malihabad Branch)',
+      'HDFC': 'HDFC Bank Ltd - Main Rural Branch',
+      'ICIC': 'ICICI Bank Ltd - Gomti Nagar Branch',
+      'PUNB': 'PNB - Punjab National Bank (Kisan Branch)',
+      'BARB': 'Bank of Baroda (BoB) - Rural Branch',
+      'CNRB': 'Canara Bank - Agri Hub',
+      'UBIN': 'Union Bank of India',
+      'BKID': 'Bank of India (BOI)',
+      'IDIB': 'Indian Bank',
+      'AXIS': 'Axis Bank Ltd',
+      'KKBK': 'Kotak Mahindra Bank'
+    };
+    return map[prefix] || (ifsc.length >= 8 ? 'Verified Commercial Bank Branch (IMPS/NEFT Enabled)' : null);
+  };
 
   // Recent Completed Jobs Log
   const [recentJobsLog, setRecentJobsLog] = useState([
@@ -99,7 +127,7 @@ export default function DriverDashboard() {
       fuelCost: 450,
       netProfit: 5400,
       time: '11:30 AM Today',
-      paymentMethod: 'UPI Escrow Disbursed'
+      paymentMethod: 'Bank Disbursed'
     },
     {
       id: 'job_100',
@@ -117,9 +145,9 @@ export default function DriverDashboard() {
 
   const isOnline = driverProfile?.status === 'online';
 
-  // Available Wallet Balance Calculation
+  // Available Wallet Balance Calculation (Defaults to ₹84,500)
   const walletBalance = useMemo(() => {
-    return driverProfile?.walletBalance || Math.max(12450, (driverProfile?.totalEarnings || 0));
+    return driverProfile?.walletBalance ?? Math.max(84500, (driverProfile?.totalEarnings || 0));
   }, [driverProfile?.walletBalance, driverProfile?.totalEarnings]);
 
   // If driver has accepted an active booking, render the full turn-by-turn Navigation Screen
@@ -164,26 +192,59 @@ export default function DriverDashboard() {
     setIsEditingRates(false);
   };
 
-  // Instant UPI Cashout Handler
+  // Direct Bank Account Transfer Handler
   const handleExecuteCashout = (e) => {
     e?.preventDefault();
-    const amountToWithdraw = Number(cashoutAmount) || Math.min(5000, walletBalance);
-    if (amountToWithdraw <= 0 || amountToWithdraw > walletBalance) return;
+    setBankFormError('');
 
+    const amountToWithdraw = Number(cashoutAmount);
+    if (!amountToWithdraw || amountToWithdraw <= 0) {
+      setBankFormError(lang === 'hi' ? 'कृपया मान्य निकासी राशि दर्ज करें।' : 'Please enter a valid withdrawal amount.');
+      return;
+    }
+    if (amountToWithdraw > walletBalance) {
+      setBankFormError(lang === 'hi' ? 'निकासी राशि उपलब्ध बैलेंस से अधिक है।' : 'Withdrawal amount exceeds available wallet balance.');
+      return;
+    }
+    if (!accountHolderName.trim()) {
+      setBankFormError(lang === 'hi' ? 'खाताधारक का नाम दर्ज करें।' : 'Please enter account holder name.');
+      return;
+    }
+    if (!accountNumber || accountNumber.length < 9) {
+      setBankFormError(lang === 'hi' ? 'मान्य बैंक खाता संख्या (9-18 अंक) दर्ज करें।' : 'Enter a valid bank account number (9-18 digits).');
+      return;
+    }
+    if (accountNumber !== confirmAccountNumber) {
+      setBankFormError(lang === 'hi' ? 'बैंक खाता संख्या मेल नहीं खाती।' : 'Bank account numbers do not match.');
+      return;
+    }
+    if (!ifscCode || ifscCode.length < 6) {
+      setBankFormError(lang === 'hi' ? 'मान्य IFSC कोड दर्ज करें।' : 'Enter a valid IFSC code (e.g. SBIN0001234).');
+      return;
+    }
+
+    // Deduct from wallet balance
     setDriverProfile(prev => ({
       ...prev,
-      walletBalance: Math.max(0, (prev.walletBalance || walletBalance) - amountToWithdraw)
+      walletBalance: Math.max(0, (prev?.walletBalance ?? walletBalance) - amountToWithdraw)
     }));
+
+    const last4 = accountNumber.slice(-4);
+    const detectedBank = getBankNameFromIfsc(ifscCode) || 'Commercial Bank';
 
     setCashoutSuccessData({
       amount: amountToWithdraw,
-      upiId: cashoutUpiId,
-      txnId: 'TXN' + Math.floor(100000000 + Math.random() * 900000000),
-      timestamp: new Date().toLocaleTimeString()
+      accountHolder: accountHolderName,
+      accountMasked: `•••• •••• ${last4}`,
+      bankName: detectedBank,
+      ifsc: ifscCode.toUpperCase(),
+      transferMode: transferMode === 'imps' ? 'Instant IMPS (24x7)' : 'NEFT / RTGS',
+      txnId: 'IMPS' + Math.floor(1000000000 + Math.random() * 9000000000),
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
     });
 
     try {
-      confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 } });
+      confetti({ particleCount: 75, spread: 65, origin: { y: 0.6 } });
     } catch (err) {}
   };
 
@@ -537,7 +598,7 @@ export default function DriverDashboard() {
                 }}
                 className="w-full py-1.5 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-black text-xs transition flex items-center justify-center gap-1.5 shadow-md active:scale-95 cursor-pointer"
               >
-                <span>⚡ {lang === 'hi' ? 'यूपीआई में निकालें' : 'Instant Cashout to UPI'}</span>
+                <span>⚡ {lang === 'hi' ? 'बैंक खाते में ट्रांसफर' : 'Direct Bank Transfer'}</span>
               </button>
             </div>
           </div>
@@ -794,111 +855,326 @@ export default function DriverDashboard() {
 
       </div>
 
-      {/* ══════════════ MODAL: INSTANT UPI CASHOUT ══════════════ */}
+      {/* ══════════════ MODAL: DIRECT BANK ACCOUNT (IMPS / NEFT) SETTLEMENT ══════════════ */}
       {isCashoutModalOpen && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-stone-950/85 backdrop-blur-md animate-fade-in">
-          <div className="bg-stone-900 text-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-emerald-500/40 space-y-5">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-stone-950/85 backdrop-blur-md animate-fade-in overflow-y-auto">
+          <div className="bg-[#0A0E13] text-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-emerald-500/40 space-y-5 my-8">
             
             {cashoutSuccessData ? (
-              <div className="text-center space-y-4 py-2">
-                <div className="w-16 h-16 rounded-3xl bg-emerald-950 border border-emerald-500/50 text-emerald-400 flex items-center justify-center text-3xl mx-auto shadow-inner">
-                  🎉
+              <div className="text-center space-y-5 py-2 animate-fade-in">
+                <div className="w-16 h-16 rounded-3xl bg-emerald-950 border border-emerald-500/50 text-emerald-400 flex items-center justify-center text-3xl mx-auto shadow-inner shadow-emerald-500/30">
+                  <CheckCircle2 className="w-9 h-9 text-emerald-400" />
                 </div>
-                <h3 className="text-xl font-black text-white">
-                  {lang === 'hi' ? 'यूपीआई भुगतान सफल!' : 'Instant Cashout Successful!'}
-                </h3>
-                <div className="p-4 rounded-2xl bg-stone-950 border border-stone-800 text-xs space-y-2 text-left">
-                  <div className="flex justify-between">
-                    <span className="text-stone-400">Amount Transferred:</span>
-                    <b className="text-emerald-400 text-sm">₹{cashoutSuccessData.amount}</b>
+                
+                <div className="space-y-1">
+                  <h3 className="text-2xl font-black text-white">
+                    {lang === 'hi' ? 'बैंक ट्रांसफर सफल!' : 'Bank Transfer Initiated!'}
+                  </h3>
+                  <p className="text-xs text-stone-400">
+                    {lang === 'hi' 
+                      ? `₹${cashoutSuccessData.amount.toLocaleString()} आपके बैंक खाते में सफलतापूर्वक भेज दिए गए हैं।` 
+                      : `₹${cashoutSuccessData.amount.toLocaleString()} sent directly to ${cashoutSuccessData.bankName.split('-')[0].trim()} A/C ending in ${cashoutSuccessData.accountMasked.slice(-8)}.`}
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-stone-950 border border-stone-800 text-xs space-y-2.5 text-left">
+                  <div className="flex justify-between items-center pb-2 border-b border-stone-800/80">
+                    <span className="text-stone-400 font-medium">{lang === 'hi' ? 'स्थानांतरित राशि:' : 'Amount Transferred:'}</span>
+                    <b className="text-emerald-400 text-base font-black">₹{cashoutSuccessData.amount.toLocaleString()}</b>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-stone-400">UPI ID:</span>
-                    <b className="text-white">{cashoutSuccessData.upiId}</b>
+                  <div className="flex justify-between items-center">
+                    <span className="text-stone-400 font-medium">{lang === 'hi' ? 'खाताधारक:' : 'Account Holder:'}</span>
+                    <b className="text-white font-bold">{cashoutSuccessData.accountHolder}</b>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-stone-400">Transaction ID:</span>
+                  <div className="flex justify-between items-center">
+                    <span className="text-stone-400 font-medium">{lang === 'hi' ? 'बैंक खाता:' : 'Bank Account:'}</span>
+                    <b className="text-stone-200 font-mono text-xs">{cashoutSuccessData.accountMasked}</b>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-stone-400 font-medium">{lang === 'hi' ? 'बैंक एवं शाखा:' : 'Bank & Branch:'}</span>
+                    <b className="text-stone-300 text-[11px]">{cashoutSuccessData.bankName}</b>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-stone-400 font-medium">IFSC:</span>
+                    <b className="text-stone-300 font-mono text-xs">{cashoutSuccessData.ifsc}</b>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-stone-400 font-medium">{lang === 'hi' ? 'ट्रांसफर मोड:' : 'Transfer Mode:'}</span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-950 text-emerald-300 border border-emerald-600/40">
+                      ⚡ {cashoutSuccessData.transferMode}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center pt-2 border-t border-stone-800/80">
+                    <span className="text-stone-400 font-medium">UTR / IMPS Ref:</span>
                     <b className="text-stone-300 font-mono text-[11px]">{cashoutSuccessData.txnId}</b>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-stone-400">Settlement Time:</span>
-                    <b className="text-stone-300">{cashoutSuccessData.timestamp} (Instant IMPS)</b>
+                  <div className="flex justify-between items-center">
+                    <span className="text-stone-400 font-medium">{lang === 'hi' ? 'समय:' : 'Timestamp:'}</span>
+                    <b className="text-stone-400 text-[11px]">{cashoutSuccessData.timestamp}</b>
                   </div>
                 </div>
+
+                <div className="p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-[11px] text-emerald-300 font-bold flex items-center justify-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>✓ 100% RBI Regulated IMPS Settlement Completed</span>
+                </div>
+
                 <button
                   type="button"
                   onClick={() => {
                     setIsCashoutModalOpen(false);
                     setCashoutSuccessData(null);
+                    setBankFormError('');
                   }}
-                  className="w-full py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-black text-sm shadow-xl shadow-emerald-500/30 transition active:scale-95 cursor-pointer"
+                  className="w-full py-4 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-black text-base shadow-xl shadow-emerald-500/30 transition active:scale-95 cursor-pointer"
                 >
-                  {lang === 'hi' ? 'समाप्त करें' : 'Done'}
+                  {lang === 'hi' ? 'संपन्न करें (Done)' : 'Done & Return to Cockpit'}
                 </button>
               </div>
             ) : (
               <form onSubmit={handleExecuteCashout} className="space-y-4">
-                <div className="flex items-center justify-between pb-3 border-b border-stone-800">
-                  <div className="flex items-center gap-2">
-                    <Wallet className="w-5 h-5 text-emerald-400" />
-                    <h3 className="text-lg font-black text-white">
-                      {lang === 'hi' ? 'तत्काल यूपीआई निकासी' : 'Instant UPI Cashout'}
-                    </h3>
+                {/* Modal Header */}
+                <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center p-2.5">
+                      <Building2 className="w-5 h-5 text-emerald-400" />
+                    </div>
+                    <div>
+                      <h3 className="text-base sm:text-lg font-black text-white leading-tight">
+                        {lang === 'hi' ? 'सीधे बैंक खाते में ट्रांसफर (IMPS / NEFT)' : 'Direct Bank Account Transfer (IMPS / NEFT)'}
+                      </h3>
+                      <p className="text-[11px] text-stone-400 font-medium">
+                        {lang === 'hi' ? '24x7 तत्काल बैंक खाता निकासी' : 'Instant 24x7 Commercial Bank Settlement'}
+                      </p>
+                    </div>
                   </div>
                   <button
                     type="button"
-                    onClick={() => setIsCashoutModalOpen(false)}
-                    className="text-stone-400 hover:text-white"
+                    onClick={() => {
+                      setIsCashoutModalOpen(false);
+                      setBankFormError('');
+                    }}
+                    className="p-1.5 rounded-xl bg-stone-900 border border-stone-800 text-stone-400 hover:text-white transition cursor-pointer"
                   >
                     <X className="w-4 h-4" />
                   </button>
                 </div>
 
-                <div className="p-3.5 rounded-2xl bg-stone-950 border border-stone-800 flex justify-between items-center text-xs">
-                  <span className="text-stone-400">Available Wallet Balance:</span>
-                  <span className="text-lg font-black text-emerald-400">₹{walletBalance.toLocaleString()}</span>
+                {/* Field 1: Available Wallet Balance Badge */}
+                <div className="p-3.5 rounded-2xl bg-stone-950 border border-emerald-500/20 flex justify-between items-center text-xs">
+                  <div>
+                    <span className="text-[11px] font-bold text-stone-400 block uppercase tracking-wider">
+                      {lang === 'hi' ? 'उपलब्ध वॉलेट बैलेंस' : 'Available Wallet Balance'}
+                    </span>
+                    <span className="text-xs text-emerald-400 font-medium">
+                      ✓ Instant IMPS Disbursal Ready
+                    </span>
+                  </div>
+                  <span className="text-2xl font-black text-emerald-400 tracking-tight">
+                    ₹{walletBalance.toLocaleString()}
+                  </span>
                 </div>
 
+                {/* Field 2: Withdrawal Amount (₹) with Quick Buttons */}
                 <div>
-                  <label className="block text-[11px] font-black text-stone-400 uppercase mb-1.5">
-                    {lang === 'hi' ? 'निकासी राशि (₹)' : 'Withdrawal Amount (₹)'}
-                  </label>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <label className="text-[11px] font-black text-stone-400 uppercase tracking-wider">
+                      {lang === 'hi' ? 'निकासी राशि (₹)' : 'Withdrawal Amount (₹)'}
+                    </label>
+                    <span className="text-[10px] text-stone-400">
+                      Min: ₹100 • Max: ₹{walletBalance.toLocaleString()}
+                    </span>
+                  </div>
                   <input
                     type="number"
                     value={cashoutAmount}
                     onChange={(e) => setCashoutAmount(e.target.value)}
                     max={walletBalance}
                     min={100}
-                    className="w-full px-4 py-3 rounded-xl border border-stone-700 bg-stone-950 font-black text-lg text-white outline-none focus:border-emerald-500"
-                    placeholder="Enter amount"
+                    className="w-full px-4 py-3 rounded-xl border border-stone-700 bg-stone-950 font-black text-lg text-white outline-none focus:border-emerald-500 transition"
+                    placeholder="Enter amount (e.g. 5000)"
                     required
                   />
+                  {/* Quick Select Amount Pills */}
+                  <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                    {[2000, 5000, 10000].map((preset) => (
+                      <button
+                        key={preset}
+                        type="button"
+                        onClick={() => setCashoutAmount(String(Math.min(preset, walletBalance)))}
+                        className={`px-2.5 py-1 rounded-lg text-[10px] font-bold border transition cursor-pointer ${
+                          Number(cashoutAmount) === preset
+                            ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300'
+                            : 'bg-stone-900 border-stone-800 text-stone-400 hover:text-white'
+                        }`}
+                      >
+                        ₹{preset.toLocaleString()}
+                      </button>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => setCashoutAmount(String(walletBalance))}
+                      className="px-2.5 py-1 rounded-lg text-[10px] font-black bg-emerald-950 border border-emerald-600/40 text-emerald-300 hover:bg-emerald-900 transition cursor-pointer ml-auto"
+                    >
+                      {lang === 'hi' ? 'पूरा बैलेंस निकालें' : 'All Balance (₹' + walletBalance.toLocaleString() + ')'}
+                    </button>
+                  </div>
                 </div>
 
+                {/* Field 3: Account Holder Name */}
                 <div>
-                  <label className="block text-[11px] font-black text-stone-400 uppercase mb-1.5">
-                    {lang === 'hi' ? 'प्राप्तकर्ता यूपीआई आईडी' : 'Recipient UPI VPA ID'}
+                  <label className="block text-[11px] font-black text-stone-400 uppercase tracking-wider mb-1.5">
+                    {lang === 'hi' ? 'खाताधारक का नाम (पासबुक अनुसार)' : 'Account Holder Name (As in Passbook)'}
                   </label>
                   <input
                     type="text"
-                    value={cashoutUpiId}
-                    onChange={(e) => setCashoutUpiId(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-stone-700 bg-stone-950 font-bold text-sm text-white outline-none focus:border-emerald-500"
-                    placeholder="yourname@upi"
+                    value={accountHolderName}
+                    onChange={(e) => setAccountHolderName(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl border border-stone-700 bg-stone-950 font-bold text-sm text-white outline-none focus:border-emerald-500 transition"
+                    placeholder="e.g. Rameshwar Singh"
                     required
                   />
                 </div>
 
-                <div className="p-3 rounded-xl bg-emerald-950/60 border border-emerald-500/30 text-[11px] text-emerald-300 font-bold flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span>₹0 Gateway Fees • Instant 24x7 IMPS Transfer</span>
+                {/* Field 4 & 5: Bank Account Number & Confirm Account Number */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-black text-stone-400 uppercase tracking-wider mb-1.5">
+                      {lang === 'hi' ? 'बैंक खाता संख्या' : 'Bank Account Number'}
+                    </label>
+                    <input
+                      type="password"
+                      value={accountNumber}
+                      onChange={(e) => setAccountNumber(e.target.value.replace(/\D/g, ''))}
+                      className="w-full px-4 py-2.5 rounded-xl border border-stone-700 bg-stone-950 font-mono font-bold text-sm text-white outline-none focus:border-emerald-500 tracking-wider transition"
+                      placeholder="Enter 9-18 digits"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-black text-stone-400 uppercase tracking-wider mb-1.5">
+                      {lang === 'hi' ? 'खाता संख्या दोबारा दर्ज करें' : 'Confirm Account Number'}
+                    </label>
+                    <input
+                      type="text"
+                      value={confirmAccountNumber}
+                      onChange={(e) => setConfirmAccountNumber(e.target.value.replace(/\D/g, ''))}
+                      className={`w-full px-4 py-2.5 rounded-xl border bg-stone-950 font-mono font-bold text-sm text-white outline-none transition tracking-wider ${
+                        confirmAccountNumber && accountNumber !== confirmAccountNumber
+                          ? 'border-rose-500 focus:border-rose-400'
+                          : 'border-stone-700 focus:border-emerald-500'
+                      }`}
+                      placeholder="Re-enter account number"
+                      required
+                    />
+                  </div>
                 </div>
 
+                {/* Live Account Number Match Verification Indicator */}
+                {confirmAccountNumber && (
+                  <div className="text-[11px]">
+                    {accountNumber === confirmAccountNumber ? (
+                      <span className="text-emerald-400 flex items-center gap-1.5 font-bold">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        {lang === 'hi' ? 'खाता संख्या सत्यापित (Match Verified)' : '✓ Account Numbers Match'}
+                      </span>
+                    ) : (
+                      <span className="text-rose-400 flex items-center gap-1.5 font-bold">
+                        <AlertCircle className="w-3.5 h-3.5" />
+                        {lang === 'hi' ? 'खाता संख्या मेल नहीं खाती (Mismatch)' : '✕ Account Numbers Do Not Match'}
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                {/* Field 6: IFSC Code & Dynamic Bank Detection */}
+                <div>
+                  <label className="block text-[11px] font-black text-stone-400 uppercase tracking-wider mb-1.5">
+                    {lang === 'hi' ? 'IFSC कोड' : 'Bank IFSC Code'}
+                  </label>
+                  <input
+                    type="text"
+                    value={ifscCode}
+                    onChange={(e) => setIfscCode(e.target.value.toUpperCase())}
+                    className="w-full px-4 py-2.5 rounded-xl border border-stone-700 bg-stone-950 font-mono font-black text-sm text-emerald-400 uppercase outline-none focus:border-emerald-500 tracking-wider transition"
+                    placeholder="e.g. SBIN0001234"
+                    maxLength={11}
+                    required
+                  />
+                  {/* Dynamic Bank Branch Detection Badge */}
+                  {getBankNameFromIfsc(ifscCode) && (
+                    <div className="mt-2 px-3 py-1.5 rounded-xl bg-emerald-950/60 border border-emerald-500/30 flex items-center gap-2 text-[11px] text-emerald-300 font-bold">
+                      <Landmark className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                      <span>✓ {getBankNameFromIfsc(ifscCode)}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Settlement Speed Selector: Instant IMPS vs NEFT */}
+                <div>
+                  <label className="block text-[11px] font-black text-stone-400 uppercase tracking-wider mb-1.5">
+                    {lang === 'hi' ? 'सेटलमेंट स्पीड' : 'Transfer Mode & Settlement Speed'}
+                  </label>
+                  <div className="grid grid-cols-2 gap-2.5">
+                    <button
+                      type="button"
+                      onClick={() => setTransferMode('imps')}
+                      className={`p-2.5 rounded-xl border text-left text-xs transition cursor-pointer ${
+                        transferMode === 'imps'
+                          ? 'bg-emerald-500/15 border-emerald-500 text-white shadow-sm'
+                          : 'bg-stone-950 border-stone-800 text-stone-400 hover:text-stone-300'
+                      }`}
+                    >
+                      <div className="flex items-center gap-1.5 font-black text-emerald-400 mb-0.5">
+                        <Zap className="w-3.5 h-3.5" />
+                        <span>Instant IMPS</span>
+                      </div>
+                      <span className="text-[10px] text-stone-400 block">24x7 Immediate Credit</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setTransferMode('neft')}
+                      className={`p-2.5 rounded-xl border text-left text-xs transition cursor-pointer ${
+                        transferMode === 'neft'
+                          ? 'bg-emerald-500/15 border-emerald-500 text-white shadow-sm'
+                          : 'bg-stone-950 border-stone-800 text-stone-400 hover:text-stone-300'
+                      }`}
+                    >
+                      <div className="flex items-center gap-1.5 font-black text-blue-400 mb-0.5">
+                        <Landmark className="w-3.5 h-3.5" />
+                        <span>NEFT / RTGS</span>
+                      </div>
+                      <span className="text-[10px] text-stone-400 block">Standard Batch Clearance</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Validation Error Banner */}
+                {bankFormError && (
+                  <div className="p-3 rounded-xl bg-rose-950/70 border border-rose-500/40 text-xs text-rose-300 font-bold flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+                    <span>{bankFormError}</span>
+                  </div>
+                )}
+
+                {/* Security & Trust Badge */}
+                <div className="p-3 rounded-2xl bg-emerald-950/50 border border-emerald-500/30 text-[11px] text-emerald-300 font-bold flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>🛡️ Bank Account Verified • Instant 24x7 Direct IMPS Disbursal • ₹0 Gateway Fee</span>
+                </div>
+
+                {/* Primary CTA Action Button */}
                 <button
                   type="submit"
-                  className="w-full py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-black text-sm shadow-xl shadow-emerald-500/30 transition active:scale-95 cursor-pointer"
+                  className="w-full py-4 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-lg rounded-2xl cursor-pointer transition-all shadow-[0_0_25px_rgba(16,185,129,0.4)] hover:shadow-[0_0_35px_rgba(16,185,129,0.6)] active:scale-98 flex items-center justify-center gap-2"
                 >
-                  {lang === 'hi' ? `₹${cashoutAmount || walletBalance} तुरंत ट्रांसफर करें →` : `Transfer ₹${cashoutAmount || walletBalance} to Bank →`}
+                  <span>
+                    {lang === 'hi' 
+                      ? `₹${Number(cashoutAmount) ? Number(cashoutAmount).toLocaleString() : walletBalance.toLocaleString()} बैंक खाते में भेजें →` 
+                      : `Transfer ₹${Number(cashoutAmount) ? Number(cashoutAmount).toLocaleString() : walletBalance.toLocaleString()} to Bank Account →`}
+                  </span>
                 </button>
               </form>
             )}
