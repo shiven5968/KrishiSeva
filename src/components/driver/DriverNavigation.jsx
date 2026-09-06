@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { calculateDistanceKm } from '../../utils/geoUtils';
 import LiveMap from '../map/LiveMap';
 import CancelReasonModal from '../common/CancelReasonModal';
+import confetti from 'canvas-confetti';
 import { 
   Navigation, 
   MapPin, 
@@ -63,6 +64,9 @@ export default function DriverNavigation() {
 
   const handleCompleteJob = () => {
     setIsJobFinished(true);
+    try {
+      confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+    } catch (e) {}
     completeJobAndPayout(activeBooking);
     if (recordDriverJobPayout) {
       recordDriverJobPayout(activeBooking.estimatedPrice, driverProfile?.phone);

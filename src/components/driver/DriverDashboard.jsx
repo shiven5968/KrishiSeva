@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import { useRealtimeSync } from '../../context/RealtimeSyncContext';
+import { usePricing } from '../../context/PricingContext';
 import LiveMap from '../map/LiveMap';
-import IncomingRideModal from './IncomingRideModal';
 import DriverNavigation from './DriverNavigation';
+import confetti from 'canvas-confetti';
 import { 
   Tractor, 
   Power, 
@@ -36,24 +37,35 @@ import {
   Crosshair,
   Zap,
   ArrowUpRight,
-  Star
+  Star,
+  Fuel,
+  Wallet,
+  ArrowDownRight,
+  Clock,
+  Navigation,
+  Send,
+  AlertCircle,
+  Truck
 } from 'lucide-react';
 
 export default function DriverDashboard() {
   const { lang, t } = useLanguage();
   const { isDark } = useTheme();
-  const { driverProfile, setDriverProfile, toggleDriverDuty } = useAuth();
+  const { driverProfile, setDriverProfile, toggleDriverDuty, recordDriverJobPayout } = useAuth();
+  const { rates } = usePricing();
   const { 
     activeBooking, 
     acceptBooking, 
     rejectBooking, 
     driverCurrentPos,
-    routeWaypoints,
     createBookingRequest
   } = useRealtimeSync();
 
   // Active Tab within Driver Dashboard: 'overview' | 'passport'
   const [activeTab, setActiveTab] = useState('overview');
+
+  // Radar Scanning Radius: '5km' vs '10km'
+  const [radarRadiusKm, setRadarRadiusKm] = useState(5);
 
   // Document Viewer Modal State (for zooming DL or Number Plate)
   const [previewDoc, setPreviewDoc] = useState(null);
@@ -61,11 +73,54 @@ export default function DriverDashboard() {
   // Rate Editing Modal State
   const [isEditingRates, setIsEditingRates] = useState(false);
   const [rateForm, setRateForm] = useState({
-    hourlyRate: driverProfile.hourlyRate || 1000,
-    acreRate: driverProfile.acreRate || 1300
+    hourlyRate: driverProfile?.hourlyRate || rates.tractor?.ratePerHour || 1000,
+    acreRate: driverProfile?.acreRate || rates.tractor?.ratePerBigha || 1300
   });
 
-  const isOnline = driverProfile.status === 'online';
+  // Diesel / Fuel Expense Tracker State
+  const [fuelCostInput, setFuelCostInput] = useState(450);
+  const [fuelPricePerLiter, setFuelPricePerLiter] = useState(90);
+
+  // Instant Cashout / Wallet Modal State
+  const [isCashoutModalOpen, setIsCashoutModalOpen] = useState(false);
+  const [cashoutAmount, setCashoutAmount] = useState('');
+  const [cashoutUpiId, setCashoutUpiId] = useState('rameshwar@okaxis');
+  const [cashoutSuccessData, setCashoutSuccessData] = useState(null);
+
+  // Recent Completed Jobs Log
+  const [recentJobsLog, setRecentJobsLog] = useState([
+    {
+      id: 'job_101',
+      farmerName: 'Balram Kisan (बलराम)',
+      khetLocation: 'Khet near Malihabad River',
+      size: '4.5 Bigha',
+      machinery: 'Tractor + Rotavator',
+      fare: 5850,
+      fuelCost: 450,
+      netProfit: 5400,
+      time: '11:30 AM Today',
+      paymentMethod: 'UPI Escrow Disbursed'
+    },
+    {
+      id: 'job_100',
+      farmerName: 'Gurpreet Singh (गुरप्रीत)',
+      khetLocation: 'Plot #8, Rampur Farm Gate',
+      size: '3.0 Bigha',
+      machinery: 'Tractor + Cultivator',
+      fare: 3900,
+      fuelCost: 320,
+      netProfit: 3580,
+      time: 'Yesterday',
+      paymentMethod: 'Cash on Field'
+    }
+  ]);
+
+  const isOnline = driverProfile?.status === 'online';
+
+  // Available Wallet Balance Calculation
+  const walletBalance = useMemo(() => {
+    return driverProfile?.walletBalance || Math.max(12450, (driverProfile?.totalEarnings || 0));
+  }, [driverProfile?.walletBalance, driverProfile?.totalEarnings]);
 
   // If driver has accepted an active booking, render the full turn-by-turn Navigation Screen
   if (activeBooking && (activeBooking.status === 'accepted' || activeBooking.status === 'arrived' || activeBooking.status === 'in_progress')) {
@@ -75,31 +130,32 @@ export default function DriverDashboard() {
   // Trigger a demo ride request for immediate evaluation
   const handleSimulateIncomingRide = () => {
     createBookingRequest({
-      farmerName: lang === 'hi' ? 'बलराम किसान' : 'Balram Kisan',
+      farmerName: lang === 'hi' ? 'बलराम किसान (रिवर साइड)' : 'Balram Kisan (River Side)',
       farmerPhone: '+91 98765 43210',
       farmerLocation: {
-        lat: 26.8467,
-        lng: 80.9462,
-        address: 'Khet #14, Gram Panchayat Rampur, Malihabad'
+        lat: 26.9168,
+        lng: 80.7075,
+        address: 'Khet #14 near River, Gram Panchayat Rampur, Malihabad'
       },
-      machineryType: driverProfile.vehicleType || 'tractor',
+      machineryType: driverProfile?.vehicleType || 'tractor',
       attachment: {
         id: 'rotavator',
-        nameKey: 'rotavator',
-        descKey: 'rotavatorDesc',
+        nameEn: 'Rotavator (Deep Tillage)',
+        nameHi: 'रोटावेटर (गहरी जुताई)',
         icon: '⚙️',
-        extraRatePerAcre: 200
+        extraRatePerAcre: 0
       },
-      landSize: 3,
+      landSize: 4.5,
       sizeUnit: 'bigha',
-      estimatedPrice: 3150,
-      estimatedETA: lang === 'hi' ? '6-8 मिनट' : '6-8 Mins'
+      estimatedPrice: 5850,
+      distanceKm: 1.8,
+      estimatedETA: lang === 'hi' ? '5-7 मिनट' : '5-7 Mins'
     });
   };
 
   // Save Updated Rates
   const handleSaveRates = (e) => {
-    e.preventDefault();
+    e?.preventDefault();
     setDriverProfile(prev => ({
       ...prev,
       hourlyRate: Number(rateForm.hourlyRate),
@@ -108,32 +164,42 @@ export default function DriverDashboard() {
     setIsEditingRates(false);
   };
 
-  // Default fallback images for DL and Plate
-  const defaultDl = driverProfile.dlPhoto || driverProfile.dlImage || 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=800&auto=format&fit=crop&q=80';
-  const defaultPlate = driverProfile.platePhoto || driverProfile.plateImage || 'https://images.unsplash.com/photo-1592417817098-8f3d6910985c?w=800&auto=format&fit=crop&q=80';
+  // Instant UPI Cashout Handler
+  const handleExecuteCashout = (e) => {
+    e?.preventDefault();
+    const amountToWithdraw = Number(cashoutAmount) || Math.min(5000, walletBalance);
+    if (amountToWithdraw <= 0 || amountToWithdraw > walletBalance) return;
+
+    setDriverProfile(prev => ({
+      ...prev,
+      walletBalance: Math.max(0, (prev.walletBalance || walletBalance) - amountToWithdraw)
+    }));
+
+    setCashoutSuccessData({
+      amount: amountToWithdraw,
+      upiId: cashoutUpiId,
+      txnId: 'TXN' + Math.floor(100000000 + Math.random() * 900000000),
+      timestamp: new Date().toLocaleTimeString()
+    });
+
+    try {
+      confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 } });
+    } catch (err) {}
+  };
 
   return (
     <div className={`min-h-screen font-sans selection:bg-emerald-500 selection:text-stone-950 transition-colors duration-200 ${
       isDark ? 'bg-[#090D0B] text-stone-100' : 'bg-slate-50 text-slate-900'
     }`}>
       
-      {/* ══════════════ MAIN WRAPPER CONTAINER ══════════════ */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      {/* ══════════════ MAIN WIDESCREEN WRAPPER (max-w-7xl) ══════════════ */}
+      <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 space-y-6 py-6 animate-fade-in">
         
-        {/* Incoming Ride Request Modal Popup */}
-        {activeBooking && activeBooking.status === 'searching' && isOnline && (
-          <IncomingRideModal
-            booking={activeBooking}
-            onAccept={() => acceptBooking(driverProfile)}
-            onReject={rejectBooking}
-          />
-        )}
-
         {/* ══════════════ 1. TOP DRIVER HEADER & STATUS BAR ══════════════ */}
-        <div className={`rounded-3xl p-5 sm:p-6 border shadow-xl backdrop-blur-xl transition-all duration-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 ${
+        <div className={`rounded-3xl p-5 sm:p-6 border shadow-2xl backdrop-blur-xl transition-all duration-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 ${
           isDark 
-            ? 'bg-[#111827]/90 border-emerald-500/20 shadow-black/60' 
-            : 'bg-white/90 border-slate-200 shadow-slate-200/60'
+            ? 'bg-[#0A0E13] border-white/10 shadow-black/60' 
+            : 'bg-white border-slate-200 shadow-slate-200/60'
         }`}>
           
           {/* Driver Identity Left Group */}
@@ -141,10 +207,10 @@ export default function DriverDashboard() {
             <div className="relative">
               <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shadow-lg border ${
                 isDark 
-                  ? 'bg-gradient-to-br from-emerald-950 via-stone-900 to-emerald-900/40 border-emerald-500/30 text-emerald-400 shadow-emerald-950/50' 
+                  ? 'bg-gradient-to-br from-emerald-950 via-stone-900 to-emerald-900/40 border-emerald-500/40 text-emerald-400 shadow-emerald-950/50' 
                   : 'bg-gradient-to-br from-emerald-100 to-green-200 border-emerald-300 text-emerald-800 shadow-emerald-200'
               }`}>
-                {driverProfile.vehicleType === 'harvester' ? '🌾' : driverProfile.vehicleType === 'jcb' ? '🏗️' : '🚜'}
+                {driverProfile?.vehicleType === 'harvester' ? '🌾' : driverProfile?.vehicleType === 'jcb' ? '🏗️' : '🚜'}
               </div>
               {isOnline && (
                 <span className="absolute -top-1 -right-1 flex h-4 w-4">
@@ -157,7 +223,7 @@ export default function DriverDashboard() {
             <div className="space-y-1">
               <div className="flex items-center gap-2 flex-wrap">
                 <h1 className={`text-xl sm:text-2xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  {driverProfile.fullName || 'Rameshwar'}
+                  {driverProfile?.fullName || 'Rameshwar Singh'}
                 </h1>
                 <span className="inline-flex items-center gap-1 text-[11px] font-black text-amber-300 bg-amber-950/80 px-2.5 py-0.5 rounded-full border border-amber-500/40 shadow-sm">
                   <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
@@ -165,21 +231,21 @@ export default function DriverDashboard() {
                 </span>
               </div>
               <p className={`text-xs font-bold ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
-                {driverProfile.modelName || 'Mahindra 575 DI'} • <span className={`font-mono font-black ${isDark ? 'text-emerald-400' : 'text-emerald-700'}`}>{driverProfile.vehicleNumber || 'UP-32-AB-1555'}</span>
+                {driverProfile?.modelName || 'Mahindra 575 DI (50 HP)'} • <span className={`font-mono font-black ${isDark ? 'text-emerald-400' : 'text-emerald-700'}`}>{driverProfile?.vehicleNumber || 'UP-32-KR-7744'}</span>
               </p>
             </div>
           </div>
 
-          {/* Action Controls: Mode Navigation & High-Contrast Duty Switcher */}
+          {/* Action Controls: Mode Navigation, Radius Toggle & Online/Offline Switch */}
           <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-between md:justify-end">
             
-            {/* Minimalist Tab Pills */}
+            {/* Minimalist Tab Switcher */}
             <nav className={`flex items-center p-1 rounded-2xl border text-xs font-black shadow-sm ${
               isDark ? 'bg-stone-950 border-stone-800' : 'bg-slate-100 border-slate-200'
             }`}>
               <button
                 onClick={() => setActiveTab('overview')}
-                className={`px-4 py-2 rounded-xl transition flex items-center gap-1.5 ${
+                className={`px-4 py-2 rounded-xl transition flex items-center gap-1.5 cursor-pointer ${
                   activeTab === 'overview'
                     ? 'bg-emerald-500 text-stone-950 shadow-md'
                     : isDark ? 'text-stone-300 hover:text-white' : 'text-slate-600 hover:text-slate-900'
@@ -191,21 +257,21 @@ export default function DriverDashboard() {
 
               <button
                 onClick={() => setActiveTab('passport')}
-                className={`px-4 py-2 rounded-xl transition flex items-center gap-1.5 ${
+                className={`px-4 py-2 rounded-xl transition flex items-center gap-1.5 cursor-pointer ${
                   activeTab === 'passport'
                     ? 'bg-emerald-500 text-stone-950 shadow-md'
                     : isDark ? 'text-stone-300 hover:text-white' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 <CreditCard className="w-3.5 h-3.5" />
-                <span>{lang === 'hi' ? 'वाहन व डीएल पासपोर्ट' : 'Vehicle & Passport'}</span>
+                <span>{lang === 'hi' ? 'वाहन व डीएल पासपोर्ट' : 'Vehicle & KYC Passport'}</span>
               </button>
             </nav>
 
             {/* High-Contrast Online/Offline Duty Toggle */}
             <button
               onClick={toggleDriverDuty}
-              className={`px-5 py-2.5 rounded-2xl font-black text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-lg active:scale-95 ${
+              className={`px-5 py-2.5 rounded-2xl font-black text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-lg active:scale-95 cursor-pointer ${
                 isOnline
                   ? 'bg-emerald-500 hover:bg-emerald-400 text-stone-950 shadow-emerald-500/25 ring-2 ring-emerald-400/50'
                   : isDark
@@ -220,33 +286,158 @@ export default function DriverDashboard() {
 
         </div>
 
-        {/* Duty Status Alert Banner */}
-        {!isOnline && (
-          <div className={`p-4 rounded-2xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs font-bold animate-fade-in ${
-            isDark 
-              ? 'bg-amber-950/40 border-amber-500/30 text-amber-200' 
-              : 'bg-amber-50 border-amber-200 text-amber-900'
-          }`}>
-            <div className="flex items-center gap-2.5">
-              <Radio className="w-4 h-4 text-amber-400 animate-pulse shrink-0" />
-              <span>{lang === 'hi' ? 'आप अभी ऑफलाइन हैं। निकटतम किसानों से बुकिंग अनुरोध पाने के लिए "ऑन ड्यूटी" बटन दबाएं।' : 'You are currently Offline. Turn On Duty to start receiving nearby farm booking dispatches.'}</span>
+        {/* ══════════════ 2. GPS TOP BANNER (DRIVER OPERATING RADAR - 320PX) ══════════════ */}
+        <div className={`rounded-3xl p-6 sm:p-7 border shadow-2xl space-y-4 transition-colors duration-200 ${
+          isDark ? 'bg-[#0A0E13] border-white/10 shadow-black/40' : 'bg-white border-slate-200 shadow-slate-200/50'
+        }`}>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+                <Compass className="w-5 h-5 text-emerald-400" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className={`font-black text-base sm:text-lg tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    {lang === 'hi' ? 'चालक लाइव ऑपरेटिंग रडार' : 'Driver Operating Radar & Farm Telemetry'}
+                  </h3>
+                  <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full border ${
+                    isOnline 
+                      ? 'bg-emerald-950 text-emerald-300 border-emerald-500/40' 
+                      : 'bg-stone-900 text-stone-400 border-stone-800'
+                  }`}>
+                    {isOnline ? `RADAR ACTIVE • ${radarRadiusKm} KM SCAN` : 'RADAR OFFLINE'}
+                  </span>
+                </div>
+                <p className={`text-xs ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+                  {lang === 'hi' ? 'मलिहाबाद व आसपास के खेतों से लाइव बुकिंग अनुरोध और निकटतम किसान लोकेशन' : 'Real-time telemetry and incoming farm dispatch requests across Malihabad & Lucknow zone.'}
+                </p>
+              </div>
             </div>
-            <button
-              onClick={toggleDriverDuty}
-              className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-stone-950 font-black rounded-xl text-xs transition active:scale-95 shadow-md self-end sm:self-auto"
-            >
-              {lang === 'hi' ? 'ऑन ड्यूटी हों' : 'Go On Duty'}
-            </button>
+
+            {/* Radar Radius Switcher & Quick Demo Test Trigger */}
+            <div className="flex items-center gap-2">
+              <div className="flex items-center p-1 rounded-xl bg-stone-900 border border-stone-800 text-xs font-bold">
+                <button
+                  type="button"
+                  onClick={() => setRadarRadiusKm(5)}
+                  className={`px-3 py-1 rounded-lg transition ${radarRadiusKm === 5 ? 'bg-emerald-500 text-stone-950 font-black' : 'text-stone-400 hover:text-white'}`}
+                >
+                  5 km
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRadarRadiusKm(10)}
+                  className={`px-3 py-1 rounded-lg transition ${radarRadiusKm === 10 ? 'bg-emerald-500 text-stone-950 font-black' : 'text-stone-400 hover:text-white'}`}
+                >
+                  10 km
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleSimulateIncomingRide}
+                className="px-3.5 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-xs font-black transition flex items-center gap-1.5 cursor-pointer active:scale-95"
+                title="Test incoming booking alert"
+              >
+                <Zap className="w-3.5 h-3.5 text-emerald-400" />
+                <span>{lang === 'hi' ? '⚡ टेस्ट अनुरोध (Demo)' : '⚡ Simulate Request (Demo)'}</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Satellite Radar Map Canvas */}
+          <div className="relative rounded-2xl overflow-hidden border border-white/10 shadow-inner">
+            <LiveMap
+              farmerLocation={activeBooking?.farmerLocation || null}
+              driverPos={driverCurrentPos}
+              activeVehicleType={driverProfile?.vehicleType || 'tractor'}
+              showNearbyDrivers={false}
+              bookingStatus={isOnline ? (activeBooking ? 'in_progress' : 'idle') : 'offline'}
+              isDriverView={true}
+              className="h-[300px] sm:h-[320px] w-full rounded-2xl"
+            />
+          </div>
+        </div>
+
+        {/* ══════════════ 3. LIVE DISPATCH REQUEST DRAWER (UBER/RAPIDO STYLE ACCEPT CARD) ══════════════ */}
+        {activeBooking && activeBooking.status === 'searching' && isOnline && (
+          <div className="rounded-3xl p-6 border-2 border-emerald-500/70 bg-gradient-to-br from-[#0A0E13] via-emerald-950/40 to-stone-950 text-white shadow-2xl shadow-emerald-950/70 space-y-5 animate-bounce-subtle">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-stone-950 flex items-center justify-center font-black text-2xl shadow-lg shadow-emerald-500/30">
+                  🚜
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-black uppercase tracking-wider text-emerald-400 bg-emerald-950 px-2.5 py-0.5 rounded-full border border-emerald-500/40">
+                      ⚡ {lang === 'hi' ? 'नया बुकिंग अनुरोध' : 'INCOMING DISPATCH ALERT'}
+                    </span>
+                    <span className="text-xs text-stone-400">• ~{activeBooking.distanceKm || '1.8'} km away</span>
+                  </div>
+                  <h3 className="text-xl font-black text-white mt-1">
+                    {activeBooking.farmerName || 'Balram Kisan'}
+                  </h3>
+                  <p className="text-xs text-stone-300 font-medium">
+                    {activeBooking.farmerLocation?.address || 'Khet #14 near River, Gram Panchayat Rampur'} ({activeBooking.landSize || '4.5'} {activeBooking.sizeUnit || 'Bigha'})
+                  </p>
+                </div>
+              </div>
+
+              <div className="text-left sm:text-right">
+                <span className="text-[11px] font-black uppercase tracking-wider text-stone-400 block">{lang === 'hi' ? 'कुल किराया (Total Fare)' : 'Total Job Fare'}</span>
+                <span className="text-3xl sm:text-4xl font-black text-emerald-400 tracking-tight">
+                  ₹{activeBooking.estimatedPrice || 5850}
+                </span>
+                <span className="text-[11px] text-emerald-300 block font-semibold">
+                  {lang === 'hi' ? 'कार्य पूरा होने पर 100% नकद/यूपीआई' : '100% Guaranteed Pay on Completion'}
+                </span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+              <div className="p-3 rounded-xl bg-stone-900/80 border border-stone-800">
+                <span className="text-stone-400 font-bold block">{lang === 'hi' ? 'मशीनरी व यंत्र:' : 'Machine & Implement:'}</span>
+                <b className="text-white capitalize">{activeBooking.machineryType || 'Tractor'} + {activeBooking.attachment?.nameEn || activeBooking.attachment?.id || 'Rotavator'}</b>
+              </div>
+              <div className="p-3 rounded-xl bg-stone-900/80 border border-stone-800">
+                <span className="text-stone-400 font-bold block">{lang === 'hi' ? 'खेत पर आगमन समय:' : 'ETA to Field:'}</span>
+                <b className="text-amber-400">{activeBooking.estimatedETA || '5-7 Mins'} (~1.8 km)</b>
+              </div>
+              <div className="p-3 rounded-xl bg-stone-900/80 border border-stone-800">
+                <span className="text-stone-400 font-bold block">{lang === 'hi' ? 'अनुमानित कार्य समय:' : 'Estimated Duration:'}</span>
+                <b className="text-blue-400">~2.5 {lang === 'hi' ? 'घंटे' : 'Hours'}</b>
+              </div>
+            </div>
+
+            {/* Accept / Decline Action Buttons */}
+            <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => acceptBooking(driverProfile)}
+                className="w-full sm:flex-1 py-4 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-black text-lg shadow-[0_0_30px_rgba(16,185,129,0.4)] hover:shadow-[0_0_45px_rgba(16,185,129,0.6)] transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-98"
+              >
+                <Check className="w-5 h-5 stroke-[3]" />
+                <span>{lang === 'hi' ? `स्वीकार करें (₹${activeBooking.estimatedPrice || 5850}) →` : `Accept Dispatch (₹${activeBooking.estimatedPrice || 5850}) →`}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={rejectBooking}
+                className="w-full sm:w-auto px-6 py-4 rounded-2xl bg-stone-900/90 hover:bg-stone-800 text-stone-300 hover:text-white font-bold text-sm border border-stone-700 transition active:scale-95 cursor-pointer"
+              >
+                <span>{lang === 'hi' ? 'अस्वीकार करें' : 'Decline'}</span>
+              </button>
+            </div>
           </div>
         )}
 
-        {/* ══════════════ 2. KEY METRICS GRID (EARNINGS & TRIPS) ══════════════ */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {/* ══════════════ 4. REAL-TIME EARNINGS & WALLET GRID (4 METRICS CARDS) ══════════════ */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           
           {/* Card 1: Today's Earnings */}
           <div className={`p-5 rounded-3xl border shadow-xl transition-all duration-200 hover:-translate-y-1 relative overflow-hidden ${
             isDark 
-              ? 'bg-[#111827]/90 border-emerald-500/20 shadow-black/50' 
+              ? 'bg-[#0A0E13] border-white/10 shadow-black/50' 
               : 'bg-white border-slate-200 shadow-slate-200/60'
           }`}>
             <div className="flex items-center justify-between mb-3">
@@ -258,12 +449,12 @@ export default function DriverDashboard() {
               </div>
             </div>
             <div className="space-y-1">
-              <h3 className={`text-3xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                ₹{driverProfile.totalEarnings.toLocaleString()}
+              <h3 className="text-3xl font-black text-emerald-400 tracking-tight">
+                ₹{(driverProfile?.totalEarnings || 0).toLocaleString()}
               </h3>
               <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-500">
                 <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-emerald-500/10 text-[10px]">
-                  <ArrowUpRight className="w-3 h-3" /> +0%
+                  <ArrowUpRight className="w-3 h-3" /> +18%
                 </span>
                 <span className={isDark ? 'text-stone-400' : 'text-slate-500'}>vs yesterday</span>
               </div>
@@ -273,7 +464,7 @@ export default function DriverDashboard() {
           {/* Card 2: Completed Jobs */}
           <div className={`p-5 rounded-3xl border shadow-xl transition-all duration-200 hover:-translate-y-1 relative overflow-hidden ${
             isDark 
-              ? 'bg-[#111827]/90 border-emerald-500/20 shadow-black/50' 
+              ? 'bg-[#0A0E13] border-white/10 shadow-black/50' 
               : 'bg-white border-slate-200 shadow-slate-200/60'
           }`}>
             <div className="flex items-center justify-between mb-3">
@@ -286,11 +477,11 @@ export default function DriverDashboard() {
             </div>
             <div className="space-y-1">
               <h3 className={`text-3xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                {driverProfile.completedRides} {lang === 'hi' ? 'खेत' : 'Khets'}
+                {driverProfile?.completedRides || 142} {lang === 'hi' ? 'खेत' : 'Khets'}
               </h3>
-              <div className="flex items-center gap-1.5 text-xs font-bold text-blue-500">
+              <div className="flex items-center gap-1.5 text-xs font-bold text-blue-400">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className={isDark ? 'text-stone-300' : 'text-slate-600'}>Direct Escrow Disbursal</span>
+                <span className={isDark ? 'text-stone-300' : 'text-slate-600'}>100% Escrow Disbursed</span>
               </div>
             </div>
           </div>
@@ -298,7 +489,7 @@ export default function DriverDashboard() {
           {/* Card 3: Driver Rating */}
           <div className={`p-5 rounded-3xl border shadow-xl transition-all duration-200 hover:-translate-y-1 relative overflow-hidden ${
             isDark 
-              ? 'bg-[#111827]/90 border-emerald-500/20 shadow-black/50' 
+              ? 'bg-[#0A0E13] border-white/10 shadow-black/50' 
               : 'bg-white border-slate-200 shadow-slate-200/60'
           }`}>
             <div className="flex items-center justify-between mb-3">
@@ -311,7 +502,7 @@ export default function DriverDashboard() {
             </div>
             <div className="space-y-1">
               <h3 className={`text-3xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                {Number(driverProfile.rating || 5.0).toFixed(1)} / 5.0
+                {Number(driverProfile?.rating || 5.0).toFixed(1)} / 5.0
               </h3>
               <div className="flex items-center gap-1 text-xs font-bold text-amber-400">
                 <span>★★★★★</span>
@@ -320,447 +511,401 @@ export default function DriverDashboard() {
             </div>
           </div>
 
+          {/* Card 4: Instant Wallet Disbursal */}
+          <div className={`p-5 rounded-3xl border shadow-xl transition-all duration-200 hover:-translate-y-1 relative overflow-hidden ${
+            isDark 
+              ? 'bg-gradient-to-br from-[#0A0E13] via-emerald-950/30 to-[#0A0E13] border-emerald-500/40 shadow-emerald-950/30' 
+              : 'bg-emerald-50/70 border-emerald-300 shadow-slate-200/60'
+          }`}>
+            <div className="flex items-center justify-between mb-3">
+              <span className={`text-[11px] font-black uppercase tracking-wider ${isDark ? 'text-emerald-400' : 'text-emerald-800'}`}>
+                {lang === 'hi' ? 'उपलब्ध वॉलेट बैलेंस' : 'Instant Wallet Balance'}
+              </span>
+              <div className="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center text-lg">
+                <Wallet className="w-4 h-4 text-emerald-400" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-3xl font-black text-white tracking-tight">
+                ₹{walletBalance.toLocaleString()}
+              </h3>
+              <button
+                type="button"
+                onClick={() => {
+                  setCashoutAmount(String(Math.min(5000, walletBalance)));
+                  setIsCashoutModalOpen(true);
+                }}
+                className="w-full py-1.5 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-black text-xs transition flex items-center justify-center gap-1.5 shadow-md active:scale-95 cursor-pointer"
+              >
+                <span>⚡ {lang === 'hi' ? 'यूपीआई में निकालें' : 'Instant Cashout to UPI'}</span>
+              </button>
+            </div>
+          </div>
+
         </div>
 
-        {/* ══════════════ 3. MAIN DASHBOARD CONTENT AREA ══════════════ */}
-        {activeTab === 'overview' && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-fade-in">
-            
-            {/* Left 8 Cols: Operating Radar & Dispatch Map */}
-            <div className="lg:col-span-8 space-y-4">
-              <div className={`p-5 sm:p-6 rounded-3xl border shadow-xl space-y-4 backdrop-blur-xl ${
-                isDark 
-                  ? 'bg-[#111827]/90 border-emerald-500/20 shadow-black/50' 
-                  : 'bg-white border-slate-200 shadow-slate-200/60'
-              }`}>
-                
-                {/* Header with Radar Pulse */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-stone-800/40">
-                  <div className="flex items-center gap-2.5">
-                    <div className={`w-3 h-3 rounded-full ${isOnline ? 'bg-emerald-400 animate-ping' : 'bg-stone-500'}`} />
-                    <div>
-                      <h4 className={`text-base font-black flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                        <span>{lang === 'hi' ? 'चालक लाइव ऑपरेटिंग रडार' : 'Driver Operating Radar (5 km Radius)'}</span>
-                      </h4>
-                      <p className={`text-xs ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
-                        {lang === 'hi' 
-                          ? 'मलिहाबाद व आसपास के खेतों से लाइव बुकिंग अनुरोध रडार पर दिखाई देंगे।' 
-                          : 'Real-time telemetry and incoming farm dispatch requests across Malihabad.'}
-                      </p>
-                    </div>
-                  </div>
-
-                  <span className={`px-3 py-1 rounded-xl text-xs font-black uppercase tracking-wider self-start sm:self-auto border ${
-                    isOnline 
-                      ? 'bg-emerald-950/80 text-emerald-400 border-emerald-500/40' 
-                      : 'bg-stone-900 text-stone-400 border-stone-800'
-                  }`}>
-                    {isOnline ? (lang === 'hi' ? 'रडार सक्रिय • अनुरोध स्कैन हो रहे हैं 🟢' : 'Radar Active • Scanning for Requests') : (lang === 'hi' ? 'रडार बंद ⚪' : 'Radar Paused ⚪')}
-                  </span>
-                </div>
-
-                {/* Map Container */}
-                <div className="relative rounded-2xl overflow-hidden border border-stone-800/80 shadow-inner">
-                  <LiveMap
-                    farmerLocation={null}
-                    driverPos={driverCurrentPos}
-                    activeVehicleType={driverProfile.vehicleType}
-                    showNearbyDrivers={false}
-                    bookingStatus={isOnline ? 'idle' : 'offline'}
-                    isDriverView={true}
-                    className="h-[340px] w-full rounded-2xl"
-                  />
-                </div>
-
-                {/* Demo Ride Trigger (For Testing) */}
-                <div className="pt-2 flex justify-end">
-                  <button
-                    onClick={handleSimulateIncomingRide}
-                    className="text-[11px] font-bold text-emerald-400 hover:text-emerald-300 underline underline-offset-2 flex items-center gap-1"
-                  >
-                    <span>⚡ Simulate Incoming Farm Request (Demo)</span>
-                  </button>
-                </div>
-
+        {/* ══════════════ 5. DRIVER ESSENTIAL UTILITY PANELS (BOTTOM 3-COLUMN GRID) ══════════════ */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          {/* Panel A (Left 4 Cols): Machine Rates Customizer */}
+          <div className={`lg:col-span-4 p-6 rounded-3xl border shadow-xl space-y-4 ${
+            isDark ? 'bg-[#0A0E13] border-white/10 shadow-black/40' : 'bg-white border-slate-200'
+          }`}>
+            <div className="flex items-center justify-between pb-3 border-b border-white/10">
+              <div className="flex items-center gap-2">
+                <Gauge className="w-4 h-4 text-emerald-400" />
+                <h4 className={`font-black text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                  {lang === 'hi' ? 'आपकी मशीनरी दरें' : 'Machine Rates & Yield'}
+                </h4>
               </div>
-            </div>
-
-            {/* Right 4 Cols: Machine Rates & Fleet Passport Card */}
-            <div className="lg:col-span-4 space-y-5">
-              
-              {/* Rate Manager Card */}
-              <div className={`p-6 rounded-3xl border shadow-xl backdrop-blur-xl space-y-4 ${
-                isDark 
-                  ? 'bg-[#111827]/90 border-emerald-500/20 shadow-black/50' 
-                  : 'bg-white border-slate-200 shadow-slate-200/60'
-              }`}>
-                <div className="flex items-center justify-between pb-2 border-b border-stone-800/40">
-                  <div className="flex items-center gap-2">
-                    <Gauge className="w-4 h-4 text-emerald-400" />
-                    <h4 className={`font-black text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                      {lang === 'hi' ? 'आपकी मशीनरी दरें' : 'Machine Rates & Yield'}
-                    </h4>
-                  </div>
-                  <button
-                    onClick={() => setIsEditingRates(true)}
-                    className="px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-xs text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-1 transition active:scale-95"
-                  >
-                    <Edit2 className="w-3 h-3" />
-                    <span>{lang === 'hi' ? 'दरें बदलें' : 'Edit Rates'}</span>
-                  </button>
-                </div>
-                
-                <div className="space-y-2.5 text-xs">
-                  <div className={`flex justify-between items-center p-3.5 rounded-2xl border ${
-                    isDark ? 'bg-stone-950 border-stone-800' : 'bg-slate-50 border-slate-200'
-                  }`}>
-                    <span className={isDark ? 'text-stone-400 font-medium' : 'text-slate-500 font-semibold'}>
-                      {lang === 'hi' ? 'प्रति घंटा दर' : 'Hourly Rate'}
-                    </span>
-                    <span className={`font-black text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                      ₹{driverProfile.hourlyRate || 1000} / {lang === 'hi' ? 'घंटा' : 'hr'}
-                    </span>
-                  </div>
-
-                  <div className={`flex justify-between items-center p-3.5 rounded-2xl border ${
-                    isDark ? 'bg-stone-950 border-stone-800' : 'bg-slate-50 border-slate-200'
-                  }`}>
-                    <span className={isDark ? 'text-stone-400 font-medium' : 'text-slate-500 font-semibold'}>
-                      {lang === 'hi' ? 'प्रति बीघा दर' : 'Per Bigha Rate'}
-                    </span>
-                    <span className="font-black text-sm text-emerald-400">
-                      ₹{driverProfile.acreRate || 1300} / {lang === 'hi' ? 'बीघा' : 'bigha'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Digital Vehicle Passport Card (Styled like a Dark Metallic ID) */}
-              <div 
-                onClick={() => setActiveTab('passport')}
-                className="p-6 rounded-3xl bg-gradient-to-br from-stone-900 via-stone-950 to-emerald-950/80 border border-emerald-500/30 text-white cursor-pointer hover:shadow-2xl hover:border-emerald-500/50 transition-all duration-200 space-y-4 group relative overflow-hidden"
+              <button
+                type="button"
+                onClick={() => setIsEditingRates(!isEditingRates)}
+                className="px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-xs text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-1 transition active:scale-95 cursor-pointer"
               >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none" />
+                <Edit2 className="w-3 h-3" />
+                <span>{isEditingRates ? (lang === 'hi' ? 'रद्द' : 'Cancel') : (lang === 'hi' ? 'दरें बदलें' : 'Edit Rates')}</span>
+              </button>
+            </div>
 
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                    <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest font-mono">
-                      {lang === 'hi' ? 'डिजिटल वाहन पासपोर्ट' : 'DIGITAL VEHICLE PASSPORT'}
-                    </span>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-emerald-400 group-hover:translate-x-1 transition-transform" />
+            {isEditingRates ? (
+              <form onSubmit={handleSaveRates} className="space-y-3">
+                <div>
+                  <label className="block text-[11px] font-bold text-stone-400 uppercase mb-1">
+                    {lang === 'hi' ? 'प्रति घंटा दर (₹/Hour)' : 'Hourly Rate (₹/Hour)'}
+                  </label>
+                  <input
+                    type="number"
+                    value={rateForm.hourlyRate}
+                    onChange={(e) => setRateForm(prev => ({ ...prev, hourlyRate: e.target.value }))}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-stone-700 bg-stone-900 text-white font-bold text-sm outline-none focus:border-emerald-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-stone-400 uppercase mb-1">
+                    {lang === 'hi' ? 'प्रति बीघा दर (₹/Bigha)' : 'Per Bigha Rate (₹/Bigha)'}
+                  </label>
+                  <input
+                    type="number"
+                    value={rateForm.acreRate}
+                    onChange={(e) => setRateForm(prev => ({ ...prev, acreRate: e.target.value }))}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-stone-700 bg-stone-900 text-white font-bold text-sm outline-none focus:border-emerald-500"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="w-full py-2.5 bg-emerald-500 text-stone-950 font-black text-xs rounded-xl shadow-md transition active:scale-95 cursor-pointer"
+                >
+                  {lang === 'hi' ? 'दरें सहेजें' : 'Save Rates'}
+                </button>
+              </form>
+            ) : (
+              <div className="space-y-2.5 text-xs">
+                <div className={`flex justify-between items-center p-3.5 rounded-2xl border ${
+                  isDark ? 'bg-stone-950 border-stone-800' : 'bg-slate-50 border-slate-200'
+                }`}>
+                  <span className={isDark ? 'text-stone-400 font-medium' : 'text-slate-500 font-semibold'}>
+                    {lang === 'hi' ? 'प्रति घंटा दर' : 'Hourly Rate'}
+                  </span>
+                  <span className={`font-black text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    ₹{driverProfile?.hourlyRate || rates.tractor?.ratePerHour || 1000} / {lang === 'hi' ? 'घंटा' : 'hr'}
+                  </span>
                 </div>
 
-                <div className="space-y-1">
-                  <h5 className="font-black text-lg text-white">
-                    {driverProfile.modelName || 'Mahindra 575 DI'}
-                  </h5>
-                  <p className="text-xs font-mono text-emerald-300 font-black px-2.5 py-1 rounded-lg bg-stone-900/90 border border-emerald-500/20 inline-block">
-                    {driverProfile.vehicleNumber || 'UP-32-AB-1555'}
-                  </p>
+                <div className={`flex justify-between items-center p-3.5 rounded-2xl border ${
+                  isDark ? 'bg-stone-950 border-stone-800' : 'bg-slate-50 border-slate-200'
+                }`}>
+                  <span className={isDark ? 'text-stone-400 font-medium' : 'text-slate-500 font-semibold'}>
+                    {lang === 'hi' ? 'प्रति बीघा दर' : 'Per Bigha Rate'}
+                  </span>
+                  <span className="font-black text-sm text-emerald-400">
+                    ₹{driverProfile?.acreRate || rates.tractor?.ratePerBigha || 1300} / {lang === 'hi' ? 'बीघा' : 'bigha'}
+                  </span>
                 </div>
 
-                <div className="pt-2 border-t border-stone-800 flex items-center justify-between text-[11px] text-stone-400">
-                  <span>Category: {driverProfile.vehicleType?.toUpperCase() || 'TRACTOR'}</span>
-                  <span className="text-emerald-400 font-bold flex items-center gap-1">
-                    <ShieldCheck className="w-3.5 h-3.5" />
-                    <span>RC Verified</span>
+                <div className="p-2.5 rounded-xl bg-emerald-950/40 border border-emerald-500/20 text-emerald-400 text-[11px] font-bold">
+                  ✓ {lang === 'hi' ? 'क्षेत्रीय आधार मूल्य से स्वतः सिंक्रनाइज़्ड' : 'Auto-synced with regional agro baseline'}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Panel B (Center 4 Cols): Diesel & Fuel Expense Tracker */}
+          <div className={`lg:col-span-4 p-6 rounded-3xl border shadow-xl space-y-4 ${
+            isDark ? 'bg-[#0A0E13] border-white/10 shadow-black/40' : 'bg-white border-slate-200'
+          }`}>
+            <div className="flex items-center justify-between pb-3 border-b border-white/10">
+              <div className="flex items-center gap-2">
+                <Fuel className="w-4 h-4 text-amber-400" />
+                <h4 className={`font-black text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                  {lang === 'hi' ? 'डीजल व ईंधन व्यय ट्रैकर' : 'Diesel & Trip Fuel Profit'}
+                </h4>
+              </div>
+              <span className="text-[10px] font-bold text-amber-400 bg-amber-950/80 px-2 py-0.5 rounded-full border border-amber-500/40">
+                ₹{fuelPricePerLiter}/L Diesel
+              </span>
+            </div>
+
+            <div className="space-y-3 text-xs">
+              <div>
+                <label className="block text-[11px] font-bold text-stone-400 uppercase mb-1">
+                  {lang === 'hi' ? 'प्रति ट्रिप डीजल खर्च (₹)' : 'Trip Fuel Expense (₹)'}
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    value={fuelCostInput}
+                    onChange={(e) => setFuelCostInput(Number(e.target.value))}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-stone-700 bg-stone-900 text-white font-bold text-sm outline-none focus:border-amber-500"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 font-bold">
+                    ≈ {(fuelCostInput / fuelPricePerLiter).toFixed(1)} L
                   </span>
                 </div>
               </div>
 
-            </div>
-
-          </div>
-        )}
-
-        {/* ══════════════ 4. PASSPORT & DL DETAILS TAB ══════════════ */}
-        {activeTab === 'passport' && (
-          <div className="space-y-6 animate-fade-in">
-            
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              
-              {/* Left Column: Commercial Driving License (DL) */}
-              <div className="lg:col-span-6 space-y-6">
-                
-                <div className={`p-6 rounded-3xl border shadow-xl backdrop-blur-xl space-y-5 ${
-                  isDark 
-                    ? 'bg-[#111827]/90 border-emerald-500/20 shadow-black/50' 
-                    : 'bg-white border-slate-200 shadow-slate-200/60'
-                }`}>
-                  <div className="flex items-center justify-between border-b border-stone-800/40 pb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-emerald-950 text-emerald-400 border border-emerald-500/40 flex items-center justify-center text-xl shadow-inner">
-                        🪪
-                      </div>
-                      <div>
-                        <h4 className={`font-black text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                          {lang === 'hi' ? 'कमर्शियल ड्राइविंग लाइसेंस (DL)' : 'Commercial Driving License (DL)'}
-                        </h4>
-                        <p className={`text-[11px] ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
-                          {lang === 'hi' ? 'परिवहन विभाग, उत्तर प्रदेश सरकार' : 'Government Transport Authority of Uttar Pradesh'}
-                        </p>
-                      </div>
-                    </div>
-
-                    <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-500/40 flex items-center gap-1">
-                      <Check className="w-3 h-3 text-emerald-400" />
-                      <span>{lang === 'hi' ? 'सत्यापित' : 'Active & Verified'}</span>
-                    </span>
-                  </div>
-
-                  {/* DL Photo Preview with Zoom button */}
-                  <div className="relative group overflow-hidden rounded-2xl border-2 border-stone-800 bg-stone-950 h-56 flex items-center justify-center">
-                    <img
-                      src={defaultDl}
-                      alt="Driving License Document"
-                      className="w-full h-full object-cover group-hover:scale-105 transition duration-300 opacity-90"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-transparent to-transparent flex items-end justify-between p-4">
-                      <div className="text-white">
-                        <span className="text-[10px] font-bold text-emerald-400 bg-stone-900/90 px-2 py-0.5 rounded border border-emerald-500/30">
-                          {lang === 'hi' ? 'डीएल सत्यापित' : 'DL Verified'}
-                        </span>
-                        <p className="text-xs font-mono font-bold mt-1">
-                          {lang === 'hi' ? 'चालक: ' : 'Holder: '}{driverProfile.fullName || 'Rameshwar'}
-                        </p>
-                      </div>
-
-                      <button
-                        onClick={() => setPreviewDoc({ title: lang === 'hi' ? 'कमर्शियल ड्राइविंग लाइसेंस' : 'Commercial Driving License', image: defaultDl, type: 'DL Document' })}
-                        className="px-3 py-1.5 bg-white hover:bg-stone-100 text-stone-900 font-black text-xs rounded-xl shadow-md flex items-center gap-1.5 transition active:scale-95"
-                      >
-                        <Eye className="w-3.5 h-3.5" />
-                        <span>{lang === 'hi' ? 'देखें' : 'Inspect'}</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* DL Metadata Details */}
-                  <div className="grid grid-cols-2 gap-3 text-xs">
-                    <div className={`p-3 rounded-2xl border ${isDark ? 'bg-stone-950 border-stone-800' : 'bg-slate-50 border-slate-200'}`}>
-                      <span className={`text-[10px] block font-bold ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>{lang === 'hi' ? 'लाइसेंस श्रेणी' : 'License Class'}</span>
-                      <span className={`font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>{lang === 'hi' ? 'हैवी ट्रैक्टर / कृषि मशीनरी' : 'Heavy Commercial Tractor'}</span>
-                    </div>
-                    <div className={`p-3 rounded-2xl border ${isDark ? 'bg-stone-950 border-stone-800' : 'bg-slate-50 border-slate-200'}`}>
-                      <span className={`text-[10px] block font-bold ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>{lang === 'hi' ? 'आरटीओ प्राधिकरण' : 'RTO Authority'}</span>
-                      <span className={`font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>RTO Malihabad (UP-32)</span>
-                    </div>
-                    <div className={`p-3 rounded-2xl border ${isDark ? 'bg-stone-950 border-stone-800' : 'bg-slate-50 border-slate-200'}`}>
-                      <span className={`text-[10px] block font-bold ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>{lang === 'hi' ? 'पंजीकृत फोन' : 'Registered Phone'}</span>
-                      <span className={`font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>{driverProfile.phone || '9876501234'}</span>
-                    </div>
-                    <div className={`p-3 rounded-2xl border ${isDark ? 'bg-stone-950 border-stone-800' : 'bg-slate-50 border-slate-200'}`}>
-                      <span className={`text-[10px] block font-bold ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>{lang === 'hi' ? 'सुरक्षा रिकॉर्ड' : 'Safety Record'}</span>
-                      <span className="font-black text-emerald-400">{lang === 'hi' ? '100% स्वच्छ रिकॉर्ड' : '100% Clean Record'}</span>
-                    </div>
-                  </div>
-
+              {/* Net Profit Calculation Display */}
+              <div className="p-3.5 rounded-2xl bg-stone-950 border border-stone-800 space-y-1.5">
+                <div className="flex justify-between text-stone-400">
+                  <span>{lang === 'hi' ? 'अनुमानित ट्रिप किराया:' : 'Est. Job Fare:'}</span>
+                  <span className="text-white font-bold">₹5,850</span>
                 </div>
-
-              </div>
-
-              {/* Right Column: Vehicle Machinery Passport & RC Plate Details */}
-              <div className="lg:col-span-6 space-y-6">
-                
-                <div className={`p-6 rounded-3xl border shadow-xl backdrop-blur-xl space-y-5 ${
-                  isDark 
-                    ? 'bg-[#111827]/90 border-emerald-500/20 shadow-black/50' 
-                    : 'bg-white border-slate-200 shadow-slate-200/60'
-                }`}>
-                  <div className="flex items-center justify-between border-b border-stone-800/40 pb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-emerald-950 text-emerald-400 border border-emerald-500/40 flex items-center justify-center text-xl shadow-inner">
-                        🚜
-                      </div>
-                      <div>
-                        <h4 className={`font-black text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                          {lang === 'hi' ? 'कृषि मशीनरी पासपोर्ट' : 'Agricultural Machinery Passport'}
-                        </h4>
-                        <p className={`text-[11px] ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
-                          {lang === 'hi' ? 'पंजीकृत भारी कृषि उपकरण' : 'Registered Heavy Fleet Equipment'}
-                        </p>
-                      </div>
-                    </div>
-
-                    <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-blue-950 text-blue-400 border border-blue-500/40">
-                      {lang === 'hi' ? 'कमर्शियल आरसी मान्य' : 'Commercial RC Valid'}
-                    </span>
-                  </div>
-
-                  {/* Number Plate & Machine Photo Preview with Zoom button */}
-                  <div className="relative group overflow-hidden rounded-2xl border-2 border-stone-800 bg-stone-950 h-56 flex items-center justify-center">
-                    <img
-                      src={defaultPlate}
-                      alt="Machinery Registration Plate"
-                      className="w-full h-full object-cover group-hover:scale-105 transition duration-300 opacity-90"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-transparent to-transparent flex items-end justify-between p-4">
-                      <div className="text-white">
-                        <span className="text-[10px] font-mono font-bold text-amber-400 bg-stone-900/90 px-2 py-0.5 rounded border border-amber-500/30">
-                          {lang === 'hi' ? 'नंबर: ' : 'Plate: '}{driverProfile.vehicleNumber || 'UP-32-AB-1555'}
-                        </span>
-                        <p className="text-xs font-bold mt-1">
-                          {driverProfile.modelName || 'Mahindra 575 DI'}
-                        </p>
-                      </div>
-
-                      <button
-                        onClick={() => setPreviewDoc({ title: lang === 'hi' ? 'वाहन नंबर प्लेट व आरसी' : 'Vehicle Number Plate & RC Photo', image: defaultPlate, type: 'Machinery RC Document' })}
-                        className="px-3 py-1.5 bg-white hover:bg-stone-100 text-stone-900 font-black text-xs rounded-xl shadow-md flex items-center gap-1.5 transition active:scale-95"
-                      >
-                        <Eye className="w-3.5 h-3.5" />
-                        <span>{lang === 'hi' ? 'देखें' : 'Inspect'}</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Vehicle Machinery Specifications */}
-                  <div className="grid grid-cols-2 gap-3 text-xs">
-                    <div className={`p-3 rounded-2xl border ${isDark ? 'bg-stone-950 border-stone-800' : 'bg-slate-50 border-slate-200'}`}>
-                      <span className={`text-[10px] block font-bold ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>{lang === 'hi' ? 'श्रेणी' : 'Category'}</span>
-                      <span className={`font-black capitalize ${isDark ? 'text-white' : 'text-slate-900'}`}>{driverProfile.vehicleType || 'Tractor (50 HP)'}</span>
-                    </div>
-                    <div className={`p-3 rounded-2xl border ${isDark ? 'bg-stone-950 border-stone-800' : 'bg-slate-50 border-slate-200'}`}>
-                      <span className={`text-[10px] block font-bold ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>{lang === 'hi' ? 'इंजन क्षमता' : 'Power Output'}</span>
-                      <span className={`font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>50 - 55 HP</span>
-                    </div>
-                  </div>
-
-                  {/* Supported Implements & Attachments */}
-                  <div className={`p-4 rounded-2xl border space-y-2 ${isDark ? 'bg-stone-950 border-stone-800' : 'bg-slate-50 border-slate-200'}`}>
-                    <span className={`text-[11px] font-black uppercase block ${isDark ? 'text-stone-400' : 'text-slate-600'}`}>
-                      {lang === 'hi' ? 'संबद्ध कृषि यंत्र व उपकरण:' : 'Supported Implements & Attachments:'}
-                    </span>
-                    <div className="flex flex-wrap gap-2">
-                      <span className={`px-2.5 py-1 rounded-lg text-xs font-bold border ${isDark ? 'bg-stone-900 border-stone-800 text-stone-200' : 'bg-white border-slate-300 text-slate-800'}`}>
-                        ⚙️ {lang === 'hi' ? 'रोटावेटर' : 'Rotavator'}
-                      </span>
-                      <span className={`px-2.5 py-1 rounded-lg text-xs font-bold border ${isDark ? 'bg-stone-900 border-stone-800 text-stone-200' : 'bg-white border-slate-300 text-slate-800'}`}>
-                        🌾 {lang === 'hi' ? 'मिट्टी पलट हल' : 'MB Plough'}
-                      </span>
-                      <span className={`px-2.5 py-1 rounded-lg text-xs font-bold border ${isDark ? 'bg-stone-900 border-stone-800 text-stone-200' : 'bg-white border-slate-300 text-slate-800'}`}>
-                        🌱 {lang === 'hi' ? 'बीज बुवाई मशीन' : 'Seed Drill'}
-                      </span>
-                      <span className={`px-2.5 py-1 rounded-lg text-xs font-bold border ${isDark ? 'bg-stone-900 border-stone-800 text-stone-200' : 'bg-white border-slate-300 text-slate-800'}`}>
-                        🚜 {lang === 'hi' ? '4-पहिया ट्रॉली' : '4-Wheel Trolley'}
-                      </span>
-                    </div>
-                  </div>
-
+                <div className="flex justify-between text-stone-400">
+                  <span>{lang === 'hi' ? 'डीजल कटौती:' : 'Fuel Deduction:'}</span>
+                  <span className="text-red-400 font-bold">-₹{fuelCostInput}</span>
                 </div>
-
-              </div>
-
-            </div>
-
-          </div>
-        )}
-
-        {/* ══════════════ MODAL 1: DOCUMENT INSPECTION POPUP ══════════════ */}
-        {previewDoc && (
-          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
-            <div className={`rounded-3xl max-w-lg w-full p-6 shadow-2xl border relative space-y-4 ${
-              isDark ? 'bg-stone-900 border-stone-800 text-white' : 'bg-white border-slate-200 text-slate-900'
-            }`}>
-              <div className="flex items-center justify-between border-b border-stone-800/40 pb-3">
-                <div>
-                  <h4 className="font-black text-base">{previewDoc.title}</h4>
-                  <p className="text-xs text-stone-400 font-semibold">{previewDoc.type}</p>
+                <div className="flex justify-between pt-1.5 border-t border-stone-800 font-black text-sm">
+                  <span className="text-stone-200">{lang === 'hi' ? 'शुद्ध चालक लाभ:' : 'Net Driver Profit:'}</span>
+                  <span className="text-emerald-400">₹{5850 - fuelCostInput} ({(Math.round((5850 - fuelCostInput)/5850 * 100))}% Margin)</span>
                 </div>
-                <button
-                  onClick={() => setPreviewDoc(null)}
-                  className="w-8 h-8 rounded-full bg-stone-800 hover:bg-stone-700 text-stone-300 flex items-center justify-center transition"
-                >
-                  <X className="w-4 h-4" />
-                </button>
               </div>
 
-              <div className="rounded-2xl overflow-hidden border border-stone-800 max-h-[60vh]">
-                <img src={previewDoc.image} alt={previewDoc.title} className="w-full h-auto object-contain" />
-              </div>
-
-              <div className="p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-emerald-300 text-xs font-bold flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>{lang === 'hi' ? 'कृषि सेवा नेटवर्क पर एन्क्रिप्टेड व सत्यापित' : 'Verified and encrypted in KrishiSeva Driver Network'}</span>
+              <div className="text-[10px] text-stone-400 flex items-center justify-between px-1">
+                <span>{lang === 'hi' ? 'औसत खपत:' : 'Avg Consumption:'} ~3.8 L/hr</span>
+                <span>{lang === 'hi' ? 'डीजल सब्सिडी समर्थित' : 'Diesel Norms Met'}</span>
               </div>
             </div>
           </div>
-        )}
 
-        {/* ══════════════ MODAL 2: EDIT MACHINE RATES POPUP ══════════════ */}
-        {isEditingRates && (
-          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
-            <div className={`rounded-3xl max-w-md w-full p-6 shadow-2xl border relative space-y-5 ${
-              isDark ? 'bg-stone-900 border-stone-800 text-white' : 'bg-white border-slate-200 text-slate-900'
-            }`}>
-              <div className="flex items-center justify-between border-b border-stone-800/40 pb-3">
-                <h4 className="font-black text-base">{lang === 'hi' ? 'मशीनरी किराया दरें अपडेट करें' : 'Update Machinery Rental Rates'}</h4>
-                <button
-                  onClick={() => setIsEditingRates(false)}
-                  className="w-8 h-8 rounded-full bg-stone-800 hover:bg-stone-700 text-stone-300 flex items-center justify-center transition"
-                >
-                  <X className="w-4 h-4" />
-                </button>
+          {/* Panel C (Right 4 Cols): Digital Vehicle Passport & KYC */}
+          <div 
+            onClick={() => setActiveTab('passport')}
+            className="lg:col-span-4 p-6 rounded-3xl bg-gradient-to-br from-stone-900 via-stone-950 to-emerald-950/80 border border-emerald-500/30 text-white cursor-pointer hover:shadow-2xl hover:border-emerald-500/50 transition-all duration-200 space-y-4 group relative overflow-hidden"
+          >
+            <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none" />
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest font-mono">
+                  {lang === 'hi' ? 'डिजिटल वाहन पासपोर्ट' : 'DIGITAL VEHICLE PASSPORT'}
+                </span>
               </div>
+              <ChevronRight className="w-4 h-4 text-emerald-400 group-hover:translate-x-1 transition-transform" />
+            </div>
 
-              <form onSubmit={handleSaveRates} className="space-y-4">
-                <div>
-                  <label className="block text-xs font-black uppercase mb-1">
-                    {lang === 'hi' ? 'प्रति घंटा दर (₹) *' : 'Hourly Rate (₹) *'}
-                  </label>
-                  <input
-                    type="number"
-                    min="200"
-                    step="50"
-                    required
-                    value={rateForm.hourlyRate}
-                    onChange={(e) => setRateForm({ ...rateForm, hourlyRate: e.target.value })}
-                    className={`w-full px-4 py-3 rounded-2xl border font-black text-base outline-none focus:border-emerald-500 ${
-                      isDark ? 'border-stone-700 bg-stone-950 text-white' : 'border-slate-300 bg-white text-slate-900'
-                    }`}
-                  />
-                </div>
+            <div className="space-y-1">
+              <h5 className="font-black text-lg text-white">
+                {driverProfile?.modelName || 'Mahindra 575 DI (50 HP)'}
+              </h5>
+              <p className="text-xs font-mono text-emerald-300 font-black px-2.5 py-1 rounded-lg bg-stone-900/90 border border-emerald-500/20 inline-block">
+                {driverProfile?.vehicleNumber || 'UP-32-KR-7744'}
+              </p>
+            </div>
 
-                <div>
-                  <label className="block text-xs font-black uppercase mb-1">
-                    {lang === 'hi' ? 'प्रति बीघा जुताई दर (₹) *' : 'Per Bigha Rate (₹) *'}
-                  </label>
-                  <input
-                    type="number"
-                    min="300"
-                    step="50"
-                    required
-                    value={rateForm.acreRate}
-                    onChange={(e) => setRateForm({ ...rateForm, acreRate: e.target.value })}
-                    className={`w-full px-4 py-3 rounded-2xl border font-black text-base text-emerald-400 outline-none focus:border-emerald-500 ${
-                      isDark ? 'border-stone-700 bg-stone-950 text-white' : 'border-slate-300 bg-white text-slate-900'
-                    }`}
-                  />
-                </div>
+            <div className="space-y-2 text-xs text-stone-300">
+              <div className="flex justify-between items-center">
+                <span>RC Verification:</span>
+                <span className="text-emerald-400 font-black">✓ UP RTO Verified</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span>Commercial DL:</span>
+                <span className="text-emerald-400 font-black">✓ Valid Heavy Agro</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span>Insurance / Fitness:</span>
+                <span className="text-blue-400 font-bold">Valid till Dec 2028</span>
+              </div>
+            </div>
 
-                <div className="flex items-center justify-between pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setIsEditingRates(false)}
-                    className="px-4 py-2.5 rounded-xl border border-stone-700 text-stone-300 font-bold text-xs hover:bg-stone-800"
-                  >
-                    {lang === 'hi' ? 'रद्द करें' : 'Cancel'}
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-black text-xs shadow-md transition active:scale-95"
-                  >
-                    {lang === 'hi' ? 'दरें सहेजें' : 'Save Rates'}
-                  </button>
-                </div>
-              </form>
+            <div className="pt-2 border-t border-stone-800 flex items-center justify-between text-[11px] text-stone-400">
+              <span>Category: TRACTOR (50 HP)</span>
+              <span className="text-emerald-400 font-bold flex items-center gap-1">
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>Level 3 KYC</span>
+              </span>
             </div>
           </div>
-        )}
+
+        </div>
+
+        {/* ══════════════ 6. RECENT COMPLETED JOBS ACTIVITY LOG ══════════════ */}
+        <div className={`rounded-3xl p-6 border shadow-2xl space-y-4 ${
+          isDark ? 'bg-[#0A0E13] border-white/10 shadow-black/40' : 'bg-white border-slate-200'
+        }`}>
+          <div className="flex items-center justify-between pb-3 border-b border-white/10">
+            <div className="flex items-center gap-2">
+              <History className="w-4 h-4 text-emerald-400" />
+              <h4 className={`font-black text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                {lang === 'hi' ? 'हालिया संपन्न कार्य व भुगतान लॉग' : 'Recent Completed Jobs & Payout Ledger'}
+              </h4>
+            </div>
+            <span className="text-xs text-stone-400 font-bold">
+              {recentJobsLog.length} Records Verified
+            </span>
+          </div>
+
+          <div className="space-y-3">
+            {recentJobsLog.map((job) => (
+              <div
+                key={job.id}
+                className={`p-4 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs transition ${
+                  isDark ? 'bg-stone-950/60 border-stone-800/80 hover:border-emerald-700/40' : 'bg-slate-50 border-slate-200'
+                }`}
+              >
+                <div className="flex items-center gap-3.5">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-950/80 border border-emerald-700/50 text-emerald-400 flex items-center justify-center text-xl shrink-0">
+                    🚜
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className={`font-bold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>{job.farmerName}</span>
+                      <span className="text-[10px] text-stone-400">• {job.time}</span>
+                    </div>
+                    <p className={`text-[11px] ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+                      {job.khetLocation} ({job.size}) • {job.machinery}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between sm:justify-end gap-4">
+                  <div className="text-right">
+                    <span className="font-black text-sm text-emerald-400 block">+₹{job.fare}</span>
+                    <span className="text-[10px] text-stone-400">Net Profit: ₹{job.netProfit}</span>
+                  </div>
+                  <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-950 text-emerald-300 border border-emerald-700/60 shrink-0">
+                    ✓ {job.paymentMethod}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
 
       </div>
+
+      {/* ══════════════ MODAL: INSTANT UPI CASHOUT ══════════════ */}
+      {isCashoutModalOpen && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-stone-950/85 backdrop-blur-md animate-fade-in">
+          <div className="bg-stone-900 text-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-emerald-500/40 space-y-5">
+            
+            {cashoutSuccessData ? (
+              <div className="text-center space-y-4 py-2">
+                <div className="w-16 h-16 rounded-3xl bg-emerald-950 border border-emerald-500/50 text-emerald-400 flex items-center justify-center text-3xl mx-auto shadow-inner">
+                  🎉
+                </div>
+                <h3 className="text-xl font-black text-white">
+                  {lang === 'hi' ? 'यूपीआई भुगतान सफल!' : 'Instant Cashout Successful!'}
+                </h3>
+                <div className="p-4 rounded-2xl bg-stone-950 border border-stone-800 text-xs space-y-2 text-left">
+                  <div className="flex justify-between">
+                    <span className="text-stone-400">Amount Transferred:</span>
+                    <b className="text-emerald-400 text-sm">₹{cashoutSuccessData.amount}</b>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-stone-400">UPI ID:</span>
+                    <b className="text-white">{cashoutSuccessData.upiId}</b>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-stone-400">Transaction ID:</span>
+                    <b className="text-stone-300 font-mono text-[11px]">{cashoutSuccessData.txnId}</b>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-stone-400">Settlement Time:</span>
+                    <b className="text-stone-300">{cashoutSuccessData.timestamp} (Instant IMPS)</b>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsCashoutModalOpen(false);
+                    setCashoutSuccessData(null);
+                  }}
+                  className="w-full py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-black text-sm shadow-xl shadow-emerald-500/30 transition active:scale-95 cursor-pointer"
+                >
+                  {lang === 'hi' ? 'समाप्त करें' : 'Done'}
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleExecuteCashout} className="space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-stone-800">
+                  <div className="flex items-center gap-2">
+                    <Wallet className="w-5 h-5 text-emerald-400" />
+                    <h3 className="text-lg font-black text-white">
+                      {lang === 'hi' ? 'तत्काल यूपीआई निकासी' : 'Instant UPI Cashout'}
+                    </h3>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsCashoutModalOpen(false)}
+                    className="text-stone-400 hover:text-white"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-stone-950 border border-stone-800 flex justify-between items-center text-xs">
+                  <span className="text-stone-400">Available Wallet Balance:</span>
+                  <span className="text-lg font-black text-emerald-400">₹{walletBalance.toLocaleString()}</span>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-black text-stone-400 uppercase mb-1.5">
+                    {lang === 'hi' ? 'निकासी राशि (₹)' : 'Withdrawal Amount (₹)'}
+                  </label>
+                  <input
+                    type="number"
+                    value={cashoutAmount}
+                    onChange={(e) => setCashoutAmount(e.target.value)}
+                    max={walletBalance}
+                    min={100}
+                    className="w-full px-4 py-3 rounded-xl border border-stone-700 bg-stone-950 font-black text-lg text-white outline-none focus:border-emerald-500"
+                    placeholder="Enter amount"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-black text-stone-400 uppercase mb-1.5">
+                    {lang === 'hi' ? 'प्राप्तकर्ता यूपीआई आईडी' : 'Recipient UPI VPA ID'}
+                  </label>
+                  <input
+                    type="text"
+                    value={cashoutUpiId}
+                    onChange={(e) => setCashoutUpiId(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-stone-700 bg-stone-950 font-bold text-sm text-white outline-none focus:border-emerald-500"
+                    placeholder="yourname@upi"
+                    required
+                  />
+                </div>
+
+                <div className="p-3 rounded-xl bg-emerald-950/60 border border-emerald-500/30 text-[11px] text-emerald-300 font-bold flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>₹0 Gateway Fees • Instant 24x7 IMPS Transfer</span>
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-black text-sm shadow-xl shadow-emerald-500/30 transition active:scale-95 cursor-pointer"
+                >
+                  {lang === 'hi' ? `₹${cashoutAmount || walletBalance} तुरंत ट्रांसफर करें →` : `Transfer ₹${cashoutAmount || walletBalance} to Bank →`}
+                </button>
+              </form>
+            )}
+
+          </div>
+        </div>
+      )}
 
     </div>
   );
