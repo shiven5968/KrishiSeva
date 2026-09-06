@@ -4,6 +4,8 @@ import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import { 
   ShieldCheck, 
+  Shield,
+  Crown,
   Lock, 
   ArrowRight, 
   KeyRound, 
@@ -11,7 +13,6 @@ import {
   User, 
   ArrowLeft,
   Zap,
-  Terminal,
   Sun,
   Moon,
   Globe
@@ -38,6 +39,7 @@ export default function AdminLoginGate({ onAdminLoginSuccess }) {
       quickDemoLogin('admin');
       setError('');
       if (onAdminLoginSuccess) onAdminLoginSuccess();
+    } else {
       setError(
         lang === 'hi' 
           ? 'अमान्य यूजर आईडी या पासकी।' 
@@ -58,24 +60,18 @@ export default function AdminLoginGate({ onAdminLoginSuccess }) {
       {/* Subtle bottom emerald glow */}
       <div className="absolute -bottom-32 left-1/2 -translate-x-1/2 w-[600px] h-64 bg-emerald-500/10 rounded-full blur-[100px] pointer-events-none" />
 
-      {/* ═══════════ TOP FLOATING CONTROLS ═══════════ */}
-      <div className="w-full max-w-5xl flex items-center justify-between z-10 pt-2">
-        {/* Return to Public Home */}
+      {/* Top Navbar Back & Tools */}
+      <div className="w-full max-w-5xl flex items-center justify-between relative z-10">
         <button
-          type="button"
-          onClick={() => {
-            window.location.hash = '';
-            setActiveRole('landing');
-          }}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-black/50 hover:bg-black/80 border border-emerald-500/20 hover:border-emerald-500/40 text-stone-300 hover:text-white text-xs font-bold transition-all duration-200 backdrop-blur-xl shadow-lg active:scale-95 group"
+          onClick={() => setActiveRole('farmer')}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-black/50 border border-emerald-500/20 text-emerald-400 hover:text-emerald-300 text-xs font-bold transition hover:bg-emerald-950/40 backdrop-blur-xl group"
         >
-          <ArrowLeft className="w-4 h-4 text-emerald-400 group-hover:-translate-x-0.5 transition-transform" />
-          <span>{lang === 'hi' ? 'मुख्य पृष्ठ पर वापस जाएं' : 'Back to KrishiSeva'}</span>
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+          <span>{lang === 'hi' ? '← मुख्य पोर्टल पर लौटें' : '← Back to App'}</span>
         </button>
 
-        {/* Header Right Utilities */}
-        <div className="flex items-center gap-2">
-          {/* Theme Switcher */}
+        <div className="flex items-center gap-2.5">
+          {/* Dark / Light Toggle */}
           <button
             onClick={toggleTheme}
             className="px-3 py-2 rounded-2xl bg-black/50 border border-emerald-500/20 text-stone-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5 backdrop-blur-xl"
@@ -106,20 +102,34 @@ export default function AdminLoginGate({ onAdminLoginSuccess }) {
             <span>🔒 RESTRICTED COMMAND PORTAL • LEVEL 3 AUTH</span>
           </div>
 
-          {/* Icon and Titles */}
-          <div className="space-y-2">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-950 to-stone-900 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto shadow-xl ring-2 ring-emerald-500/20 shadow-emerald-500/10">
-              <Terminal className="w-8 h-8 text-emerald-400" />
+          {/* Super Admin Emblem Logo and Titles */}
+          <div className="space-y-3">
+            <div className="relative w-18 h-18 mx-auto flex items-center justify-center group">
+              {/* Outer ambient pulsing glow */}
+              <div className="absolute inset-0 bg-emerald-500/25 rounded-3xl blur-xl group-hover:bg-emerald-500/40 transition-all duration-500 animate-pulse" />
+              
+              {/* Main emblem squircle container */}
+              <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-950 via-stone-900 to-[#0A0E13] border-2 border-emerald-500/50 flex items-center justify-center shadow-[0_0_25px_rgba(16,185,129,0.25)] ring-1 ring-white/10 group-hover:scale-105 transition-transform duration-300">
+                {/* Admin Shield Icon */}
+                <ShieldCheck className="w-8 h-8 text-emerald-400 drop-shadow-[0_0_12px_rgba(16,185,129,0.6)] stroke-[2.2]" />
+                
+                {/* Crown / Authority Badge in Top Corner */}
+                <div className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-gradient-to-tr from-amber-500 to-amber-300 border-2 border-stone-950 flex items-center justify-center shadow-lg shadow-amber-500/30">
+                  <Crown className="w-3.5 h-3.5 text-stone-950 fill-stone-950 stroke-[2.5]" />
+                </div>
+              </div>
             </div>
 
-            <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-              {lang === 'hi' ? 'सुपर एडमिन कमांड सेंटर' : 'Super Admin Command'}
-            </h2>
-            <p className="text-xs text-stone-400 font-medium max-w-xs mx-auto">
-              {lang === 'hi' 
-                ? 'कृषि फ्लीट टेलीमेट्री, ड्राइवर केवाईसी व प्लेटफॉर्म दर प्रबंधन' 
-                : 'Enterprise Fleet Telemetry, Driver KYC Audit & Dynamic Pricing Engine'}
-            </p>
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                {lang === 'hi' ? 'सुपर एडमिन कमांड सेंटर' : 'Super Admin Command'}
+              </h2>
+              <p className="text-xs text-stone-400 font-medium max-w-xs mx-auto mt-1">
+                {lang === 'hi' 
+                  ? 'कृषि फ्लीट टेलीमेट्री, ड्राइवर केवाईसी व प्लेटफॉर्म दर प्रबंधन' 
+                  : 'Enterprise Fleet Telemetry, Driver KYC Audit & Dynamic Pricing Engine'}
+              </p>
+            </div>
           </div>
 
           {error && (
