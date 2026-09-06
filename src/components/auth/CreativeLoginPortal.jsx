@@ -531,14 +531,14 @@ export default function CreativeLoginPortal() {
 
         {/* Actions & Controls (Far Right) */}
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* Top Navigation Bar Login Pill */}
+          {/* Top Navigation Bar Login Pill — 3D Emerald */}
           <button
             onClick={() => setPortalView(prev => prev === 'landing' ? 'login' : 'landing')}
-            className="px-5 py-2.5 rounded-full bg-slate-900/80 hover:bg-emerald-500/10 border border-emerald-500/40 text-emerald-400 hover:text-emerald-300 font-bold text-sm backdrop-blur-xl shadow-lg hover:border-emerald-400 transition-all active:scale-95 cursor-pointer flex items-center gap-2"
+            className="px-8 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-400 border-b-[3px] border-emerald-700 hover:border-emerald-600 text-white font-bold text-sm shadow-[0_4px_14px_rgba(16,185,129,0.35)] hover:shadow-[0_6px_20px_rgba(16,185,129,0.5)] active:border-b-0 active:mt-[3px] active:shadow-[0_2px_6px_rgba(16,185,129,0.2)] transition-all duration-150 cursor-pointer flex items-center gap-2.5"
           >
             {portalView === 'landing' ? (
               <>
-                <User className="w-4 h-4 text-emerald-400" />
+                <User className="w-4 h-4 text-white" />
                 <span>{lang === 'hi' ? 'लॉगिन' : 'Login'}</span>
               </>
             ) : (
