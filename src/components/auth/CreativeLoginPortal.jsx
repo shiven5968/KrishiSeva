@@ -1585,68 +1585,64 @@ export default function CreativeLoginPortal() {
 
       {/* ═══════════ FARMER FAQ SECTION (Landing View Only) ═══════════ */}
       {portalView === 'landing' && (
-        <div 
-          ref={faqRef}
-          className={`relative w-full py-20 px-6 border-t transition-all duration-700 ease-out transform ${
-            isDark 
-              ? 'bg-slate-950 border-white/5 text-stone-100' 
-              : 'bg-slate-50 border-slate-200 text-slate-900'
-          } ${
-            faqVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
-          }`}
+        <section 
+          className="relative w-full py-20 px-4 sm:px-6 lg:px-8 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950 transition-colors duration-300"
         >
-          <div className="max-w-4xl mx-auto space-y-8 text-center mb-12">
-            <span className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs px-3.5 py-1.5 rounded-full inline-block font-semibold">
-              ❓ {lang === 'hi' ? 'किसान सहायता केंद्र' : 'FARMER HELP CENTER'}
+          <div className="max-w-4xl mx-auto space-y-4 text-center mb-12">
+            <span className="bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 text-xs px-4 py-1.5 rounded-full inline-flex items-center gap-1.5 font-bold shadow-sm">
+              <Sparkles className="w-3.5 h-3.5 text-emerald-500" />
+              <span>{lang === 'hi' ? 'अक्सर पूछे जाने वाले सवाल' : 'Frequently Asked Questions'}</span>
             </span>
-            <h2 className={`text-3xl md:text-4xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white font-display">
               {lang === 'hi' ? 'बुकिंग करने से पहले सब कुछ जानें' : 'Everything You Should Know Before Booking'}
             </h2>
-            <p className={`text-sm md:text-base max-w-2xl mx-auto ${isDark ? 'text-slate-400' : 'text-slate-650'}`}>
+            <p className="text-sm sm:text-base max-w-2xl mx-auto text-slate-600 dark:text-slate-400">
               {lang === 'hi' 
                 ? 'सत्यापित ट्रैक्टरों और हार्वेस्टरों को 100% भरोसे के साथ बुक करने में आपकी सहायता के लिए स्पष्ट उत्तर।' 
                 : 'Clear, transparent answers to help you book tractors and harvesters with 100% confidence.'}
             </p>
           </div>
 
-          <div className="max-w-3xl mx-auto">
-            {faqs.map((faq, index) => (
-              <div
-                key={index}
-                onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
-                className={`transition-all duration-300 shadow-xl cursor-pointer text-left mb-4 rounded-2xl p-6 border ${
-                  openFaqIndex === index 
-                    ? isDark
-                      ? 'border-l-4 border-l-emerald-500 border-emerald-500/40 bg-slate-900' 
-                      : 'border-l-4 border-l-emerald-500 border-emerald-500/30 bg-slate-100'
-                    : isDark
-                      ? 'bg-slate-900 border-white/10 hover:border-emerald-500/40' 
-                      : 'bg-white border-slate-200 hover:border-emerald-500/40'
-                }`}
-              >
-                <div className="flex justify-between items-center gap-4">
-                  <span className={`font-bold text-sm md:text-base ${
-                    openFaqIndex === index 
-                      ? 'text-emerald-500 font-extrabold' 
-                      : isDark ? 'text-white' : 'text-slate-800'
-                  }`}>
-                    {faq.q}
-                  </span>
-                  <ChevronDown className={`w-5 h-5 shrink-0 text-emerald-600 dark:text-emerald-400 transition-transform duration-300 ${
-                    openFaqIndex === index ? 'rotate-180' : 'rotate-0'
-                  }`} />
+          <div className="max-w-3xl mx-auto space-y-3.5">
+            {faqs.map((faq, index) => {
+              const isOpen = openFaqIndex === index;
+              return (
+                <div
+                  key={index}
+                  onClick={() => setOpenFaqIndex(isOpen ? null : index)}
+                  className={`rounded-2xl border transition-all duration-200 cursor-pointer p-5 sm:p-6 shadow-sm ${
+                    isOpen 
+                      ? 'bg-white dark:bg-slate-900 border-l-4 border-l-emerald-500 border-emerald-500/40 shadow-md' 
+                      : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-emerald-500/40 hover:shadow-md'
+                  }`}
+                >
+                  <div className="flex justify-between items-center gap-4">
+                    <span className={`font-bold text-sm sm:text-base ${
+                      isOpen ? 'text-emerald-600 dark:text-emerald-400 font-extrabold' : 'text-slate-900 dark:text-white'
+                    }`}>
+                      {faq.q}
+                    </span>
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-200 ${
+                      isOpen 
+                        ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 rotate-180' 
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                    }`}>
+                      <ChevronDown className="w-4 h-4" />
+                    </div>
+                  </div>
+                  
+                  {isOpen && (
+                    <div className="mt-3.5 pt-3.5 border-t border-slate-100 dark:border-slate-800/80 animate-fade-in">
+                      <p className="text-xs sm:text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                        {faq.a}
+                      </p>
+                    </div>
+                  )}
                 </div>
-                <div className={`overflow-hidden transition-all duration-300 ${
-                  openFaqIndex === index ? 'max-h-40 mt-4 opacity-100' : 'max-h-0 opacity-0'
-                }`}>
-                  <p className={`text-xs md:text-sm leading-relaxed ${isDark ? 'text-stone-300' : 'text-slate-600'}`}>
-                    {faq.a}
-                  </p>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
-        </div>
+        </section>
       )}
 
       {/* ═══════════ MINIMALIST FOOTER ═══════════ */}
