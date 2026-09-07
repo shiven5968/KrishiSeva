@@ -514,30 +514,19 @@ export default function CreativeLoginPortal() {
 
         {/* Actions & Controls (Far Right) */}
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* Top Navigation Bar Login / Home Pill */}
-          <button
-            onClick={() => setPortalView(prev => prev === 'landing' ? 'login' : 'landing')}
-            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold border transition-all duration-200 cursor-pointer flex items-center gap-2 active:scale-95 shadow-sm ${
-              portalView === 'landing'
-                ? isDark
-                  ? 'bg-slate-900/90 hover:bg-slate-800 border-slate-800 text-slate-100 hover:border-emerald-500/40'
-                  : 'bg-white/95 hover:bg-emerald-50/60 border-slate-200 text-slate-900 hover:border-emerald-500/40'
-                : isDark
-                  ? 'bg-emerald-950/60 hover:bg-emerald-900/60 border-emerald-800/80 text-emerald-300'
-                  : 'bg-emerald-50 hover:bg-emerald-100 border-emerald-200 text-emerald-800'
-            }`}
-          >
-            {portalView === 'landing' ? (
-              <>
-                <LogIn className="w-4 h-4 text-emerald-500" />
-                <span>{lang === 'hi' ? 'लॉगिन करें' : 'Sign In'}</span>
-              </>
-            ) : (
-              <>
-                <span>{lang === 'hi' ? '← मुख्य पृष्ठ' : '← Home'}</span>
-              </>
-            )}
-          </button>
+          {/* Back to Home Button (Visible only when in Login Portal) */}
+          {portalView === 'login' && (
+            <button
+              onClick={() => setPortalView('landing')}
+              className={`px-3.5 py-1.5 rounded-full text-xs font-bold border transition-all active:scale-95 cursor-pointer flex items-center gap-1.5 shadow-sm ${
+                isDark
+                  ? 'bg-slate-900/90 hover:bg-slate-800 border-slate-800 text-slate-200'
+                  : 'bg-white hover:bg-slate-100 border-slate-200 text-slate-700'
+              }`}
+            >
+              <span>{lang === 'hi' ? '← मुख्य पृष्ठ' : '← Home'}</span>
+            </button>
+          )}
 
           {/* Admin Login Quick Link */}
           <button
