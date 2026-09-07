@@ -5,6 +5,31 @@ const AuthContext = createContext();
 
 // Default Pre-Registered Users Database
 export const MOCK_USER_DATABASE = {
+  '1111111111': {
+    phone: '1111111111',
+    role: 'farmer',
+    name: 'Balram Singh (बलराम सिंह)',
+    village: 'Gram Malihabad',
+    isRegistered: true,
+    isAgriStackVerified: true,
+    farmerId: 'UPFR-2026-88910'
+  },
+  '9999999999': {
+    phone: '9999999999',
+    role: 'driver',
+    name: 'Jagjit Singh (जगजीत सिंह)',
+    verificationStatus: 'verified',
+    status: 'online',
+    vehicleType: 'tractor',
+    modelName: 'Mahindra 575 DI (50 HP)',
+    vehicleNumber: 'UP-32-KR-7744',
+    hourlyRate: 1000,
+    acreRate: 1300,
+    isRegistered: true,
+    totalEarnings: 84500,
+    completedRides: 142,
+    rating: 4.95
+  },
   '9876543210': {
     phone: '9876543210',
     role: 'farmer',
@@ -46,8 +71,8 @@ export const MOCK_USER_DATABASE = {
     completedRides: 0,
     rating: 5.0
   },
-  '9999999999': {
-    phone: '9999999999',
+  '8888888888': {
+    phone: '8888888888',
     role: 'admin',
     name: 'Super Admin (प्रशासक)',
     isRegistered: true
@@ -251,8 +276,8 @@ export function AuthProvider({ children }) {
     limitData.requestTimestamps.push(now);
     localStorage.setItem(rateLimitKey, JSON.stringify(limitData));
 
-    // Generate secure 6-digit numeric OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    // Generate secure 4-digit numeric OTP
+    const otp = Math.floor(1000 + Math.random() * 9000).toString();
     setGeneratedOtp(otp);
     setOtpExpiresAt(now + 5 * 60 * 1000); // 5 minutes expiration
     setPendingAuthPhone(cleanPhone);
@@ -266,9 +291,9 @@ export function AuthProvider({ children }) {
     const cleanPhone = phone.replace(/\D/g, '').slice(-10);
     const lang = localStorage.getItem('krishi_lang') || 'hi';
 
-    const isUniversalDemoOtp = otpVal === '123456';
+    const isUniversalDemoOtp = otpVal === '1234' || otpVal === '1111' || otpVal === '123456';
 
-    // 1. Expiration Check (bypassed if universal demo OTP 123456 is used)
+    // 1. Expiration Check (bypassed if universal demo OTP 1234/1111/123456 is used)
     if (!isUniversalDemoOtp && otpExpiresAt > 0 && Date.now() > otpExpiresAt) {
       return { 
         success: false, 
@@ -327,7 +352,7 @@ export function AuthProvider({ children }) {
 
     return { 
       success: false, 
-      error: lang === 'hi' ? 'गलत ओटीपी कोड। कृपया सही 6-अंकीय कोड दर्ज करें।' : 'Invalid OTP. Please check the code sent to your mobile.' 
+      error: lang === 'hi' ? 'गलत ओटीपी कोड। कृपया सही 4-अंकीय कोड दर्ज करें।' : 'Invalid OTP. Please check the 4-digit code sent to your mobile.' 
     };
   };
 

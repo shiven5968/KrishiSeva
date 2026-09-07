@@ -199,12 +199,12 @@ export default function CreativeLoginPortal() {
   };
 
   // ─────────────────────────────────────────────────────────────
-  // 2. Verify 6-Digit WhatsApp OTP Logic
+  // 2. Verify 4-Digit WhatsApp OTP Logic
   // ─────────────────────────────────────────────────────────────
   const handleVerifyOtp = (e) => {
     e?.preventDefault();
-    if (!otp || otp.length < 6) {
-      setError(lang === 'hi' ? 'कृपया पूरा 6-अंकीय ओटीपी दर्ज करें' : 'Please enter the full 6-digit OTP');
+    if (!otp || otp.length < 4) {
+      setError(lang === 'hi' ? 'कृपया पूरा 4-अंकीय ओटीपी दर्ज करें' : 'Please enter the full 4-digit OTP');
       return;
     }
     setError('');
@@ -215,7 +215,7 @@ export default function CreativeLoginPortal() {
 
     if (result.success) {
       if (result.isNewUser) {
-        // New user -> prompt for Role (Farmer vs Driver) and Name
+        // New user -> prompt for Role (Farmer vs Driver)
         setStep('profile_setup');
       } else {
         // Returning user -> log straight into cockpit
@@ -230,6 +230,16 @@ export default function CreativeLoginPortal() {
     } else {
       setError(result.error);
     }
+  };
+
+  // Direct 1-Click Role Login for Fallback / Unknown phone numbers
+  const handleDirectRoleLogin = (role) => {
+    const cleanPhone = phone.replace(/\D/g, '').slice(-10);
+    completeNewUserRegistration(role, {
+      name: userName.trim() || (role === 'farmer' ? `Kisan ${cleanPhone.slice(-4)}` : `Driver ${cleanPhone.slice(-4)}`),
+      phone: cleanPhone
+    });
+    setActiveRole(role);
   };
 
   // ─────────────────────────────────────────────────────────────
@@ -732,71 +742,6 @@ export default function CreativeLoginPortal() {
                     </button>
                   </form>
 
-                  {/* Quick 1-Click Demo Logins */}
-                  <div className="pt-2 space-y-2.5">
-                    <div className="flex items-center gap-2">
-                      <div className={`h-px flex-1 ${isDark ? 'bg-stone-800' : 'bg-slate-200'}`} />
-                      <span className="text-[10px] font-black uppercase tracking-wider text-emerald-500">
-                        {lang === 'hi' ? '⚡ 1-क्लिक डेमो लॉगिन (बिना ओटीपी)' : '⚡ 1-Click Demo Login (No OTP)'}
-                      </span>
-                      <div className={`h-px flex-1 ${isDark ? 'bg-stone-800' : 'bg-slate-200'}`} />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2.5">
-                      <div
-                        onClick={() => quickDemoLogin('farmer')}
-                        className={`border p-3.5 rounded-2xl cursor-pointer transition-all duration-250 flex items-center justify-between group active:scale-95 ${
-                          isDark 
-                            ? 'bg-white/[0.03] hover:bg-white/[0.07] border-white/10 hover:border-emerald-500/40 text-slate-200' 
-                            : 'bg-slate-50 hover:bg-slate-100/80 border-slate-200 hover:border-emerald-500/40 text-slate-800 shadow-xs'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          <span className="text-xl">🌾</span>
-                          <div>
-                            <span className={`text-xs font-bold block group-hover:text-emerald-505 transition-colors duration-200 ${
-                              isDark ? 'text-white' : 'text-slate-900'
-                            }`}>
-                              {lang === 'hi' ? 'बलराम (किसान)' : 'Balram (Farmer)'}
-                            </span>
-                            <span className={`text-[10px] font-mono ${
-                              isDark ? 'text-slate-400' : 'text-slate-500'
-                            }`}>
-                              9876543210
-                            </span>
-                          </div>
-                        </div>
-                        <ArrowRight className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 opacity-70 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
-                      </div>
-
-                      <div
-                        onClick={() => quickDemoLogin('driver')}
-                        className={`border p-3.5 rounded-2xl cursor-pointer transition-all duration-250 flex items-center justify-between group active:scale-95 ${
-                          isDark 
-                            ? 'bg-white/[0.03] hover:bg-white/[0.07] border-white/10 hover:border-emerald-500/40 text-slate-200' 
-                            : 'bg-slate-50 hover:bg-slate-100/80 border-slate-200 hover:border-emerald-500/40 text-slate-800 shadow-xs'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          <span className="text-xl">🚜</span>
-                          <div>
-                            <span className={`text-xs font-bold block group-hover:text-emerald-505 transition-colors duration-200 ${
-                              isDark ? 'text-white' : 'text-slate-900'
-                            }`}>
-                              {lang === 'hi' ? 'जगजीत (चालक)' : 'Jagjit (Driver)'}
-                            </span>
-                            <span className={`text-[10px] font-mono ${
-                              isDark ? 'text-slate-400' : 'text-slate-500'
-                            }`}>
-                              9876501234
-                            </span>
-                          </div>
-                        </div>
-                        <ArrowRight className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 opacity-70 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
-                      </div>
-                    </div>
-                  </div>
-
                   {/* Minimal Security Text */}
                   <div className={`flex items-center justify-center gap-2 text-[10px] pt-1 ${
                     isDark ? 'text-stone-400' : 'text-slate-500'
@@ -815,7 +760,7 @@ export default function CreativeLoginPortal() {
                       <MessageSquare className="w-7 h-7 text-emerald-400" />
                     </div>
                     <h3 className={`text-2xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                      {lang === 'hi' ? '6-अंकीय ओटीपी दर्ज करें' : 'Enter 6-Digit OTP'}
+                      {lang === 'hi' ? '4-अंकीय ओटीपी दर्ज करें' : 'Enter 4-Digit OTP'}
                     </h3>
                     <p className={`text-xs font-medium ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
                       {lang === 'hi' ? `व्हाट्सएप (+91 ${phone}) पर भेजा गया सुरक्षा कोड` : `WhatsApp verification code sent to +91 ${phone}`}
@@ -838,13 +783,16 @@ export default function CreativeLoginPortal() {
 
                   
                   <form onSubmit={handleVerifyOtp} className="space-y-4">
+                    <div className="flex items-center justify-center gap-1.5 py-1 px-3 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-semibold">
+                      <span>{lang === 'hi' ? 'परीक्षण कोड: 1234 या 1111' : 'Test Code: 1234 or 1111'}</span>
+                    </div>
                     <div>
                       <input
                         type="text"
-                        maxLength="6"
+                        maxLength="4"
                         value={otp}
                         onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-                        placeholder="••••••"
+                        placeholder="••••"
                         className="w-full py-4 text-center tracking-[0.6em] rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/60 font-black text-emerald-400 text-3xl outline-none transition-all duration-200 shadow-inner"
                         required
                         autoFocus
@@ -897,7 +845,7 @@ export default function CreativeLoginPortal() {
                         ) : (
                           <>
                             <ShieldCheck className="w-4 h-4 text-stone-950" />
-                            <span>{lang === 'hi' ? 'ओटीपी सत्यापित करें' : 'Verify OTP'}</span>
+                            <span>{lang === 'hi' ? 'सत्यापित करें व लॉगिन करें' : 'Verify & Login'}</span>
                           </>
                         )}
                       </button>
@@ -1005,16 +953,32 @@ export default function CreativeLoginPortal() {
                       </div>
                     </div>
 
+                    <div className="grid grid-cols-2 gap-3 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => handleDirectRoleLogin('farmer')}
+                        className="py-3.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition-all shadow-md flex items-center justify-center gap-1.5 active:scale-95"
+                      >
+                        <span>🌾 {lang === 'hi' ? 'किसान लॉगिन' : 'Log in as Farmer'}</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDirectRoleLogin('driver')}
+                        className="py-3.5 px-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white font-black text-xs transition-all shadow-md flex items-center justify-center gap-1.5 active:scale-95 border border-slate-700"
+                      >
+                        <span>🚜 {lang === 'hi' ? 'चालक लॉगिन' : 'Log in as Driver'}</span>
+                      </button>
+                    </div>
+
                     <button
                       type="submit"
-                      className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-stone-950 font-black text-base shadow-xl shadow-emerald-500/20 hover:shadow-emerald-500/30 transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98] hover:translate-y-[-1px]"
+                      className="w-full py-3.5 rounded-2xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-bold text-xs transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98]"
                     >
                       <span>
                         {selectedRole === 'farmer' 
-                          ? (lang === 'hi' ? 'आधार सत्यापन हेतु आगे बढ़ें' : 'Continue to Aadhaar KYC') 
-                          : (lang === 'hi' ? 'चालक विवरण हेतु आगे बढ़ें' : 'Continue to Driver KYC')}
+                          ? (lang === 'hi' ? 'पूरा प्रोफाइल व आधार KYC भरें →' : 'Complete Profile & Aadhaar KYC →') 
+                          : (lang === 'hi' ? 'पूरा चालक विवरण भरें →' : 'Complete Driver KYC Profile →')}
                       </span>
-                      <ArrowRight className="w-5 h-5 text-stone-950" />
                     </button>
                   </form>
                 </div>
