@@ -6,7 +6,8 @@ import { sendRealWhatsAppOtp } from '../../utils/smsGateway';
 import { verifyAgriStackFarmer } from '../../services/bhulekhLandService';
 import { audioHelper } from '../../utils/audioHelper';
 import { 
-  Phone, 
+  Phone,
+  LogIn, 
   ShieldCheck, 
   ArrowRight, 
   Tractor, 
