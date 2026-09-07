@@ -259,7 +259,7 @@ export default function DriverDashboard() {
         {/* ══════════════ 1. TOP DRIVER HEADER & STATUS BAR ══════════════ */}
         <div className={`rounded-3xl p-5 sm:p-6 border shadow-2xl backdrop-blur-xl transition-all duration-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 ${
           isDark 
-            ? 'bg-[#0A0E13] border-white/10 shadow-black/60' 
+            ? 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-black/60' 
             : 'bg-white border-slate-200 shadow-slate-200/60'
         }`}>
           
@@ -291,7 +291,7 @@ export default function DriverDashboard() {
                   <span>{lang === 'hi' ? 'केवाईसी सत्यापित पार्टनर' : 'KYC Verified Partner'}</span>
                 </span>
               </div>
-              <p className={`text-xs font-bold ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+              <p className={`text-xs font-bold ${isDark ? 'text-slate-500 dark:text-slate-400' : 'text-slate-500'}`}>
                 {driverProfile?.modelName || 'Mahindra 575 DI (50 HP)'} • <span className={`font-mono font-black ${isDark ? 'text-emerald-400' : 'text-emerald-700'}`}>{driverProfile?.vehicleNumber || 'UP-32-KR-7744'}</span>
               </p>
             </div>
@@ -302,14 +302,14 @@ export default function DriverDashboard() {
             
             {/* Minimalist Tab Switcher */}
             <nav className={`flex items-center p-1 rounded-2xl border text-xs font-black shadow-sm ${
-              isDark ? 'bg-stone-950 border-stone-800' : 'bg-slate-100 border-slate-200'
+              isDark ? 'bg-stone-950 border-slate-200 dark:border-slate-800' : 'bg-slate-100 border-slate-200'
             }`}>
               <button
                 onClick={() => setActiveTab('overview')}
                 className={`px-4 py-2 rounded-xl transition flex items-center gap-1.5 cursor-pointer ${
                   activeTab === 'overview'
                     ? 'bg-emerald-500 text-stone-950 shadow-md'
-                    : isDark ? 'text-stone-300 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+                    : isDark ? 'text-slate-700 dark:text-slate-300 hover:text-white' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 <Radio className="w-3.5 h-3.5" />
@@ -321,7 +321,7 @@ export default function DriverDashboard() {
                 className={`px-4 py-2 rounded-xl transition flex items-center gap-1.5 cursor-pointer ${
                   activeTab === 'passport'
                     ? 'bg-emerald-500 text-stone-950 shadow-md'
-                    : isDark ? 'text-stone-300 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+                    : isDark ? 'text-slate-700 dark:text-slate-300 hover:text-white' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 <CreditCard className="w-3.5 h-3.5" />
@@ -336,11 +336,11 @@ export default function DriverDashboard() {
                 isOnline
                   ? 'bg-emerald-500 hover:bg-emerald-400 text-stone-950 shadow-emerald-500/25 ring-2 ring-emerald-400/50'
                   : isDark
-                  ? 'bg-stone-800 hover:bg-stone-700 text-stone-300 border border-stone-700'
+                  ? 'bg-stone-800 hover:bg-stone-700 text-slate-700 dark:text-slate-300 border border-stone-700'
                   : 'bg-slate-200 hover:bg-slate-300 text-slate-700 border border-slate-300'
               }`}
             >
-              <Power className={`w-4 h-4 ${isOnline ? 'text-stone-950' : 'text-stone-400'}`} />
+              <Power className={`w-4 h-4 ${isOnline ? 'text-stone-950' : 'text-slate-500 dark:text-slate-400'}`} />
               <span>{isOnline ? (lang === 'hi' ? '🟢 ऑन ड्यूटी (Online)' : '🟢 Online / On Duty') : (lang === 'hi' ? '⚪ ऑफ ड्यूटी (Offline)' : '⚪ Off Duty (Offline)')}</span>
             </button>
           </div>
@@ -349,7 +349,7 @@ export default function DriverDashboard() {
 
         {/* ══════════════ 2. GPS TOP BANNER (DRIVER OPERATING RADAR - 320PX) ══════════════ */}
         <div className={`rounded-3xl p-6 sm:p-7 border shadow-2xl space-y-4 transition-colors duration-200 ${
-          isDark ? 'bg-[#0A0E13] border-white/10 shadow-black/40' : 'bg-white border-slate-200 shadow-slate-200/50'
+          isDark ? 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-black/40' : 'bg-white border-slate-200 shadow-slate-200/50'
         }`}>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-3">
@@ -364,12 +364,12 @@ export default function DriverDashboard() {
                   <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full border ${
                     isOnline 
                       ? 'bg-emerald-950 text-emerald-300 border-emerald-500/40' 
-                      : 'bg-stone-900 text-stone-400 border-stone-800'
+                      : 'bg-stone-900 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-800'
                   }`}>
                     {isOnline ? `RADAR ACTIVE • ${radarRadiusKm} KM SCAN` : 'RADAR OFFLINE'}
                   </span>
                 </div>
-                <p className={`text-xs ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+                <p className={`text-xs ${isDark ? 'text-slate-500 dark:text-slate-400' : 'text-slate-500'}`}>
                   {lang === 'hi' ? 'मलिहाबाद व आसपास के खेतों से लाइव बुकिंग अनुरोध और निकटतम किसान लोकेशन' : 'Real-time telemetry and incoming farm dispatch requests across Malihabad & Lucknow zone.'}
                 </p>
               </div>
@@ -377,18 +377,18 @@ export default function DriverDashboard() {
 
             {/* Radar Radius Switcher & Quick Demo Test Trigger */}
             <div className="flex items-center gap-2">
-              <div className="flex items-center p-1 rounded-xl bg-stone-900 border border-stone-800 text-xs font-bold">
+              <div className="flex items-center p-1 rounded-xl bg-stone-900 border border-slate-200 dark:border-slate-800 text-xs font-bold">
                 <button
                   type="button"
                   onClick={() => setRadarRadiusKm(5)}
-                  className={`px-3 py-1 rounded-lg transition ${radarRadiusKm === 5 ? 'bg-emerald-500 text-stone-950 font-black' : 'text-stone-400 hover:text-white'}`}
+                  className={`px-3 py-1 rounded-lg transition ${radarRadiusKm === 5 ? 'bg-emerald-500 text-stone-950 font-black' : 'text-slate-500 dark:text-slate-400 hover:text-white'}`}
                 >
                   5 km
                 </button>
                 <button
                   type="button"
                   onClick={() => setRadarRadiusKm(10)}
-                  className={`px-3 py-1 rounded-lg transition ${radarRadiusKm === 10 ? 'bg-emerald-500 text-stone-950 font-black' : 'text-stone-400 hover:text-white'}`}
+                  className={`px-3 py-1 rounded-lg transition ${radarRadiusKm === 10 ? 'bg-emerald-500 text-stone-950 font-black' : 'text-slate-500 dark:text-slate-400 hover:text-white'}`}
                 >
                   10 km
                 </button>
@@ -407,7 +407,7 @@ export default function DriverDashboard() {
           </div>
 
           {/* Satellite Radar Map Canvas */}
-          <div className="relative rounded-2xl overflow-hidden border border-white/10 shadow-inner">
+          <div className="relative rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-inner">
             <LiveMap
               farmerLocation={activeBooking?.farmerLocation || null}
               driverPos={driverCurrentPos}
@@ -423,7 +423,7 @@ export default function DriverDashboard() {
         {/* ══════════════ 3. LIVE DISPATCH REQUEST DRAWER (UBER/RAPIDO STYLE ACCEPT CARD) ══════════════ */}
         {activeBooking && activeBooking.status === 'searching' && isOnline && (
           <div className="rounded-3xl p-6 border-2 border-emerald-500/70 bg-gradient-to-br from-[#0A0E13] via-emerald-950/40 to-stone-950 text-white shadow-2xl shadow-emerald-950/70 space-y-5 animate-bounce-subtle">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-stone-950 flex items-center justify-center font-black text-2xl shadow-lg shadow-emerald-500/30">
                   🚜
@@ -433,19 +433,19 @@ export default function DriverDashboard() {
                     <span className="text-xs font-black uppercase tracking-wider text-emerald-400 bg-emerald-950 px-2.5 py-0.5 rounded-full border border-emerald-500/40">
                       ⚡ {lang === 'hi' ? 'नया बुकिंग अनुरोध' : 'INCOMING DISPATCH ALERT'}
                     </span>
-                    <span className="text-xs text-stone-400">• ~{activeBooking.distanceKm || '1.8'} km away</span>
+                    <span className="text-xs text-slate-500 dark:text-slate-400">• ~{activeBooking.distanceKm || '1.8'} km away</span>
                   </div>
                   <h3 className="text-xl font-black text-white mt-1">
                     {activeBooking.farmerName || 'Balram Kisan'}
                   </h3>
-                  <p className="text-xs text-stone-300 font-medium">
+                  <p className="text-xs text-slate-700 dark:text-slate-300 font-medium">
                     {activeBooking.farmerLocation?.address || 'Khet #14 near River, Gram Panchayat Rampur'} ({activeBooking.landSize || '4.5'} {activeBooking.sizeUnit || 'Bigha'})
                   </p>
                 </div>
               </div>
 
               <div className="text-left sm:text-right">
-                <span className="text-[11px] font-black uppercase tracking-wider text-stone-400 block">{lang === 'hi' ? 'कुल किराया (Total Fare)' : 'Total Job Fare'}</span>
+                <span className="text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 block">{lang === 'hi' ? 'कुल किराया (Total Fare)' : 'Total Job Fare'}</span>
                 <span className="text-3xl sm:text-4xl font-black text-emerald-400 tracking-tight">
                   ₹{activeBooking.estimatedPrice || 5850}
                 </span>
@@ -456,16 +456,16 @@ export default function DriverDashboard() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-              <div className="p-3 rounded-xl bg-stone-900/80 border border-stone-800">
-                <span className="text-stone-400 font-bold block">{lang === 'hi' ? 'मशीनरी व यंत्र:' : 'Machine & Implement:'}</span>
+              <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                <span className="text-slate-500 dark:text-slate-400 font-bold block">{lang === 'hi' ? 'मशीनरी व यंत्र:' : 'Machine & Implement:'}</span>
                 <b className="text-white capitalize">{activeBooking.machineryType || 'Tractor'} + {activeBooking.attachment?.nameEn || activeBooking.attachment?.id || 'Rotavator'}</b>
               </div>
-              <div className="p-3 rounded-xl bg-stone-900/80 border border-stone-800">
-                <span className="text-stone-400 font-bold block">{lang === 'hi' ? 'खेत पर आगमन समय:' : 'ETA to Field:'}</span>
+              <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                <span className="text-slate-500 dark:text-slate-400 font-bold block">{lang === 'hi' ? 'खेत पर आगमन समय:' : 'ETA to Field:'}</span>
                 <b className="text-amber-400">{activeBooking.estimatedETA || '5-7 Mins'} (~1.8 km)</b>
               </div>
-              <div className="p-3 rounded-xl bg-stone-900/80 border border-stone-800">
-                <span className="text-stone-400 font-bold block">{lang === 'hi' ? 'अनुमानित कार्य समय:' : 'Estimated Duration:'}</span>
+              <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                <span className="text-slate-500 dark:text-slate-400 font-bold block">{lang === 'hi' ? 'अनुमानित कार्य समय:' : 'Estimated Duration:'}</span>
                 <b className="text-blue-400">~2.5 {lang === 'hi' ? 'घंटे' : 'Hours'}</b>
               </div>
             </div>
@@ -484,7 +484,7 @@ export default function DriverDashboard() {
               <button
                 type="button"
                 onClick={rejectBooking}
-                className="w-full sm:w-auto px-6 py-4 rounded-2xl bg-stone-900/90 hover:bg-stone-800 text-stone-300 hover:text-white font-bold text-sm border border-stone-700 transition active:scale-95 cursor-pointer"
+                className="w-full sm:w-auto px-6 py-4 rounded-2xl bg-stone-900/90 hover:bg-stone-800 text-slate-700 dark:text-slate-300 hover:text-white font-bold text-sm border border-stone-700 transition active:scale-95 cursor-pointer"
               >
                 <span>{lang === 'hi' ? 'अस्वीकार करें' : 'Decline'}</span>
               </button>
@@ -498,11 +498,11 @@ export default function DriverDashboard() {
           {/* Card 1: Today's Earnings */}
           <div className={`p-5 rounded-3xl border shadow-xl transition-all duration-200 hover:-translate-y-1 relative overflow-hidden ${
             isDark 
-              ? 'bg-[#0A0E13] border-white/10 shadow-black/50' 
+              ? 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-black/50' 
               : 'bg-white border-slate-200 shadow-slate-200/60'
           }`}>
             <div className="flex items-center justify-between mb-3">
-              <span className={`text-[11px] font-black uppercase tracking-wider ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+              <span className={`text-[11px] font-black uppercase tracking-wider ${isDark ? 'text-slate-500 dark:text-slate-400' : 'text-slate-500'}`}>
                 {lang === 'hi' ? 'आज की कुल कमाई' : "Today's Earnings"}
               </span>
               <div className="w-9 h-9 rounded-xl bg-emerald-950/80 border border-emerald-500/40 text-emerald-400 flex items-center justify-center font-black text-lg">
@@ -517,7 +517,7 @@ export default function DriverDashboard() {
                 <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-emerald-500/10 text-[10px]">
                   <ArrowUpRight className="w-3 h-3" /> +18%
                 </span>
-                <span className={isDark ? 'text-stone-400' : 'text-slate-500'}>vs yesterday</span>
+                <span className={isDark ? 'text-slate-500 dark:text-slate-400' : 'text-slate-500'}>vs yesterday</span>
               </div>
             </div>
           </div>
@@ -525,11 +525,11 @@ export default function DriverDashboard() {
           {/* Card 2: Completed Jobs */}
           <div className={`p-5 rounded-3xl border shadow-xl transition-all duration-200 hover:-translate-y-1 relative overflow-hidden ${
             isDark 
-              ? 'bg-[#0A0E13] border-white/10 shadow-black/50' 
+              ? 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-black/50' 
               : 'bg-white border-slate-200 shadow-slate-200/60'
           }`}>
             <div className="flex items-center justify-between mb-3">
-              <span className={`text-[11px] font-black uppercase tracking-wider ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+              <span className={`text-[11px] font-black uppercase tracking-wider ${isDark ? 'text-slate-500 dark:text-slate-400' : 'text-slate-500'}`}>
                 {lang === 'hi' ? 'कुल संपन्न कार्य' : 'Completed Jobs'}
               </span>
               <div className="w-9 h-9 rounded-xl bg-blue-950/80 border border-blue-500/40 text-blue-400 flex items-center justify-center text-lg">
@@ -542,7 +542,7 @@ export default function DriverDashboard() {
               </h3>
               <div className="flex items-center gap-1.5 text-xs font-bold text-blue-400">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className={isDark ? 'text-stone-300' : 'text-slate-600'}>100% Escrow Disbursed</span>
+                <span className={isDark ? 'text-slate-700 dark:text-slate-300' : 'text-slate-600'}>100% Escrow Disbursed</span>
               </div>
             </div>
           </div>
@@ -550,11 +550,11 @@ export default function DriverDashboard() {
           {/* Card 3: Driver Rating */}
           <div className={`p-5 rounded-3xl border shadow-xl transition-all duration-200 hover:-translate-y-1 relative overflow-hidden ${
             isDark 
-              ? 'bg-[#0A0E13] border-white/10 shadow-black/50' 
+              ? 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-black/50' 
               : 'bg-white border-slate-200 shadow-slate-200/60'
           }`}>
             <div className="flex items-center justify-between mb-3">
-              <span className={`text-[11px] font-black uppercase tracking-wider ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+              <span className={`text-[11px] font-black uppercase tracking-wider ${isDark ? 'text-slate-500 dark:text-slate-400' : 'text-slate-500'}`}>
                 {lang === 'hi' ? 'चालक रेटिंग' : 'Driver Rating'}
               </span>
               <div className="w-9 h-9 rounded-xl bg-amber-950/80 border border-amber-500/40 text-amber-400 flex items-center justify-center text-lg">
@@ -567,7 +567,7 @@ export default function DriverDashboard() {
               </h3>
               <div className="flex items-center gap-1 text-xs font-bold text-amber-400">
                 <span>★★★★★</span>
-                <span className={`ml-1 text-[11px] ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>Top Rated Partner</span>
+                <span className={`ml-1 text-[11px] ${isDark ? 'text-slate-500 dark:text-slate-400' : 'text-slate-500'}`}>Top Rated Partner</span>
               </div>
             </div>
           </div>
@@ -610,9 +610,9 @@ export default function DriverDashboard() {
           
           {/* Panel A (Left 4 Cols): Machine Rates Customizer */}
           <div className={`lg:col-span-4 p-6 rounded-3xl border shadow-xl space-y-4 ${
-            isDark ? 'bg-[#0A0E13] border-white/10 shadow-black/40' : 'bg-white border-slate-200'
+            isDark ? 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-black/40' : 'bg-white border-slate-200'
           }`}>
-            <div className="flex items-center justify-between pb-3 border-b border-white/10">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
               <div className="flex items-center gap-2">
                 <Gauge className="w-4 h-4 text-emerald-400" />
                 <h4 className={`font-black text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -632,7 +632,7 @@ export default function DriverDashboard() {
             {isEditingRates ? (
               <form onSubmit={handleSaveRates} className="space-y-3">
                 <div>
-                  <label className="block text-[11px] font-bold text-stone-400 uppercase mb-1">
+                  <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">
                     {lang === 'hi' ? 'प्रति घंटा दर (₹/Hour)' : 'Hourly Rate (₹/Hour)'}
                   </label>
                   <input
@@ -643,7 +643,7 @@ export default function DriverDashboard() {
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-bold text-stone-400 uppercase mb-1">
+                  <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">
                     {lang === 'hi' ? 'प्रति बीघा दर (₹/Bigha)' : 'Per Bigha Rate (₹/Bigha)'}
                   </label>
                   <input
@@ -663,9 +663,9 @@ export default function DriverDashboard() {
             ) : (
               <div className="space-y-2.5 text-xs">
                 <div className={`flex justify-between items-center p-3.5 rounded-2xl border ${
-                  isDark ? 'bg-stone-950 border-stone-800' : 'bg-slate-50 border-slate-200'
+                  isDark ? 'bg-stone-950 border-slate-200 dark:border-slate-800' : 'bg-slate-50 border-slate-200'
                 }`}>
-                  <span className={isDark ? 'text-stone-400 font-medium' : 'text-slate-500 font-semibold'}>
+                  <span className={isDark ? 'text-slate-500 dark:text-slate-400 font-medium' : 'text-slate-500 font-semibold'}>
                     {lang === 'hi' ? 'प्रति घंटा दर' : 'Hourly Rate'}
                   </span>
                   <span className={`font-black text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -674,9 +674,9 @@ export default function DriverDashboard() {
                 </div>
 
                 <div className={`flex justify-between items-center p-3.5 rounded-2xl border ${
-                  isDark ? 'bg-stone-950 border-stone-800' : 'bg-slate-50 border-slate-200'
+                  isDark ? 'bg-stone-950 border-slate-200 dark:border-slate-800' : 'bg-slate-50 border-slate-200'
                 }`}>
-                  <span className={isDark ? 'text-stone-400 font-medium' : 'text-slate-500 font-semibold'}>
+                  <span className={isDark ? 'text-slate-500 dark:text-slate-400 font-medium' : 'text-slate-500 font-semibold'}>
                     {lang === 'hi' ? 'प्रति बीघा दर' : 'Per Bigha Rate'}
                   </span>
                   <span className="font-black text-sm text-emerald-400">
@@ -693,9 +693,9 @@ export default function DriverDashboard() {
 
           {/* Panel B (Center 4 Cols): Diesel & Fuel Expense Tracker */}
           <div className={`lg:col-span-4 p-6 rounded-3xl border shadow-xl space-y-4 ${
-            isDark ? 'bg-[#0A0E13] border-white/10 shadow-black/40' : 'bg-white border-slate-200'
+            isDark ? 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-black/40' : 'bg-white border-slate-200'
           }`}>
-            <div className="flex items-center justify-between pb-3 border-b border-white/10">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
               <div className="flex items-center gap-2">
                 <Fuel className="w-4 h-4 text-amber-400" />
                 <h4 className={`font-black text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -709,7 +709,7 @@ export default function DriverDashboard() {
 
             <div className="space-y-3 text-xs">
               <div>
-                <label className="block text-[11px] font-bold text-stone-400 uppercase mb-1">
+                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">
                   {lang === 'hi' ? 'प्रति ट्रिप डीजल खर्च (₹)' : 'Trip Fuel Expense (₹)'}
                 </label>
                 <div className="relative">
@@ -719,29 +719,29 @@ export default function DriverDashboard() {
                     onChange={(e) => setFuelCostInput(Number(e.target.value))}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-stone-700 bg-stone-900 text-white font-bold text-sm outline-none focus:border-amber-500"
                   />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 font-bold">
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 font-bold">
                     ≈ {(fuelCostInput / fuelPricePerLiter).toFixed(1)} L
                   </span>
                 </div>
               </div>
 
               {/* Net Profit Calculation Display */}
-              <div className="p-3.5 rounded-2xl bg-stone-950 border border-stone-800 space-y-1.5">
-                <div className="flex justify-between text-stone-400">
+              <div className="p-3.5 rounded-2xl bg-stone-950 border border-slate-200 dark:border-slate-800 space-y-1.5">
+                <div className="flex justify-between text-slate-500 dark:text-slate-400">
                   <span>{lang === 'hi' ? 'अनुमानित ट्रिप किराया:' : 'Est. Job Fare:'}</span>
                   <span className="text-white font-bold">₹5,850</span>
                 </div>
-                <div className="flex justify-between text-stone-400">
+                <div className="flex justify-between text-slate-500 dark:text-slate-400">
                   <span>{lang === 'hi' ? 'डीजल कटौती:' : 'Fuel Deduction:'}</span>
                   <span className="text-red-400 font-bold">-₹{fuelCostInput}</span>
                 </div>
-                <div className="flex justify-between pt-1.5 border-t border-stone-800 font-black text-sm">
+                <div className="flex justify-between pt-1.5 border-t border-slate-200 dark:border-slate-800 font-black text-sm">
                   <span className="text-stone-200">{lang === 'hi' ? 'शुद्ध चालक लाभ:' : 'Net Driver Profit:'}</span>
                   <span className="text-emerald-400">₹{5850 - fuelCostInput} ({(Math.round((5850 - fuelCostInput)/5850 * 100))}% Margin)</span>
                 </div>
               </div>
 
-              <div className="text-[10px] text-stone-400 flex items-center justify-between px-1">
+              <div className="text-[10px] text-slate-500 dark:text-slate-400 flex items-center justify-between px-1">
                 <span>{lang === 'hi' ? 'औसत खपत:' : 'Avg Consumption:'} ~3.8 L/hr</span>
                 <span>{lang === 'hi' ? 'डीजल सब्सिडी समर्थित' : 'Diesel Norms Met'}</span>
               </div>
@@ -774,7 +774,7 @@ export default function DriverDashboard() {
               </p>
             </div>
 
-            <div className="space-y-2 text-xs text-stone-300">
+            <div className="space-y-2 text-xs text-slate-700 dark:text-slate-300">
               <div className="flex justify-between items-center">
                 <span>RC Verification:</span>
                 <span className="text-emerald-400 font-black">✓ UP RTO Verified</span>
@@ -789,7 +789,7 @@ export default function DriverDashboard() {
               </div>
             </div>
 
-            <div className="pt-2 border-t border-stone-800 flex items-center justify-between text-[11px] text-stone-400">
+            <div className="pt-2 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
               <span>Category: TRACTOR (50 HP)</span>
               <span className="text-emerald-400 font-bold flex items-center gap-1">
                 <ShieldCheck className="w-3.5 h-3.5" />
@@ -802,16 +802,16 @@ export default function DriverDashboard() {
 
         {/* ══════════════ 6. RECENT COMPLETED JOBS ACTIVITY LOG ══════════════ */}
         <div className={`rounded-3xl p-6 border shadow-2xl space-y-4 ${
-          isDark ? 'bg-[#0A0E13] border-white/10 shadow-black/40' : 'bg-white border-slate-200'
+          isDark ? 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-black/40' : 'bg-white border-slate-200'
         }`}>
-          <div className="flex items-center justify-between pb-3 border-b border-white/10">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
             <div className="flex items-center gap-2">
               <History className="w-4 h-4 text-emerald-400" />
               <h4 className={`font-black text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
                 {lang === 'hi' ? 'हालिया संपन्न कार्य व भुगतान लॉग' : 'Recent Completed Jobs & Payout Ledger'}
               </h4>
             </div>
-            <span className="text-xs text-stone-400 font-bold">
+            <span className="text-xs text-slate-500 dark:text-slate-400 font-bold">
               {recentJobsLog.length} Records Verified
             </span>
           </div>
@@ -821,7 +821,7 @@ export default function DriverDashboard() {
               <div
                 key={job.id}
                 className={`p-4 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs transition ${
-                  isDark ? 'bg-stone-950/60 border-stone-800/80 hover:border-emerald-700/40' : 'bg-slate-50 border-slate-200'
+                  isDark ? 'bg-stone-950/60 border-slate-200 dark:border-slate-800/80 hover:border-emerald-700/40' : 'bg-slate-50 border-slate-200'
                 }`}
               >
                 <div className="flex items-center gap-3.5">
@@ -831,9 +831,9 @@ export default function DriverDashboard() {
                   <div>
                     <div className="flex items-center gap-2">
                       <span className={`font-bold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>{job.farmerName}</span>
-                      <span className="text-[10px] text-stone-400">• {job.time}</span>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400">• {job.time}</span>
                     </div>
-                    <p className={`text-[11px] ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+                    <p className={`text-[11px] ${isDark ? 'text-slate-500 dark:text-slate-400' : 'text-slate-500'}`}>
                       {job.khetLocation} ({job.size}) • {job.machinery}
                     </p>
                   </div>
@@ -842,7 +842,7 @@ export default function DriverDashboard() {
                 <div className="flex items-center justify-between sm:justify-end gap-4">
                   <div className="text-right">
                     <span className="font-black text-sm text-emerald-400 block">+₹{job.fare}</span>
-                    <span className="text-[10px] text-stone-400">Net Profit: ₹{job.netProfit}</span>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400">Net Profit: ₹{job.netProfit}</span>
                   </div>
                   <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-950 text-emerald-300 border border-emerald-700/60 shrink-0">
                     ✓ {job.paymentMethod}
@@ -858,7 +858,7 @@ export default function DriverDashboard() {
       {/* ══════════════ MODAL: DIRECT BANK ACCOUNT (IMPS / NEFT) SETTLEMENT ══════════════ */}
       {isCashoutModalOpen && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-stone-950/85 backdrop-blur-md animate-fade-in overflow-y-auto">
-          <div className="bg-[#0A0E13] text-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-emerald-500/40 space-y-5 my-8">
+          <div className="bg-white dark:bg-slate-900 text-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-emerald-500/40 space-y-5 my-8">
             
             {cashoutSuccessData ? (
               <div className="text-center space-y-5 py-2 animate-fade-in">
@@ -870,47 +870,47 @@ export default function DriverDashboard() {
                   <h3 className="text-2xl font-black text-white">
                     {lang === 'hi' ? 'बैंक ट्रांसफर सफल!' : 'Bank Transfer Initiated!'}
                   </h3>
-                  <p className="text-xs text-stone-400">
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
                     {lang === 'hi' 
                       ? `₹${cashoutSuccessData.amount.toLocaleString()} आपके बैंक खाते में सफलतापूर्वक भेज दिए गए हैं।` 
                       : `₹${cashoutSuccessData.amount.toLocaleString()} sent directly to ${cashoutSuccessData.bankName.split('-')[0].trim()} A/C ending in ${cashoutSuccessData.accountMasked.slice(-8)}.`}
                   </p>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-stone-950 border border-stone-800 text-xs space-y-2.5 text-left">
-                  <div className="flex justify-between items-center pb-2 border-b border-stone-800/80">
-                    <span className="text-stone-400 font-medium">{lang === 'hi' ? 'स्थानांतरित राशि:' : 'Amount Transferred:'}</span>
+                <div className="p-4 rounded-2xl bg-stone-950 border border-slate-200 dark:border-slate-800 text-xs space-y-2.5 text-left">
+                  <div className="flex justify-between items-center pb-2 border-b border-slate-200 dark:border-slate-800/80">
+                    <span className="text-slate-500 dark:text-slate-400 font-medium">{lang === 'hi' ? 'स्थानांतरित राशि:' : 'Amount Transferred:'}</span>
                     <b className="text-emerald-400 text-base font-black">₹{cashoutSuccessData.amount.toLocaleString()}</b>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-stone-400 font-medium">{lang === 'hi' ? 'खाताधारक:' : 'Account Holder:'}</span>
+                    <span className="text-slate-500 dark:text-slate-400 font-medium">{lang === 'hi' ? 'खाताधारक:' : 'Account Holder:'}</span>
                     <b className="text-white font-bold">{cashoutSuccessData.accountHolder}</b>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-stone-400 font-medium">{lang === 'hi' ? 'बैंक खाता:' : 'Bank Account:'}</span>
+                    <span className="text-slate-500 dark:text-slate-400 font-medium">{lang === 'hi' ? 'बैंक खाता:' : 'Bank Account:'}</span>
                     <b className="text-stone-200 font-mono text-xs">{cashoutSuccessData.accountMasked}</b>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-stone-400 font-medium">{lang === 'hi' ? 'बैंक एवं शाखा:' : 'Bank & Branch:'}</span>
-                    <b className="text-stone-300 text-[11px]">{cashoutSuccessData.bankName}</b>
+                    <span className="text-slate-500 dark:text-slate-400 font-medium">{lang === 'hi' ? 'बैंक एवं शाखा:' : 'Bank & Branch:'}</span>
+                    <b className="text-slate-700 dark:text-slate-300 text-[11px]">{cashoutSuccessData.bankName}</b>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-stone-400 font-medium">IFSC:</span>
-                    <b className="text-stone-300 font-mono text-xs">{cashoutSuccessData.ifsc}</b>
+                    <span className="text-slate-500 dark:text-slate-400 font-medium">IFSC:</span>
+                    <b className="text-slate-700 dark:text-slate-300 font-mono text-xs">{cashoutSuccessData.ifsc}</b>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-stone-400 font-medium">{lang === 'hi' ? 'ट्रांसफर मोड:' : 'Transfer Mode:'}</span>
+                    <span className="text-slate-500 dark:text-slate-400 font-medium">{lang === 'hi' ? 'ट्रांसफर मोड:' : 'Transfer Mode:'}</span>
                     <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-950 text-emerald-300 border border-emerald-600/40">
                       ⚡ {cashoutSuccessData.transferMode}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center pt-2 border-t border-stone-800/80">
-                    <span className="text-stone-400 font-medium">UTR / IMPS Ref:</span>
-                    <b className="text-stone-300 font-mono text-[11px]">{cashoutSuccessData.txnId}</b>
+                  <div className="flex justify-between items-center pt-2 border-t border-slate-200 dark:border-slate-800/80">
+                    <span className="text-slate-500 dark:text-slate-400 font-medium">UTR / IMPS Ref:</span>
+                    <b className="text-slate-700 dark:text-slate-300 font-mono text-[11px]">{cashoutSuccessData.txnId}</b>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-stone-400 font-medium">{lang === 'hi' ? 'समय:' : 'Timestamp:'}</span>
-                    <b className="text-stone-400 text-[11px]">{cashoutSuccessData.timestamp}</b>
+                    <span className="text-slate-500 dark:text-slate-400 font-medium">{lang === 'hi' ? 'समय:' : 'Timestamp:'}</span>
+                    <b className="text-slate-500 dark:text-slate-400 text-[11px]">{cashoutSuccessData.timestamp}</b>
                   </div>
                 </div>
 
@@ -934,7 +934,7 @@ export default function DriverDashboard() {
             ) : (
               <form onSubmit={handleExecuteCashout} className="space-y-4">
                 {/* Modal Header */}
-                <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center p-2.5">
                       <Building2 className="w-5 h-5 text-emerald-400" />
@@ -943,7 +943,7 @@ export default function DriverDashboard() {
                       <h3 className="text-base sm:text-lg font-black text-white leading-tight">
                         {lang === 'hi' ? 'सीधे बैंक खाते में ट्रांसफर (IMPS / NEFT)' : 'Direct Bank Account Transfer (IMPS / NEFT)'}
                       </h3>
-                      <p className="text-[11px] text-stone-400 font-medium">
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                         {lang === 'hi' ? '24x7 तत्काल बैंक खाता निकासी' : 'Instant 24x7 Commercial Bank Settlement'}
                       </p>
                     </div>
@@ -954,7 +954,7 @@ export default function DriverDashboard() {
                       setIsCashoutModalOpen(false);
                       setBankFormError('');
                     }}
-                    className="p-1.5 rounded-xl bg-stone-900 border border-stone-800 text-stone-400 hover:text-white transition cursor-pointer"
+                    className="p-1.5 rounded-xl bg-stone-900 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:text-white transition cursor-pointer"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -963,7 +963,7 @@ export default function DriverDashboard() {
                 {/* Field 1: Available Wallet Balance Badge */}
                 <div className="p-3.5 rounded-2xl bg-stone-950 border border-emerald-500/20 flex justify-between items-center text-xs">
                   <div>
-                    <span className="text-[11px] font-bold text-stone-400 block uppercase tracking-wider">
+                    <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 block uppercase tracking-wider">
                       {lang === 'hi' ? 'उपलब्ध वॉलेट बैलेंस' : 'Available Wallet Balance'}
                     </span>
                     <span className="text-xs text-emerald-400 font-medium">
@@ -978,10 +978,10 @@ export default function DriverDashboard() {
                 {/* Field 2: Withdrawal Amount (₹) with Quick Buttons */}
                 <div>
                   <div className="flex justify-between items-center mb-1.5">
-                    <label className="text-[11px] font-black text-stone-400 uppercase tracking-wider">
+                    <label className="text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                       {lang === 'hi' ? 'निकासी राशि (₹)' : 'Withdrawal Amount (₹)'}
                     </label>
-                    <span className="text-[10px] text-stone-400">
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400">
                       Min: ₹100 • Max: ₹{walletBalance.toLocaleString()}
                     </span>
                   </div>
@@ -1005,7 +1005,7 @@ export default function DriverDashboard() {
                         className={`px-2.5 py-1 rounded-lg text-[10px] font-bold border transition cursor-pointer ${
                           Number(cashoutAmount) === preset
                             ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300'
-                            : 'bg-stone-900 border-stone-800 text-stone-400 hover:text-white'
+                            : 'bg-stone-900 border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:text-white'
                         }`}
                       >
                         ₹{preset.toLocaleString()}
@@ -1023,7 +1023,7 @@ export default function DriverDashboard() {
 
                 {/* Field 3: Account Holder Name */}
                 <div>
-                  <label className="block text-[11px] font-black text-stone-400 uppercase tracking-wider mb-1.5">
+                  <label className="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">
                     {lang === 'hi' ? 'खाताधारक का नाम (पासबुक अनुसार)' : 'Account Holder Name (As in Passbook)'}
                   </label>
                   <input
@@ -1039,7 +1039,7 @@ export default function DriverDashboard() {
                 {/* Field 4 & 5: Bank Account Number & Confirm Account Number */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[11px] font-black text-stone-400 uppercase tracking-wider mb-1.5">
+                    <label className="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">
                       {lang === 'hi' ? 'बैंक खाता संख्या' : 'Bank Account Number'}
                     </label>
                     <input
@@ -1053,7 +1053,7 @@ export default function DriverDashboard() {
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-black text-stone-400 uppercase tracking-wider mb-1.5">
+                    <label className="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">
                       {lang === 'hi' ? 'खाता संख्या दोबारा दर्ज करें' : 'Confirm Account Number'}
                     </label>
                     <input
@@ -1090,7 +1090,7 @@ export default function DriverDashboard() {
 
                 {/* Field 6: IFSC Code & Dynamic Bank Detection */}
                 <div>
-                  <label className="block text-[11px] font-black text-stone-400 uppercase tracking-wider mb-1.5">
+                  <label className="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">
                     {lang === 'hi' ? 'IFSC कोड' : 'Bank IFSC Code'}
                   </label>
                   <input
@@ -1113,7 +1113,7 @@ export default function DriverDashboard() {
 
                 {/* Settlement Speed Selector: Instant IMPS vs NEFT */}
                 <div>
-                  <label className="block text-[11px] font-black text-stone-400 uppercase tracking-wider mb-1.5">
+                  <label className="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">
                     {lang === 'hi' ? 'सेटलमेंट स्पीड' : 'Transfer Mode & Settlement Speed'}
                   </label>
                   <div className="grid grid-cols-2 gap-2.5">
@@ -1123,14 +1123,14 @@ export default function DriverDashboard() {
                       className={`p-2.5 rounded-xl border text-left text-xs transition cursor-pointer ${
                         transferMode === 'imps'
                           ? 'bg-emerald-500/15 border-emerald-500 text-white shadow-sm'
-                          : 'bg-stone-950 border-stone-800 text-stone-400 hover:text-stone-300'
+                          : 'bg-stone-950 border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-300'
                       }`}
                     >
                       <div className="flex items-center gap-1.5 font-black text-emerald-400 mb-0.5">
                         <Zap className="w-3.5 h-3.5" />
                         <span>Instant IMPS</span>
                       </div>
-                      <span className="text-[10px] text-stone-400 block">24x7 Immediate Credit</span>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 block">24x7 Immediate Credit</span>
                     </button>
 
                     <button
@@ -1139,14 +1139,14 @@ export default function DriverDashboard() {
                       className={`p-2.5 rounded-xl border text-left text-xs transition cursor-pointer ${
                         transferMode === 'neft'
                           ? 'bg-emerald-500/15 border-emerald-500 text-white shadow-sm'
-                          : 'bg-stone-950 border-stone-800 text-stone-400 hover:text-stone-300'
+                          : 'bg-stone-950 border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-300'
                       }`}
                     >
                       <div className="flex items-center gap-1.5 font-black text-blue-400 mb-0.5">
                         <Landmark className="w-3.5 h-3.5" />
                         <span>NEFT / RTGS</span>
                       </div>
-                      <span className="text-[10px] text-stone-400 block">Standard Batch Clearance</span>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 block">Standard Batch Clearance</span>
                     </button>
                   </div>
                 </div>

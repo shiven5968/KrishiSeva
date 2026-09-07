@@ -138,7 +138,7 @@ export default function UniversalAuthModal({ isOpen, onClose }) {
 
             {/* Quick Demo Test Profiles for Fast Testing */}
             <div className="pt-2 border-t border-stone-100 space-y-2">
-              <span className="text-[10px] text-stone-400 font-extrabold uppercase tracking-wider block text-center">
+              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-extrabold uppercase tracking-wider block text-center">
                 ⚡ 1-Click Fast Demo Login (डेमो प्रोफ़ाइल चुनें)
               </span>
               <div className="grid grid-cols-2 gap-2">

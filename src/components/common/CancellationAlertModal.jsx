@@ -50,7 +50,7 @@ export default function CancellationAlertModal({ isOpen, onClose, alertData }) {
         {/* Action Button */}
         <button
           onClick={onClose}
-          className="w-full py-3.5 rounded-2xl bg-stone-900 hover:bg-stone-800 text-white font-black text-xs sm:text-sm shadow-xl transition active:scale-98 flex items-center justify-center gap-2"
+          className="w-full py-3.5 rounded-2xl bg-white dark:bg-slate-900 hover:bg-stone-800 text-white font-black text-xs sm:text-sm shadow-xl transition active:scale-98 flex items-center justify-center gap-2"
         >
           <span>{lang === 'hi' ? 'समझ गया (Dismiss & Continue)' : 'Dismiss & Return to Dashboard'}</span>
           <ArrowRight className="w-4 h-4" />

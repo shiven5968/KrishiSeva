@@ -143,10 +143,10 @@ export default function DriverNavigation() {
     <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 space-y-6 py-6 animate-fade-in font-sans">
       
       {/* ══════════════ SECTION 1 (TOP): REAL-TIME FIELD NAVIGATION RADAR ══════════════ */}
-      <div className="bg-[#0A0E13] border border-white/10 rounded-3xl p-5 sm:p-6 shadow-2xl backdrop-blur-xl space-y-4">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-2xl backdrop-blur-xl space-y-4">
         
         {/* Top Header & Live Telemetry Banner */}
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-white/10">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center shadow-lg shadow-emerald-950/40 shrink-0">
               <Navigation className="w-7 h-7 text-emerald-400 animate-pulse" />
@@ -158,7 +158,7 @@ export default function DriverNavigation() {
                 </span>
                 
                 {/* Live Speed & Remaining Distance */}
-                <div className="flex items-center gap-1.5 text-xs text-stone-300 font-bold bg-stone-900/80 px-2.5 py-0.5 rounded-full border border-stone-800">
+                <div className="flex items-center gap-1.5 text-xs text-slate-700 dark:text-slate-300 font-bold bg-white dark:bg-slate-900 px-2.5 py-0.5 rounded-full border border-slate-200 dark:border-slate-800">
                   <Gauge className="w-3.5 h-3.5 text-emerald-400" />
                   <span>Speed: {currentSpeed} km/h • Remaining: ~{remainingDistanceKm} km</span>
                 </div>
@@ -183,7 +183,7 @@ export default function DriverNavigation() {
               className={`px-4 py-2.5 rounded-2xl font-black text-xs flex items-center gap-2 transition shadow-lg cursor-pointer active:scale-95 ${
                 isHardwareGpsActive
                   ? 'bg-emerald-500 text-stone-950 shadow-emerald-500/30 ring-2 ring-emerald-400 animate-pulse'
-                  : 'bg-stone-900 hover:bg-stone-800 text-stone-300 border border-stone-700'
+                  : 'bg-stone-900 hover:bg-stone-800 text-slate-700 dark:text-slate-300 border border-stone-700'
               }`}
               title="Broadcast Real Physical Device GPS to Farmer"
             >
@@ -193,7 +193,7 @@ export default function DriverNavigation() {
 
             <button
               onClick={() => setIsCancelModalOpen(true)}
-              className="px-3.5 py-2.5 rounded-2xl bg-stone-900 hover:bg-red-950/40 text-stone-400 hover:text-red-400 border border-stone-800 hover:border-red-500/40 font-bold text-xs transition cursor-pointer active:scale-95"
+              className="px-3.5 py-2.5 rounded-2xl bg-stone-900 hover:bg-red-950/40 text-slate-500 dark:text-slate-400 hover:text-red-400 border border-slate-200 dark:border-slate-800 hover:border-red-500/40 font-bold text-xs transition cursor-pointer active:scale-95"
             >
               {lang === 'hi' ? 'रद्द करें' : 'Cancel'}
             </button>
@@ -201,7 +201,7 @@ export default function DriverNavigation() {
         </div>
 
         {/* Full-Width Interactive Turn-by-Turn Route Map */}
-        <div className="w-full h-[380px] rounded-2xl overflow-hidden border border-white/10 relative shadow-inner">
+        <div className="w-full h-[380px] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 relative shadow-inner">
           <LiveMap
             farmerLocation={activeBooking.farmerLocation}
             driverPos={driverCurrentPos}
@@ -229,12 +229,12 @@ export default function DriverNavigation() {
       </div>
 
       {/* ══════════════ SECTION 2: FARMER CONTACT & OTP START CARD ══════════════ */}
-      <div className="bg-[#0A0E13] border border-white/10 rounded-3xl p-5 sm:p-6 shadow-2xl backdrop-blur-xl">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-2xl backdrop-blur-xl">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5">
           
           {/* Farmer Contact & Field Location */}
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-stone-900 border border-stone-800 flex items-center justify-center text-3xl shadow-md">
+            <div className="w-14 h-14 rounded-2xl bg-stone-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-3xl shadow-md">
               👨‍🌾
             </div>
             <div>
@@ -242,14 +242,14 @@ export default function DriverNavigation() {
                 <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-800/40">
                   {lang === 'hi' ? 'किसान विवरण' : 'Farmer Contact'}
                 </span>
-                <span className="text-xs text-stone-400 font-bold">
+                <span className="text-xs text-slate-500 dark:text-slate-400 font-bold">
                   {activeBooking.farmerPhone || '+91 98765 43210'}
                 </span>
               </div>
               <h3 className="text-lg font-black text-white mt-0.5">
                 {activeBooking.farmerName || 'Balram Kisan (बलराम)'}
               </h3>
-              <p className="text-xs text-stone-400 font-medium flex items-center gap-1 mt-0.5">
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1 mt-0.5">
                 <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                 <span>{activeBooking.farmerLocation?.address || 'Plot #12, Gomti River Basin, Malihabad'}</span>
               </p>
@@ -286,8 +286,8 @@ export default function DriverNavigation() {
       </div>
 
       {/* ══════════════ SECTION 3: STEP-BY-STEP JOB LIFECYCLE ACTION BUTTONS ══════════════ */}
-      <div className="bg-[#0A0E13] border border-white/10 rounded-3xl p-5 sm:p-6 shadow-2xl backdrop-blur-xl space-y-4">
-        <div className="flex items-center justify-between pb-3 border-b border-white/10">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-2xl backdrop-blur-xl space-y-4">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
           <div className="flex items-center gap-2">
             <Zap className="w-5 h-5 text-emerald-400" />
             <h3 className="text-base sm:text-lg font-black text-white">
@@ -304,9 +304,9 @@ export default function DriverNavigation() {
           
           {/* Phase 1: En Route -> Mark Arrived */}
           {isEnRoute && (
-            <div className="p-4 rounded-2xl bg-stone-950 border border-stone-800 space-y-3">
+            <div className="p-4 rounded-2xl bg-stone-950 border border-slate-200 dark:border-slate-800 space-y-3">
               <div className="flex items-center justify-between text-xs">
-                <span className="font-bold text-stone-400">Step 1: Traveling to Farmer's Field</span>
+                <span className="font-bold text-slate-500 dark:text-slate-400">Step 1: Traveling to Farmer's Field</span>
                 <span className="text-amber-400 font-black">~{remainingDistanceKm} km remaining</span>
               </div>
 
@@ -329,7 +329,7 @@ export default function DriverNavigation() {
                   <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                   <span>{lang === 'hi' ? 'मशीन खेत पर पहुँच चुकी है' : 'Machinery Arrived at Field'}</span>
                 </div>
-                <span className="text-xs text-stone-400">
+                <span className="text-xs text-slate-500 dark:text-slate-400">
                   {lang === 'hi' ? 'किसान से 4-अंकों का स्टार्ट पिन प्राप्त करें' : 'Obtain 4-digit start PIN from farmer'}
                 </span>
               </div>
@@ -357,7 +357,7 @@ export default function DriverNavigation() {
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
                   <span>{lang === 'hi' ? 'खेत में जुताई/कटाई कार्य प्रगति पर है' : 'Field Operation Live in Progress'}</span>
                 </span>
-                <span className="text-stone-400 font-bold">Telemetric GPS Synchronized</span>
+                <span className="text-slate-500 dark:text-slate-400 font-bold">Telemetric GPS Synchronized</span>
               </div>
 
               <button
@@ -380,7 +380,7 @@ export default function DriverNavigation() {
             <button
               type="button"
               onClick={() => setIsCancelModalOpen(true)}
-              className="px-4 py-2 rounded-xl bg-stone-900/60 hover:bg-red-950/30 text-stone-400 hover:text-red-400 border border-stone-800 hover:border-red-500/30 font-bold text-xs transition cursor-pointer flex items-center gap-1.5"
+              className="px-4 py-2 rounded-xl bg-stone-900/60 hover:bg-red-950/30 text-slate-500 dark:text-slate-400 hover:text-red-400 border border-slate-200 dark:border-slate-800 hover:border-red-500/30 font-bold text-xs transition cursor-pointer flex items-center gap-1.5"
             >
               <XCircle className="w-3.5 h-3.5" />
               <span>{lang === 'hi' ? '✕ आपातकालीन / कारण सहित बुकिंग रद्द करें' : '✕ Emergency / Cancel Booking with Reason'}</span>
@@ -391,9 +391,9 @@ export default function DriverNavigation() {
       </div>
 
       {/* ══════════════ SECTION 4: LIVE PAYOUT & GUARANTEED EARNINGS BREAKDOWN ══════════════ */}
-      <div className="bg-[#0A0E13] border border-white/10 rounded-3xl p-5 sm:p-6 shadow-2xl backdrop-blur-xl space-y-4">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-2xl backdrop-blur-xl space-y-4">
         
-        <div className="flex items-center justify-between pb-3 border-b border-white/10">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
           <div className="flex items-center gap-2">
             <IndianRupee className="w-5 h-5 text-emerald-400" />
             <h3 className="text-base sm:text-lg font-black text-white">
@@ -409,34 +409,34 @@ export default function DriverNavigation() {
           
           {/* Metric 1: Guaranteed Payout */}
           <div className="p-4 rounded-2xl bg-stone-950 border border-emerald-500/30 space-y-1">
-            <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider block">
+            <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
               {lang === 'hi' ? 'नियत कुल किराया' : 'Guaranteed Payout'}
             </span>
             <span className="text-2xl sm:text-3xl font-black text-emerald-400 tracking-tight block">
               ₹{guaranteedFare.toLocaleString()}
             </span>
-            <span className="text-[11px] text-stone-400">
+            <span className="text-[11px] text-slate-500 dark:text-slate-400">
               {activeBooking.landSize || '4.5'} {activeBooking.sizeUnit || 'Bigha'} • {activeBooking.attachment?.nameEn || 'Rotavator'}
             </span>
           </div>
 
           {/* Metric 2: Regional Rate Multiplier */}
-          <div className="p-4 rounded-2xl bg-stone-950 border border-stone-800 space-y-1">
-            <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider block">
+          <div className="p-4 rounded-2xl bg-stone-950 border border-slate-200 dark:border-slate-800 space-y-1">
+            <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
               {lang === 'hi' ? 'क्षेत्रीय दर गुणांक' : 'Regional Multiplier'}
             </span>
             <span className="text-2xl font-black text-white block">
               1.0x UP Base
             </span>
-            <span className="text-[11px] text-stone-400">
+            <span className="text-[11px] text-slate-500 dark:text-slate-400">
               ₹1,300/Bigha Central UP Rate
             </span>
           </div>
 
           {/* Metric 3: Diesel Expense Estimator */}
-          <div className="p-4 rounded-2xl bg-stone-950 border border-stone-800 space-y-1">
+          <div className="p-4 rounded-2xl bg-stone-950 border border-slate-200 dark:border-slate-800 space-y-1">
             <div className="flex justify-between items-center">
-              <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider">
+              <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                 {lang === 'hi' ? 'डीजल खर्च अनुमान' : 'Diesel Expense'}
               </span>
               <Fuel className="w-3.5 h-3.5 text-amber-400" />
@@ -444,7 +444,7 @@ export default function DriverNavigation() {
             <span className="text-2xl font-black text-amber-400 block">
               -₹{estimatedDieselCost.toLocaleString()}
             </span>
-            <span className="text-[11px] text-stone-400">
+            <span className="text-[11px] text-slate-500 dark:text-slate-400">
               ~{fuelLiters} Liters @ ₹{dieselPricePerLiter}/L
             </span>
           </div>
@@ -471,7 +471,7 @@ export default function DriverNavigation() {
       {/* ══════════════ MODAL: START JOB OTP VERIFICATION ══════════════ */}
       {isOtpModalOpen && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-stone-950/85 backdrop-blur-md animate-fade-in">
-          <div className="bg-[#0A0E13] border border-emerald-500/40 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl text-white space-y-5 relative">
+          <div className="bg-white dark:bg-slate-900 border border-emerald-500/40 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl text-white space-y-5 relative">
             <div className="text-center space-y-2">
               <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-2xl mx-auto shadow-inner">
                 🔐
@@ -479,7 +479,7 @@ export default function DriverNavigation() {
               <h3 className="text-xl font-black text-white">
                 {lang === 'hi' ? 'किसान का स्टार्ट ओटीपी दर्ज करें' : 'Enter Farmer Start Job OTP PIN'}
               </h3>
-              <p className="text-xs text-stone-400">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 {lang === 'hi' 
                   ? 'किसान के मोबाइल स्क्रीन पर प्रदर्शित 4-अंकों का सुरक्षा पिन प्राप्त कर दर्ज करें।' 
                   : 'Ask the farmer for the 4-digit security PIN shown on their live tracking screen.'}
@@ -502,7 +502,7 @@ export default function DriverNavigation() {
                 />
 
                 {/* Quick Hint / Master bypass for testing */}
-                <div className="flex items-center justify-between text-[11px] text-stone-400 px-1">
+                <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 px-1">
                   <span>{lang === 'hi' ? 'ओटीपी किसान से पूछें' : 'PIN displayed on Farmer app'}</span>
                   <button 
                     type="button" 
@@ -531,7 +531,7 @@ export default function DriverNavigation() {
                 <button
                   type="button"
                   onClick={() => setIsOtpModalOpen(false)}
-                  className="flex-1 py-3.5 rounded-2xl bg-stone-900 border border-stone-800 hover:bg-stone-800 text-stone-300 font-bold text-xs transition cursor-pointer"
+                  className="flex-1 py-3.5 rounded-2xl bg-stone-900 border border-slate-200 dark:border-slate-800 hover:bg-stone-800 text-slate-700 dark:text-slate-300 font-bold text-xs transition cursor-pointer"
                 >
                   {lang === 'hi' ? 'रद्द करें' : 'Cancel'}
                 </button>

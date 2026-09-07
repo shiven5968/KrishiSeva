@@ -331,20 +331,20 @@ export default function AdminPortal() {
       
       {/* ══════════════ SUB-COMMAND TABS STRIP ══════════════ */}
       <div className={`border-b py-3 px-4 sm:px-6 lg:px-8 transition-colors duration-200 ${
-        isDark ? 'bg-stone-900/40 border-stone-800/80' : 'bg-white/70 border-slate-200'
+        isDark ? 'bg-stone-900/40 border-slate-200 dark:border-slate-800/80' : 'bg-white/70 border-slate-200'
       }`}>
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
           
           {/* Navigation Pill Tabs */}
           <nav className={`flex items-center p-1 rounded-2xl border text-xs font-black shadow-sm ${
-            isDark ? 'bg-stone-950 border-stone-800' : 'bg-slate-100 border-slate-200'
+            isDark ? 'bg-stone-950 border-slate-200 dark:border-slate-800' : 'bg-slate-100 border-slate-200'
           }`}>
             <button
               onClick={() => setActiveTab('dashboard')}
               className={`px-4 py-2 rounded-xl transition flex items-center gap-1.5 ${
                 activeTab === 'dashboard'
                   ? 'bg-emerald-500 text-stone-950 shadow-md'
-                  : isDark ? 'text-stone-300 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+                  : isDark ? 'text-slate-700 dark:text-slate-300 hover:text-white' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <Activity className="w-3.5 h-3.5" />
@@ -356,7 +356,7 @@ export default function AdminPortal() {
               className={`px-4 py-2 rounded-xl transition flex items-center gap-1.5 relative ${
                 activeTab === 'kyc'
                   ? 'bg-emerald-500 text-stone-950 shadow-md'
-                  : isDark ? 'text-stone-300 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+                  : isDark ? 'text-slate-700 dark:text-slate-300 hover:text-white' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <ShieldCheck className="w-3.5 h-3.5" />
@@ -373,7 +373,7 @@ export default function AdminPortal() {
               className={`px-4 py-2 rounded-xl transition flex items-center gap-1.5 ${
                 activeTab === 'directory'
                   ? 'bg-emerald-500 text-stone-950 shadow-md'
-                  : isDark ? 'text-stone-300 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+                  : isDark ? 'text-slate-700 dark:text-slate-300 hover:text-white' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <Users className="w-3.5 h-3.5" />
@@ -385,7 +385,7 @@ export default function AdminPortal() {
               className={`px-4 py-2 rounded-xl transition flex items-center gap-1.5 ${
                 activeTab === 'pricing'
                   ? 'bg-emerald-500 text-stone-950 shadow-md'
-                  : isDark ? 'text-stone-300 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+                  : isDark ? 'text-slate-700 dark:text-slate-300 hover:text-white' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <Sliders className="w-3.5 h-3.5" />
@@ -396,7 +396,7 @@ export default function AdminPortal() {
           {/* Right Status Badge & Public App shortcut */}
           <div className="flex items-center gap-3">
             <div className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl border text-[11px] font-bold ${
-              isDark ? 'bg-stone-950 border-stone-800 text-stone-300' : 'bg-slate-50 border-slate-200 text-slate-600'
+              isDark ? 'bg-stone-950 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-600'
             }`}>
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               <span>Malihabad Node: Operational</span>
@@ -442,10 +442,10 @@ export default function AdminPortal() {
               
               {/* Stat 1: Total Active Bookings */}
               <div className={`p-5 rounded-3xl border shadow-lg relative overflow-hidden transition-all duration-200 ${
-                isDark ? 'bg-stone-900/80 border-stone-800 shadow-black/40' : 'bg-white border-slate-200 shadow-slate-200/60'
+                isDark ? 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-black/40' : 'bg-white border-slate-200 shadow-slate-200/60'
               }`}>
                 <div className="flex items-center justify-between mb-3">
-                  <span className={`text-[11px] font-black uppercase tracking-wider ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+                  <span className={`text-[11px] font-black uppercase tracking-wider ${isDark ? 'text-slate-500 dark:text-slate-400' : 'text-slate-500'}`}>
                     Active Field Dispatches
                   </span>
                   <div className="w-9 h-9 rounded-xl bg-emerald-950/80 border border-emerald-500/40 text-emerald-400 flex items-center justify-center">
@@ -460,17 +460,17 @@ export default function AdminPortal() {
                     <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-emerald-500/10 text-[10px]">
                       <ArrowUpRight className="w-3 h-3" /> +14.2%
                     </span>
-                    <span className={isDark ? 'text-stone-400' : 'text-slate-500'}>today (Live Stream)</span>
+                    <span className={isDark ? 'text-slate-500 dark:text-slate-400' : 'text-slate-500'}>today (Live Stream)</span>
                   </div>
                 </div>
               </div>
 
               {/* Stat 2: Live Fleets Online */}
               <div className={`p-5 rounded-3xl border shadow-lg relative overflow-hidden transition-all duration-200 ${
-                isDark ? 'bg-stone-900/80 border-stone-800 shadow-black/40' : 'bg-white border-slate-200 shadow-slate-200/60'
+                isDark ? 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-black/40' : 'bg-white border-slate-200 shadow-slate-200/60'
               }`}>
                 <div className="flex items-center justify-between mb-3">
-                  <span className={`text-[11px] font-black uppercase tracking-wider ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+                  <span className={`text-[11px] font-black uppercase tracking-wider ${isDark ? 'text-slate-500 dark:text-slate-400' : 'text-slate-500'}`}>
                     Operational Machinery
                   </span>
                   <div className="w-9 h-9 rounded-xl bg-blue-950/80 border border-blue-500/40 text-blue-400 flex items-center justify-center">
@@ -483,17 +483,17 @@ export default function AdminPortal() {
                   </h3>
                   <div className="flex items-center gap-1.5 text-xs font-bold text-blue-500">
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                    <span className={isDark ? 'text-stone-300' : 'text-slate-600'}>11 Tractors • 4 Combines • 3 JCBs</span>
+                    <span className={isDark ? 'text-slate-700 dark:text-slate-300' : 'text-slate-600'}>11 Tractors • 4 Combines • 3 JCBs</span>
                   </div>
                 </div>
               </div>
 
               {/* Stat 3: Gross Farm Coverage */}
               <div className={`p-5 rounded-3xl border shadow-lg relative overflow-hidden transition-all duration-200 ${
-                isDark ? 'bg-stone-900/80 border-stone-800 shadow-black/40' : 'bg-white border-slate-200 shadow-slate-200/60'
+                isDark ? 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-black/40' : 'bg-white border-slate-200 shadow-slate-200/60'
               }`}>
                 <div className="flex items-center justify-between mb-3">
-                  <span className={`text-[11px] font-black uppercase tracking-wider ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+                  <span className={`text-[11px] font-black uppercase tracking-wider ${isDark ? 'text-slate-500 dark:text-slate-400' : 'text-slate-500'}`}>
                     Gross Farm Coverage
                   </span>
                   <div className="w-9 h-9 rounded-xl bg-amber-950/80 border border-amber-500/40 text-amber-400 flex items-center justify-center">
@@ -508,17 +508,17 @@ export default function AdminPortal() {
                     <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-amber-500/10 text-[10px]">
                       🌾 +85 Bighas
                     </span>
-                    <span className={isDark ? 'text-stone-400' : 'text-slate-500'}>serviced this week</span>
+                    <span className={isDark ? 'text-slate-500 dark:text-slate-400' : 'text-slate-500'}>serviced this week</span>
                   </div>
                 </div>
               </div>
 
               {/* Stat 4: Network Uptime & Driver Payouts */}
               <div className={`p-5 rounded-3xl border shadow-lg relative overflow-hidden transition-all duration-200 ${
-                isDark ? 'bg-stone-900/80 border-stone-800 shadow-black/40' : 'bg-white border-slate-200 shadow-slate-200/60'
+                isDark ? 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-black/40' : 'bg-white border-slate-200 shadow-slate-200/60'
               }`}>
                 <div className="flex items-center justify-between mb-3">
-                  <span className={`text-[11px] font-black uppercase tracking-wider ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+                  <span className={`text-[11px] font-black uppercase tracking-wider ${isDark ? 'text-slate-500 dark:text-slate-400' : 'text-slate-500'}`}>
                     Gross GMV & Disbursals
                   </span>
                   <div className="w-9 h-9 rounded-xl bg-purple-950/80 border border-purple-500/40 text-purple-400 flex items-center justify-center font-black">
@@ -533,7 +533,7 @@ export default function AdminPortal() {
                     <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-purple-500/10 text-[10px]">
                       🟢 99.98%
                     </span>
-                    <span className={isDark ? 'text-stone-400' : 'text-slate-500'}>Direct Driver Payouts</span>
+                    <span className={isDark ? 'text-slate-500 dark:text-slate-400' : 'text-slate-500'}>Direct Driver Payouts</span>
                   </div>
                 </div>
               </div>
@@ -542,16 +542,16 @@ export default function AdminPortal() {
 
             {/* ══════════════ LIVE PLATFORM DISPATCHES PIPELINE ══════════════ */}
             <div className={`p-6 rounded-3xl border shadow-xl space-y-4 ${
-              isDark ? 'bg-stone-900/90 border-stone-800' : 'bg-white border-slate-200'
+              isDark ? 'bg-stone-900/90 border-slate-200 dark:border-slate-800' : 'bg-white border-slate-200'
             }`}>
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-stone-800/40">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-800/40">
                 <div className="flex items-center gap-2.5">
                   <div className="w-3 h-3 rounded-full bg-emerald-400 animate-ping" />
                   <div>
                     <h3 className={`text-lg font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
                       {lang === 'hi' ? 'लाइव प्लेटफॉर्म बुकिंग एवं डिस्पैच मॉनिटर' : 'Live Bookings & Field Dispatch Monitor'}
                     </h3>
-                    <p className={`text-xs ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+                    <p className={`text-xs ${isDark ? 'text-slate-500 dark:text-slate-400' : 'text-slate-500'}`}>
                       Real-time machinery dispatch ledger across farm plots in Malihabad
                     </p>
                   </div>
@@ -568,7 +568,7 @@ export default function AdminPortal() {
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
                   <thead className={`border-b uppercase font-black tracking-wider text-[10px] ${
-                    isDark ? 'bg-stone-950/80 border-stone-800 text-stone-400' : 'bg-slate-100 border-slate-200 text-slate-600'
+                    isDark ? 'bg-stone-950/80 border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400' : 'bg-slate-100 border-slate-200 text-slate-600'
                   }`}>
                     <tr>
                       <th className="py-3.5 px-4">Booking ID & Farmer</th>
@@ -589,7 +589,7 @@ export default function AdminPortal() {
                             <span className="text-xl">{dispatch.vehicleIcon}</span>
                             <div>
                               <span className="font-black text-sm block">{dispatch.farmerName}</span>
-                              <span className="text-[10px] text-stone-400 font-mono">
+                              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">
                                 #{dispatch.bookingId} • {dispatch.village}
                               </span>
                             </div>
@@ -608,7 +608,7 @@ export default function AdminPortal() {
                         <td className="py-4 px-4">
                           <div>
                             <span className="font-bold text-xs block">{dispatch.operatorName}</span>
-                            <span className="text-[10px] text-stone-400 font-mono">
+                            <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">
                               {dispatch.operatorPlate} • {dispatch.operatorPhone}
                             </span>
                           </div>
@@ -634,14 +634,14 @@ export default function AdminPortal() {
                             <span className="font-black text-sm text-emerald-400 font-mono block">
                               ₹{dispatch.amount.toLocaleString()}
                             </span>
-                            <span className="text-[10px] text-stone-400">
+                            <span className="text-[10px] text-slate-500 dark:text-slate-400">
                               {dispatch.paymentMode}
                             </span>
                           </div>
                         </td>
 
                         <td className="py-4 px-4 text-right">
-                          <span className="font-mono text-xs font-bold text-stone-400">
+                          <span className="font-mono text-xs font-bold text-slate-500 dark:text-slate-400">
                             {dispatch.startTime}
                           </span>
                         </td>
@@ -657,9 +657,9 @@ export default function AdminPortal() {
               
               {/* Left 7 Cols: Real-Time Audit Event Log */}
               <div className={`lg:col-span-7 p-6 rounded-3xl border shadow-xl space-y-4 ${
-                isDark ? 'bg-stone-900/90 border-stone-800' : 'bg-white border-slate-200'
+                isDark ? 'bg-stone-900/90 border-slate-200 dark:border-slate-800' : 'bg-white border-slate-200'
               }`}>
-                <div className="flex items-center justify-between pb-3 border-b border-stone-800/40">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800/40">
                   <div className="flex items-center gap-2">
                     <Radio className="w-4 h-4 text-emerald-400 animate-pulse" />
                     <h4 className={`text-base font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -674,13 +674,13 @@ export default function AdminPortal() {
                     <div 
                       key={idx}
                       className={`p-3 rounded-2xl border flex items-start gap-3 text-xs ${
-                        isDark ? 'bg-stone-950 border-stone-800' : 'bg-slate-50 border-slate-200'
+                        isDark ? 'bg-stone-950 border-slate-200 dark:border-slate-800' : 'bg-slate-50 border-slate-200'
                       }`}
                     >
                       <span className="font-mono text-[11px] font-bold text-emerald-400 px-2 py-0.5 rounded-lg bg-emerald-950/80 border border-emerald-800/60 shrink-0">
                         {log.time}
                       </span>
-                      <p className={`font-medium ${isDark ? 'text-stone-300' : 'text-slate-700'}`}>
+                      <p className={`font-medium ${isDark ? 'text-slate-700 dark:text-slate-300' : 'text-slate-700'}`}>
                         {log.text}
                       </p>
                     </div>
@@ -690,10 +690,10 @@ export default function AdminPortal() {
 
               {/* Right 5 Cols: Machinery Availability Breakdown */}
               <div className={`lg:col-span-5 p-6 rounded-3xl border shadow-xl space-y-4 flex flex-col justify-between ${
-                isDark ? 'bg-stone-900/90 border-stone-800' : 'bg-white border-slate-200'
+                isDark ? 'bg-stone-900/90 border-slate-200 dark:border-slate-800' : 'bg-white border-slate-200'
               }`}>
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between pb-3 border-b border-stone-800/40">
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800/40">
                     <div className="flex items-center gap-2">
                       <Gauge className="w-4 h-4 text-emerald-400" />
                       <h4 className={`text-base font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -767,13 +767,13 @@ export default function AdminPortal() {
         {/* ═════════════════════════════════════════════ */}
         {activeTab === 'kyc' && (
           <div className="space-y-6 animate-fade-in">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-stone-800/40">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-200 dark:border-slate-800/40">
               <div>
                 <h2 className={`text-xl font-black flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
                   <ShieldCheck className="w-5 h-5 text-emerald-400" />
                   <span>{t('pendingDrivers')} ({pendingApplications.length})</span>
                 </h2>
-                <p className={`text-xs ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+                <p className={`text-xs ${isDark ? 'text-slate-500 dark:text-slate-400' : 'text-slate-500'}`}>
                   Review submitted Driving Licenses, Vehicle RC plates & approve for instant fleet dispatch
                 </p>
               </div>
@@ -781,7 +781,7 @@ export default function AdminPortal() {
 
             {pendingApplications.length === 0 ? (
               <div className={`p-12 text-center rounded-3xl border shadow-lg space-y-3 ${
-                isDark ? 'bg-stone-900/80 border-stone-800' : 'bg-white border-slate-200'
+                isDark ? 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800' : 'bg-white border-slate-200'
               }`}>
                 <div className="w-16 h-16 rounded-2xl bg-emerald-950/80 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto text-3xl shadow-inner">
                   ✅
@@ -789,7 +789,7 @@ export default function AdminPortal() {
                 <h3 className={`text-lg font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
                   {t('noPending')}
                 </h3>
-                <p className={`text-xs max-w-sm mx-auto ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+                <p className={`text-xs max-w-sm mx-auto ${isDark ? 'text-slate-500 dark:text-slate-400' : 'text-slate-500'}`}>
                   {lang === 'hi' 
                     ? 'सभी प्राप्त ड्राइविंग लाइसेंस और नंबर प्लेट सत्यापित कर लिए गए हैं।' 
                     : 'All driver applications have been thoroughly audited and approved.'}
@@ -801,7 +801,7 @@ export default function AdminPortal() {
                   <div 
                     key={app.id}
                     className={`p-6 rounded-3xl border shadow-lg hover:shadow-xl transition-all duration-200 space-y-5 ${
-                      isDark ? 'bg-stone-900/90 border-stone-800' : 'bg-white border-slate-200'
+                      isDark ? 'bg-stone-900/90 border-slate-200 dark:border-slate-800' : 'bg-white border-slate-200'
                     }`}
                   >
                     <div className="flex items-start justify-between">
@@ -813,7 +813,7 @@ export default function AdminPortal() {
                           <h3 className={`font-black text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>
                             {app.driverName}
                           </h3>
-                          <p className={`text-xs font-bold ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+                          <p className={`text-xs font-bold ${isDark ? 'text-slate-500 dark:text-slate-400' : 'text-slate-500'}`}>
                             {app.phone} • <span className={isDark ? 'text-emerald-400' : 'text-emerald-700'}>{app.modelName}</span>
                           </p>
                         </div>
@@ -825,10 +825,10 @@ export default function AdminPortal() {
                     </div>
 
                     <div className={`flex items-center justify-between p-3.5 rounded-2xl border text-xs ${
-                      isDark ? 'bg-stone-950 border-stone-800' : 'bg-slate-50 border-slate-200'
+                      isDark ? 'bg-stone-950 border-slate-200 dark:border-slate-800' : 'bg-slate-50 border-slate-200'
                     }`}>
                       <div>
-                        <span className={`text-[10px] uppercase font-bold block ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+                        <span className={`text-[10px] uppercase font-bold block ${isDark ? 'text-slate-500 dark:text-slate-400' : 'text-slate-500'}`}>
                           Vehicle Number
                         </span>
                         <span className={`font-black text-sm font-mono ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -836,7 +836,7 @@ export default function AdminPortal() {
                         </span>
                       </div>
                       <div className="text-right">
-                        <span className={`text-[10px] uppercase font-bold block ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+                        <span className={`text-[10px] uppercase font-bold block ${isDark ? 'text-slate-500 dark:text-slate-400' : 'text-slate-500'}`}>
                           Platform Dynamic Rates
                         </span>
                         <span className="font-extrabold text-emerald-500 text-xs">
@@ -850,7 +850,7 @@ export default function AdminPortal() {
                       <div 
                         onClick={() => setInspectingApp(app)}
                         className={`border rounded-2xl p-2 cursor-pointer transition text-center group ${
-                          isDark ? 'bg-stone-950 border-stone-800 hover:border-emerald-500/60' : 'bg-slate-50 border-slate-200 hover:border-emerald-500'
+                          isDark ? 'bg-stone-950 border-slate-200 dark:border-slate-800 hover:border-emerald-500/60' : 'bg-slate-50 border-slate-200 hover:border-emerald-500'
                         }`}
                       >
                         <img
@@ -858,7 +858,7 @@ export default function AdminPortal() {
                           alt="DL"
                           className="w-full h-24 object-cover rounded-xl border border-stone-700 group-hover:opacity-90 transition-opacity"
                         />
-                        <span className="mt-1 block text-[10px] font-bold text-stone-400 group-hover:text-emerald-400">
+                        <span className="mt-1 block text-[10px] font-bold text-slate-500 dark:text-slate-400 group-hover:text-emerald-400">
                           🔍 {t('dlPreview')}
                         </span>
                       </div>
@@ -866,7 +866,7 @@ export default function AdminPortal() {
                       <div 
                         onClick={() => setInspectingApp(app)}
                         className={`border rounded-2xl p-2 cursor-pointer transition text-center group ${
-                          isDark ? 'bg-stone-950 border-stone-800 hover:border-emerald-500/60' : 'bg-slate-50 border-slate-200 hover:border-emerald-500'
+                          isDark ? 'bg-stone-950 border-slate-200 dark:border-slate-800 hover:border-emerald-500/60' : 'bg-slate-50 border-slate-200 hover:border-emerald-500'
                         }`}
                       >
                         <img
@@ -874,7 +874,7 @@ export default function AdminPortal() {
                           alt="Plate"
                           className="w-full h-24 object-cover rounded-xl border border-stone-700 group-hover:opacity-90 transition-opacity"
                         />
-                        <span className="mt-1 block text-[10px] font-bold text-stone-400 group-hover:text-emerald-400">
+                        <span className="mt-1 block text-[10px] font-bold text-slate-500 dark:text-slate-400 group-hover:text-emerald-400">
                           🔍 {t('platePreview')}
                         </span>
                       </div>
@@ -886,7 +886,7 @@ export default function AdminPortal() {
                         onClick={() => setInspectingApp(app)}
                         className={`w-1/3 py-3 rounded-2xl border font-bold text-xs flex items-center justify-center gap-1 transition ${
                           isDark 
-                            ? 'border-stone-700 text-stone-300 hover:bg-stone-800' 
+                            ? 'border-stone-700 text-slate-700 dark:text-slate-300 hover:bg-stone-800' 
                             : 'border-slate-300 text-slate-700 hover:bg-slate-100'
                         }`}
                       >
@@ -923,26 +923,26 @@ export default function AdminPortal() {
         {/* ═════════════════════════════════════════════ */}
         {activeTab === 'directory' && (
           <div className="space-y-6 animate-fade-in">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-stone-800/40">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-800/40">
               <div>
                 <h2 className={`text-xl font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
                   {lang === 'hi' ? 'पंजीकृत फ्लीट एवं मशीनरी इन्वेंटरी' : 'Registered Fleet & Machinery Inventory'}
                 </h2>
-                <p className={`text-xs ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+                <p className={`text-xs ${isDark ? 'text-slate-500 dark:text-slate-400' : 'text-slate-500'}`}>
                   Directory of all authorized drivers, machinery specs, implements and verification states
                 </p>
               </div>
 
               {/* Search */}
               <div className="relative w-full sm:w-72">
-                <Search className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Search className="w-4 h-4 text-slate-500 dark:text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   value={fleetSearch}
                   onChange={(e) => setFleetSearch(e.target.value)}
                   placeholder="Search by driver, model or plate..."
                   className={`w-full pl-10 pr-4 py-2.5 rounded-2xl border text-xs font-bold outline-none focus:border-emerald-500 ${
-                    isDark ? 'border-stone-800 bg-stone-900 text-white' : 'border-slate-300 bg-white text-slate-900'
+                    isDark ? 'border-slate-200 dark:border-slate-800 bg-stone-900 text-white' : 'border-slate-300 bg-white text-slate-900'
                   }`}
                 />
               </div>
@@ -950,12 +950,12 @@ export default function AdminPortal() {
 
             {/* High-Contrast Data Table */}
             <div className={`rounded-3xl border shadow-xl overflow-hidden ${
-              isDark ? 'bg-stone-900/90 border-stone-800' : 'bg-white border-slate-200'
+              isDark ? 'bg-stone-900/90 border-slate-200 dark:border-slate-800' : 'bg-white border-slate-200'
             }`}>
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
                   <thead className={`border-b uppercase font-black tracking-wider text-[10px] ${
-                    isDark ? 'bg-stone-950/80 border-stone-800 text-stone-400' : 'bg-slate-100 border-slate-200 text-slate-600'
+                    isDark ? 'bg-stone-950/80 border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400' : 'bg-slate-100 border-slate-200 text-slate-600'
                   }`}>
                     <tr>
                       <th className="py-4 px-5">Fleet ID & Driver</th>
@@ -985,7 +985,7 @@ export default function AdminPortal() {
                               </span>
                               <div>
                                 <span className="font-black text-sm block">{fleet.driverName}</span>
-                                <span className="text-[10px] text-stone-400 font-mono">{fleet.id} • {fleet.phone}</span>
+                                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">{fleet.id} • {fleet.phone}</span>
                               </div>
                             </div>
                           </td>
@@ -998,7 +998,7 @@ export default function AdminPortal() {
                           </td>
 
                           <td className="py-4 px-4">
-                            <span className="font-mono font-black text-xs px-2 py-1 rounded-lg bg-stone-950 border border-stone-800 text-emerald-400">
+                            <span className="font-mono font-black text-xs px-2 py-1 rounded-lg bg-stone-950 border border-slate-200 dark:border-slate-800 text-emerald-400">
                               {fleet.vehicleNumber}
                             </span>
                           </td>
@@ -1007,7 +1007,7 @@ export default function AdminPortal() {
                             <div className="flex items-center gap-1 font-bold">
                               <span className="text-amber-400">★</span>
                               <span>{fleet.rating}</span>
-                              <span className="text-[10px] text-stone-400">({fleet.completedJobs} rides)</span>
+                              <span className="text-[10px] text-slate-500 dark:text-slate-400">({fleet.completedJobs} rides)</span>
                             </div>
                           </td>
 
@@ -1044,9 +1044,9 @@ export default function AdminPortal() {
             
             {/* Header Box */}
             <div className={`p-6 sm:p-8 rounded-3xl border shadow-xl ${
-              isDark ? 'bg-stone-900/90 border-stone-800' : 'bg-white border-slate-200'
+              isDark ? 'bg-stone-900/90 border-slate-200 dark:border-slate-800' : 'bg-white border-slate-200'
             }`}>
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-stone-800/40 pb-5">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800/40 pb-5">
                 <div>
                   <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/80 text-emerald-400 border border-emerald-800/60 text-xs font-black uppercase tracking-wider">
                     <Sliders className="w-3.5 h-3.5" />
@@ -1055,7 +1055,7 @@ export default function AdminPortal() {
                   <h2 className={`text-2xl font-black mt-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
                     {lang === 'hi' ? 'क्षेत्रीय कृषि बूम व मौसमी मांग आधारित दर प्रबंधन' : 'Regional Agro-Boom & Seasonal Demand Rates Management'}
                   </h2>
-                  <p className={`text-xs sm:text-sm mt-1 ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+                  <p className={`text-xs sm:text-sm mt-1 ${isDark ? 'text-slate-500 dark:text-slate-400' : 'text-slate-500'}`}>
                     {lang === 'hi' 
                       ? 'यूपी पूर्वांचल आधार दर (₹1,300/बीघा) के अनुसार विभिन्न राज्यों के कृषि बूम व कटाई/बुवाई पीक सीजन के आधार पर डायनामिक दरें तय करें।' 
                       : 'Anchor pricing based on UP Purvanchal (₹1,300/bigha base), scaling dynamically for high-intensity cash-crop boom belts (Maharashtra, Granary) & harvest season surges.'}
@@ -1067,7 +1067,7 @@ export default function AdminPortal() {
                   onClick={handleResetRates}
                   className={`px-4 py-2.5 rounded-2xl border font-bold text-xs flex items-center gap-1.5 transition shrink-0 ${
                     isDark 
-                      ? 'border-stone-700 text-stone-300 hover:bg-stone-800' 
+                      ? 'border-stone-700 text-slate-700 dark:text-slate-300 hover:bg-stone-800' 
                       : 'border-slate-300 text-slate-700 hover:bg-slate-100'
                   }`}
                 >
@@ -1085,7 +1085,7 @@ export default function AdminPortal() {
                     <Globe className="w-4 h-4" />
                     <span>1. Select State / Agricultural Zone (राज्य व कृषि बूम क्षेत्र)</span>
                   </label>
-                  <span className="text-[11px] font-bold text-stone-400">
+                  <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
                     Active: <span className="text-emerald-400 font-black">{REGIONAL_AGRO_ZONES.find(z => z.id === activeZoneId)?.nameEn}</span>
                   </span>
                 </div>
@@ -1101,7 +1101,7 @@ export default function AdminPortal() {
                           isSelected
                             ? 'border-emerald-500 bg-emerald-950/40 shadow-lg shadow-emerald-500/15 ring-2 ring-emerald-500/30'
                             : isDark
-                            ? 'border-stone-800 bg-stone-950 hover:border-stone-700 hover:bg-stone-900/60'
+                            ? 'border-slate-200 dark:border-slate-800 bg-stone-950 hover:border-stone-700 hover:bg-stone-900/60'
                             : 'border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100'
                         }`}
                       >
@@ -1123,13 +1123,13 @@ export default function AdminPortal() {
                         </div>
 
                         <p className={`text-[11px] leading-snug line-clamp-2 ${
-                          isDark ? 'text-stone-400' : 'text-slate-600'
+                          isDark ? 'text-slate-500 dark:text-slate-400' : 'text-slate-600'
                         }`}>
                           {zone.description}
                         </p>
 
-                        <div className="mt-2.5 pt-2 border-t border-stone-800/40 flex items-center justify-between text-[10px] font-mono">
-                          <span className="text-stone-400">Multiplier:</span>
+                        <div className="mt-2.5 pt-2 border-t border-slate-200 dark:border-slate-800/40 flex items-center justify-between text-[10px] font-mono">
+                          <span className="text-slate-500 dark:text-slate-400">Multiplier:</span>
                           <span className="font-black text-emerald-400 font-bold">{zone.multiplier}x</span>
                         </div>
                       </div>
@@ -1147,7 +1147,7 @@ export default function AdminPortal() {
                     <Zap className="w-4 h-4" />
                     <span>2. Seasonal Crop Cycle & Demand Surge (फसल चक्र व पीक सीजन मांग)</span>
                   </label>
-                  <span className="text-[11px] font-bold text-stone-400">
+                  <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
                     Active Season: <span className="text-amber-400 font-black">{SEASONAL_CROP_CYCLES.find(s => s.id === activeSeasonId)?.nameEn}</span>
                   </span>
                 </div>
@@ -1163,7 +1163,7 @@ export default function AdminPortal() {
                           isSelected
                             ? 'border-amber-500 bg-amber-950/40 shadow-lg shadow-amber-500/15 ring-2 ring-amber-500/30'
                             : isDark
-                            ? 'border-stone-800 bg-stone-950 hover:border-stone-700 hover:bg-stone-900/60'
+                            ? 'border-slate-200 dark:border-slate-800 bg-stone-950 hover:border-stone-700 hover:bg-stone-900/60'
                             : 'border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100'
                         }`}
                       >
@@ -1184,10 +1184,10 @@ export default function AdminPortal() {
                           </span>
                         </div>
 
-                        <p className={`text-[11px] font-bold text-stone-300 mt-1`}>
+                        <p className={`text-[11px] font-bold text-slate-700 dark:text-slate-300 mt-1`}>
                           🌾 {season.activeCrops}
                         </p>
-                        <p className={`text-[10px] mt-0.5 ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+                        <p className={`text-[10px] mt-0.5 ${isDark ? 'text-slate-500 dark:text-slate-400' : 'text-slate-500'}`}>
                           {season.demandFocus}
                         </p>
                       </div>
@@ -1215,13 +1215,13 @@ export default function AdminPortal() {
                           {currentZone.nameEn} • {currentSeason.nameEn}
                         </span>
                       </div>
-                      <p className="font-mono text-[11px] text-stone-300">
+                      <p className="font-mono text-[11px] text-slate-700 dark:text-slate-300">
                         Formula: ₹1,300 (UP Purvanchal Base) × {currentZone.multiplier}x (Agro Boom) × {currentSeason.surgeMultiplier}x (Season Surge) = <span className="text-emerald-400 font-black">₹{editableRates.tractorBigha} / Bigha (Combined Multiplier: {totalMultiplier}x)</span>
                       </p>
                     </div>
 
                     <div className="text-right shrink-0">
-                      <span className="text-[10px] uppercase text-stone-400 block font-bold">Total Effective Factor</span>
+                      <span className="text-[10px] uppercase text-slate-500 dark:text-slate-400 block font-bold">Total Effective Factor</span>
                       <span className="text-xl font-black text-emerald-400 font-mono">{totalMultiplier}x</span>
                     </div>
                   </div>
@@ -1243,7 +1243,7 @@ export default function AdminPortal() {
                     </div>
 
                     <div>
-                      <label className={`block text-[11px] font-bold uppercase mb-1.5 ${isDark ? 'text-stone-300' : 'text-slate-600'}`}>
+                      <label className={`block text-[11px] font-bold uppercase mb-1.5 ${isDark ? 'text-slate-700 dark:text-slate-300' : 'text-slate-600'}`}>
                         Rate per Bigha (₹)
                       </label>
                       <div className="relative">
@@ -1272,7 +1272,7 @@ export default function AdminPortal() {
                     </div>
 
                     <div>
-                      <label className={`block text-[11px] font-bold uppercase mb-1.5 ${isDark ? 'text-stone-300' : 'text-slate-600'}`}>
+                      <label className={`block text-[11px] font-bold uppercase mb-1.5 ${isDark ? 'text-slate-700 dark:text-slate-300' : 'text-slate-600'}`}>
                         Rate per Bigha (₹)
                       </label>
                       <div className="relative">
@@ -1301,7 +1301,7 @@ export default function AdminPortal() {
                     </div>
 
                     <div>
-                      <label className={`block text-[11px] font-bold uppercase mb-1.5 ${isDark ? 'text-stone-300' : 'text-slate-600'}`}>
+                      <label className={`block text-[11px] font-bold uppercase mb-1.5 ${isDark ? 'text-slate-700 dark:text-slate-300' : 'text-slate-600'}`}>
                         Rate per Hour (₹)
                       </label>
                       <div className="relative">
@@ -1331,7 +1331,7 @@ export default function AdminPortal() {
 
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className={`block text-[10px] font-bold uppercase mb-1 ${isDark ? 'text-stone-300' : 'text-slate-600'}`}>
+                        <label className={`block text-[10px] font-bold uppercase mb-1 ${isDark ? 'text-slate-700 dark:text-slate-300' : 'text-slate-600'}`}>
                           Base (₹)
                         </label>
                         <input
@@ -1345,7 +1345,7 @@ export default function AdminPortal() {
                         />
                       </div>
                       <div>
-                        <label className={`block text-[10px] font-bold uppercase mb-1 ${isDark ? 'text-stone-300' : 'text-slate-600'}`}>
+                        <label className={`block text-[10px] font-bold uppercase mb-1 ${isDark ? 'text-slate-700 dark:text-slate-300' : 'text-slate-600'}`}>
                           Per Km (₹)
                         </label>
                         <input
@@ -1383,10 +1383,10 @@ export default function AdminPortal() {
       {inspectingApp && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
           <div className={`rounded-3xl max-w-3xl w-full p-6 sm:p-8 shadow-2xl border max-h-[90vh] overflow-y-auto space-y-6 ${
-            isDark ? 'bg-stone-900 border-stone-800 text-white' : 'bg-white border-slate-200 text-slate-900'
+            isDark ? 'bg-stone-900 border-slate-200 dark:border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'
           }`}>
             
-            <div className="flex items-center justify-between pb-4 border-b border-stone-800/40">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800/40">
               <div>
                 <span className="text-xs font-black uppercase text-emerald-400 bg-emerald-950 px-2.5 py-0.5 rounded-full border border-emerald-800">
                   Driver Document Inspection
@@ -1398,7 +1398,7 @@ export default function AdminPortal() {
 
               <button
                 onClick={() => setInspectingApp(null)}
-                className="w-8 h-8 rounded-full bg-stone-800 hover:bg-stone-700 flex items-center justify-center text-stone-300 font-bold transition"
+                className="w-8 h-8 rounded-full bg-stone-800 hover:bg-stone-700 flex items-center justify-center text-slate-700 dark:text-slate-300 font-bold transition"
               >
                 ✕
               </button>
@@ -1407,11 +1407,11 @@ export default function AdminPortal() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               
               <div className="space-y-2">
-                <h4 className="text-xs font-black uppercase tracking-wider text-stone-400 flex items-center gap-1.5">
+                <h4 className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
                   <FileText className="w-4 h-4 text-emerald-400" />
                   <span>{t('dlPreview')} (Driving License)</span>
                 </h4>
-                <div className="border border-stone-800 rounded-2xl p-2 bg-stone-950">
+                <div className="border border-slate-200 dark:border-slate-800 rounded-2xl p-2 bg-stone-950">
                   <img
                     src={inspectingApp.dlPhoto}
                     alt="Driving License Full"
@@ -1421,11 +1421,11 @@ export default function AdminPortal() {
               </div>
 
               <div className="space-y-2">
-                <h4 className="text-xs font-black uppercase tracking-wider text-stone-400 flex items-center gap-1.5">
+                <h4 className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
                   <Truck className="w-4 h-4 text-emerald-400" />
                   <span>{t('platePreview')} (Number Plate Photo)</span>
                 </h4>
-                <div className="border border-stone-800 rounded-2xl p-2 bg-stone-950">
+                <div className="border border-slate-200 dark:border-slate-800 rounded-2xl p-2 bg-stone-950">
                   <img
                     src={inspectingApp.platePhoto}
                     alt="Number Plate Full"
@@ -1436,7 +1436,7 @@ export default function AdminPortal() {
 
             </div>
 
-            <div className="flex gap-3 pt-4 border-t border-stone-800/40">
+            <div className="flex gap-3 pt-4 border-t border-slate-200 dark:border-slate-800/40">
               <button
                 onClick={() => { setRejectingApp(inspectingApp); setInspectingApp(null); }}
                 className="w-1/2 py-4 rounded-2xl border border-red-800/60 text-red-400 hover:bg-red-950/40 font-black text-sm transition"
@@ -1464,7 +1464,7 @@ export default function AdminPortal() {
             isDark ? 'bg-stone-900 text-white' : 'bg-white text-slate-900'
           }`}>
             
-            <div className="flex items-start justify-between border-b border-stone-800/40 pb-4">
+            <div className="flex items-start justify-between border-b border-slate-200 dark:border-slate-800/40 pb-4">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-2xl bg-red-950 border border-red-700 text-red-400 flex items-center justify-center font-black text-xl shrink-0">
                   <ShieldAlert className="w-6 h-6" />
@@ -1476,7 +1476,7 @@ export default function AdminPortal() {
                   <h3 className="text-lg font-black mt-0.5">
                     {lang === 'hi' ? 'अस्वीकृति का कारण चुनें' : 'Provide Rejection Reason'}
                   </h3>
-                  <p className="text-xs text-stone-400 font-bold">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-bold">
                     For {rejectingApp.driverName} ({rejectingApp.vehicleNumber})
                   </p>
                 </div>
@@ -1484,14 +1484,14 @@ export default function AdminPortal() {
 
               <button
                 onClick={() => setRejectingApp(null)}
-                className="w-8 h-8 rounded-full bg-stone-800 hover:bg-stone-700 flex items-center justify-center text-stone-300 font-bold"
+                className="w-8 h-8 rounded-full bg-stone-800 hover:bg-stone-700 flex items-center justify-center text-slate-700 dark:text-slate-300 font-bold"
               >
                 ✕
               </button>
             </div>
 
             <form onSubmit={handleConfirmReject} className="space-y-4">
-              <label className="block text-xs font-black text-stone-300 uppercase tracking-wider">
+              <label className="block text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider">
                 {lang === 'hi' ? 'मानक कारण चुनें (Preset Reasons)' : 'Select Reason for Driver Notification:'}
               </label>
 
@@ -1502,7 +1502,7 @@ export default function AdminPortal() {
                     className={`p-3 rounded-2xl border cursor-pointer flex items-start gap-2.5 transition text-xs font-bold ${
                       selectedReason === reason && !customReason.trim()
                         ? 'border-red-500 bg-red-950/40 text-red-200'
-                        : 'border-stone-800 bg-stone-950 hover:bg-stone-900 text-stone-300'
+                        : 'border-slate-200 dark:border-slate-800 bg-stone-950 hover:bg-stone-900 text-slate-700 dark:text-slate-300'
                     }`}
                   >
                     <input
@@ -1518,7 +1518,7 @@ export default function AdminPortal() {
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-stone-400 uppercase mb-1">
+                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">
                   {lang === 'hi' ? 'या अन्य विशिष्ट कारण लिखें (Custom Reason):' : 'Or Type Custom Specific Reason:'}
                 </label>
                 <textarea
@@ -1526,7 +1526,7 @@ export default function AdminPortal() {
                   placeholder="उदा. ड्राइविंग लाइसेंस का कोना कटा हुआ है, कृपया पूरी फोटो भेजें।"
                   value={customReason}
                   onChange={(e) => setCustomReason(e.target.value)}
-                  className="w-full p-3 rounded-2xl border border-stone-800 bg-stone-950 font-bold text-xs text-white outline-none focus:border-red-500"
+                  className="w-full p-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-stone-950 font-bold text-xs text-white outline-none focus:border-red-500"
                 />
               </div>
 
@@ -1534,7 +1534,7 @@ export default function AdminPortal() {
                 <button
                   type="button"
                   onClick={() => setRejectingApp(null)}
-                  className="w-1/3 py-3.5 rounded-2xl border border-stone-800 text-stone-300 font-bold text-xs hover:bg-stone-800"
+                  className="w-1/3 py-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs hover:bg-stone-800"
                 >
                   Cancel
                 </button>

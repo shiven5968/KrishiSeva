@@ -184,7 +184,7 @@ export default function FarmerLiveTracking() {
         return {
           title: 'Booking Active',
           subtitle: '',
-          badgeColor: 'bg-stone-900 border-white/10 text-white'
+          badgeColor: 'bg-stone-900 border-slate-200 dark:border-slate-800 text-white'
         };
     }
   };
@@ -223,10 +223,10 @@ export default function FarmerLiveTracking() {
     <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 space-y-6 py-6 animate-fade-in font-sans">
       
       {/* ══════════════ SECTION 1 (TOP): FULL-WIDTH RADAR MAP & SEARCH STATUS BANNER ══════════════ */}
-      <div className="bg-[#0A0E13] border border-white/10 rounded-3xl p-5 sm:p-6 shadow-2xl backdrop-blur-xl space-y-4">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-2xl backdrop-blur-xl space-y-4">
         
         {/* Header Overlay & Top Telemetry Row */}
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-white/10">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
           <div className="flex items-center gap-3.5">
             <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-2xl shadow-inner">
               {isSearching ? (
@@ -249,7 +249,7 @@ export default function FarmerLiveTracking() {
                   </span>
                 )}
               </div>
-              <p className="text-xs text-stone-400 font-medium mt-0.5">
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
                 {statusInfo.subtitle}
               </p>
             </div>
@@ -263,7 +263,7 @@ export default function FarmerLiveTracking() {
                 <span>Searching: {searchSeconds}s</span>
               </div>
             ) : (
-              <div className="flex items-center gap-3 p-2.5 rounded-2xl bg-stone-900/90 border border-stone-800 text-xs font-black text-white">
+              <div className="flex items-center gap-3 p-2.5 rounded-2xl bg-stone-900/90 border border-slate-200 dark:border-slate-800 text-xs font-black text-white">
                 <div className="flex items-center gap-1.5 text-emerald-400">
                   <Gauge className="w-3.5 h-3.5" />
                   <span>Speed: {currentSpeed} km/h</span>
@@ -283,7 +283,7 @@ export default function FarmerLiveTracking() {
             {/* Cancel Button */}
             <button
               onClick={() => setIsCancelModalOpen(true)}
-              className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-red-950/40 text-stone-400 hover:text-red-400 border border-stone-800 hover:border-red-500/40 font-bold text-xs transition cursor-pointer active:scale-95"
+              className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-red-950/40 text-slate-500 dark:text-slate-400 hover:text-red-400 border border-slate-200 dark:border-slate-800 hover:border-red-500/40 font-bold text-xs transition cursor-pointer active:scale-95"
             >
               {t('cancelBooking')}
             </button>
@@ -291,7 +291,7 @@ export default function FarmerLiveTracking() {
         </div>
 
         {/* Full-Width Interactive Radar Leaflet Map */}
-        <div className="w-full h-[360px] rounded-2xl overflow-hidden border border-white/10 relative shadow-inner">
+        <div className="w-full h-[360px] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 relative shadow-inner">
           <LiveMap
             farmerLocation={activeBooking.farmerLocation}
             driverPos={driverCurrentPos}
@@ -303,7 +303,7 @@ export default function FarmerLiveTracking() {
           />
 
           {/* Map Bottom Floating Pill */}
-          <div className="absolute bottom-3 left-3 z-[1000] px-3.5 py-1.5 rounded-xl bg-stone-950/90 border border-white/15 text-[11px] font-bold text-stone-300 backdrop-blur-md flex items-center gap-2 shadow-lg">
+          <div className="absolute bottom-3 left-3 z-[1000] px-3.5 py-1.5 rounded-xl bg-stone-950/90 border border-slate-200 dark:border-slate-800 text-[11px] font-bold text-slate-700 dark:text-slate-300 backdrop-blur-md flex items-center gap-2 shadow-lg">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
             <span>
               {isSearching 
@@ -316,7 +316,7 @@ export default function FarmerLiveTracking() {
       </div>
 
       {/* ══════════════ SECTION 2: DYNAMIC LIVE MATCHING TIMELINE & PROGRESSION ══════════════ */}
-      <div className="bg-[#0A0E13] border border-white/10 rounded-3xl p-5 sm:p-6 shadow-2xl backdrop-blur-xl">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-2xl backdrop-blur-xl">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 relative">
           {progressSteps.map((stepItem, idx) => {
             const isDone = stepItem.status === 'done';
@@ -329,7 +329,7 @@ export default function FarmerLiveTracking() {
                     ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-300' 
                     : isCurrent 
                       ? 'bg-emerald-500/10 border-emerald-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.15)] ring-1 ring-emerald-500/30' 
-                      : 'bg-stone-950/60 border-stone-800 text-stone-500'
+                      : 'bg-stone-950/60 border-slate-200 dark:border-slate-800 text-stone-500'
                 }`}
               >
                 <div className="flex items-center justify-between mb-1.5">
@@ -347,17 +347,17 @@ export default function FarmerLiveTracking() {
                       ●
                     </div>
                   ) : (
-                    <div className="w-5 h-5 rounded-full bg-stone-900 border border-stone-800 text-stone-600 flex items-center justify-center text-[10px] font-bold">
+                    <div className="w-5 h-5 rounded-full bg-stone-900 border border-slate-200 dark:border-slate-800 text-stone-600 flex items-center justify-center text-[10px] font-bold">
                       {stepItem.step}
                     </div>
                   )}
                 </div>
                 <h4 className={`text-xs sm:text-sm font-black ${
-                  isDone ? 'text-emerald-300' : isCurrent ? 'text-white' : 'text-stone-400'
+                  isDone ? 'text-emerald-300' : isCurrent ? 'text-white' : 'text-slate-500 dark:text-slate-400'
                 }`}>
                   {lang === 'hi' ? stepItem.nameHi : stepItem.nameEn}
                 </h4>
-                <p className="text-[10px] text-stone-400 mt-0.5">
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
                   {isDone ? 'Completed' : isCurrent ? 'Active In Progress...' : 'Pending'}
                 </p>
               </div>
@@ -367,12 +367,12 @@ export default function FarmerLiveTracking() {
       </div>
 
       {/* ══════════════ SECTION 3: WIDESCREEN BOOKING SUMMARY & BARGAIN ENGINE ══════════════ */}
-      <div className="bg-[#0A0E13] border border-white/10 rounded-3xl p-5 sm:p-6 shadow-2xl backdrop-blur-xl space-y-5">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-2xl backdrop-blur-xl space-y-5">
         
         {/* Horizontal Booking Summary Bar */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 rounded-2xl bg-stone-950 border border-stone-800/90 text-xs">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 rounded-2xl bg-stone-950 border border-slate-200 dark:border-slate-800/90 text-xs">
           <div>
-            <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">
+            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
               {lang === 'hi' ? 'मशीनरी व यंत्र' : 'Machinery & Implement'}
             </span>
             <b className="text-white capitalize text-sm">
@@ -381,7 +381,7 @@ export default function FarmerLiveTracking() {
           </div>
 
           <div>
-            <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">
+            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
               {lang === 'hi' ? 'खेत का रकबा' : 'Land Area / Size'}
             </span>
             <b className="text-white text-sm">
@@ -390,7 +390,7 @@ export default function FarmerLiveTracking() {
           </div>
 
           <div>
-            <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">
+            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
               {lang === 'hi' ? 'क्षेत्रीय बेस दर' : 'Base Zone Rate'}
             </span>
             <b className="text-emerald-400 text-sm">
@@ -399,7 +399,7 @@ export default function FarmerLiveTracking() {
           </div>
 
           <div>
-            <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">
+            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
               {lang === 'hi' ? 'कुल अनुमानित किराया' : 'Final Estimated Fare'}
             </span>
             <b className="text-2xl font-black text-emerald-400">
@@ -416,7 +416,7 @@ export default function FarmerLiveTracking() {
                 <Coins className="w-4 h-4 text-emerald-400" />
                 <span>{lang === 'hi' ? 'किराया मोल-भाव (Live Counter-Offer Bargain Engine)' : 'Live Counter-Offer Bargain Engine'}</span>
               </div>
-              <span className="text-[11px] text-stone-400 font-medium">
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                 {lang === 'hi' ? 'अपना नया प्रस्तावित किराया दर्ज करें, ऑपरेटरों को तुरंत दिखेगा' : 'Send instant custom bid to all nearby operators in radar'}
               </span>
             </div>
@@ -424,7 +424,7 @@ export default function FarmerLiveTracking() {
             <div className="flex flex-col sm:flex-row items-center gap-3">
               {/* Quick Discount Pills */}
               <div className="flex items-center gap-2 w-full sm:w-auto">
-                <span className="text-[11px] text-stone-400 font-bold whitespace-nowrap">Quick:</span>
+                <span className="text-[11px] text-slate-500 dark:text-slate-400 font-bold whitespace-nowrap">Quick:</span>
                 {[100, 250, 500].map(disc => (
                   <button
                     key={disc}
@@ -440,7 +440,7 @@ export default function FarmerLiveTracking() {
               {/* Input & Send Button */}
               <div className="flex items-center gap-2 w-full sm:flex-1">
                 <div className="relative flex-1">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-bold text-stone-400 text-sm">₹</span>
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-bold text-slate-500 dark:text-slate-400 text-sm">₹</span>
                   <input
                     type="number"
                     value={bargainPriceInput}
@@ -485,9 +485,9 @@ export default function FarmerLiveTracking() {
       {/* ══════════════ SECTION 4: ASSIGNED OPERATOR DETAILS & OTP PIN (WHEN ACCEPTED) ══════════════ */}
       {assignedDriver ? (
         /* Matched Operator Info Card & OTP Start Card */
-        <div className="bg-[#0A0E13] border border-emerald-500/40 rounded-3xl p-5 sm:p-6 shadow-2xl backdrop-blur-xl space-y-5">
+        <div className="bg-white dark:bg-slate-900 border border-emerald-500/40 rounded-3xl p-5 sm:p-6 shadow-2xl backdrop-blur-xl space-y-5">
           
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
             {/* Driver Identity */}
             <div className="flex items-center gap-4">
               <img
@@ -509,7 +509,7 @@ export default function FarmerLiveTracking() {
                   <span className="text-xs font-mono font-black text-emerald-300 px-2 py-0.5 rounded-md bg-stone-950 border border-emerald-900">
                     {assignedDriver.vehicleNumber || 'UP-32-BT-9901'}
                   </span>
-                  <span className="text-xs text-stone-400 font-bold">
+                  <span className="text-xs text-slate-500 dark:text-slate-400 font-bold">
                     {assignedDriver.modelName || 'Mahindra 575 DI (50 HP)'}
                   </span>
                 </div>
@@ -545,7 +545,7 @@ export default function FarmerLiveTracking() {
                 </div>
               </div>
 
-              <p className="text-xs text-stone-300 font-medium">
+              <p className="text-xs text-slate-700 dark:text-slate-300 font-medium">
                 {lang === 'hi' 
                   ? 'ड्राइवर के खेत पर पहुँचने के बाद ही यह 4-अंकों का सुरक्षा पिन चालक को बताएं।' 
                   : 'Share this 4-digit PIN with the machinery operator upon arrival at field.'}
@@ -566,7 +566,7 @@ export default function FarmerLiveTracking() {
 
               <button
                 onClick={() => cancelBooking('Trip Finished', 'farmer')}
-                className="w-full py-3.5 rounded-2xl font-black text-xs flex items-center justify-center gap-2 transition bg-stone-900 hover:bg-stone-800 text-white border border-stone-800 cursor-pointer"
+                className="w-full py-3.5 rounded-2xl font-black text-xs flex items-center justify-center gap-2 transition bg-stone-900 hover:bg-stone-800 text-white border border-slate-200 dark:border-slate-800 cursor-pointer"
               >
                 <Sparkles className="w-4 h-4 text-amber-400" />
                 <span>{lang === 'hi' ? 'नई बुकिंग करें' : 'Book Another Machine'}</span>

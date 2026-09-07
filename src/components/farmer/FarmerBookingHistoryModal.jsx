@@ -135,7 +135,7 @@ export default function FarmerBookingHistoryModal({ isOpen, onClose }) {
         
         {/* Header */}
         <div className={`p-5 sm:p-6 border-b flex items-center justify-between gap-3 ${
-          isDark ? 'border-stone-800 bg-stone-950/50' : 'border-slate-200 bg-slate-50'
+          isDark ? 'border-slate-200 dark:border-slate-800 bg-stone-950/50' : 'border-slate-200 bg-slate-50'
         }`}>
           <div className="flex items-center gap-3">
             <div className={`w-11 h-11 rounded-2xl flex items-center justify-center text-xl shadow-md border ${
@@ -147,7 +147,7 @@ export default function FarmerBookingHistoryModal({ isOpen, onClose }) {
               <h3 className="text-lg font-black tracking-tight">
                 {lang === 'hi' ? 'बुकिंग इतिहास व रसीदें' : 'My Booking History & Receipts'}
               </h3>
-              <p className={`text-xs ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+              <p className={`text-xs ${isDark ? 'text-slate-500 dark:text-slate-400' : 'text-slate-500'}`}>
                 {lang === 'hi' ? 'आपके सभी पूर्ण किए गए कार्य व चालक रेटिंग्स' : 'All completed machinery dispatches & ratings'}
               </p>
             </div>
@@ -157,7 +157,7 @@ export default function FarmerBookingHistoryModal({ isOpen, onClose }) {
             onClick={onClose}
             className={`w-9 h-9 rounded-xl border flex items-center justify-center transition active:scale-95 ${
               isDark 
-                ? 'bg-stone-900 border-stone-800 text-stone-300 hover:text-white hover:border-stone-700' 
+                ? 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:text-white hover:border-stone-700' 
                 : 'bg-white border-slate-200 text-slate-600 hover:text-slate-900'
             }`}
           >
@@ -169,10 +169,10 @@ export default function FarmerBookingHistoryModal({ isOpen, onClose }) {
         <div className="p-5 sm:p-6 overflow-y-auto space-y-4 flex-1 custom-scrollbar">
           {historyList.length === 0 ? (
             <div className="py-12 text-center space-y-3">
-              <div className="w-16 h-16 rounded-3xl bg-stone-900 border border-stone-800 text-stone-500 flex items-center justify-center text-2xl mx-auto">
+              <div className="w-16 h-16 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-stone-500 flex items-center justify-center text-2xl mx-auto">
                 🚜
               </div>
-              <p className={`text-sm font-bold ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+              <p className={`text-sm font-bold ${isDark ? 'text-slate-500 dark:text-slate-400' : 'text-slate-500'}`}>
                 {lang === 'hi' ? 'अभी तक कोई बुकिंग इतिहास उपलब्ध नहीं है।' : 'No booking history recorded yet.'}
               </p>
             </div>
@@ -189,18 +189,18 @@ export default function FarmerBookingHistoryModal({ isOpen, onClose }) {
                   key={item.id || index}
                   className={`p-4 sm:p-5 rounded-2xl border transition-all space-y-3.5 ${
                     isDark 
-                      ? 'bg-stone-950/80 border-stone-800 hover:border-emerald-500/40' 
+                      ? 'bg-stone-950/80 border-slate-200 dark:border-slate-800 hover:border-emerald-500/40' 
                       : 'bg-slate-50 border-slate-200 hover:border-emerald-400'
                   }`}
                 >
                   {/* Top Bar: Booking ID, Date & Status */}
-                  <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-stone-800/40 text-xs">
+                  <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-200 dark:border-slate-800/40 text-xs">
                     <div className="flex items-center gap-2">
                       <span className="font-mono font-black text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded-md border border-emerald-800/60">
                         #{String(item.id).replace('book_', 'KS-')}
                       </span>
-                      <span className={`text-[11px] font-bold flex items-center gap-1 ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
-                        <Calendar className="w-3 h-3 text-stone-400" />
+                      <span className={`text-[11px] font-bold flex items-center gap-1 ${isDark ? 'text-slate-500 dark:text-slate-400' : 'text-slate-500'}`}>
+                        <Calendar className="w-3 h-3 text-slate-500 dark:text-slate-400" />
                         <span>{formatDate(item.completedAt || item.createdAt)}</span>
                       </span>
                     </div>
@@ -214,7 +214,7 @@ export default function FarmerBookingHistoryModal({ isOpen, onClose }) {
                   {/* Body: Machinery & Farm Details */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                     <div className="space-y-1">
-                      <span className={`text-[10px] uppercase font-bold tracking-wider ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+                      <span className={`text-[10px] uppercase font-bold tracking-wider ${isDark ? 'text-slate-500 dark:text-slate-400' : 'text-slate-500'}`}>
                         {lang === 'hi' ? 'वाहन व उपकरण' : 'Machinery & Cargo'}
                       </span>
                       <p className="font-black text-sm text-emerald-400 flex items-center gap-1.5">
@@ -227,14 +227,14 @@ export default function FarmerBookingHistoryModal({ isOpen, onClose }) {
                         </p>
                       )}
                       {item.cargoDetails && (
-                        <p className={`text-[11px] font-medium ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+                        <p className={`text-[11px] font-medium ${isDark ? 'text-slate-500 dark:text-slate-400' : 'text-slate-500'}`}>
                           📦 {item.cargoDetails}
                         </p>
                       )}
                     </div>
 
                     <div className="space-y-1 sm:text-right">
-                      <span className={`text-[10px] uppercase font-bold tracking-wider ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+                      <span className={`text-[10px] uppercase font-bold tracking-wider ${isDark ? 'text-slate-500 dark:text-slate-400' : 'text-slate-500'}`}>
                         {lang === 'hi' ? 'खेत / गंतव्य स्थान' : 'Farm / Destination'}
                       </span>
                       <p className={`font-bold text-xs ${isDark ? 'text-stone-200' : 'text-slate-800'}`}>
@@ -248,14 +248,14 @@ export default function FarmerBookingHistoryModal({ isOpen, onClose }) {
 
                   {/* Driver & Payout Bar */}
                   <div className={`p-3 rounded-xl border flex flex-wrap items-center justify-between gap-3 text-xs ${
-                    isDark ? 'bg-stone-900/60 border-stone-800' : 'bg-white border-slate-200'
+                    isDark ? 'bg-white dark:bg-slate-900/60 border-slate-200 dark:border-slate-800' : 'bg-white border-slate-200'
                   }`}>
                     <div>
                       <span className={`text-[10px] uppercase font-bold block ${isDark ? 'text-stone-500' : 'text-slate-400'}`}>
                         {lang === 'hi' ? 'चालक पार्टनर' : 'Driver Partner'}
                       </span>
                       <span className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{driver.name}</span>
-                      <span className="font-mono text-[10px] text-stone-400 ml-1.5">({driver.vehicleNumber})</span>
+                      <span className="font-mono text-[10px] text-slate-500 dark:text-slate-400 ml-1.5">({driver.vehicleNumber})</span>
                     </div>
 
                     <div className="flex items-center gap-3">
@@ -265,17 +265,17 @@ export default function FarmerBookingHistoryModal({ isOpen, onClose }) {
                           <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
                           <span>{Number(item.farmerRating || 5.0).toFixed(1)} / 5.0</span>
                         </span>
-                        <span className={`text-[9px] ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+                        <span className={`text-[9px] ${isDark ? 'text-slate-500 dark:text-slate-400' : 'text-slate-500'}`}>
                           {lang === 'hi' ? 'आपकी रेटिंग' : 'Your Rating'}
                         </span>
                       </div>
 
                       {/* Paid Amount */}
-                      <div className="text-right pl-2 border-l border-stone-800">
+                      <div className="text-right pl-2 border-l border-slate-200 dark:border-slate-800">
                         <span className="text-base font-black text-emerald-400 block">
                           ₹{item.paidAmount || item.estimatedPrice}
                         </span>
-                        <span className="text-[9px] uppercase font-bold text-stone-400">
+                        <span className="text-[9px] uppercase font-bold text-slate-500 dark:text-slate-400">
                           {item.paymentMethod === 'cod' ? 'Paid COD' : 'Paid Online'}
                         </span>
                       </div>
@@ -290,7 +290,7 @@ export default function FarmerBookingHistoryModal({ isOpen, onClose }) {
 
         {/* Footer */}
         <div className={`p-4 border-t flex justify-end ${
-          isDark ? 'border-stone-800 bg-stone-950/60' : 'border-slate-200 bg-slate-50'
+          isDark ? 'border-slate-200 dark:border-slate-800 bg-stone-950/60' : 'border-slate-200 bg-slate-50'
         }`}>
           <button
             onClick={onClose}

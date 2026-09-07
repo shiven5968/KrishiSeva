@@ -63,13 +63,13 @@ export default function PreBookingsModal({ isOpen, onClose }) {
 
         {/* Active Scheduled Reservations */}
         <div className="space-y-4">
-          <h4 className="font-black text-xs uppercase tracking-wider text-stone-400">
+          <h4 className="font-black text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">
             {lang === 'hi' ? 'आगामी आरक्षित बुकिंग्स' : 'Upcoming Scheduled Reservations'} ({activePreBookings.length})
           </h4>
 
           {activePreBookings.length === 0 ? (
             <div className="p-8 rounded-2xl bg-stone-50 border-2 border-dashed border-stone-200 text-center space-y-2">
-              <CalendarDays className="w-10 h-10 text-stone-400 mx-auto" />
+              <CalendarDays className="w-10 h-10 text-slate-500 dark:text-slate-400 mx-auto" />
               <p className="text-sm font-black text-stone-700">
                 {lang === 'hi' ? 'कोई सक्रिय अग्रिम बुकिंग नहीं है' : 'No upcoming scheduled bookings'}
               </p>
@@ -108,14 +108,14 @@ export default function PreBookingsModal({ isOpen, onClose }) {
                   {/* Machinery & Field Info */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                     <div className="p-2.5 bg-white rounded-xl border border-stone-200">
-                      <span className="text-[10px] text-stone-400 block font-bold">{lang === 'hi' ? 'मशीन व उपकरण' : 'Machinery & Attachment'}</span>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-bold">{lang === 'hi' ? 'मशीन व उपकरण' : 'Machinery & Attachment'}</span>
                       <span className="font-black text-stone-900 capitalize">
                         {booking.machineryType} • {t(booking.attachment?.nameKey) || 'Rotavator'}
                       </span>
                     </div>
 
                     <div className="p-2.5 bg-white rounded-xl border border-stone-200">
-                      <span className="text-[10px] text-stone-400 block font-bold">{lang === 'hi' ? 'खेत व आकार' : 'Field & Size'}</span>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-bold">{lang === 'hi' ? 'खेत व आकार' : 'Field & Size'}</span>
                       <span className="font-black text-stone-900">
                         {booking.landName} ({booking.landSize} {booking.sizeUnit})
                       </span>
@@ -135,7 +135,7 @@ export default function PreBookingsModal({ isOpen, onClose }) {
 
                   {/* Actions */}
                   <div className="flex items-center justify-between pt-1">
-                    <span className="text-[10px] text-stone-400 font-bold">
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold">
                       ID: #{booking.id}
                     </span>
 
@@ -156,7 +156,7 @@ export default function PreBookingsModal({ isOpen, onClose }) {
         {/* Past / Cancelled Pre-Bookings */}
         {pastPreBookings.length > 0 && (
           <div className="space-y-3 pt-3 border-t border-stone-100">
-            <h4 className="font-black text-xs uppercase tracking-wider text-stone-400">
+            <h4 className="font-black text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">
               {lang === 'hi' ? 'रद्द व पिछली बुकिंग्स' : 'Cancelled & Past Reservations'}
             </h4>
 
@@ -176,7 +176,7 @@ export default function PreBookingsModal({ isOpen, onClose }) {
 
                   <button
                     onClick={() => deletePreBooking(booking.id)}
-                    className="p-1 text-stone-400 hover:text-red-600"
+                    className="p-1 text-slate-500 dark:text-slate-400 hover:text-red-600"
                     title="Remove from list"
                   >
                     <Trash2 className="w-3.5 h-3.5" />

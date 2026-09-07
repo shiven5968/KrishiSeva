@@ -226,7 +226,7 @@ function KhetBoundaryDrawer({ onBoundaryCalculated, initialLocation }) {
         </span>
       </div>
 
-      <div className="relative isolate overflow-hidden rounded-2xl border-2 border-emerald-500 shadow-md h-64 w-full bg-stone-900">
+      <div className="relative isolate overflow-hidden rounded-2xl border-2 border-emerald-500 shadow-md h-64 w-full bg-white dark:bg-slate-900">
         <div ref={mapContainerRef} className="w-full h-full z-0" />
 
         {/* Top Floating Controls */}
@@ -244,7 +244,7 @@ function KhetBoundaryDrawer({ onBoundaryCalculated, initialLocation }) {
           <button
             type="button"
             onClick={toggleLayer}
-            className="px-2.5 py-1 rounded-lg bg-stone-900/90 text-white text-[10px] font-bold shadow-md border border-stone-700 flex items-center gap-1"
+            className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900/90 text-white text-[10px] font-bold shadow-md border border-stone-700 flex items-center gap-1"
           >
             <Layers className="w-3 h-3 text-emerald-400" />
             <span>{activeLayer === 'satellite' ? (lang === 'hi' ? '🛰️ सैटेलाइट' : '🛰️ Satellite') : (lang === 'hi' ? '🗺️ नक्शा' : '🗺️ Map')}</span>
@@ -272,12 +272,12 @@ function KhetBoundaryDrawer({ onBoundaryCalculated, initialLocation }) {
                 <span className="text-emerald-400 font-black text-xs">
                   📐 {calculatedArea.bighas} {lang === 'hi' ? 'बीघा' : 'Bigha'}
                 </span>
-                <span className="text-[10px] text-stone-400">
+                <span className="text-[10px] text-slate-500 dark:text-slate-400">
                   (~{calculatedArea.acres} {lang === 'hi' ? 'एकड़' : 'Acres'} • {calculatedArea.areaM2.toLocaleString()} m²)
                 </span>
               </div>
             ) : (
-              <span className="text-[11px] text-stone-400">
+              <span className="text-[11px] text-slate-500 dark:text-slate-400">
                 {points.length < 3 ? (lang === 'hi' ? 'कम से कम 3 कोने जोड़ें' : 'Place at least 3 corner points') : (lang === 'hi' ? 'गणना कर रहे हैं...' : 'Calculating...')}
               </span>
             )}
@@ -288,7 +288,7 @@ function KhetBoundaryDrawer({ onBoundaryCalculated, initialLocation }) {
               <button
                 type="button"
                 onClick={handleUndo}
-                className="px-2 py-1 rounded-lg bg-stone-800 hover:bg-stone-700 text-[10px] font-bold text-stone-300"
+                className="px-2 py-1 rounded-lg bg-stone-800 hover:bg-stone-700 text-[10px] font-bold text-slate-700 dark:text-slate-300"
               >
                 {lang === 'hi' ? '↩ पूर्ववत' : '↩ Undo'}
               </button>
@@ -669,18 +669,18 @@ export default function SavedLandsModal({ isOpen, onClose }) {
                     {/* Metadata Grid with Automated Hectare to Bigha Conversion */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                       
-                      <div className="p-2.5 rounded-xl bg-stone-900/90 border border-emerald-800/60">
-                        <span className="text-[10px] text-stone-400 block">{lang === 'hi' ? 'गाटा संख्या' : 'Gata / Khasra No.'}</span>
+                      <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900/90 border border-emerald-800/60">
+                        <span className="text-[10px] text-slate-500 dark:text-slate-400 block">{lang === 'hi' ? 'गाटा संख्या' : 'Gata / Khasra No.'}</span>
                         <span className="font-black text-emerald-300 text-sm">#{bhulekhResult.khasraNumber}</span>
                       </div>
 
-                      <div className="p-2.5 rounded-xl bg-stone-900/90 border border-emerald-800/60">
-                        <span className="text-[10px] text-stone-400 block">{lang === 'hi' ? 'खतौनी संख्या' : 'Khata No.'}</span>
+                      <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900/90 border border-emerald-800/60">
+                        <span className="text-[10px] text-slate-500 dark:text-slate-400 block">{lang === 'hi' ? 'खतौनी संख्या' : 'Khata No.'}</span>
                         <span className="font-black text-white text-sm">{bhulekhResult.khataNumber}</span>
                       </div>
 
-                      <div className="p-2.5 rounded-xl bg-stone-900/90 border border-emerald-800/60">
-                        <span className="text-[10px] text-stone-400 block">{lang === 'hi' ? 'क्षेत्रफल (हेक्टेयर)' : 'Area (Hectare)'}</span>
+                      <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900/90 border border-emerald-800/60">
+                        <span className="text-[10px] text-slate-500 dark:text-slate-400 block">{lang === 'hi' ? 'क्षेत्रफल (हेक्टेयर)' : 'Area (Hectare)'}</span>
                         <span className="font-black text-amber-300 text-sm">{bhulekhResult.areaHectare} Hec</span>
                       </div>
 
@@ -693,7 +693,7 @@ export default function SavedLandsModal({ isOpen, onClose }) {
                     </div>
 
                     {/* Formula Explanation Callout */}
-                    <div className="p-2.5 rounded-xl bg-stone-900/80 border border-stone-800 text-[11px] text-stone-300 flex items-center justify-between gap-2">
+                    <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-[11px] text-slate-700 dark:text-slate-300 flex items-center justify-between gap-2">
                       <div className="flex items-center gap-1.5">
                         <Calculator className="w-3.5 h-3.5 text-emerald-400" />
                         <span>{lang === 'hi' ? `रूपांतरण: ${bhulekhResult.areaHectare} हेक्टेयर × 3.95 = ${bhulekhResult.areaBigha} पक्का बीघा` : `Conversion: ${bhulekhResult.areaHectare} Hectares × 3.95 = ${bhulekhResult.areaBigha} Bigha`}</span>
@@ -836,7 +836,7 @@ export default function SavedLandsModal({ isOpen, onClose }) {
 
         {/* List of Saved Lands */}
         <div className="space-y-3">
-          <span className="text-xs font-black uppercase tracking-wider text-stone-400">
+          <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
             {lang === 'hi' ? 'सहेजे गए खेत सूची' : 'Your Farmlands Portfolio'} ({savedLands.length})
           </span>
 
@@ -908,7 +908,7 @@ export default function SavedLandsModal({ isOpen, onClose }) {
                     {savedLands.length > 1 && (
                       <button
                         onClick={() => deleteLand(land.id)}
-                        className="p-2 rounded-xl text-stone-400 hover:text-red-600 hover:bg-red-50 transition"
+                        className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-red-600 hover:bg-red-50 transition"
                         title="Delete Land"
                       >
                         <Trash2 className="w-4 h-4" />

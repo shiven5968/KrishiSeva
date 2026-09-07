@@ -487,14 +487,12 @@ export default function CreativeLoginPortal() {
 
   return (
     <div className={`min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-stone-950 font-sans relative overflow-x-hidden transition-colors duration-200 ${
-      isDark ? 'bg-[#05080C] text-stone-100' : 'bg-[#F2F8F4] text-[#0F172A]'
+      isDark ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
     }`}>
       
       {/* ═══════════ SEAMLESS FULL-WIDTH NAVBAR ═══════════ */}
       <header className={`w-full fixed top-0 left-0 right-0 z-50 px-8 pt-6 pb-4 flex items-center justify-between border-b shadow-sm transition-colors duration-200 ${
-        isDark 
-          ? 'bg-black/20 backdrop-blur-xl border-white/10' 
-          : 'bg-[#F2F8F4]/80 backdrop-blur-xl border-b border-emerald-900/10 text-[#0F172A]'
+        isDark ? 'bg-slate-950/80 backdrop-blur-md border-b border-slate-800' : 'bg-white/80 backdrop-blur-md border-b border-slate-200 text-slate-900'
       }`}>
         {/* Brand Logo (Far Left) */}
         <div 
@@ -654,17 +652,17 @@ export default function CreativeLoginPortal() {
 
             {/* Feature Badges */}
             <div className="flex flex-wrap items-center gap-2.5 pt-2">
-              <span className="bg-white/5 border border-white/10 backdrop-blur-lg px-4 py-2.5 rounded-2xl text-xs font-medium text-slate-200 flex items-center gap-2 transition-all duration-300 hover:border-emerald-500/40">
+              <span className="bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 backdrop-blur-lg px-4 py-2.5 rounded-2xl text-xs font-medium text-slate-200 flex items-center gap-2 transition-all duration-300 hover:border-emerald-500/40">
                 <Tractor className="w-4 h-4 text-emerald-400" />
                 <span>{lang === 'hi' ? 'सत्यापित कृषि उपकरण' : 'Verified Equipment'}</span>
               </span>
 
-              <span className="bg-white/5 border border-white/10 backdrop-blur-lg px-4 py-2.5 rounded-2xl text-xs font-medium text-slate-200 flex items-center gap-2 transition-all duration-300 hover:border-emerald-500/40">
+              <span className="bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 backdrop-blur-lg px-4 py-2.5 rounded-2xl text-xs font-medium text-slate-200 flex items-center gap-2 transition-all duration-300 hover:border-emerald-500/40">
                 <Zap className="w-4 h-4 text-emerald-400" />
                 <span>{lang === 'hi' ? 'त्वरित 1-क्लिक वाहन सेवा' : 'Instant Dispatch'}</span>
               </span>
 
-              <span className="bg-white/5 border border-white/10 backdrop-blur-lg px-4 py-2.5 rounded-2xl text-xs font-medium text-slate-200 flex items-center gap-2 transition-all duration-300 hover:border-emerald-500/40">
+              <span className="bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 backdrop-blur-lg px-4 py-2.5 rounded-2xl text-xs font-medium text-slate-200 flex items-center gap-2 transition-all duration-300 hover:border-emerald-500/40">
                 <ShieldCheck className="w-4 h-4 text-emerald-400" />
                 <span>{lang === 'hi' ? 'एग्रीस्टैक भूलेख सत्यापित' : 'AgriStack Verified'}</span>
               </span>
@@ -879,7 +877,7 @@ export default function CreativeLoginPortal() {
                         value={otp}
                         onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
                         placeholder="••••••"
-                        className="w-full py-4 text-center tracking-[0.6em] rounded-2xl bg-black/50 border border-white/15 focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/60 font-black text-emerald-400 text-3xl outline-none transition-all duration-200 shadow-inner"
+                        className="w-full py-4 text-center tracking-[0.6em] rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/60 font-black text-emerald-400 text-3xl outline-none transition-all duration-200 shadow-inner"
                         required
                         autoFocus
                       />
@@ -913,7 +911,7 @@ export default function CreativeLoginPortal() {
                       <button
                         type="button"
                         onClick={() => { setStep('phone'); setOtp(''); setError(''); }}
-                        className="w-1/3 py-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 text-slate-350 font-bold text-xs transition-all duration-200 hover:border-emerald-500/40 hover:text-white"
+                        className="w-1/3 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 hover:bg-white/10 text-slate-350 font-bold text-xs transition-all duration-200 hover:border-emerald-500/40 hover:text-white"
                       >
                         {lang === 'hi' ? 'नंबर बदलें' : 'Change Number'}
                       </button>

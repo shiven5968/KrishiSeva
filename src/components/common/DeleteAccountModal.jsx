@@ -39,7 +39,7 @@ export default function DeleteAccountModal({ isOpen, onClose }) {
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in">
       <div className={`rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border relative overflow-hidden transition-all duration-300 ${
         isDark 
-          ? 'bg-stone-900 border-red-500/40 text-white shadow-red-950/50' 
+          ? 'bg-white dark:bg-slate-900 border-red-500/40 text-white shadow-red-950/50' 
           : 'bg-white border-red-200 text-slate-900 shadow-2xl shadow-red-500/10'
       }`}>
         
@@ -51,7 +51,7 @@ export default function DeleteAccountModal({ isOpen, onClose }) {
           <button
             onClick={onClose}
             className={`absolute top-4 right-4 p-2 rounded-xl transition ${
-              isDark ? 'text-stone-400 hover:text-white hover:bg-stone-800' : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100'
+              isDark ? 'text-slate-500 dark:text-slate-400 hover:text-white hover:bg-stone-800' : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100'
             }`}
           >
             <X className="w-5 h-5" />
@@ -67,7 +67,7 @@ export default function DeleteAccountModal({ isOpen, onClose }) {
               <h3 className="text-xl font-black text-red-400">
                 {lang === 'hi' ? 'खाता सफलतापूर्वक हटा दिया गया' : 'Account Permanently Deleted'}
               </h3>
-              <p className={`text-xs ${isDark ? 'text-stone-300' : 'text-slate-600'}`}>
+              <p className={`text-xs ${isDark ? 'text-slate-700 dark:text-slate-300' : 'text-slate-600'}`}>
                 {lang === 'hi' 
                   ? 'आपका सारा डेटा डेटाबेस से हमेशा के लिए हटा दिया गया है। अगली बार लॉगिन करने पर आप नए किसान के रूप में शुरुआत करेंगे।' 
                   : 'All your data has been purged from our database. Re-registering in the future will start as a brand new user.'}
@@ -86,15 +86,15 @@ export default function DeleteAccountModal({ isOpen, onClose }) {
                 <h3 className="text-lg sm:text-xl font-black tracking-tight text-red-400 flex items-center gap-1.5">
                   <span>{lang === 'hi' ? 'खाता स्थायी रूप से हटाएं?' : 'Delete Account Permanently?'}</span>
                 </h3>
-                <p className={`text-xs font-bold mt-0.5 ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
-                  {currentUser.name} • <span className="font-mono text-stone-300">{currentUser.phone}</span>
+                <p className={`text-xs font-bold mt-0.5 ${isDark ? 'text-slate-500 dark:text-slate-400' : 'text-slate-500'}`}>
+                  {currentUser.name} • <span className="font-mono text-slate-700 dark:text-slate-300">{currentUser.phone}</span>
                 </p>
               </div>
             </div>
 
             {/* Warning Points */}
             <div className={`p-4 rounded-2xl border space-y-3 text-xs ${
-              isDark ? 'bg-stone-950/80 border-stone-800 text-stone-300' : 'bg-red-50/70 border-red-200 text-slate-800'
+              isDark ? 'bg-stone-950/80 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300' : 'bg-red-50/70 border-red-200 text-slate-800'
             }`}>
               <div className="flex items-start gap-2.5">
                 <Database className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
@@ -123,7 +123,7 @@ export default function DeleteAccountModal({ isOpen, onClose }) {
                 onChange={(e) => setConfirmed(e.target.checked)}
                 className="w-4 h-4 text-red-500 rounded border-stone-700 focus:ring-red-500 shrink-0 cursor-pointer"
               />
-              <span className={`text-xs font-bold ${isDark ? 'text-stone-300' : 'text-slate-700'}`}>
+              <span className={`text-xs font-bold ${isDark ? 'text-slate-700 dark:text-slate-300' : 'text-slate-700'}`}>
                 {lang === 'hi' 
                   ? 'हाँ, मैं समझता हूँ कि यह डेटाबेस से हमेशा के लिए हट जाएगा।' 
                   : 'Yes, I understand that this will be permanently erased.'}
@@ -137,7 +137,7 @@ export default function DeleteAccountModal({ isOpen, onClose }) {
                 onClick={onClose}
                 disabled={isDeleting}
                 className={`w-1/2 py-3 rounded-xl border text-xs font-bold transition active:scale-95 ${
-                  isDark ? 'border-stone-700 text-stone-300 hover:bg-stone-800' : 'border-slate-300 text-slate-700 hover:bg-slate-100'
+                  isDark ? 'border-stone-700 text-slate-700 dark:text-slate-300 hover:bg-stone-800' : 'border-slate-300 text-slate-700 hover:bg-slate-100'
                 }`}
               >
                 {lang === 'hi' ? 'रद्द करें' : 'Cancel'}

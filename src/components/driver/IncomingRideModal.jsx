@@ -114,7 +114,7 @@ export default function IncomingRideModal({ booking, onAccept, onReject }) {
               {booking.machineryType === 'truck' ? '🚛' : '🚜'}
             </div>
             <div>
-              <span className="text-[10px] text-stone-400 font-black uppercase">
+              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-black uppercase">
                 {booking.machineryType === 'truck' ? (lang === 'hi' ? 'सामग्री व वाहन प्रकार' : 'Cargo & Vehicle') : t('requiredMachine')}
               </span>
               <p className="font-extrabold text-stone-900 text-sm">
@@ -136,7 +136,7 @@ export default function IncomingRideModal({ booking, onAccept, onReject }) {
               <MapPin className="w-5 h-5" />
             </div>
             <div className="w-full">
-              <span className="text-[10px] text-stone-400 font-black uppercase">
+              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-black uppercase">
                 {booking.machineryType === 'truck' ? (lang === 'hi' ? 'पिकअप व डिलीवरी रूट' : 'Pickup & Drop Route') : t('farmerLocation')}
               </span>
               <p className="font-bold text-stone-900 text-sm">
