@@ -4,12 +4,26 @@
 
 @layer base {
   body {
-    font-family: 'Plus Jakarta Sans', 'Tiro Devanagari Hindi', system-ui, sans-serif;
+    font-family: 'Inter', 'Noto Sans Devanagari', 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.011em;
   }
 
-  /* Smooth transitions on everything by default */
+  /* Professional & Prominent Hindi Typography (Larger & Crisp) */
+  html.lang-hi,
+  [lang="hi"],
+  .lang-hi,
+  .font-hindi {
+    font-family: 'Noto Sans Devanagari', 'Poppins', 'Inter', sans-serif;
+    letter-spacing: 0.005em;
+  }
+
+  html.lang-hi h1, html.lang-hi h2, html.lang-hi h3 {
+    font-weight: 800;
+  }
+
+  /* Smooth transitions */
   *, *::before, *::after {
     transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);

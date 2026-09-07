@@ -55,10 +55,11 @@ export default {
         }
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-        display: ['Poppins', 'Inter', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'Noto Sans Devanagari', 'Poppins', 'system-ui', '-apple-system', 'sans-serif'],
+        display: ['Poppins', 'Inter', 'Noto Sans Devanagari', 'sans-serif'],
         poppins: ['Poppins', 'sans-serif'],
         inter: ['Inter', 'sans-serif'],
+        hindi: ['Noto Sans Devanagari', 'Poppins', 'sans-serif'],
       },
       animation: {
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',

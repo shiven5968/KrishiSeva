@@ -47,6 +47,12 @@ export function LanguageProvider({ children }) {
 
   useEffect(() => {
     localStorage.setItem('krishi_lang', lang);
+    document.documentElement.lang = lang;
+    if (lang === 'hi') {
+      document.documentElement.classList.add('lang-hi');
+    } else {
+      document.documentElement.classList.remove('lang-hi');
+    }
   }, [lang]);
 
   const t = (key) => {
