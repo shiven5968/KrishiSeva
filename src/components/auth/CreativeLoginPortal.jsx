@@ -577,13 +577,25 @@ export default function CreativeLoginPortal() {
         </div>
 
         {/* Dead-Center Viewport Wrapper */}
-        <div className="flex items-center justify-center min-h-[80vh] w-full px-4 py-12 pt-28">
+        <div className="flex flex-col items-center justify-center min-h-[85vh] w-full px-4 py-12 pt-28 relative">
+          
+          {/* Radial Ambient Glow Behind Card */}
+          <div className="w-[500px] h-[500px] bg-emerald-400/20 dark:bg-emerald-500/15 rounded-full blur-3xl pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -z-10" />
+
+          {/* Top Header Floating Badge */}
+          <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-emerald-900/10 dark:border-slate-800 text-emerald-800 dark:text-emerald-300 text-xs font-bold px-4 py-2 rounded-full shadow-sm mb-6 mx-auto inline-flex items-center gap-2">
+            <span>🌾</span>
+            <span>{lang === 'hi' ? 'कृषि सेवा • अखिल भारतीय सटीक कृषि मशीनरी नेटवर्क' : 'KrishiSeva • Pan-India Precision Farm Machinery Network'}</span>
+          </div>
+
           <div className="max-w-md w-full relative animate-fade-in mx-auto">
-            {/* Subtle emerald radial ambient light glow behind the card */}
-            <div className="absolute -inset-10 bg-emerald-500/10 blur-[120px] pointer-events-none rounded-full z-0" />
-            
             {/* Auth Card Elevation & Sizing */}
             <div className="max-w-md w-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-emerald-900/10 dark:border-slate-800 p-8 rounded-3xl shadow-2xl shadow-emerald-900/10 dark:shadow-2xl text-slate-900 dark:text-white relative z-10 transition-all duration-300 mx-auto">
+
+              {/* Quick Phone Role Hints (Inside Top of Card) */}
+              <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-900 dark:text-emerald-300 text-xs font-semibold p-3 rounded-xl text-center mb-5">
+                <span>{lang === 'hi' ? '💡 त्वरित परीक्षण: किसान हेतु 1111111111 | चालक हेतु 9999999999 दर्ज करें' : '💡 Quick Testing: Enter 1111111111 for Farmer | 9999999999 for Driver'}</span>
+              </div>
 
               {/* Back Link (if not on first step) */}
               {step !== 'phone' && (
@@ -1438,6 +1450,23 @@ export default function CreativeLoginPortal() {
 
             </div>
           </div>
+
+          {/* Bottom Trust Metrics Bar (Below Card) */}
+          <div className="flex flex-wrap items-center justify-center gap-6 mt-8 text-xs font-bold text-slate-700 dark:text-slate-300 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md px-6 py-3 rounded-2xl border border-emerald-900/10 dark:border-slate-800 shadow-sm">
+            <span className="flex items-center gap-1.5">
+              <span>⚡</span>
+              <span>{lang === 'hi' ? '15 मिनट त्वरित वाहन सेवा' : '15-Min Instant Dispatch'}</span>
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span>🛡️</span>
+              <span>{lang === 'hi' ? '100% एग्रीस्टैक सत्यापित' : '100% AgriStack Verified'}</span>
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span>📍</span>
+              <span>{lang === 'hi' ? '28 राज्यों में पारदर्शी मूल्य' : '28 States Dynamic Pricing'}</span>
+            </span>
+          </div>
+
         </div>
       </main>
 
