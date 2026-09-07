@@ -1037,26 +1037,9 @@ export default function CreativeLoginPortal() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3 pt-1">
-                      <button
-                        type="button"
-                        onClick={() => handleDirectRoleLogin('farmer')}
-                        className="py-3.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition-all shadow-md flex items-center justify-center gap-1.5 active:scale-95"
-                      >
-                        <span>🌾 {lang === 'hi' ? 'किसान लॉगिन' : 'Log in as Farmer'}</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleDirectRoleLogin('driver')}
-                        className="py-3.5 px-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white font-black text-xs transition-all shadow-md flex items-center justify-center gap-1.5 active:scale-95 border border-slate-700"
-                      >
-                        <span>🚜 {lang === 'hi' ? 'चालक लॉगिन' : 'Log in as Driver'}</span>
-                      </button>
-                    </div>
-
                     <button
                       type="submit"
-                      className="w-full py-3.5 rounded-2xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-bold text-xs transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98]"
+                      className="w-full py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-sm shadow-xl shadow-emerald-600/30 hover:shadow-emerald-500/50 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex items-center justify-center gap-2 active:scale-[0.98] cursor-pointer"
                     >
                       <span>
                         {selectedRole === 'farmer' 
