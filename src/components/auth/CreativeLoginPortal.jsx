@@ -576,105 +576,26 @@ export default function CreativeLoginPortal() {
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_70%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-60 dark:opacity-40" />
         </div>
 
-        {/* Content alignment wrapper */}
-        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 flex-1 flex items-center pt-28 pb-12">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center w-full">
-          
-          {/* LEFT COLUMN: Commanding Headlines */}
-          <div className={`transition-all duration-500 ease-out ${
-            portalView === 'landing'
-              ? 'lg:col-span-12 flex flex-col items-center justify-center text-center max-w-4xl mx-auto space-y-8 py-6'
-              : 'lg:col-span-7 space-y-6 text-left'
-          }`}>
-            {/* Top Live Status Pill */}
-            <div className={`inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/35 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-wider animate-pulse ${
-              portalView === 'landing' ? 'mx-auto mb-6' : 'mb-1'
-            }`}>
-              <span>⚡ 100% VERIFIED FLEET • DISPATCH ACTIVE</span>
-            </div>
+        {/* Dead-Center Viewport Wrapper */}
+        <div className="flex items-center justify-center min-h-[80vh] w-full px-4 py-12 pt-28">
+          <div className="max-w-md w-full relative animate-fade-in mx-auto">
+            {/* Subtle emerald radial ambient light glow behind the card */}
+            <div className="absolute -inset-10 bg-emerald-500/10 blur-[120px] pointer-events-none rounded-full z-0" />
+            
+            {/* Auth Card Elevation & Sizing */}
+            <div className="max-w-md w-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-emerald-900/10 dark:border-slate-800 p-8 rounded-3xl shadow-2xl shadow-emerald-900/10 dark:shadow-2xl text-slate-900 dark:text-white relative z-10 transition-all duration-300 mx-auto">
 
-            <div className={`space-y-4 ${portalView === 'landing' ? 'text-center mx-auto max-w-3xl' : ''}`}>
-              <h1 className="text-4xl sm:text-5xl lg:text-[54px] font-extrabold tracking-tight leading-[1.1] text-slate-900 dark:text-white font-display">
-                {lang === 'hi' ? (
-                  <>
-                    मांग पर मशीनें।<br />
-                    <span className="text-emerald-600 dark:text-emerald-400">
-                      सीधे आपके खेत पर।
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    Machinery on Demand.<br />
-                    <span className="text-emerald-400">
-                      Directly to Your Farm.
-                    </span>
-                  </>
-                )}
-              </h1>
-
-              <p className={`text-base sm:text-lg font-medium leading-relaxed text-slate-600 dark:text-slate-300 ${
-                portalView === 'landing' ? 'text-center mx-auto max-w-2xl' : 'max-w-xl'
-              }`}>
-                {lang === 'hi'
-                  ? 'ट्रैक्टर, हार्वेस्टर एवं अर्थमूवर की तत्काल 1-क्लिक बुकिंग। वास्तविक समय में अपने खेत तक लाइव जीपीएस ट्रैक करें।'
-                  : 'Instant booking for tractors, harvesters, and earthmovers. Track dispatches in real-time.'}
-              </p>
-            </div>
-
-            {/* ═══════════ CLASSIC HERO ACTION CTA BUTTONS ═══════════ */}
-            {portalView === 'landing' && (
-              <div className="pt-2 flex justify-center mx-auto">
-                <button
-                  onClick={() => setPortalView('login')}
-                  className="px-8 py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-base shadow-xl shadow-emerald-600/30 hover:shadow-emerald-500/50 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex items-center justify-center gap-3 cursor-pointer group"
-                >
-                  <LogIn className="w-5 h-5 text-white transition-transform group-hover:scale-110" />
-                  <span>{lang === 'hi' ? 'मशीनरी बुक करें / लॉगिन' : 'Book Machinery / Sign In'}</span>
-                  <span className="text-lg transition-transform group-hover:translate-x-1">→</span>
-                </button>
-              </div>
-            )}
-
-            {/* Feature Badges */}
-            <div className={`flex flex-wrap items-center gap-3 pt-6 ${
-              portalView === 'landing' ? 'justify-center mx-auto' : 'gap-2.5 pt-2'
-            }`}>
-              <span className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 shadow-sm backdrop-blur-md px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2 transition-all duration-300 hover:border-emerald-500/40">
-                <Tractor className="w-4 h-4 text-emerald-400" />
-                <span>{lang === 'hi' ? 'सत्यापित कृषि उपकरण' : 'Verified Equipment'}</span>
-              </span>
-
-              <span className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 shadow-sm backdrop-blur-md px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2 transition-all duration-300 hover:border-emerald-500/40">
-                <Zap className="w-4 h-4 text-emerald-400" />
-                <span>{lang === 'hi' ? 'त्वरित 1-क्लिक वाहन सेवा' : 'Instant Dispatch'}</span>
-              </span>
-
-              <span className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 shadow-sm backdrop-blur-md px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2 transition-all duration-300 hover:border-emerald-500/40">
-                <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                <span>{lang === 'hi' ? 'एग्रीस्टैक भूलेख सत्यापित' : 'AgriStack Verified'}</span>
-              </span>
-            </div>
-
-
-          </div>
-
-          {/* RIGHT COLUMN: WhatsApp OTP & Role Onboarding Card (State 2) */}
-          {portalView === 'login' && (
-            <div className="lg:col-span-5 w-full relative mt-10 lg:mt-16 animate-fade-in">
-              {/* Subtle emerald radial ambient light glow behind the card */}
-              <div className="absolute -inset-10 bg-emerald-500/10 blur-[120px] pointer-events-none rounded-full z-0" />
-              
-              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-900/5 dark:shadow-2xl rounded-3xl p-6 sm:p-8 text-slate-900 dark:text-white relative z-10 transition-all duration-300">
-
-                {/* Subtle Back to Home Link */}
+              {/* Back Link (if not on first step) */}
+              {step !== 'phone' && (
                 <button
                   type="button"
-                  onClick={() => setPortalView('landing')}
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-stone-400 hover:text-emerald-400 transition-colors mb-4 group cursor-pointer"
+                  onClick={() => { setStep('phone'); setOtp(''); setError(''); }}
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-emerald-500 transition-colors mb-4 group cursor-pointer"
                 >
                   <span className="transition-transform duration-200 group-hover:-translate-x-1 font-bold">←</span>
-                  <span>{lang === 'hi' ? 'मुख्य पृष्ठ पर वापस' : 'Back to Home'}</span>
+                  <span>{lang === 'hi' ? 'वापस जाएं' : 'Back'}</span>
                 </button>
+              )}
 
               {/* STEP 1: Phone Number Input & Send WhatsApp OTP */}
               {step === 'phone' && (
@@ -1517,15 +1438,11 @@ export default function CreativeLoginPortal() {
 
             </div>
           </div>
-        )}
-
         </div>
-      </div>
-    </main>
+      </main>
 
       {/* ═══════════ FARMER FAQ SECTION (Landing View Only) ═══════════ */}
-      {portalView === 'landing' && (
-        <section 
+      <section 
           className="relative w-full py-20 px-4 sm:px-6 lg:px-8 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950 transition-colors duration-300"
         >
           <div className="max-w-4xl mx-auto space-y-4 text-center mb-12">
@@ -1583,7 +1500,6 @@ export default function CreativeLoginPortal() {
             })}
           </div>
         </section>
-      )}
 
       {/* ═══════════ MINIMALIST FOOTER ═══════════ */}
       <footer className={`relative z-10 border-t px-6 py-4 transition-colors duration-200 ${
