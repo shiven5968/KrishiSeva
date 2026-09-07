@@ -36,7 +36,9 @@ import {
   Camera,
   Upload,
   RefreshCw,
-  ChevronDown
+  ChevronDown,
+  Menu,
+  X
 } from 'lucide-react';
 
 export default function CreativeLoginPortal() {
@@ -52,6 +54,7 @@ export default function CreativeLoginPortal() {
 
   // Portal View State: State 1 (landing) vs State 2 (login)
   const [portalView, setPortalView] = useState('landing'); // 'landing' | 'login'
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Authentication States
   const [phone, setPhone] = useState('');
@@ -503,25 +506,28 @@ export default function CreativeLoginPortal() {
     }`}>
       
       {/* ═══════════ SEAMLESS UNIFIED TOP NAVBAR ═══════════ */}
-      <header className="w-full fixed top-0 left-0 right-0 z-50 bg-[#ECF5F0]/40 dark:bg-slate-950/40 backdrop-blur-md transition-colors duration-300">
-        <div className="max-w-7xl w-full mx-auto px-6 lg:px-8 py-4 flex items-center justify-between">
+      <header className="w-full fixed top-0 left-0 right-0 z-50 bg-[#ECF5F0]/80 dark:bg-slate-950/80 backdrop-blur-md transition-colors duration-300">
+        <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-3.5 sm:py-4 flex items-center justify-between">
           {/* Brand Logo & Name (Sitting naturally on mint canvas without white box) */}
           <div 
-            onClick={() => setPortalView('landing')}
-            className="flex items-center gap-3 cursor-pointer group"
+            onClick={() => {
+              setPortalView('landing');
+              setIsMobileMenuOpen(false);
+            }}
+            className="shrink-0 flex items-center gap-2.5 sm:gap-3 cursor-pointer group select-none"
           >
             <img 
               src="/images/logo.png" 
               alt="KrishiSeva Logo" 
-              className="h-9 w-auto object-contain transition-transform duration-200 group-hover:scale-105 rounded-xl" 
+              className="h-8 sm:h-9 w-auto object-contain transition-transform duration-200 group-hover:scale-105 rounded-xl shrink-0" 
             />
-            <span className="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white font-display transition-colors group-hover:text-emerald-600">
+            <span className="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white font-display transition-colors group-hover:text-emerald-600 whitespace-nowrap">
               KrishiSeva
             </span>
           </div>
 
-          {/* Actions & Controls (Far Right Glass Pills) */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          {/* Actions & Controls (Desktop) */}
+          <div className="hidden md:flex items-center gap-2 sm:gap-3">
             <button
               onClick={() => setActiveRole('admin')}
               className="text-xs px-3.5 py-1.5 rounded-full border bg-white/70 dark:bg-slate-900/80 backdrop-blur-sm border-emerald-900/10 dark:border-slate-800 text-slate-800 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-900 shadow-sm transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer"
@@ -558,7 +564,75 @@ export default function CreativeLoginPortal() {
               <span>{lang === 'hi' ? 'English' : 'हिंदी'}</span>
             </button>
           </div>
-        </div></header>
+
+          {/* Mobile Hamburger Toggle */}
+          <div className="flex md:hidden items-center gap-2">
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="p-2 rounded-xl border bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border-emerald-900/10 dark:border-slate-800 text-slate-800 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-900 shadow-sm transition-all active:scale-95 cursor-pointer"
+              aria-label="Toggle navigation menu"
+            >
+              {isMobileMenuOpen ? (
+                <X className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+              ) : (
+                <Menu className="w-5 h-5 text-slate-700 dark:text-slate-200" />
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Dropdown Menu Sheet */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden border-t border-emerald-900/10 dark:border-slate-800 bg-[#ECF5F0]/95 dark:bg-slate-950/95 backdrop-blur-xl px-4 py-3 space-y-2.5 animate-fade-in shadow-xl">
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={() => {
+                  setActiveRole('admin');
+                  setIsMobileMenuOpen(false);
+                }}
+                className="w-full text-xs font-bold px-3.5 py-2.5 rounded-xl border bg-white/90 dark:bg-slate-900/90 border-emerald-900/10 dark:border-slate-800 text-slate-800 dark:text-slate-200 shadow-sm flex items-center justify-between cursor-pointer"
+              >
+                <span className="flex items-center gap-2">
+                  <Lock className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <span>{lang === 'hi' ? 'एडमिन लॉगिन' : 'Admin Login'}</span>
+                </span>
+                <span className="text-emerald-600 font-bold">→</span>
+              </button>
+
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => {
+                    toggleTheme();
+                  }}
+                  className="text-xs font-bold px-3 py-2 rounded-xl border bg-white/90 dark:bg-slate-900/90 border-emerald-900/10 dark:border-slate-800 text-slate-800 dark:text-slate-200 shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  {isDark ? (
+                    <>
+                      <Sun className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Light</span>
+                    </>
+                  ) : (
+                    <>
+                      <Moon className="w-3.5 h-3.5 text-indigo-600" />
+                      <span>Dark</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  onClick={() => {
+                    toggleLanguage();
+                  }}
+                  className="text-xs font-bold px-3 py-2 rounded-xl border bg-white/90 dark:bg-slate-900/90 border-emerald-900/10 dark:border-slate-800 text-slate-800 dark:text-slate-200 shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <Globe className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                  <span>{lang === 'hi' ? 'English' : 'हिंदी'}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </header>
 
       {/* ═══════════ HERO & AUTH CONTAINER ═══════════ */}
       <main className="relative w-full min-h-screen flex flex-col justify-between overflow-hidden z-10">
@@ -622,25 +696,24 @@ export default function CreativeLoginPortal() {
                 }}
                 className="px-8 py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-base shadow-xl shadow-emerald-600/30 hover:shadow-emerald-500/50 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex items-center justify-center gap-3 cursor-pointer group"
               >
-                <LogIn className="w-5 h-5 text-white transition-transform group-hover:scale-110" />
                 <span>{lang === 'hi' ? 'मशीनरी बुक करें / लॉगिन' : 'Book Machinery / Sign In'}</span>
                 <span className="text-lg transition-transform group-hover:translate-x-1">→</span>
               </button>
             </div>
 
             {/* Feature Badges */}
-            <div className="flex flex-wrap items-center justify-center gap-3 pt-8 mx-auto">
-              <span className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 shadow-sm backdrop-blur-md px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2 transition-all duration-300 hover:border-emerald-500/40">
+            <div className="flex flex-wrap items-center justify-center gap-2 max-w-sm sm:max-w-none mx-auto pt-8">
+              <span className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 shadow-sm backdrop-blur-md px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2 transition-all duration-300 hover:border-emerald-500/40">
                 <Tractor className="w-4 h-4 text-emerald-500" />
                 <span>{lang === 'hi' ? 'सत्यापित कृषि उपकरण' : 'Verified Equipment'}</span>
               </span>
 
-              <span className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 shadow-sm backdrop-blur-md px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2 transition-all duration-300 hover:border-emerald-500/40">
+              <span className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 shadow-sm backdrop-blur-md px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2 transition-all duration-300 hover:border-emerald-500/40">
                 <Zap className="w-4 h-4 text-emerald-500" />
                 <span>{lang === 'hi' ? 'त्वरित 1-क्लिक वाहन सेवा' : 'Instant Dispatch'}</span>
               </span>
 
-              <span className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 shadow-sm backdrop-blur-md px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2 transition-all duration-300 hover:border-emerald-500/40">
+              <span className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 shadow-sm backdrop-blur-md px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2 transition-all duration-300 hover:border-emerald-500/40">
                 <ShieldCheck className="w-4 h-4 text-emerald-400" />
                 <span>{lang === 'hi' ? 'एग्रीस्टैक भूलेख सत्यापित' : 'AgriStack Verified'}</span>
               </span>
