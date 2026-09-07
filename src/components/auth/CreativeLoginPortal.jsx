@@ -671,17 +671,7 @@ export default function CreativeLoginPortal() {
                   <span className="text-lg transition-transform group-hover:translate-x-1">→</span>
                 </button>
 
-                <button
-                  onClick={() => {
-                    setSelectedRole('driver');
-                    setPortalView('login');
-                  }}
-                  className="px-6 py-4 rounded-2xl bg-slate-900/80 hover:bg-slate-900 border border-slate-700/80 hover:border-emerald-500/50 text-slate-200 hover:text-white font-bold text-sm sm:text-base backdrop-blur-md transition-all duration-200 flex items-center justify-center gap-2.5 cursor-pointer"
-                >
-                  <Tractor className="w-5 h-5 text-emerald-400" />
-                  <span>{lang === 'hi' ? 'ड्राइवर / फ्लीट लॉगिन' : 'Driver & Fleet Portal'}</span>
-                </button>
-              </div>
+                </div>
             )}
 
             {/* Feature Badges */}
