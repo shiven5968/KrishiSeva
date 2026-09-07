@@ -681,7 +681,7 @@ export default function CreativeLoginPortal() {
               <p className="text-base sm:text-lg max-w-2xl mx-auto font-medium leading-relaxed text-slate-600 dark:text-slate-300">
                 {lang === 'hi'
                   ? 'ट्रैक्टर, हार्वेस्टर एवं अर्थमूवर की तत्काल 1-क्लिक बुकिंग। वास्तविक समय में अपने खेत तक लाइव जीपीएस ट्रैक करें।'
-                  : 'Instant booking for tractors, harvesters, and earthmovers. Track dispatches in real-time.'}
+                  : 'Instant booking for tractors, harvesters and earthmovers. Track dispatches in real-time.'}
               </p>
             </div>
 
