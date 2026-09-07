@@ -488,96 +488,67 @@ export default function CreativeLoginPortal() {
 
   return (
     <div className={`min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-stone-950 font-sans relative overflow-x-hidden transition-colors duration-200 ${
-      isDark ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
+      isDark ? 'bg-slate-950 text-slate-100' : 'bg-[#ECF5F0] text-slate-900'
     }`}>
       
-      {/* ═══════════ SEAMLESS FULL-WIDTH NAVBAR ═══════════ */}
-      <header className={`w-full fixed top-0 left-0 right-0 z-50 px-8 pt-6 pb-4 flex items-center justify-between border-b shadow-sm transition-colors duration-200 ${
-        isDark ? 'bg-slate-950/80 backdrop-blur-md border-b border-slate-800' : 'bg-white/80 backdrop-blur-md border-b border-slate-200 text-slate-900'
-      }`}>
-        {/* Brand Logo (Far Left) */}
-        <div 
-          onClick={() => setPortalView('landing')}
-          className="flex items-center gap-3 group cursor-pointer"
-        >
-          <img 
-            src="/images/logo.png" 
-            alt="KrishiSeva Logo" 
-            className="h-9 w-auto object-contain transition-transform duration-200 hover:scale-105 rounded-xl" 
-          />
-          <span className={`text-xl font-extrabold tracking-tight transition-all duration-300 group-hover:text-emerald-500 ${
-            isDark ? 'text-white' : 'text-[#0F172A]'
-          }`}>
-            KrishiSeva
-          </span>
-        </div>
+      {/* ═══════════ SEAMLESS UNIFIED TOP NAVBAR ═══════════ */}
+      <header className="w-full fixed top-0 left-0 right-0 z-50 bg-[#ECF5F0]/40 dark:bg-slate-950/40 backdrop-blur-md transition-colors duration-300">
+        <div className="max-w-7xl w-full mx-auto px-6 lg:px-8 py-4 flex items-center justify-between">
+          {/* Brand Logo & Name (Sitting naturally on mint canvas without white box) */}
+          <div 
+            onClick={() => setPortalView('landing')}
+            className="flex items-center gap-3 cursor-pointer group"
+          >
+            <img 
+              src="/images/logo.png" 
+              alt="KrishiSeva Logo" 
+              className="h-9 w-auto object-contain transition-transform duration-200 group-hover:scale-105 rounded-xl" 
+            />
+            <span className="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white font-display transition-colors group-hover:text-emerald-600">
+              KrishiSeva
+            </span>
+          </div>
 
-        {/* Actions & Controls (Far Right) */}
-        <div className="flex items-center gap-2 sm:gap-3">
-          {/* Back to Home Button (Visible only when in Login Portal) */}
-          {portalView === 'login' && (
+          {/* Actions & Controls (Far Right Glass Pills) */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Admin Login Quick Link */}
             <button
-              onClick={() => setPortalView('landing')}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-bold border transition-all active:scale-95 cursor-pointer flex items-center gap-1.5 shadow-sm ${
-                isDark
-                  ? 'bg-slate-900/90 hover:bg-slate-800 border-slate-800 text-slate-200'
-                  : 'bg-white hover:bg-slate-100 border-slate-200 text-slate-700'
-              }`}
+              onClick={() => setActiveRole('admin')}
+              className="text-xs px-3.5 py-1.5 rounded-full border bg-white/70 dark:bg-slate-900/80 backdrop-blur-sm border-emerald-900/10 dark:border-slate-800 text-slate-800 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-900 shadow-sm transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer"
             >
-              <span>{lang === 'hi' ? '← मुख्य पृष्ठ' : '← Home'}</span>
+              <Lock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+              <span>{lang === 'hi' ? 'एडमिन लॉगिन' : 'Admin Login'}</span>
             </button>
-          )}
 
-          {/* Admin Login Quick Link */}
-          <button
-            onClick={() => setActiveRole('admin')}
-            className={`text-xs px-3.5 py-1.5 rounded-full border transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer ${
-              isDark 
-                ? 'bg-slate-900 hover:bg-slate-800 border-slate-800 text-slate-200' 
-                : 'bg-white hover:bg-slate-100 border-slate-200 text-slate-700 shadow-sm'
-            }`}
-          >
-            <Lock className={`w-3.5 h-3.5 ${isDark ? 'text-stone-400' : 'text-emerald-600'}`} />
-            <span>{lang === 'hi' ? 'एडमिन लॉगिन' : 'Admin Login'}</span>
-          </button>
+            {/* Dark / Light Theme Switcher */}
+            <button
+              onClick={toggleTheme}
+              className="text-xs px-3.5 py-1.5 rounded-full border bg-white/70 dark:bg-slate-900/80 backdrop-blur-sm border-emerald-900/10 dark:border-slate-800 text-slate-800 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-900 shadow-sm transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer"
+              title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            >
+              {isDark ? (
+                <>
+                  <Sun className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Light</span>
+                </>
+              ) : (
+                <>
+                  <Moon className="w-3.5 h-3.5 text-indigo-600" />
+                  <span>Dark</span>
+                </>
+              )}
+            </button>
 
-          {/* Dark / Light Theme Switcher */}
-          <button
-            onClick={toggleTheme}
-            className={`text-xs px-3.5 py-1.5 rounded-full border transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer ${
-              isDark 
-                ? 'bg-slate-900 hover:bg-slate-800 border-slate-800 text-slate-200' 
-                : 'bg-white hover:bg-slate-100 border-slate-200 text-slate-700 shadow-sm'
-            }`}
-            title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-          >
-            {isDark ? (
-              <>
-                <Sun className="w-3.5 h-3.5 text-amber-400" />
-                <span>Light</span>
-              </>
-            ) : (
-              <>
-                <Moon className="w-3.5 h-3.5 text-indigo-600" />
-                <span>Dark</span>
-              </>
-            )}
-          </button>
-
-          {/* Language Switcher */}
-          <button
-            onClick={toggleLanguage}
-            className={`text-xs px-3.5 py-1.5 rounded-full border transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer ${
-              isDark 
-                ? 'bg-slate-900 hover:bg-slate-800 border-slate-800 text-slate-200' 
-                : 'bg-white hover:bg-slate-100 border-slate-200 text-slate-700 shadow-sm'
-            }`}
-          >
-            <Globe className="w-3.5 h-3.5 text-emerald-500" />
-            <span>{lang === 'hi' ? 'English' : 'हिंदी'}</span>
-          </button>
-        </div>
-      </header>
+            {/* Language Switcher */}
+            <button
+              onClick={toggleLanguage}
+              className="text-xs px-3.5 py-1.5 rounded-full border bg-white/70 dark:bg-slate-900/80 backdrop-blur-sm border-emerald-900/10 dark:border-slate-800 text-slate-800 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-900 shadow-sm transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer"
+            >
+              <Globe className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+              <span>{lang === 'hi' ? 'English' : 'हिंदी'}</span>
+            </button>
+          </div>
+        </div></header>
 
       {/* ═══════════ HERO & AUTH CONTAINER ═══════════ */}
       <main className="relative w-full min-h-screen flex flex-col justify-between overflow-hidden z-10">
