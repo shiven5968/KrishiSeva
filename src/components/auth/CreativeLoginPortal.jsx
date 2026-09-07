@@ -581,17 +581,19 @@ export default function CreativeLoginPortal() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center w-full">
           
           {/* LEFT COLUMN: Commanding Headlines */}
-          <div className={`transition-all duration-500 ease-out text-left ${
+          <div className={`transition-all duration-500 ease-out ${
             portalView === 'landing'
-              ? 'lg:col-span-12 max-w-3xl space-y-8 py-6'
-              : 'lg:col-span-7 space-y-6'
+              ? 'lg:col-span-12 flex flex-col items-center justify-center text-center max-w-4xl mx-auto space-y-8 py-6'
+              : 'lg:col-span-7 space-y-6 text-left'
           }`}>
             {/* Top Live Status Pill */}
-            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/35 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-wider animate-pulse mb-1">
+            <div className={`inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/35 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-wider animate-pulse ${
+              portalView === 'landing' ? 'mx-auto mb-6' : 'mb-1'
+            }`}>
               <span>⚡ 100% VERIFIED FLEET • DISPATCH ACTIVE</span>
             </div>
 
-            <div className="space-y-4">
+            <div className={`space-y-4 ${portalView === 'landing' ? 'text-center mx-auto max-w-3xl' : ''}`}>
               <h1 className="text-4xl sm:text-5xl lg:text-[54px] font-extrabold tracking-tight leading-[1.1] text-slate-900 dark:text-white font-display">
                 {lang === 'hi' ? (
                   <>
@@ -610,7 +612,9 @@ export default function CreativeLoginPortal() {
                 )}
               </h1>
 
-              <p className="text-base sm:text-lg max-w-xl font-medium leading-relaxed text-slate-600 dark:text-slate-300">
+              <p className={`text-base sm:text-lg font-medium leading-relaxed text-slate-600 dark:text-slate-300 ${
+                portalView === 'landing' ? 'text-center mx-auto max-w-2xl' : 'max-w-xl'
+              }`}>
                 {lang === 'hi'
                   ? 'ट्रैक्टर, हार्वेस्टर एवं अर्थमूवर की तत्काल 1-क्लिक बुकिंग। वास्तविक समय में अपने खेत तक लाइव जीपीएस ट्रैक करें।'
                   : 'Instant booking for tractors, harvesters, and earthmovers. Track dispatches in real-time.'}
@@ -619,7 +623,7 @@ export default function CreativeLoginPortal() {
 
             {/* ═══════════ CLASSIC HERO ACTION CTA BUTTONS ═══════════ */}
             {portalView === 'landing' && (
-              <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5">
+              <div className="pt-2 flex justify-center mx-auto">
                 <button
                   onClick={() => setPortalView('login')}
                   className="px-8 py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-base shadow-xl shadow-emerald-600/30 hover:shadow-emerald-500/50 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex items-center justify-center gap-3 cursor-pointer group"
@@ -628,12 +632,13 @@ export default function CreativeLoginPortal() {
                   <span>{lang === 'hi' ? 'मशीनरी बुक करें / लॉगिन' : 'Book Machinery / Sign In'}</span>
                   <span className="text-lg transition-transform group-hover:translate-x-1">→</span>
                 </button>
-
-                </div>
+              </div>
             )}
 
             {/* Feature Badges */}
-            <div className="flex flex-wrap items-center gap-2.5 pt-2">
+            <div className={`flex flex-wrap items-center gap-3 pt-6 ${
+              portalView === 'landing' ? 'justify-center mx-auto' : 'gap-2.5 pt-2'
+            }`}>
               <span className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 shadow-sm backdrop-blur-md px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2 transition-all duration-300 hover:border-emerald-500/40">
                 <Tractor className="w-4 h-4 text-emerald-400" />
                 <span>{lang === 'hi' ? 'सत्यापित कृषि उपकरण' : 'Verified Equipment'}</span>
