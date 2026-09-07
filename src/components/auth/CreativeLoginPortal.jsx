@@ -579,6 +579,20 @@ export default function CreativeLoginPortal() {
         {/* Dead-Center Viewport Wrapper */}
         <div className="flex flex-col items-center justify-center min-h-[85vh] w-full px-4 py-12 pt-28 relative">
           
+          {/* Top-Left Back to Home Button */}
+          <button
+            type="button"
+            onClick={() => {
+              setStep('phone');
+              setOtp('');
+              setError('');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className="absolute top-6 left-6 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/70 dark:bg-slate-900/70 backdrop-blur-md border border-emerald-900/10 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:text-emerald-700 dark:hover:text-emerald-400 hover:bg-white dark:hover:bg-slate-800 text-sm font-semibold transition-all shadow-sm cursor-pointer z-20"
+          >
+            <span>{lang === 'hi' ? '← मुख्य पृष्ठ पर वापस' : '← Back to Home'}</span>
+          </button>
+
           {/* Radial Ambient Glow Behind Card */}
           <div className="w-[500px] h-[500px] bg-emerald-400/20 dark:bg-emerald-500/15 rounded-full blur-3xl pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -z-10" />
 
@@ -592,10 +606,7 @@ export default function CreativeLoginPortal() {
             {/* Auth Card Elevation & Sizing */}
             <div className="max-w-md w-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-emerald-900/10 dark:border-slate-800 p-8 rounded-3xl shadow-2xl shadow-emerald-900/10 dark:shadow-2xl text-slate-900 dark:text-white relative z-10 transition-all duration-300 mx-auto">
 
-              {/* Quick Phone Role Hints (Inside Top of Card) */}
-              <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-900 dark:text-emerald-300 text-xs font-semibold p-3 rounded-xl text-center mb-5">
-                <span>{lang === 'hi' ? '💡 त्वरित परीक्षण: किसान हेतु 1111111111 | चालक हेतु 9999999999 दर्ज करें' : '💡 Quick Testing: Enter 1111111111 for Farmer | 9999999999 for Driver'}</span>
-              </div>
+
 
               {/* Back Link (if not on first step) */}
               {step !== 'phone' && (
