@@ -513,15 +513,23 @@ export default function CreativeLoginPortal() {
 
         {/* Actions & Controls (Far Right) */}
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* Top Navigation Bar Login Pill — 3D Emerald */}
+          {/* Top Navigation Bar Login / Home Pill */}
           <button
             onClick={() => setPortalView(prev => prev === 'landing' ? 'login' : 'landing')}
-            className="px-8 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-400 border-b-[3px] border-emerald-700 hover:border-emerald-600 text-white font-bold text-sm shadow-[0_4px_14px_rgba(16,185,129,0.35)] hover:shadow-[0_6px_20px_rgba(16,185,129,0.5)] active:border-b-0 active:mt-[3px] active:shadow-[0_2px_6px_rgba(16,185,129,0.2)] transition-all duration-150 cursor-pointer flex items-center gap-2.5"
+            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold border transition-all duration-200 cursor-pointer flex items-center gap-2 active:scale-95 shadow-sm ${
+              portalView === 'landing'
+                ? isDark
+                  ? 'bg-slate-900/90 hover:bg-slate-800 border-slate-800 text-slate-100 hover:border-emerald-500/40'
+                  : 'bg-white/95 hover:bg-emerald-50/60 border-slate-200 text-slate-900 hover:border-emerald-500/40'
+                : isDark
+                  ? 'bg-emerald-950/60 hover:bg-emerald-900/60 border-emerald-800/80 text-emerald-300'
+                  : 'bg-emerald-50 hover:bg-emerald-100 border-emerald-200 text-emerald-800'
+            }`}
           >
             {portalView === 'landing' ? (
               <>
-                <User className="w-4 h-4 text-white" />
-                <span>{lang === 'hi' ? 'लॉगिन' : 'Login'}</span>
+                <LogIn className="w-4 h-4 text-emerald-500" />
+                <span>{lang === 'hi' ? 'लॉगिन करें' : 'Sign In'}</span>
               </>
             ) : (
               <>
@@ -649,6 +657,31 @@ export default function CreativeLoginPortal() {
                   : 'Instant booking for tractors, harvesters, and earthmovers. Track dispatches in real-time.'}
               </p>
             </div>
+
+            {/* ═══════════ CLASSIC HERO ACTION CTA BUTTONS ═══════════ */}
+            {portalView === 'landing' && (
+              <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5">
+                <button
+                  onClick={() => setPortalView('login')}
+                  className="px-8 py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-base shadow-xl shadow-emerald-600/30 hover:shadow-emerald-500/50 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex items-center justify-center gap-3 cursor-pointer group"
+                >
+                  <LogIn className="w-5 h-5 text-white transition-transform group-hover:scale-110" />
+                  <span>{lang === 'hi' ? 'मशीनरी बुक करें / लॉगिन' : 'Book Machinery / Sign In'}</span>
+                  <span className="text-lg transition-transform group-hover:translate-x-1">→</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setSelectedRole('driver');
+                    setPortalView('login');
+                  }}
+                  className="px-6 py-4 rounded-2xl bg-slate-900/80 hover:bg-slate-900 border border-slate-700/80 hover:border-emerald-500/50 text-slate-200 hover:text-white font-bold text-sm sm:text-base backdrop-blur-md transition-all duration-200 flex items-center justify-center gap-2.5 cursor-pointer"
+                >
+                  <Tractor className="w-5 h-5 text-emerald-400" />
+                  <span>{lang === 'hi' ? 'ड्राइवर / फ्लीट लॉगिन' : 'Driver & Fleet Portal'}</span>
+                </button>
+              </div>
+            )}
 
             {/* Feature Badges */}
             <div className="flex flex-wrap items-center gap-2.5 pt-2">
