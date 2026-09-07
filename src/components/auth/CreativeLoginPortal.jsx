@@ -522,19 +522,34 @@ export default function CreativeLoginPortal() {
 
           {/* Actions & Controls (Far Right Glass Pills) */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Admin Login Quick Link */}
-            <button
-              onClick={() => {
-                setStep('phone');
-                setOtp('');
-                setError('');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-              className="text-xs px-3.5 py-1.5 rounded-full border bg-white/70 dark:bg-slate-900/80 backdrop-blur-sm border-emerald-900/10 dark:border-slate-800 text-slate-800 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-900 shadow-sm transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer"
-            >
-              <ArrowLeft className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-              <span>{lang === 'hi' ? 'मुख्य पृष्ठ' : 'Back to Home'}</span>
-            </button>
+            {portalView === 'login' ? (
+              <button
+                onClick={() => {
+                  setPortalView('landing');
+                  setStep('phone');
+                  setOtp('');
+                  setError('');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="text-xs px-3.5 py-1.5 rounded-full border bg-white/70 dark:bg-slate-900/80 backdrop-blur-sm border-emerald-900/10 dark:border-slate-800 text-slate-800 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-900 shadow-sm transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer"
+              >
+                <ArrowLeft className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                <span>{lang === 'hi' ? 'मुख्य पृष्ठ' : 'Back to Home'}</span>
+              </button>
+            ) : (
+              <button
+                onClick={() => {
+                  setPortalView('login');
+                  setStep('phone');
+                  setOtp('');
+                  setError('');
+                }}
+                className="text-xs px-3.5 py-1.5 rounded-full border bg-emerald-600 hover:bg-emerald-500 text-white font-bold shadow-sm transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer"
+              >
+                <LogIn className="w-3.5 h-3.5 text-white" />
+                <span>{lang === 'hi' ? 'लॉगिन / बुक करें' : 'Sign In / Book'}</span>
+              </button>
+            )}
 
             <button
               onClick={() => setActiveRole('admin')}
@@ -590,38 +605,111 @@ export default function CreativeLoginPortal() {
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_70%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-60 dark:opacity-40" />
         </div>
 
-        {/* Dead-Center Viewport Wrapper */}
-        <div className="flex flex-col items-center justify-center min-h-[85vh] w-full px-4 py-12 pt-28 relative">
-          
+        
+        {/* ═══════════ VIEW 1: LANDING PAGE HERO ═══════════ */}
+        {portalView === 'landing' && (
+          <div className="flex flex-col items-center justify-center min-h-[80vh] w-full px-4 py-12 pt-28 max-w-4xl mx-auto text-center animate-fade-in">
+            {/* Top Live Status Pill */}
+            <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/35 text-emerald-600 dark:text-emerald-400 text-xs font-black uppercase tracking-wider animate-pulse mb-6 mx-auto shadow-xs">
+              <span>⚡ 100% VERIFIED FLEET • DISPATCH ACTIVE</span>
+            </div>
 
+            <div className="space-y-4 max-w-3xl mx-auto">
+              <h1 className="text-4xl sm:text-5xl lg:text-[56px] font-extrabold tracking-tight leading-[1.1] text-slate-900 dark:text-white font-display">
+                {lang === 'hi' ? (
+                  <>
+                    मांग पर मशीनें।<br />
+                    <span className="text-emerald-600 dark:text-emerald-400">
+                      सीधे आपके खेत पर।
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    Machinery on Demand.<br />
+                    <span className="text-emerald-500 dark:text-emerald-400">
+                      Directly to Your Farm.
+                    </span>
+                  </>
+                )}
+              </h1>
 
-          {/* Radial Ambient Glow Behind Card */}
-          <div className="w-[500px] h-[500px] bg-emerald-400/20 dark:bg-emerald-500/15 rounded-full blur-3xl pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -z-10" />
+              <p className="text-base sm:text-lg max-w-2xl mx-auto font-medium leading-relaxed text-slate-600 dark:text-slate-300">
+                {lang === 'hi'
+                  ? 'ट्रैक्टर, हार्वेस्टर एवं अर्थमूवर की तत्काल 1-क्लिक बुकिंग। वास्तविक समय में अपने खेत तक लाइव जीपीएस ट्रैक करें।'
+                  : 'Instant booking for tractors, harvesters, and earthmovers. Track dispatches in real-time.'}
+              </p>
+            </div>
 
-          {/* Top Header Floating Badge */}
-          <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-emerald-900/10 dark:border-slate-800 text-emerald-800 dark:text-emerald-300 text-xs font-bold px-4 py-2 rounded-full shadow-sm mb-6 mx-auto inline-flex items-center gap-2">
-            <span>🌾</span>
-            <span>{lang === 'hi' ? 'कृषि सेवा • अखिल भारतीय सटीक कृषि मशीनरी नेटवर्क' : 'KrishiSeva • Pan-India Precision Farm Machinery Network'}</span>
-          </div>
-
-          <div className="max-w-md w-full relative animate-fade-in mx-auto">
-            {/* Auth Card Elevation & Sizing */}
-            <div className="max-w-md w-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-emerald-900/10 dark:border-slate-800 p-8 rounded-3xl shadow-2xl shadow-emerald-900/10 dark:shadow-2xl text-slate-900 dark:text-white relative z-10 transition-all duration-300 mx-auto">
-
-              {/* Back to Home Button Inside Card */}
+            {/* CTA Action Button */}
+            <div className="pt-8 flex justify-center mx-auto">
               <button
-                type="button"
                 onClick={() => {
+                  setPortalView('login');
                   setStep('phone');
                   setOtp('');
                   setError('');
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-400 transition-colors mb-5 group cursor-pointer"
+                className="px-8 py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-base shadow-xl shadow-emerald-600/30 hover:shadow-emerald-500/50 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex items-center justify-center gap-3 cursor-pointer group"
               >
-                <ArrowLeft className="w-3.5 h-3.5 transition-transform duration-200 group-hover:-translate-x-1" />
-                <span>{lang === 'hi' ? 'मुख्य पृष्ठ पर वापस' : 'Back to Home'}</span>
+                <LogIn className="w-5 h-5 text-white transition-transform group-hover:scale-110" />
+                <span>{lang === 'hi' ? 'मशीनरी बुक करें / लॉगिन' : 'Book Machinery / Sign In'}</span>
+                <span className="text-lg transition-transform group-hover:translate-x-1">→</span>
               </button>
+            </div>
+
+            {/* Feature Badges */}
+            <div className="flex flex-wrap items-center justify-center gap-3 pt-8 mx-auto">
+              <span className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 shadow-sm backdrop-blur-md px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2 transition-all duration-300 hover:border-emerald-500/40">
+                <Tractor className="w-4 h-4 text-emerald-500" />
+                <span>{lang === 'hi' ? 'सत्यापित कृषि उपकरण' : 'Verified Equipment'}</span>
+              </span>
+
+              <span className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 shadow-sm backdrop-blur-md px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2 transition-all duration-300 hover:border-emerald-500/40">
+                <Zap className="w-4 h-4 text-emerald-500" />
+                <span>{lang === 'hi' ? 'त्वरित 1-क्लिक वाहन सेवा' : 'Instant Dispatch'}</span>
+              </span>
+
+              <span className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 shadow-sm backdrop-blur-md px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2 transition-all duration-300 hover:border-emerald-500/40">
+                <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                <span>{lang === 'hi' ? 'एग्रीस्टैक भूलेख सत्यापित' : 'AgriStack Verified'}</span>
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* ═══════════ VIEW 2: DEAD-CENTER AUTH VIEW ═══════════ */}
+        {portalView === 'login' && (
+          <div className="flex flex-col items-center justify-center min-h-[85vh] w-full px-4 py-12 pt-28 relative">
+            
+            {/* Radial Ambient Glow Behind Card */}
+            <div className="w-[500px] h-[500px] bg-emerald-400/20 dark:bg-emerald-500/15 rounded-full blur-3xl pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -z-10" />
+
+            {/* Top Header Floating Badge */}
+            <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-emerald-900/10 dark:border-slate-800 text-emerald-800 dark:text-emerald-300 text-xs font-bold px-4 py-2 rounded-full shadow-sm mb-6 mx-auto inline-flex items-center gap-2">
+              <span>🌾</span>
+              <span>{lang === 'hi' ? 'कृषि सेवा • अखिल भारतीय सटीक कृषि मशीनरी नेटवर्क' : 'KrishiSeva • Pan-India Precision Farm Machinery Network'}</span>
+            </div>
+
+            <div className="max-w-md w-full relative animate-fade-in mx-auto">
+              {/* Auth Card Elevation & Sizing */}
+              <div className="max-w-md w-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-emerald-900/10 dark:border-slate-800 p-8 rounded-3xl shadow-2xl shadow-emerald-900/10 dark:shadow-2xl text-slate-900 dark:text-white relative z-10 transition-all duration-300 mx-auto">
+
+                {/* Back to Home Button Inside Card */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPortalView('landing');
+                    setStep('phone');
+                    setOtp('');
+                    setError('');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-400 transition-colors mb-5 group cursor-pointer"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5 transition-transform duration-200 group-hover:-translate-x-1" />
+                  <span>{lang === 'hi' ? 'मुख्य पृष्ठ पर वापस' : 'Back to Home'}</span>
+                </button>
+
 
               {/* STEP 1: Phone Number Input & Send WhatsApp OTP */}
               {step === 'phone' && (
@@ -1465,23 +1553,24 @@ export default function CreativeLoginPortal() {
             </div>
           </div>
 
-          {/* Bottom Trust Metrics Bar (Below Card) */}
-          <div className="flex flex-wrap items-center justify-center gap-6 mt-8 text-xs font-bold text-slate-700 dark:text-slate-300 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md px-6 py-3 rounded-2xl border border-emerald-900/10 dark:border-slate-800 shadow-sm">
-            <span className="flex items-center gap-1.5">
-              <span>⚡</span>
-              <span>{lang === 'hi' ? '15 मिनट त्वरित वाहन सेवा' : '15-Min Instant Dispatch'}</span>
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span>🛡️</span>
-              <span>{lang === 'hi' ? '100% एग्रीस्टैक सत्यापित' : '100% AgriStack Verified'}</span>
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span>📍</span>
-              <span>{lang === 'hi' ? '28 राज्यों में पारदर्शी मूल्य' : '28 States Dynamic Pricing'}</span>
-            </span>
-          </div>
+            {/* Bottom Trust Metrics Bar (Below Card) */}
+            <div className="flex flex-wrap items-center justify-center gap-6 mt-8 text-xs font-bold text-slate-700 dark:text-slate-300 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md px-6 py-3 rounded-2xl border border-emerald-900/10 dark:border-slate-800 shadow-sm">
+              <span className="flex items-center gap-1.5">
+                <span>⚡</span>
+                <span>{lang === 'hi' ? '15 मिनट त्वरित वाहन सेवा' : '15-Min Instant Dispatch'}</span>
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span>🛡️</span>
+                <span>{lang === 'hi' ? '100% एग्रीस्टैक सत्यापित' : '100% AgriStack Verified'}</span>
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span>📍</span>
+                <span>{lang === 'hi' ? '28 राज्यों में पारदर्शी मूल्य' : '28 States Dynamic Pricing'}</span>
+              </span>
+            </div>
 
-        </div>
+          </div>
+        )}
       </main>
 
       {/* ═══════════ FARMER FAQ SECTION (Landing View Only) ═══════════ */}
