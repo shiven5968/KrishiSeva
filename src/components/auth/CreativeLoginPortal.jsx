@@ -582,29 +582,17 @@ export default function CreativeLoginPortal() {
       {/* ═══════════ HERO & AUTH CONTAINER ═══════════ */}
       <main className="relative w-full min-h-screen flex flex-col justify-between overflow-hidden z-10">
         
-        {/* ───── Background Farm Vignette (Wheat Field 4K Video) ───── */}
+        {/* ───── Crisp MessMates Modern SaaS Background ───── */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden -z-10">
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="auto"
-            className={`absolute inset-0 w-full h-full object-cover scale-105 transition-all duration-700 ${
-              isDark 
-                ? 'opacity-70 brightness-95 contrast-100' 
-                : 'opacity-85 brightness-95 contrast-105 saturate-110'
-            }`}
-            poster="https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=1920&q=80"
-          >
-            <source src="/videos/hero_field_bg.mp4" type="video/mp4" />
-          </video>
-          {/* Subtle Dark Mint/Slate Vignette Gradient Overlay for Crisp Legibility */}
-          <div className={`absolute inset-0 backdrop-blur-[2px] transition-colors duration-300 ${
-            isDark 
-              ? 'bg-gradient-to-b from-slate-950/80 via-slate-950/60 to-slate-950/90' 
-              : 'bg-gradient-to-b from-slate-50/90 via-slate-50/70 to-slate-50/95'
-          }`} />
+          {/* Top Emerald Radial Ambient Glow */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-20%,rgba(16,185,129,0.12),transparent)]" />
+          
+          {/* Left & Right Soft Ambient Lighting Orbs */}
+          <div className="absolute top-1/4 -left-32 w-96 h-96 bg-emerald-500/8 dark:bg-emerald-500/10 rounded-full blur-[120px]" />
+          <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-teal-500/6 dark:bg-teal-500/8 rounded-full blur-[120px]" />
+          
+          {/* Subtle Modern Grid Pattern */}
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_70%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-60 dark:opacity-40" />
         </div>
 
         {/* Content alignment wrapper */}
@@ -690,11 +678,7 @@ export default function CreativeLoginPortal() {
               {/* Subtle emerald radial ambient light glow behind the card */}
               <div className="absolute -inset-10 bg-emerald-500/10 blur-[120px] pointer-events-none rounded-full z-0" />
               
-              <div className={`border backdrop-blur-xl rounded-3xl p-6 sm:p-8 transition-all duration-300 relative z-10 ${
-                isDark 
-                  ? 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-xl text-slate-900 dark:text-white' 
-                  : 'bg-white/90 border-slate-200 shadow-[0_25px_60px_rgba(15,23,42,0.12)] text-slate-800'
-              }`}>
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-900/5 dark:shadow-2xl rounded-3xl p-6 sm:p-8 text-slate-900 dark:text-white relative z-10 transition-all duration-300">
 
                 {/* Subtle Back to Home Link */}
                 <button
