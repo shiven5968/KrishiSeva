@@ -522,35 +522,6 @@ export default function CreativeLoginPortal() {
 
           {/* Actions & Controls (Far Right Glass Pills) */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {portalView === 'login' ? (
-              <button
-                onClick={() => {
-                  setPortalView('landing');
-                  setStep('phone');
-                  setOtp('');
-                  setError('');
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
-                className="text-xs px-3.5 py-1.5 rounded-full border bg-white/70 dark:bg-slate-900/80 backdrop-blur-sm border-emerald-900/10 dark:border-slate-800 text-slate-800 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-900 shadow-sm transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer"
-              >
-                <ArrowLeft className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                <span>{lang === 'hi' ? 'मुख्य पृष्ठ' : 'Back to Home'}</span>
-              </button>
-            ) : (
-              <button
-                onClick={() => {
-                  setPortalView('login');
-                  setStep('phone');
-                  setOtp('');
-                  setError('');
-                }}
-                className="text-xs px-3.5 py-1.5 rounded-full border bg-emerald-600 hover:bg-emerald-500 text-white font-bold shadow-sm transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer"
-              >
-                <LogIn className="w-3.5 h-3.5 text-white" />
-                <span>{lang === 'hi' ? 'लॉगिन / बुक करें' : 'Sign In / Book'}</span>
-              </button>
-            )}
-
             <button
               onClick={() => setActiveRole('admin')}
               className="text-xs px-3.5 py-1.5 rounded-full border bg-white/70 dark:bg-slate-900/80 backdrop-blur-sm border-emerald-900/10 dark:border-slate-800 text-slate-800 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-900 shadow-sm transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer"
