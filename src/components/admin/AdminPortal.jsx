@@ -326,7 +326,7 @@ export default function AdminPortal() {
 
   return (
     <div className={`min-h-screen font-sans selection:bg-emerald-500 selection:text-stone-950 transition-colors duration-200 ${
-      isDark ? 'bg-[#090D0B] text-stone-100' : 'bg-slate-50 text-slate-900'
+      isDark ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
     }`}>
       
       {/* ══════════════ SUB-COMMAND TABS STRIP ══════════════ */}

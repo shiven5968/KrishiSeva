@@ -250,7 +250,7 @@ export default function DriverDashboard() {
 
   return (
     <div className={`min-h-screen font-sans selection:bg-emerald-500 selection:text-stone-950 transition-colors duration-200 ${
-      isDark ? 'bg-[#090D0B] text-stone-100' : 'bg-slate-50 text-slate-900'
+      isDark ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
     }`}>
       
       {/* ══════════════ MAIN WIDESCREEN WRAPPER (max-w-7xl) ══════════════ */}
@@ -422,7 +422,7 @@ export default function DriverDashboard() {
 
         {/* ══════════════ 3. LIVE DISPATCH REQUEST DRAWER (UBER/RAPIDO STYLE ACCEPT CARD) ══════════════ */}
         {activeBooking && activeBooking.status === 'searching' && isOnline && (
-          <div className="rounded-3xl p-6 border-2 border-emerald-500/70 bg-gradient-to-br from-[#0A0E13] via-emerald-950/40 to-stone-950 text-white shadow-2xl shadow-emerald-950/70 space-y-5 animate-bounce-subtle">
+          <div className="rounded-3xl p-6 border-2 border-emerald-500/70 bg-gradient-to-br from-slate-900 via-emerald-950/40 to-stone-950 text-white shadow-2xl shadow-emerald-950/70 space-y-5 animate-bounce-subtle">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-stone-950 flex items-center justify-center font-black text-2xl shadow-lg shadow-emerald-500/30">
@@ -575,7 +575,7 @@ export default function DriverDashboard() {
           {/* Card 4: Instant Wallet Disbursal */}
           <div className={`p-5 rounded-3xl border shadow-xl transition-all duration-200 hover:-translate-y-1 relative overflow-hidden ${
             isDark 
-              ? 'bg-gradient-to-br from-[#0A0E13] via-emerald-950/30 to-[#0A0E13] border-emerald-500/40 shadow-emerald-950/30' 
+              ? 'bg-gradient-to-br from-slate-900 via-emerald-950/30 to-slate-900 border-emerald-500/40 shadow-emerald-950/30' 
               : 'bg-emerald-50/70 border-emerald-300 shadow-slate-200/60'
           }`}>
             <div className="flex items-center justify-between mb-3">

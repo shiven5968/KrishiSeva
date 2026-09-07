@@ -50,7 +50,7 @@ export default function AdminLoginGate({ onAdminLoginSuccess }) {
 
   return (
     <div className={`min-h-screen flex flex-col justify-between items-center p-4 sm:p-6 relative overflow-hidden selection:bg-emerald-500 selection:text-stone-950 transition-colors duration-200 ${
-      isDark ? 'bg-[#090D0B] text-stone-100' : 'bg-slate-900 text-slate-100'
+      isDark ? 'bg-slate-950 text-slate-100' : 'bg-slate-900 text-slate-100'
     }`}>
       
       {/* ───── Signature Obsidian & Emerald Ambient Tech Background ───── */}
@@ -109,7 +109,7 @@ export default function AdminLoginGate({ onAdminLoginSuccess }) {
               <div className="absolute inset-0 bg-emerald-500/25 rounded-3xl blur-xl group-hover:bg-emerald-500/40 transition-all duration-500 animate-pulse" />
               
               {/* Main emblem squircle container */}
-              <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-950 via-stone-900 to-[#0A0E13] border-2 border-emerald-500/50 flex items-center justify-center shadow-[0_0_25px_rgba(16,185,129,0.25)] ring-1 ring-white/10 group-hover:scale-105 transition-transform duration-300">
+              <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-950 via-stone-900 to-slate-900 border-2 border-emerald-500/50 flex items-center justify-center shadow-[0_0_25px_rgba(16,185,129,0.25)] ring-1 ring-white/10 group-hover:scale-105 transition-transform duration-300">
                 {/* Admin Shield Icon */}
                 <ShieldCheck className="w-8 h-8 text-emerald-400 drop-shadow-[0_0_12px_rgba(16,185,129,0.6)] stroke-[2.2]" />
                 
