@@ -798,9 +798,9 @@ export default function CreativeLoginPortal() {
         
         {/* ═══════════ VIEW 1: LANDING PAGE HERO ═══════════ */}
         {portalView === 'landing' && (
-          <div className="flex flex-col items-center justify-center min-h-[80vh] w-full px-4 py-12 pt-28 max-w-4xl mx-auto text-center animate-fade-in">
+          <div className="min-h-[calc(100vh-80px)] flex flex-col justify-center items-center text-center px-4 py-8 w-full max-w-4xl mx-auto animate-fade-in space-y-6 sm:space-y-8">
 
-            <div className="space-y-4 max-w-3xl mx-auto">
+            <div className="space-y-3 sm:space-y-4 max-w-3xl mx-auto">
               <h1 className="text-4xl sm:text-5xl lg:text-[56px] font-extrabold tracking-tight leading-[1.1] text-slate-900 dark:text-white font-display">
                 {lang === 'hi' ? (
                   <>
@@ -827,7 +827,7 @@ export default function CreativeLoginPortal() {
             </div>
 
             {/* CTA Action Button */}
-            <div className="pt-8 flex justify-center mx-auto">
+            <div className="flex justify-center mx-auto pt-2">
               <button
                 onClick={() => {
                   setPortalView('login');
@@ -843,7 +843,7 @@ export default function CreativeLoginPortal() {
             </div>
 
             {/* Feature Badges */}
-            <div className="flex flex-wrap items-center justify-center gap-2 max-w-sm sm:max-w-none mx-auto pt-8">
+            <div className="flex flex-wrap items-center justify-center gap-2 max-w-sm sm:max-w-none mx-auto pt-2">
               <span className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 shadow-sm backdrop-blur-md px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2 transition-all duration-300 hover:border-emerald-500/40">
                 <Tractor className="w-4 h-4 text-emerald-500" />
                 <span>{lang === 'hi' ? 'सत्यापित कृषि उपकरण' : 'Verified Equipment'}</span>
