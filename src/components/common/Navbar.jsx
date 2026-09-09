@@ -277,34 +277,6 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
                   </div>
                 </div>
 
-                {/* Switch Role Quick Action */}
-                <div className="p-1 rounded-2xl bg-slate-100 dark:bg-slate-800/60 flex items-center">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                      if (currentUser?.role === 'driver') {
-                        window.location.hash = '#farmer';
-                        setActiveRole('farmer');
-                      } else {
-                        window.location.hash = '#driver';
-                        setActiveRole('driver');
-                      }
-                    }}
-                    className="w-full py-2 px-3 rounded-xl hover:bg-white dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 flex items-center justify-between text-xs font-bold transition shadow-xs cursor-pointer"
-                  >
-                    <div className="flex items-center gap-2">
-                      <ArrowRightLeft className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                      <span>
-                        {currentUser?.role === 'driver' 
-                          ? (lang === 'hi' ? 'किसान पोर्टल पर जाएँ' : 'Switch to Farmer Portal') 
-                          : (lang === 'hi' ? 'चालक कॉकपिट पर जाएँ' : 'Switch to Driver Cockpit')}
-                      </span>
-                    </div>
-                    <span className="text-xs text-slate-400">→</span>
-                  </button>
-                </div>
-
                 {/* DRIVER SPECIFIC ACTIONS */}
                 {currentUser?.role === 'driver' && (
                   <div className="space-y-1">
