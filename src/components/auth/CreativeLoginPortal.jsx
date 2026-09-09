@@ -800,10 +800,10 @@ export default function CreativeLoginPortal() {
         
         {/* ═══════════ VIEW 1: LANDING PAGE HERO ═══════════ */}
         {portalView === 'landing' && (
-          <div className="min-h-[calc(100vh-80px)] flex flex-col justify-center items-center text-center px-4 py-8 w-full max-w-4xl mx-auto animate-fade-in space-y-6 sm:space-y-8">
+          <div className="min-h-[calc(100vh-80px)] flex flex-col justify-center items-center text-center px-4 py-8 w-full max-w-5xl mx-auto animate-fade-in space-y-7 sm:space-y-10">
 
-            <div className="space-y-3 sm:space-y-4 max-w-3xl mx-auto">
-              <h1 className="text-4xl sm:text-5xl lg:text-[56px] font-extrabold tracking-tight leading-[1.1] text-slate-900 dark:text-white font-display">
+            <div className="space-y-4 sm:space-y-6 max-w-4xl mx-auto">
+              <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[76px] font-black tracking-tight leading-[1.08] text-slate-900 dark:text-white font-display">
                 {lang === 'hi' ? (
                   <>
                     मांग पर मशीनें।<br />
@@ -821,7 +821,7 @@ export default function CreativeLoginPortal() {
                 )}
               </h1>
 
-              <p className="text-base sm:text-lg max-w-2xl mx-auto font-medium leading-relaxed text-slate-600 dark:text-slate-300">
+              <p className="text-lg sm:text-2xl md:text-[26px] max-w-3xl mx-auto font-semibold leading-relaxed text-slate-700 dark:text-slate-200">
                 {lang === 'hi'
                   ? 'ट्रैक्टर, हार्वेस्टर एवं अर्थमूवर की तत्काल 1-क्लिक बुकिंग। वास्तविक समय में अपने खेत तक लाइव जीपीएस ट्रैक करें।'
                   : 'Instant booking for tractors, harvesters and earthmovers. Track dispatches in real-time.'}
@@ -837,26 +837,26 @@ export default function CreativeLoginPortal() {
                   setOtp('');
                   setError('');
                 }}
-                className="px-8 py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-base shadow-xl shadow-emerald-600/30 hover:shadow-emerald-500/50 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex items-center justify-center gap-3 cursor-pointer group"
+                className="px-10 py-5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-lg sm:text-xl shadow-2xl shadow-emerald-600/35 hover:shadow-emerald-500/50 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex items-center justify-center gap-3 cursor-pointer group"
               >
                 <span>{lang === 'hi' ? 'मशीनरी बुक करें / लॉगिन' : 'Book Machinery / Sign In'}</span>
-                <span className="text-lg transition-transform group-hover:translate-x-1">→</span>
+                <span className="text-2xl transition-transform group-hover:translate-x-1.5">→</span>
               </button>
             </div>
 
             {/* Feature Badges */}
-            <div className="flex flex-wrap items-center justify-center gap-2 max-w-sm sm:max-w-none mx-auto pt-2">
-              <span className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 shadow-sm backdrop-blur-md px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2 transition-all duration-300 hover:border-emerald-500/40">
+            <div className="flex flex-wrap items-center justify-center gap-3 max-w-md sm:max-w-none mx-auto pt-2">
+              <span className="bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 shadow-sm backdrop-blur-md px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2 transition-all duration-300 hover:border-emerald-500/40">
                 <Tractor className="w-4 h-4 text-emerald-500" />
                 <span>{lang === 'hi' ? 'सत्यापित कृषि उपकरण' : 'Verified Equipment'}</span>
               </span>
 
-              <span className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 shadow-sm backdrop-blur-md px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2 transition-all duration-300 hover:border-emerald-500/40">
+              <span className="bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 shadow-sm backdrop-blur-md px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2 transition-all duration-300 hover:border-emerald-500/40">
                 <Zap className="w-4 h-4 text-emerald-500" />
                 <span>{lang === 'hi' ? 'त्वरित 1-क्लिक वाहन सेवा' : 'Instant Dispatch'}</span>
               </span>
 
-              <span className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 shadow-sm backdrop-blur-md px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2 transition-all duration-300 hover:border-emerald-500/40">
+              <span className="bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 shadow-sm backdrop-blur-md px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2 transition-all duration-300 hover:border-emerald-500/40">
                 <ShieldCheck className="w-4 h-4 text-emerald-400" />
                 <span>{lang === 'hi' ? 'एग्रीस्टैक भूलेख सत्यापित' : 'AgriStack Verified'}</span>
               </span>
