@@ -1,22 +1,21 @@
 import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { generateNearbyDrivers, generateFarmPlotPolygon, calculateDistanceKm } from '../../utils/geoUtils';
 import { useRealtimeSync } from '../../context/RealtimeSyncContext';
 import { useTheme } from '../../context/ThemeContext';
 import { Layers, Crosshair, Navigation2, Compass, Radio } from 'lucide-react';
 
-// Ultra-fast, High-Reliability Google Maps Tile Layer (100% English, zero watermarks, 20x zoom)
+// Ultra-fast Google Maps Tile Layers (100% English, crisp worldwide)
 const MAP_LAYERS = {
   standard: {
     name: 'Road Map',
-    url: 'https://mt{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
-    subdomains: ['0', '1', '2', '3'],
+    url: 'https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
     maxZoom: 20
   },
   satellite: {
     name: 'Satellite View',
-    url: 'https://mt{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
-    subdomains: ['0', '1', '2', '3'],
+    url: 'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
     maxZoom: 20
   }
 };
@@ -381,7 +380,11 @@ export default function LiveMap({
     <div className="relative group overflow-hidden rounded-2xl shadow-inner">
       
       {/* Map Container */}
-      <div ref={mapContainerRef} className={className} />
+      <div 
+        ref={mapContainerRef} 
+        className={className} 
+        style={{ minHeight: '280px', width: '100%' }} 
+      />
 
       {/* Floating Modern Micro-Controls (Top Right & Bottom Left) */}
       <div className="absolute top-3 right-3 z-[400] flex items-center gap-1.5 bg-stone-900/85 backdrop-blur-md p-1 rounded-xl border border-stone-700/80 shadow-md">
