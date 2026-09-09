@@ -37,16 +37,17 @@ import {
   Building2
 } from 'lucide-react';
 
-// Tile Layer URLs
+// Tile Layer URLs with English-first CartoDB Voyager tiles
 const MAP_LAYERS = {
+  standard: {
+    name: 'Road Map',
+    url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+    maxZoom: 19,
+    subdomains: 'abcd'
+  },
   satellite: {
     name: 'Satellite Field View',
     url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    maxZoom: 19
-  },
-  standard: {
-    name: 'Road Map',
-    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     maxZoom: 19
   }
 };
@@ -185,7 +186,17 @@ function KhetBoundaryDrawer({ onBoundaryCalculated, initialLocation }) {
 
     if (mapInstanceRef.current && tileLayerRef.current) {
       mapInstanceRef.current.removeLayer(tileLayerRef.current);
-      const newTile = L.tileLayer(MAP_LAYERS[nextLayer].url, { maxZoom: 19 }).addTo(mapInstanceRef.current);
+      const layerDef = MAP_LAYERS[nextLayer];
+      const newTile = L.tileLayer(layerDef.url, {
+        maxZoom: layerDef.maxZoom || 19,
+        subdomains: layerDef.subdomains || 'abc',
+        minZoom: 5,
+        noWrap: true,
+        bounds: [
+          [-85, -180],
+          [85, 180]
+        ]
+      }).addTo(mapInstanceRef.current);
       tileLayerRef.current = newTile;
     }
   };

@@ -5,12 +5,13 @@ import { useRealtimeSync } from '../../context/RealtimeSyncContext';
 import { useTheme } from '../../context/ThemeContext';
 import { Layers, Crosshair, Navigation2, Compass, Radio } from 'lucide-react';
 
-// Tile Layer URLs
+// Tile Layer URLs with explicit English labeling (CartoDB Voyager English + ArcGIS Satellite)
 const MAP_LAYERS = {
   standard: {
     name: 'Road Map',
-    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    maxZoom: 19
+    url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+    maxZoom: 19,
+    subdomains: 'abcd'
   },
   satellite: {
     name: 'Satellite View',
@@ -101,10 +102,11 @@ export default function LiveMap({
       attributionControl: false
     });
 
-    const initialTileUrl = MAP_LAYERS.standard.url;
-    const tileLayer = L.tileLayer(initialTileUrl, {
+    const initialTileLayerDef = MAP_LAYERS.standard;
+    const tileLayer = L.tileLayer(initialTileLayerDef.url, {
       maxZoom: 19,
       minZoom: 5,
+      subdomains: initialTileLayerDef.subdomains || 'abc',
       noWrap: true,
       bounds: [
         [-85, -180],
@@ -148,13 +150,14 @@ export default function LiveMap({
       map.removeLayer(tileLayerRef.current);
     }
 
-    const tileUrl = activeLayerType === 'satellite'
-      ? MAP_LAYERS.satellite.url
-      : MAP_LAYERS.standard.url;
+    const currentLayerDef = activeLayerType === 'satellite'
+      ? MAP_LAYERS.satellite
+      : MAP_LAYERS.standard;
 
-    const newTileLayer = L.tileLayer(tileUrl, {
+    const newTileLayer = L.tileLayer(currentLayerDef.url, {
       maxZoom: 19,
       minZoom: 5,
+      subdomains: currentLayerDef.subdomains || 'abc',
       noWrap: true,
       bounds: [
         [-85, -180],
