@@ -38,7 +38,9 @@ import {
   RefreshCw,
   ChevronDown,
   Menu,
-  X
+  X,
+  Crosshair,
+  Navigation
 } from 'lucide-react';
 
 export default function CreativeLoginPortal() {
@@ -1509,35 +1511,74 @@ export default function CreativeLoginPortal() {
                             </label>
                           </div>
 
-                          {/* GPS Field Geo-Tagging Button */}
+                          {/* High-Tech GPS Field Radar / Searcher Widget */}
                           <div className="space-y-1.5 pt-1">
                             <button
                               type="button"
                               onClick={handleGeoTagField}
                               disabled={isGeoTagging}
-                              className={`w-full py-3.5 px-4 rounded-2xl border font-extrabold text-xs transition-all flex items-center justify-between cursor-pointer ${
+                              className={`w-full py-3.5 px-4 rounded-2xl border font-bold text-xs transition-all duration-300 flex items-center justify-between cursor-pointer relative overflow-hidden group shadow-sm ${
                                 geoTaggedCoords
-                                  ? 'bg-emerald-950/60 border-emerald-500/60 text-emerald-400'
-                                  : isDark ? 'bg-stone-950 border-stone-700 text-stone-200 hover:border-emerald-500' : 'bg-slate-50 border-slate-300 text-slate-700 hover:border-emerald-500'
+                                  ? 'bg-emerald-950/70 dark:bg-emerald-950/80 border-emerald-500/70 text-emerald-400 ring-1 ring-emerald-500/30'
+                                  : isDark
+                                  ? 'bg-stone-950/90 border-emerald-500/30 text-stone-200 hover:border-emerald-500 hover:bg-stone-900'
+                                  : 'bg-emerald-50/70 border-emerald-500/40 text-slate-800 hover:border-emerald-600 hover:bg-emerald-50'
                               }`}
                             >
-                              <div className="flex items-center gap-2">
-                                <MapPin className={`w-4 h-4 ${geoTaggedCoords ? 'text-emerald-400' : 'text-emerald-500'}`} />
-                                <span>
-                                  {isGeoTagging
-                                    ? (lang === 'hi' ? 'जीपीएस लोकेशन ट्रैक कर रहे हैं...' : 'Pinning GPS Coordinates...')
+                              {/* Animated Radar Scanning Line when locating */}
+                              {isGeoTagging && (
+                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent animate-[shimmer_1.5s_infinite] pointer-events-none" />
+                              )}
+
+                              <div className="flex items-center gap-3 relative z-10 min-w-0">
+                                <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-all ${
+                                  isGeoTagging
+                                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
                                     : geoTaggedCoords
-                                    ? (lang === 'hi' ? `खेत लोकेशन टैग हुई: 26.9168° N, 80.7075° E` : `Field Geo-Tagged: 26.9168° N, 80.7075° E`)
-                                    : (lang === 'hi' ? 'वर्तमान खेत की जीपीएस लोकेशन टैग करें' : 'Pin Current Field Location')}
+                                    ? 'bg-emerald-500 text-stone-950 font-black'
+                                    : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
+                                }`}>
+                                  {isGeoTagging ? (
+                                    <Crosshair className="w-4 h-4 animate-spin text-emerald-400" />
+                                  ) : geoTaggedCoords ? (
+                                    <Check className="w-4 h-4 text-stone-950 stroke-[3]" />
+                                  ) : (
+                                    <Crosshair className="w-4 h-4 text-emerald-500 group-hover:scale-110 transition-transform" />
+                                  )}
+                                </div>
+
+                                <div className="text-left min-w-0">
+                                  <span className="font-extrabold text-xs block truncate text-slate-900 dark:text-white">
+                                    {isGeoTagging
+                                      ? (lang === 'hi' ? '📡 जीपीएस उपग्रह से खेत स्कैन कर रहे हैं...' : '📡 Scanning Field GPS via Satellites...')
+                                      : geoTaggedCoords
+                                      ? (lang === 'hi' ? '🎯 खेत जीपीएस पिन हो गया' : '🎯 Field GPS Coordinates Locked')
+                                      : (lang === 'hi' ? 'खेत की जीपीएस लोकेशन खोजें व पिन करें' : 'Search & Pin Field GPS Location')}
+                                  </span>
+                                  <span className="text-[10px] text-slate-500 dark:text-slate-400 block truncate font-medium">
+                                    {isGeoTagging
+                                      ? (lang === 'hi' ? 'सटीक उपग्रह निर्देशांक प्राप्त हो रहे हैं...' : 'Acquiring high-precision lock...')
+                                      : geoTaggedCoords
+                                      ? `Lat: ${geoTaggedCoords.lat.toFixed(4)}°N, Lng: ${geoTaggedCoords.lng.toFixed(4)}°E • ±${geoTaggedCoords.accuracy || 2}m`
+                                      : (lang === 'hi' ? '1-क्लिक ऑटो-जीपीएस सैटेलाइट डिटेक्टर' : '1-Click Automatic GPS Satellite Searcher')}
+                                  </span>
+                                </div>
+                              </div>
+
+                              <div className="flex items-center gap-1.5 shrink-0 relative z-10 pl-2">
+                                <span className={`text-[10px] font-black px-2.5 py-1 rounded-full border transition-all flex items-center gap-1 ${
+                                  geoTaggedCoords
+                                    ? 'bg-emerald-500 text-stone-950 border-emerald-400 font-extrabold shadow-xs'
+                                    : isGeoTagging
+                                    ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40 animate-pulse'
+                                    : 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30'
+                                }`}>
+                                  <span className={`w-1.5 h-1.5 rounded-full ${
+                                    geoTaggedCoords ? 'bg-stone-950' : 'bg-emerald-500 animate-ping'
+                                  }`} />
+                                  <span>{isGeoTagging ? 'Searching...' : geoTaggedCoords ? '±2m Locked' : 'GPS Search'}</span>
                                 </span>
                               </div>
-                              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                                geoTaggedCoords
-                                  ? 'bg-emerald-500 text-stone-950'
-                                  : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-                              }`}>
-                                {geoTaggedCoords ? '±2m Verified' : 'GPS Tag'}
-                              </span>
                             </button>
                           </div>
 
