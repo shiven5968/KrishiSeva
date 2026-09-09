@@ -89,28 +89,13 @@ export default function LiveMap({
     const map = L.map(mapContainerRef.current, {
       center: [center.lat, center.lng],
       zoom: 15,
-      minZoom: 5,
-      maxZoom: 19,
-      worldCopyJump: false,
-      maxBounds: [
-        [-85, -180],
-        [85, 180]
-      ],
-      maxBoundsViscosity: 1.0,
       zoomControl: false,
       attributionControl: false
     });
 
-    const initialTileLayerDef = MAP_LAYERS.standard;
-    const tileLayer = L.tileLayer(initialTileLayerDef.url, {
-      maxZoom: 19,
-      minZoom: 5,
-      subdomains: initialTileLayerDef.subdomains || 'abc',
-      noWrap: true,
-      bounds: [
-        [-85, -180],
-        [85, 180]
-      ]
+    const initialLayerDef = activeLayerType === 'satellite' ? MAP_LAYERS.satellite : MAP_LAYERS.standard;
+    const tileLayer = L.tileLayer(initialLayerDef.url, {
+      maxZoom: 19
     }).addTo(map);
     tileLayerRef.current = tileLayer;
 
@@ -160,14 +145,7 @@ export default function LiveMap({
         : MAP_LAYERS.standard;
 
       const newTileLayer = L.tileLayer(currentLayerDef.url, {
-        maxZoom: 19,
-        minZoom: 5,
-        subdomains: currentLayerDef.subdomains || 'abc',
-        noWrap: true,
-        bounds: [
-          [-85, -180],
-          [85, 180]
-        ]
+        maxZoom: 19
       }).addTo(map);
       tileLayerRef.current = newTileLayer;
     }
