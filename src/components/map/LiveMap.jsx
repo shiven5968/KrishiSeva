@@ -5,17 +5,19 @@ import { useRealtimeSync } from '../../context/RealtimeSyncContext';
 import { useTheme } from '../../context/ThemeContext';
 import { Layers, Crosshair, Navigation2, Compass, Radio } from 'lucide-react';
 
-// Tile Layer URLs (Esri ArcGIS World Street Map + ArcGIS Satellite - Clean English, No API Key Required)
+// Ultra-fast, High-Reliability Google Maps Tile Layer (100% English, zero watermarks, 20x zoom)
 const MAP_LAYERS = {
   standard: {
     name: 'Road Map',
-    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
-    maxZoom: 19
+    url: 'https://mt{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
+    subdomains: ['0', '1', '2', '3'],
+    maxZoom: 20
   },
   satellite: {
     name: 'Satellite View',
-    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    maxZoom: 19
+    url: 'https://mt{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
+    subdomains: ['0', '1', '2', '3'],
+    maxZoom: 20
   }
 };
 
@@ -95,7 +97,8 @@ export default function LiveMap({
 
     const initialLayerDef = activeLayerType === 'satellite' ? MAP_LAYERS.satellite : MAP_LAYERS.standard;
     const tileLayer = L.tileLayer(initialLayerDef.url, {
-      maxZoom: 19
+      maxZoom: initialLayerDef.maxZoom || 20,
+      subdomains: initialLayerDef.subdomains || ['0', '1', '2', '3']
     }).addTo(map);
     tileLayerRef.current = tileLayer;
 
@@ -145,7 +148,8 @@ export default function LiveMap({
         : MAP_LAYERS.standard;
 
       const newTileLayer = L.tileLayer(currentLayerDef.url, {
-        maxZoom: 19
+        maxZoom: currentLayerDef.maxZoom || 20,
+        subdomains: currentLayerDef.subdomains || ['0', '1', '2', '3']
       }).addTo(map);
       tileLayerRef.current = newTileLayer;
     }

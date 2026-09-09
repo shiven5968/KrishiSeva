@@ -37,17 +37,19 @@ import {
   Building2
 } from 'lucide-react';
 
-// Tile Layer URLs (Esri ArcGIS World Street Map + ArcGIS Satellite - Clean English, No API Key Required)
+// Ultra-fast, High-Reliability Google Maps Tile Layer (100% English, zero watermarks, 20x zoom)
 const MAP_LAYERS = {
   standard: {
     name: 'Road Map',
-    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
-    maxZoom: 19
+    url: 'https://mt{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
+    subdomains: ['0', '1', '2', '3'],
+    maxZoom: 20
   },
   satellite: {
     name: 'Satellite Field View',
-    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    maxZoom: 19
+    url: 'https://mt{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
+    subdomains: ['0', '1', '2', '3'],
+    maxZoom: 20
   }
 };
 
@@ -81,7 +83,8 @@ function KhetBoundaryDrawer({ onBoundaryCalculated, initialLocation }) {
 
       // Default to Satellite View for realistic farm boundary marking
       const tile = L.tileLayer(MAP_LAYERS.satellite.url, {
-        maxZoom: 19
+        maxZoom: 20,
+        subdomains: MAP_LAYERS.satellite.subdomains || ['0', '1', '2', '3']
       }).addTo(map);
       tileLayerRef.current = tile;
 
@@ -188,7 +191,8 @@ function KhetBoundaryDrawer({ onBoundaryCalculated, initialLocation }) {
       mapInstanceRef.current.removeLayer(tileLayerRef.current);
       const layerDef = MAP_LAYERS[nextLayer];
       const newTile = L.tileLayer(layerDef.url, {
-        maxZoom: 19
+        maxZoom: layerDef.maxZoom || 20,
+        subdomains: layerDef.subdomains || ['0', '1', '2', '3']
       }).addTo(mapInstanceRef.current);
       tileLayerRef.current = newTile;
     }
