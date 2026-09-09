@@ -799,10 +799,6 @@ export default function CreativeLoginPortal() {
         {/* ═══════════ VIEW 1: LANDING PAGE HERO ═══════════ */}
         {portalView === 'landing' && (
           <div className="flex flex-col items-center justify-center min-h-[80vh] w-full px-4 py-12 pt-28 max-w-4xl mx-auto text-center animate-fade-in">
-            {/* Top Live Status Pill */}
-            <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/35 text-emerald-600 dark:text-emerald-400 text-xs font-black uppercase tracking-wider animate-pulse mb-6 mx-auto shadow-xs">
-              <span>⚡ 100% VERIFIED FLEET • DISPATCH ACTIVE</span>
-            </div>
 
             <div className="space-y-4 max-w-3xl mx-auto">
               <h1 className="text-4xl sm:text-5xl lg:text-[56px] font-extrabold tracking-tight leading-[1.1] text-slate-900 dark:text-white font-display">
