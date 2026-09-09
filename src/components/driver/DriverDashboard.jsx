@@ -115,34 +115,6 @@ export default function DriverDashboard() {
     return map[prefix] || (ifsc.length >= 8 ? 'Verified Commercial Bank Branch (IMPS/NEFT Enabled)' : null);
   };
 
-  // Recent Completed Jobs Log
-  const [recentJobsLog, setRecentJobsLog] = useState([
-    {
-      id: 'job_101',
-      farmerName: 'Balram Kisan (बलराम)',
-      khetLocation: 'Khet near Malihabad River',
-      size: '4.5 Bigha',
-      machinery: 'Tractor + Rotavator',
-      fare: 5850,
-      fuelCost: 450,
-      netProfit: 5400,
-      time: '11:30 AM Today',
-      paymentMethod: 'Bank Disbursed'
-    },
-    {
-      id: 'job_100',
-      farmerName: 'Gurpreet Singh (गुरप्रीत)',
-      khetLocation: 'Plot #8, Rampur Farm Gate',
-      size: '3.0 Bigha',
-      machinery: 'Tractor + Cultivator',
-      fare: 3900,
-      fuelCost: 320,
-      netProfit: 3580,
-      time: 'Yesterday',
-      paymentMethod: 'Cash on Field'
-    }
-  ]);
-
   const isOnline = driverProfile?.status === 'online';
 
   // Available Wallet Balance Calculation (Defaults to ₹84,500)
@@ -798,59 +770,6 @@ export default function DriverDashboard() {
             </div>
           </div>
 
-        </div>
-
-        {/* ══════════════ 6. RECENT COMPLETED JOBS ACTIVITY LOG ══════════════ */}
-        <div className={`rounded-3xl p-6 border shadow-2xl space-y-4 ${
-          isDark ? 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-black/40' : 'bg-white border-slate-200'
-        }`}>
-          <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
-            <div className="flex items-center gap-2">
-              <History className="w-4 h-4 text-emerald-400" />
-              <h4 className={`font-black text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                {lang === 'hi' ? 'हालिया संपन्न कार्य व भुगतान लॉग' : 'Recent Completed Jobs & Payout Ledger'}
-              </h4>
-            </div>
-            <span className="text-xs text-slate-500 dark:text-slate-400 font-bold">
-              {recentJobsLog.length} Records Verified
-            </span>
-          </div>
-
-          <div className="space-y-3">
-            {recentJobsLog.map((job) => (
-              <div
-                key={job.id}
-                className={`p-4 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs transition ${
-                  isDark ? 'bg-stone-950/60 border-slate-200 dark:border-slate-800/80 hover:border-emerald-700/40' : 'bg-slate-50 border-slate-200'
-                }`}
-              >
-                <div className="flex items-center gap-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-950/80 border border-emerald-700/50 text-emerald-400 flex items-center justify-center text-xl shrink-0">
-                    🚜
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className={`font-bold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>{job.farmerName}</span>
-                      <span className="text-[10px] text-slate-500 dark:text-slate-400">• {job.time}</span>
-                    </div>
-                    <p className={`text-[11px] ${isDark ? 'text-slate-500 dark:text-slate-400' : 'text-slate-500'}`}>
-                      {job.khetLocation} ({job.size}) • {job.machinery}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between sm:justify-end gap-4">
-                  <div className="text-right">
-                    <span className="font-black text-sm text-emerald-400 block">+₹{job.fare}</span>
-                    <span className="text-[10px] text-slate-500 dark:text-slate-400">Net Profit: ₹{job.netProfit}</span>
-                  </div>
-                  <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-950 text-emerald-300 border border-emerald-700/60 shrink-0">
-                    ✓ {job.paymentMethod}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
 
       </div>
