@@ -1621,15 +1621,6 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
               )}
             </div>
 
-            {/* Zero Advance Required Guarantee Banner */}
-            <div className="p-3 rounded-xl bg-emerald-950/70 border border-emerald-500/30 text-emerald-300 text-xs flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-              <p className="font-bold leading-tight">
-                {lang === 'hi' 
-                  ? '🔒 ₹0 अग्रिम राशि — बुकिंग हेतु अभी कोई पैसा नहीं देना है। कार्य पूरा होने के बाद चालक को भुगतान करें।' 
-                  : '🔒 ₹0 Advance Required — No money needed to book. Pay driver only after field work is completed.'}
-              </p>
-            </div>
           </div>
 
           {/* Right Side (col-span-6): Prominent Full Action Button */}
