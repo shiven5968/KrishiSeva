@@ -871,12 +871,6 @@ export default function CreativeLoginPortal() {
             {/* Radial Ambient Glow Behind Card */}
             <div className="w-[500px] h-[500px] bg-emerald-400/20 dark:bg-emerald-500/15 rounded-full blur-3xl pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -z-10" />
 
-            {/* Top Header Floating Badge */}
-            <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-emerald-900/10 dark:border-slate-800 text-emerald-800 dark:text-emerald-300 text-xs font-bold px-4 py-2 rounded-full shadow-sm mb-6 mx-auto inline-flex items-center gap-2">
-              <span>🌾</span>
-              <span>{lang === 'hi' ? 'कृषि सेवा • अखिल भारतीय सटीक कृषि मशीनरी नेटवर्क' : 'KrishiSeva • Pan-India Precision Farm Machinery Network'}</span>
-            </div>
-
             <div className="max-w-md w-full relative animate-fade-in mx-auto">
               {/* Auth Card Elevation & Sizing */}
               <div className="max-w-md w-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-emerald-900/10 dark:border-slate-800 p-8 rounded-3xl shadow-2xl shadow-emerald-900/10 dark:shadow-2xl text-slate-900 dark:text-white relative z-10 transition-all duration-300 mx-auto">
