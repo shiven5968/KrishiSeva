@@ -5,13 +5,12 @@ import { useRealtimeSync } from '../../context/RealtimeSyncContext';
 import { useTheme } from '../../context/ThemeContext';
 import { Layers, Crosshair, Navigation2, Compass, Radio } from 'lucide-react';
 
-// Tile Layer URLs with explicit English labeling (CartoDB Voyager English + ArcGIS Satellite)
+// Tile Layer URLs (Esri ArcGIS World Street Map + ArcGIS Satellite - Clean English, No API Key Required)
 const MAP_LAYERS = {
   standard: {
     name: 'Road Map',
-    url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-    maxZoom: 19,
-    subdomains: 'abcd'
+    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+    maxZoom: 19
   },
   satellite: {
     name: 'Satellite View',
