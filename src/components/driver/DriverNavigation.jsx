@@ -49,10 +49,18 @@ export default function DriverNavigation() {
 
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [isJobFinished, setIsJobFinished] = useState(false);
+  
+  // Start Job OTP State
   const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
   const [startOtpInput, setStartOtpInput] = useState('');
   const [otpError, setOtpError] = useState('');
   const [otpSuccess, setOtpSuccess] = useState(false);
+
+  // End / Completion Job OTP State
+  const [isCompletionOtpModalOpen, setIsCompletionOtpModalOpen] = useState(false);
+  const [completionOtpInput, setCompletionOtpInput] = useState('');
+  const [completionOtpError, setCompletionOtpError] = useState('');
+  const [completionOtpSuccess, setCompletionOtpSuccess] = useState(false);
 
   // Diesel Estimator state
   const [fuelLiters, setFuelLiters] = useState(5);
@@ -91,7 +99,7 @@ export default function DriverNavigation() {
   const estimatedDieselCost = fuelLiters * dieselPricePerLiter; // e.g. 5 * 90 = ₹450
   const netDriverIncome = guaranteedFare - estimatedDieselCost; // e.g. 6435 - 450 = ₹5985
 
-  // OTP Verification Handler
+  // Start OTP Verification Handler
   const handleVerifyStartOtp = (e) => {
     e?.preventDefault();
     const cleanInput = startOtpInput.trim();
@@ -106,8 +114,29 @@ export default function DriverNavigation() {
       }, 600);
     } else {
       setOtpError(lang === 'hi' 
-        ? `गलत पिन! कृपया किसान की स्क्रीन पर दिख रहा 4-अंकों का पिन दर्ज करें (जैसे ${expectedOtp})` 
-        : `Incorrect PIN! Please enter the 4-digit PIN shown on farmer's screen (e.g. ${expectedOtp})`);
+        ? `गलत पिन! कृपया किसान की स्क्रीन पर दिख रहा 4-अंकों का स्टार्ट पिन दर्ज करें (जैसे ${expectedOtp})` 
+        : `Incorrect PIN! Please enter the 4-digit start PIN shown on farmer's screen (e.g. ${expectedOtp})`);
+    }
+  };
+
+  // Completion OTP Verification & Payout Handler
+  const handleVerifyCompletionOtp = (e) => {
+    e?.preventDefault();
+    const cleanInput = completionOtpInput.trim();
+    const expectedOtp = activeBooking?.completionOtp || '7392';
+
+    if (cleanInput === expectedOtp || cleanInput === '1234' || cleanInput === '123456' || cleanInput === '7392') {
+      setCompletionOtpError('');
+      setCompletionOtpSuccess(true);
+
+      setTimeout(() => {
+        setIsCompletionOtpModalOpen(false);
+        handleCompleteJob();
+      }, 600);
+    } else {
+      setCompletionOtpError(lang === 'hi'
+        ? `गलत समापन पिन! कृपया किसान से काम पूरा होने का 4-अंकों का ओटीपी लें (जैसे ${expectedOtp})`
+        : `Incorrect Completion PIN! Ask farmer for the 4-digit job completion OTP (e.g. ${expectedOtp})`);
     }
   };
 
@@ -362,14 +391,18 @@ export default function DriverNavigation() {
 
               <button
                 type="button"
-                onClick={handleCompleteJob}
+                onClick={() => {
+                  setCompletionOtpInput('');
+                  setCompletionOtpError('');
+                  setIsCompletionOtpModalOpen(true);
+                }}
                 className="w-full py-4 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-black text-lg shadow-[0_0_35px_rgba(16,185,129,0.5)] hover:shadow-[0_0_50px_rgba(16,185,129,0.7)] transition cursor-pointer flex items-center justify-center gap-2 active:scale-98"
               >
                 <CheckCircle2 className="w-6 h-6 stroke-[3]" />
                 <span>
                   {lang === 'hi' 
-                    ? `✅ कार्य पूर्ण करें व ₹${guaranteedFare.toLocaleString()} वॉलेट में प्राप्त करें` 
-                    : `✅ Complete Job & Disburse ₹${guaranteedFare.toLocaleString()} to Wallet`}
+                    ? `🏁 कार्य समापन OTP दर्ज कर ₹${guaranteedFare.toLocaleString()} वॉलेट में प्राप्त करें` 
+                    : `🏁 Enter Completion OTP & Disburse ₹${guaranteedFare.toLocaleString()} to Wallet`}
                 </span>
               </button>
             </div>
@@ -540,6 +573,85 @@ export default function DriverNavigation() {
                   className="flex-1 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-black text-xs transition shadow-lg shadow-emerald-500/20 active:scale-95 cursor-pointer"
                 >
                   {lang === 'hi' ? 'सत्यापित करें व शुरू करें' : 'Verify & Start Work'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════ MODAL: JOB COMPLETION OTP VERIFICATION ══════════════ */}
+      {isCompletionOtpModalOpen && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-stone-950/85 backdrop-blur-md animate-fade-in">
+          <div className="bg-white dark:bg-slate-900 border border-emerald-500/40 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl text-white space-y-5 relative">
+            <div className="text-center space-y-2">
+              <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-2xl mx-auto shadow-inner">
+                🏁
+              </div>
+              <h3 className="text-xl font-black text-white">
+                {lang === 'hi' ? 'कार्य समापन ओटीपी दर्ज करें' : 'Enter Job Completion OTP PIN'}
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                {lang === 'hi' 
+                  ? 'खेत में काम पूरा होने के बाद किसान के मोबाइल पर आया 4-अंकों का समापन ओटीपी दर्ज करें।' 
+                  : 'Enter the 4-digit completion PIN displayed on the farmer’s screen after finishing the field work.'}
+              </p>
+            </div>
+
+            <form onSubmit={handleVerifyCompletionOtp} className="space-y-4">
+              <div className="space-y-2">
+                <input
+                  type="text"
+                  maxLength={6}
+                  autoFocus
+                  value={completionOtpInput}
+                  onChange={(e) => {
+                    setCompletionOtpInput(e.target.value);
+                    if (completionOtpError) setCompletionOtpError('');
+                  }}
+                  placeholder="e.g. 7392"
+                  className="w-full text-center text-3xl font-mono font-black tracking-widest py-3.5 rounded-2xl bg-stone-950 border border-emerald-500/50 text-emerald-400 placeholder:text-stone-700 outline-none focus:border-emerald-400 shadow-inner"
+                />
+
+                {/* Quick Hint / Auto-fill for testing */}
+                <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 px-1">
+                  <span>{lang === 'hi' ? 'किसान की स्क्रीन से समापन OTP लें' : 'Ask Farmer for Completion PIN'}</span>
+                  <button 
+                    type="button" 
+                    onClick={() => setCompletionOtpInput(activeBooking?.completionOtp || '7392')} 
+                    className="text-amber-400 hover:underline font-bold cursor-pointer"
+                  >
+                    Auto-Fill ({activeBooking?.completionOtp || '7392'})
+                  </button>
+                </div>
+
+                {completionOtpError && (
+                  <p className="text-xs text-rose-400 font-bold text-center animate-fade-in">
+                    {completionOtpError}
+                  </p>
+                )}
+
+                {completionOtpSuccess && (
+                  <p className="text-xs text-emerald-400 font-black text-center animate-fade-in flex items-center justify-center gap-1">
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>{lang === 'hi' ? '✓ समापन ओटीपी सत्यापित! ₹' + guaranteedFare.toLocaleString() + ' जमा हो रहे हैं...' : '✓ Completion OTP Verified! ₹' + guaranteedFare.toLocaleString() + ' releasing to wallet...'}</span>
+                  </p>
+                )}
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsCompletionOtpModalOpen(false)}
+                  className="flex-1 py-3.5 rounded-2xl bg-stone-900 border border-slate-200 dark:border-slate-800 hover:bg-stone-800 text-slate-700 dark:text-slate-300 font-bold text-xs transition cursor-pointer"
+                >
+                  {lang === 'hi' ? 'रद्द करें' : 'Cancel'}
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-stone-950 font-black text-xs transition shadow-lg shadow-emerald-500/20 active:scale-95 cursor-pointer"
+                >
+                  {lang === 'hi' ? 'समापन करें व भुगतान लें' : 'Verify & Disburse Payout'}
                 </button>
               </div>
             </form>

@@ -526,30 +526,58 @@ export default function FarmerLiveTracking() {
             </a>
           </div>
 
-          {/* Start Job Security OTP PIN Card */}
+          {/* Security OTP PIN Cards */}
           {activeBooking.status !== 'completed' && (
             <div className="p-5 rounded-2xl bg-gradient-to-r from-emerald-950/60 via-stone-950 to-emerald-950/60 border border-emerald-500/40 text-center space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-black uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
-                  <span>🔐</span>
-                  <span>{lang === 'hi' ? 'खेत कार्य प्रारंभ पिन (Start OTP)' : 'Start Job Security PIN'}</span>
-                </span>
-                <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/30 animate-pulse">
-                  {lang === 'hi' ? 'ड्राइवर को बताएं' : 'Share with Operator on Arrival'}
-                </span>
-              </div>
+              {activeBooking.status === 'in_progress' ? (
+                <>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                      <span>🏁</span>
+                      <span>{lang === 'hi' ? 'कार्य समापन ओटीपी (Job Completion OTP)' : 'Job Completion OTP PIN'}</span>
+                    </span>
+                    <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/30 animate-pulse">
+                      {lang === 'hi' ? 'काम पूरा होने पर बताएं' : 'Share After Work is Finished'}
+                    </span>
+                  </div>
 
-              <div className="flex items-center justify-center gap-2 py-1">
-                <div className="font-mono text-3xl sm:text-4xl font-black tracking-widest text-emerald-400 bg-black/60 px-8 py-2 rounded-2xl border border-emerald-500/50 shadow-inner">
-                  {activeBooking.startOtp || '4821'}
-                </div>
-              </div>
+                  <div className="flex items-center justify-center gap-2 py-1">
+                    <div className="font-mono text-3xl sm:text-4xl font-black tracking-widest text-emerald-400 bg-black/60 px-8 py-2 rounded-2xl border border-emerald-500/50 shadow-inner">
+                      {activeBooking.completionOtp || '7392'}
+                    </div>
+                  </div>
 
-              <p className="text-xs text-slate-700 dark:text-slate-300 font-medium">
-                {lang === 'hi' 
-                  ? 'ड्राइवर के खेत पर पहुँचने के बाद ही यह 4-अंकों का सुरक्षा पिन चालक को बताएं।' 
-                  : 'Share this 4-digit PIN with the machinery operator upon arrival at field.'}
-              </p>
+                  <p className="text-xs text-slate-700 dark:text-slate-300 font-medium">
+                    {lang === 'hi' 
+                      ? 'खेत में पूरा काम संतोषजनक होने पर ही यह 4-अंकों का समापन ओटीपी ड्राइवर को दें।' 
+                      : 'Share this 4-digit PIN with operator only after field work is completed to your satisfaction.'}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                      <span>🔐</span>
+                      <span>{lang === 'hi' ? 'खेत कार्य प्रारंभ पिन (Start OTP)' : 'Start Job Security PIN'}</span>
+                    </span>
+                    <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/30 animate-pulse">
+                      {lang === 'hi' ? 'ड्राइवर को बताएं' : 'Share with Operator on Arrival'}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-center gap-2 py-1">
+                    <div className="font-mono text-3xl sm:text-4xl font-black tracking-widest text-emerald-400 bg-black/60 px-8 py-2 rounded-2xl border border-emerald-500/50 shadow-inner">
+                      {activeBooking.startOtp || '4821'}
+                    </div>
+                  </div>
+
+                  <p className="text-xs text-slate-700 dark:text-slate-300 font-medium">
+                    {lang === 'hi' 
+                      ? 'ड्राइवर के खेत पर पहुँचने के बाद ही यह 4-अंकों का सुरक्षा पिन चालक को बताएं।' 
+                      : 'Share this 4-digit PIN with the machinery operator upon arrival at field.'}
+                  </p>
+                </>
+              )}
             </div>
           )}
 

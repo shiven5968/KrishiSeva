@@ -454,7 +454,8 @@ export function RealtimeSyncProvider({ children }) {
           lng: (bookingDetails.farmerLocation?.lng || DEFAULT_FARM_LOCATION.lng) + 0.0076
         };
 
-    const generatedOtp = String(Math.floor(1000 + Math.random() * 9000));
+    const generatedStartOtp = String(Math.floor(1000 + Math.random() * 9000));
+    const generatedCompletionOtp = String(Math.floor(1000 + Math.random() * 9000));
 
     const booking = {
       id: `book_${Date.now()}`,
@@ -469,7 +470,8 @@ export function RealtimeSyncProvider({ children }) {
       estimatedPrice: bookingDetails.estimatedPrice,
       estimatedETA: bookingDetails.estimatedETA || '35-60 Mins',
       status: 'searching',
-      startOtp: generatedOtp,
+      startOtp: generatedStartOtp,
+      completionOtp: generatedCompletionOtp,
       createdAt: new Date().toISOString(),
       driverStartPos: initialDriverPos
     };
