@@ -621,11 +621,6 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
               <h2 className={`font-black text-lg sm:text-xl tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
                 {lang === 'hi' ? 'किसान बुकिंग कॉकपिट' : 'Farmer Booking Cockpit'}
               </h2>
-              <span className={`text-[10px] px-3 py-1 rounded-full font-extrabold uppercase tracking-wider backdrop-blur-sm ${
-                isDark ? 'bg-emerald-950/90 text-emerald-300 border border-emerald-500/40' : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-              }`}>
-                {lang === 'hi' ? '1-क्लिक वाहन सेवा' : '1-Click Dispatch'}
-              </span>
             </div>
             <p className={`text-xs font-medium mt-1 ${isDark ? 'text-slate-500 dark:text-slate-400' : 'text-slate-500'}`}>
               {lang === 'hi' ? 'सक्रिय खेत: ' : 'Active Land: '}
