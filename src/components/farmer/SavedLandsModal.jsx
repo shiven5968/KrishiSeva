@@ -111,11 +111,26 @@ function KhetBoundaryDrawer({ onBoundaryCalculated, initialLocation }) {
       });
 
       mapInstanceRef.current = map;
-    }
 
-    return () => {
-      // Cleanup
-    };
+      const t1 = setTimeout(() => map.invalidateSize(), 50);
+      const t2 = setTimeout(() => map.invalidateSize(), 200);
+
+      let resizeObserver = null;
+      if (window.ResizeObserver && mapContainerRef.current) {
+        resizeObserver = new ResizeObserver(() => {
+          map.invalidateSize();
+        });
+        resizeObserver.observe(mapContainerRef.current);
+      }
+
+      return () => {
+        clearTimeout(t1);
+        clearTimeout(t2);
+        if (resizeObserver) resizeObserver.disconnect();
+        map.remove();
+        mapInstanceRef.current = null;
+      };
+    }
   }, []);
 
   // Update Markers and Polygon whenever points change

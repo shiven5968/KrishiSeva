@@ -140,34 +140,56 @@ export default function LiveMap({
     };
   }, []);
 
-  // Sync Tile Layer whenever activeLayerType or isDark changes
+  // Keep track of current layer type to avoid redundant layer reinstantiations
+  const activeLayerTypeRef = useRef(activeLayerType);
+
+  // Sync Tile Layer ONLY when activeLayerType changes (standard <-> satellite)
   useEffect(() => {
     const map = mapInstanceRef.current;
     if (!map) return;
 
-    if (tileLayerRef.current) {
-      map.removeLayer(tileLayerRef.current);
+    if (activeLayerTypeRef.current !== activeLayerType) {
+      activeLayerTypeRef.current = activeLayerType;
+
+      if (tileLayerRef.current) {
+        map.removeLayer(tileLayerRef.current);
+      }
+
+      const currentLayerDef = activeLayerType === 'satellite'
+        ? MAP_LAYERS.satellite
+        : MAP_LAYERS.standard;
+
+      const newTileLayer = L.tileLayer(currentLayerDef.url, {
+        maxZoom: 19,
+        minZoom: 5,
+        subdomains: currentLayerDef.subdomains || 'abc',
+        noWrap: true,
+        bounds: [
+          [-85, -180],
+          [85, 180]
+        ]
+      }).addTo(map);
+      tileLayerRef.current = newTileLayer;
     }
-
-    const currentLayerDef = activeLayerType === 'satellite'
-      ? MAP_LAYERS.satellite
-      : MAP_LAYERS.standard;
-
-    const newTileLayer = L.tileLayer(currentLayerDef.url, {
-      maxZoom: 19,
-      minZoom: 5,
-      subdomains: currentLayerDef.subdomains || 'abc',
-      noWrap: true,
-      bounds: [
-        [-85, -180],
-        [85, 180]
-      ]
-    }).addTo(map);
-    tileLayerRef.current = newTileLayer;
 
     const t = setTimeout(() => map.invalidateSize(), 60);
     return () => clearTimeout(t);
-  }, [activeLayerType, isDark]);
+  }, [activeLayerType]);
+
+  // Keep map properly sized and responsive when theme changes (light <-> dark) without destroying tiles
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+
+    const t1 = setTimeout(() => map.invalidateSize(), 50);
+    const t2 = setTimeout(() => map.invalidateSize(), 150);
+    const t3 = setTimeout(() => map.invalidateSize(), 350);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+    };
+  }, [isDark]);
 
   // Pan map smoothly when farmerLocation changes
   useEffect(() => {
