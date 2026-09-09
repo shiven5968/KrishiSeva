@@ -800,28 +800,28 @@ export default function CreativeLoginPortal() {
         
         {/* ═══════════ VIEW 1: LANDING PAGE HERO ═══════════ */}
         {portalView === 'landing' && (
-          <div className="min-h-[calc(100vh-80px)] flex flex-col justify-center items-center text-center px-4 py-8 w-full max-w-5xl mx-auto animate-fade-in space-y-7 sm:space-y-10">
+          <div className="min-h-[calc(100vh-80px)] flex flex-col justify-center items-center text-center px-4 pt-28 pb-16 sm:pt-32 sm:pb-20 w-full max-w-5xl mx-auto animate-fade-in space-y-6 sm:space-y-8">
 
-            <div className="space-y-4 sm:space-y-6 max-w-4xl mx-auto">
-              <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[76px] font-black tracking-tight leading-[1.08] text-slate-900 dark:text-white font-display">
+            <div className="space-y-4 sm:space-y-5 max-w-4xl mx-auto overflow-visible">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[66px] font-black tracking-tight leading-[1.2] text-slate-900 dark:text-white font-display pt-2">
                 {lang === 'hi' ? (
                   <>
-                    मांग पर मशीनें।<br />
-                    <span className="text-emerald-600 dark:text-emerald-400">
+                    <span className="inline-block">मांग पर मशीनें।</span><br />
+                    <span className="text-emerald-600 dark:text-emerald-400 inline-block">
                       सीधे आपके खेत पर।
                     </span>
                   </>
                 ) : (
                   <>
-                    Machinery on Demand.<br />
-                    <span className="text-emerald-500 dark:text-emerald-400">
+                    <span className="inline-block">Machinery on Demand.</span><br />
+                    <span className="text-emerald-500 dark:text-emerald-400 inline-block">
                       Directly to Your Farm.
                     </span>
                   </>
                 )}
               </h1>
 
-              <p className="text-lg sm:text-2xl md:text-[26px] max-w-3xl mx-auto font-semibold leading-relaxed text-slate-700 dark:text-slate-200">
+              <p className="text-base sm:text-xl md:text-2xl max-w-3xl mx-auto font-semibold leading-relaxed text-slate-700 dark:text-slate-200">
                 {lang === 'hi'
                   ? 'ट्रैक्टर, हार्वेस्टर एवं अर्थमूवर की तत्काल 1-क्लिक बुकिंग। वास्तविक समय में अपने खेत तक लाइव जीपीएस ट्रैक करें।'
                   : 'Instant booking for tractors, harvesters and earthmovers. Track dispatches in real-time.'}
