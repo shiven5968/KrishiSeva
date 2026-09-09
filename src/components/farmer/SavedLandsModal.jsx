@@ -75,12 +75,28 @@ function KhetBoundaryDrawer({ onBoundaryCalculated, initialLocation }) {
       const map = L.map(mapContainerRef.current, {
         center: [center.lat, center.lng],
         zoom: 16,
+        minZoom: 5,
+        maxZoom: 19,
+        worldCopyJump: false,
+        maxBounds: [
+          [-85, -180],
+          [85, 180]
+        ],
+        maxBoundsViscosity: 1.0,
         zoomControl: false,
         attributionControl: false
       });
 
       // Default to Satellite View for realistic farm boundary marking
-      const tile = L.tileLayer(MAP_LAYERS.satellite.url, { maxZoom: 19 }).addTo(map);
+      const tile = L.tileLayer(MAP_LAYERS.satellite.url, {
+        maxZoom: 19,
+        minZoom: 5,
+        noWrap: true,
+        bounds: [
+          [-85, -180],
+          [85, 180]
+        ]
+      }).addTo(map);
       tileLayerRef.current = tile;
 
       L.control.zoom({ position: 'bottomright' }).addTo(map);
