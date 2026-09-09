@@ -448,7 +448,8 @@ export function AuthProvider({ children }) {
       aadhaarMasked: extraData.aadhaarMasked || null,
       totalLandBigha: extraData.totalLandBigha || null,
       linkedLands: extraData.linkedLands || [],
-      createdAt: new Date().toISOString()
+      ...extraData,
+      createdAt: extraData.createdAt || new Date().toISOString()
     };
 
     // 1. Persist to Users Database

@@ -423,6 +423,10 @@ export default function CreativeLoginPortal() {
     const cleanKhasra = tenantKhasra.trim();
     const cleanOwnerPhone = tenantLandownerPhone.replace(/\D/g, '').slice(-10);
 
+    const now = new Date();
+    const expiry = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000);
+    const passToken = `BATAI-PASS-${cleanKhasra}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+
     const tenantPlot = {
       id: `land_tenant_${Date.now()}`,
       name: `बटाई खेत #${cleanKhasra} (${parsedSize} बीघा)`,
@@ -435,7 +439,9 @@ export default function CreativeLoginPortal() {
       lat: geoTaggedCoords?.lat || 26.9168,
       lng: geoTaggedCoords?.lng || 80.7075,
       isGovtVerified: true,
-      ulpin: `BATAI-UPFR-${cleanKhasra}-01`
+      ulpin: `BATAI-UPFR-${cleanKhasra}-01`,
+      bataiPassToken: passToken,
+      bataiPassExpiry: expiry.toISOString()
     };
 
     completeNewUserRegistration('farmer', {
@@ -448,13 +454,25 @@ export default function CreativeLoginPortal() {
       isAgriStackVerified: true,
       farmerId: `BATAI-UPFR-${Math.floor(10000 + Math.random() * 90000)}`,
       linkedLands: [tenantPlot],
+      bataiPass: {
+        active: true,
+        khasraNumber: cleanKhasra,
+        bigha: parsedSize,
+        expiryDate: expiry.toISOString(),
+        issuedDate: now.toISOString(),
+        token: passToken,
+        landownerPhone: cleanOwnerPhone,
+        geoTaggedCoords: geoTaggedCoords || { lat: 26.9168, lng: 80.7075 }
+      },
       tenantDetails: {
         khasraNumber: cleanKhasra,
         landSizeBigha: parsedSize,
         landownerPhone: cleanOwnerPhone,
         isOwnerLinkSent: isOwnerLinkSent || true,
         agreementUploaded: !!tenantAgreementDoc,
-        geoTaggedCoords: geoTaggedCoords || { lat: 26.9168, lng: 80.7075 }
+        geoTaggedCoords: geoTaggedCoords || { lat: 26.9168, lng: 80.7075 },
+        passToken: passToken,
+        validUntil: expiry.toISOString()
       }
     });
 

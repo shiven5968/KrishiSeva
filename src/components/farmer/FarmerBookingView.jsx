@@ -636,7 +636,43 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        {/* Batai Active Pass or Standard Land Info */}
+        <div className="flex flex-wrap items-center gap-2.5">
+          {currentUser?.bataiPass?.active || selectedLand?.ownershipType === 'tenant_batai' ? (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className={`text-xs font-bold px-3 py-1.5 rounded-full inline-flex items-center gap-2 border shadow-sm ${
+                isDark 
+                  ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300' 
+                  : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-900'
+              }`}>
+                <span>🌾</span>
+                <span>
+                  {lang === 'hi'
+                    ? `सक्रिय बटाई खेत #${currentUser?.bataiPass?.khasraNumber || selectedLand?.khasraNumber || '142/1'} • 1-वर्ष सत्यापित पास (वैध: ${currentUser?.bataiPass?.expiryDate ? new Date(currentUser.bataiPass.expiryDate).toLocaleDateString('hi-IN', { month: 'short', year: 'numeric' }) : 'Sep 2027'})`
+                    : `Active Batai Plot #${currentUser?.bataiPass?.khasraNumber || selectedLand?.khasraNumber || '142/1'} • 1-Year Verified Pass (Valid till ${currentUser?.bataiPass?.expiryDate ? new Date(currentUser.bataiPass.expiryDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'Sep 2027'})`}
+                </span>
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              </span>
+
+              <button
+                type="button"
+                onClick={() => setIsSavedLandsModalOpen(true)}
+                className="text-xs font-bold px-3 py-1.5 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 transition flex items-center gap-1 active:scale-95 cursor-pointer"
+              >
+                <span>+ {lang === 'hi' ? 'खेत बदलें / जोड़ें' : 'Switch / Add Plot'}</span>
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setIsSavedLandsModalOpen(true)}
+              className="text-xs font-bold px-3 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 transition flex items-center gap-1.5 active:scale-95 cursor-pointer"
+            >
+              <LandPlot className="w-3.5 h-3.5" />
+              <span>{lang === 'hi' ? 'खेत बदलें / जोड़ें' : 'Switch / Add Plot'}</span>
+            </button>
+          )}
+
           <span className={`text-xs font-bold px-3.5 py-1.5 rounded-xl border flex items-center gap-2 ${
             isDark ? 'bg-stone-900/90 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-700'
           }`}>
