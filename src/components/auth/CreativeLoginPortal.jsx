@@ -803,7 +803,7 @@ export default function CreativeLoginPortal() {
           <div className="min-h-[calc(100vh-80px)] flex flex-col justify-center items-center text-center px-4 pt-28 pb-16 sm:pt-32 sm:pb-20 w-full max-w-5xl mx-auto animate-fade-in space-y-6 sm:space-y-8">
 
             <div className="space-y-4 sm:space-y-5 max-w-4xl mx-auto overflow-visible">
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[66px] font-black tracking-tight leading-[1.2] text-slate-900 dark:text-white font-display pt-2">
+              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1.15] text-slate-900 dark:text-white font-display pt-2">
                 {lang === 'hi' ? (
                   <>
                     <span className="inline-block">मांग पर मशीनें।</span><br />
@@ -821,7 +821,7 @@ export default function CreativeLoginPortal() {
                 )}
               </h1>
 
-              <p className="text-base sm:text-xl md:text-2xl max-w-3xl mx-auto font-semibold leading-relaxed text-slate-700 dark:text-slate-200">
+              <p className="text-base sm:text-lg lg:text-xl font-medium max-w-2xl sm:max-w-3xl mx-auto leading-relaxed text-slate-600 dark:text-slate-300">
                 {lang === 'hi'
                   ? 'ट्रैक्टर, हार्वेस्टर एवं अर्थमूवर की तत्काल 1-क्लिक बुकिंग। वास्तविक समय में अपने खेत तक लाइव जीपीएस ट्रैक करें।'
                   : 'Instant booking for tractors, harvesters and earthmovers. Track dispatches in real-time.'}
@@ -837,10 +837,10 @@ export default function CreativeLoginPortal() {
                   setOtp('');
                   setError('');
                 }}
-                className="px-10 py-5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-lg sm:text-xl shadow-2xl shadow-emerald-600/35 hover:shadow-emerald-500/50 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex items-center justify-center gap-3 cursor-pointer group"
+                className="px-8 py-4 sm:px-9 sm:py-4.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-base sm:text-lg lg:text-xl shadow-xl shadow-emerald-600/35 hover:shadow-emerald-500/50 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex items-center justify-center gap-3 cursor-pointer group"
               >
-                <span>{lang === 'hi' ? 'मशीनरी बुक करें / लॉगिन' : 'Book Machinery / Sign In'}</span>
-                <span className="text-2xl transition-transform group-hover:translate-x-1.5">→</span>
+                <span>{lang === 'hi' ? 'मशीनरी बुक करें / साइन इन' : 'Book Machinery / Sign In'}</span>
+                <span className="text-xl sm:text-2xl transition-transform group-hover:translate-x-1.5">→</span>
               </button>
             </div>
 

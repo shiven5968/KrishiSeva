@@ -55,9 +55,9 @@ export default {
         }
       },
       fontFamily: {
-        sans: ['Inter', 'Mukta', 'Noto Sans Devanagari', 'Poppins', 'system-ui', '-apple-system', 'sans-serif'],
-        display: ['Poppins', 'Mukta', 'Inter', 'Noto Sans Devanagari', 'sans-serif'],
-        hindi: ['Mukta', 'Noto Sans Devanagari', 'Poppins', 'sans-serif'],
+        sans: ['Inter', 'Noto Sans Devanagari', 'Poppins', 'Mukta', 'system-ui', '-apple-system', 'sans-serif'],
+        display: ['Poppins', 'Noto Sans Devanagari', 'Mukta', 'Inter', 'sans-serif'],
+        hindi: ['Noto Sans Devanagari', 'Poppins', 'Mukta', 'sans-serif'],
         poppins: ['Poppins', 'sans-serif'],
         inter: ['Inter', 'sans-serif'],
       },
