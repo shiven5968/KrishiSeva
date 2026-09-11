@@ -57,6 +57,7 @@ export default function CreativeLoginPortal() {
   // Portal View State: State 1 (landing) vs State 2 (login)
   const [portalView, setPortalView] = useState('landing'); // 'landing' | 'login'
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   // Authentication States
   const [phone, setPhone] = useState('');
@@ -125,6 +126,15 @@ export default function CreativeLoginPortal() {
         observer.unobserve(faqRef.current);
       }
     };
+  }, []);
+
+  // Window scroll listener for seamless glassmorphic header transition
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   // 60-Second Resend Countdown Timer
@@ -648,15 +658,26 @@ export default function CreativeLoginPortal() {
   ];
 
   return (
-    <div className={`min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-stone-950 font-sans relative overflow-x-hidden transition-colors duration-300 ${
+    <div className={`min-h-screen flex flex-col justify-between selection:bg-[#1A4F32] selection:text-white font-sans relative overflow-x-hidden transition-colors duration-500 ${
       isDark 
-        ? 'bg-slate-950 text-slate-100' 
-        : 'bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-emerald-100/60 via-slate-50 to-emerald-50/40 text-slate-900'
+        ? 'bg-[#080E0B] text-[#EAEFEA]' 
+        : 'bg-[#FDFBF7] text-[#0B1E14]'
     }`}>
+      {/* Subtle SVG Noise / Grain Texture Overlay (tactile, non-digital aesthetic) */}
+      <div 
+        className="fixed inset-0 pointer-events-none z-50 opacity-[0.035] dark:opacity-[0.025] mix-blend-overlay"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
+        }}
+      />
       
-      {/* ═══════════ FLOATING FROSTED GLASS PILL HEADER ═══════════ */}
-      <header className="w-full fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 lg:px-8 py-2 pointer-events-none transition-all duration-300">
-        <div className="mx-auto mt-2 max-w-7xl px-5 sm:px-6 py-2.5 sm:py-3 rounded-2xl bg-white/60 dark:bg-slate-900/70 backdrop-blur-xl border border-white/80 dark:border-slate-800 shadow-[0_4px_20px_-4px_rgba(16,185,129,0.08)] dark:shadow-2xl transition-all flex items-center justify-between pointer-events-auto">
+      {/* ═══════════ SEAMLESS ORGANIC MINIMALIST HEADER ═══════════ */}
+      <header className={`w-full fixed top-0 left-0 right-0 z-40 transition-all duration-500 ${
+        isScrolled 
+          ? 'backdrop-blur-md bg-[#FDFBF7]/85 dark:bg-[#080E0B]/85 border-b border-black/[0.04] dark:border-white/[0.05] py-3.5 shadow-sm' 
+          : 'bg-transparent py-5'
+      }`}>
+        <div className="mx-auto max-w-7xl px-5 sm:px-8 flex items-center justify-between">
           {/* Brand Logo & Name */}
           <div 
             onClick={() => {
@@ -668,27 +689,27 @@ export default function CreativeLoginPortal() {
             <img 
               src="/images/logo.png" 
               alt="KrishiSeva Logo" 
-              className="h-8 sm:h-9 w-auto object-contain transition-transform duration-200 group-hover:scale-105 rounded-xl shrink-0" 
+              className="h-8 sm:h-9 w-auto object-contain transition-transform duration-300 group-hover:scale-105 rounded-xl shrink-0" 
             />
-            <span className="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white font-display transition-colors group-hover:text-emerald-600 whitespace-nowrap">
+            <span className="text-xl font-bold tracking-tight text-[#0B1E14] dark:text-[#EAEFEA] font-display transition-colors group-hover:text-[#1A4F32] dark:group-hover:text-[#4ADE80] whitespace-nowrap">
               KrishiSeva
             </span>
           </div>
 
-          {/* Actions & Controls (Desktop) */}
-          <div className="hidden md:flex items-center gap-2 sm:gap-3">
+          {/* Actions & Controls (Desktop) - Minimal Text Links with Soft Hover */}
+          <div className="hidden md:flex items-center gap-1 sm:gap-2">
             <button
               onClick={() => setActiveRole('admin')}
-              className="bg-white/80 dark:bg-slate-900/80 border border-emerald-900/10 dark:border-slate-800 hover:border-emerald-500/30 dark:hover:border-emerald-500/30 hover:bg-white dark:hover:bg-slate-900 hover:shadow-sm transition-all rounded-xl text-slate-700 dark:text-slate-200 text-sm font-semibold px-3.5 py-1.5 active:scale-95 flex items-center gap-1.5 cursor-pointer"
+              className="text-[#0B1E14] dark:text-[#EAEFEA] hover:text-[#1A4F32] dark:hover:text-[#4ADE80] hover:bg-[#1A4F32]/5 dark:hover:bg-white/5 transition-all duration-300 text-sm font-medium px-4 py-2 rounded-full active:scale-95 flex items-center gap-2 cursor-pointer"
             >
-              <Lock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+              <Lock className="w-3.5 h-3.5 text-[#1A4F32] dark:text-[#4ADE80]" />
               <span>{lang === 'hi' ? 'एडमिन लॉगिन' : 'Admin Login'}</span>
             </button>
 
             {/* Dark / Light Theme Switcher */}
             <button
               onClick={toggleTheme}
-              className="bg-white/80 dark:bg-slate-900/80 border border-emerald-900/10 dark:border-slate-800 hover:border-emerald-500/30 dark:hover:border-emerald-500/30 hover:bg-white dark:hover:bg-slate-900 hover:shadow-sm transition-all rounded-xl text-slate-700 dark:text-slate-200 text-sm font-semibold px-3.5 py-1.5 active:scale-95 flex items-center gap-1.5 cursor-pointer"
+              className="text-[#0B1E14] dark:text-[#EAEFEA] hover:text-[#1A4F32] dark:hover:text-[#4ADE80] hover:bg-[#1A4F32]/5 dark:hover:bg-white/5 transition-all duration-300 text-sm font-medium px-4 py-2 rounded-full active:scale-95 flex items-center gap-2 cursor-pointer"
               title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
             >
               {isDark ? (
@@ -698,7 +719,7 @@ export default function CreativeLoginPortal() {
                 </>
               ) : (
                 <>
-                  <Moon className="w-3.5 h-3.5 text-indigo-600" />
+                  <Moon className="w-3.5 h-3.5 text-[#1A4F32]" />
                   <span>Dark</span>
                 </>
               )}
@@ -707,9 +728,9 @@ export default function CreativeLoginPortal() {
             {/* Language Switcher */}
             <button
               onClick={toggleLanguage}
-              className="bg-white/80 dark:bg-slate-900/80 border border-emerald-900/10 dark:border-slate-800 hover:border-emerald-500/30 dark:hover:border-emerald-500/30 hover:bg-white dark:hover:bg-slate-900 hover:shadow-sm transition-all rounded-xl text-slate-700 dark:text-slate-200 text-sm font-semibold px-3.5 py-1.5 active:scale-95 flex items-center gap-1.5 cursor-pointer"
+              className="text-[#0B1E14] dark:text-[#EAEFEA] hover:text-[#1A4F32] dark:hover:text-[#4ADE80] hover:bg-[#1A4F32]/5 dark:hover:bg-white/5 transition-all duration-300 text-sm font-medium px-4 py-2 rounded-full active:scale-95 flex items-center gap-2 cursor-pointer"
             >
-              <Globe className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+              <Globe className="w-3.5 h-3.5 text-[#1A4F32] dark:text-[#4ADE80]" />
               <span>{lang === 'hi' ? 'English' : 'हिंदी'}</span>
             </button>
           </div>
@@ -718,13 +739,13 @@ export default function CreativeLoginPortal() {
           <div className="flex md:hidden items-center gap-2">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2 rounded-xl border bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border-emerald-900/10 dark:border-slate-800 text-slate-800 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-900 shadow-sm transition-all active:scale-95 cursor-pointer"
+              className="p-2.5 rounded-full text-[#0B1E14] dark:text-[#EAEFEA] hover:bg-[#1A4F32]/5 dark:hover:bg-white/5 transition-all active:scale-95 cursor-pointer"
               aria-label="Toggle navigation menu"
             >
               {isMobileMenuOpen ? (
-                <X className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                <X className="w-5 h-5 text-[#1A4F32] dark:text-[#4ADE80]" />
               ) : (
-                <Menu className="w-5 h-5 text-slate-700 dark:text-slate-200" />
+                <Menu className="w-5 h-5" />
               )}
             </button>
           </div>
@@ -732,28 +753,26 @@ export default function CreativeLoginPortal() {
 
         {/* Mobile Dropdown Menu Sheet */}
         {isMobileMenuOpen && (
-          <div className="md:hidden mt-2 max-w-7xl mx-auto rounded-2xl border border-white/80 dark:border-slate-800 bg-white/90 dark:bg-slate-950/95 backdrop-blur-xl px-4 py-3 space-y-2.5 animate-fade-in shadow-xl pointer-events-auto">
+          <div className="md:hidden mt-2 max-w-lg mx-auto rounded-2xl border border-black/5 dark:border-white/10 bg-[#FDFBF7]/95 dark:bg-[#080E0B]/95 backdrop-blur-xl px-5 py-4 space-y-3 animate-fade-in shadow-xl mx-4">
             <div className="flex flex-col gap-2">
               <button
                 onClick={() => {
                   setActiveRole('admin');
                   setIsMobileMenuOpen(false);
                 }}
-                className="w-full text-xs font-bold px-3.5 py-2.5 rounded-xl border bg-white/90 dark:bg-slate-900/90 border-emerald-900/10 dark:border-slate-800 text-slate-800 dark:text-slate-200 shadow-sm flex items-center justify-between cursor-pointer"
+                className="w-full text-xs font-semibold px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 text-[#0B1E14] dark:text-[#EAEFEA] flex items-center justify-between cursor-pointer"
               >
                 <span className="flex items-center gap-2">
-                  <Lock className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <Lock className="w-4 h-4 text-[#1A4F32] dark:text-[#4ADE80]" />
                   <span>{lang === 'hi' ? 'एडमिन लॉगिन' : 'Admin Login'}</span>
                 </span>
-                <span className="text-emerald-600 font-bold">→</span>
+                <span className="text-[#1A4F32] dark:text-[#4ADE80] font-bold">→</span>
               </button>
 
               <div className="grid grid-cols-2 gap-2">
                 <button
-                  onClick={() => {
-                    toggleTheme();
-                  }}
-                  className="text-xs font-bold px-3 py-2 rounded-xl border bg-white/90 dark:bg-slate-900/90 border-emerald-900/10 dark:border-slate-800 text-slate-800 dark:text-slate-200 shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
+                  onClick={() => toggleTheme()}
+                  className="text-xs font-semibold px-3 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 text-[#0B1E14] dark:text-[#EAEFEA] flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   {isDark ? (
                     <>
@@ -762,19 +781,17 @@ export default function CreativeLoginPortal() {
                     </>
                   ) : (
                     <>
-                      <Moon className="w-3.5 h-3.5 text-indigo-600" />
+                      <Moon className="w-3.5 h-3.5 text-[#1A4F32]" />
                       <span>Dark</span>
                     </>
                   )}
                 </button>
 
                 <button
-                  onClick={() => {
-                    toggleLanguage();
-                  }}
-                  className="text-xs font-bold px-3 py-2 rounded-xl border bg-white/90 dark:bg-slate-900/90 border-emerald-900/10 dark:border-slate-800 text-slate-800 dark:text-slate-200 shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
+                  onClick={() => toggleLanguage()}
+                  className="text-xs font-semibold px-3 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 text-[#0B1E14] dark:text-[#EAEFEA] flex items-center justify-center gap-1.5 cursor-pointer"
                 >
-                  <Globe className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                  <Globe className="w-3.5 h-3.5 text-[#1A4F32] dark:text-[#4ADE80]" />
                   <span>{lang === 'hi' ? 'English' : 'हिंदी'}</span>
                 </button>
               </div>
@@ -786,57 +803,37 @@ export default function CreativeLoginPortal() {
       {/* ═══════════ HERO & AUTH CONTAINER ═══════════ */}
       <main className="relative w-full min-h-screen flex flex-col justify-between overflow-hidden z-10">
         
-        {/* ───── Multi-Layered Ambient Light Mesh Background ───── */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden -z-10">
-          {/* Top Emerald Ambient Gradient */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-20%,rgba(16,185,129,0.14),transparent)]" />
-          
-          {/* Ambient Radial Glow sphere directly behind hero heading */}
-          <div className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-emerald-400/20 blur-[120px] rounded-full pointer-events-none" />
-
-          {/* Left & Right Soft Ambient Lighting Orbs */}
-          <div className="absolute top-1/4 -left-32 w-96 h-96 bg-emerald-500/10 dark:bg-emerald-500/10 rounded-full blur-[120px]" />
-          <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-teal-500/8 dark:bg-teal-500/8 rounded-full blur-[120px]" />
-          
-          {/* Ultra-Subtle Grid Pattern with Soft Fade Mask */}
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#059669_1px,transparent_1px),linear-gradient(to_bottom,#059669_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-[0.07] dark:opacity-30" />
-        </div>
-
-        
         {/* ═══════════ VIEW 1: LANDING PAGE HERO ═══════════ */}
         {portalView === 'landing' && (
-          <div className="min-h-[calc(100vh-80px)] flex flex-col justify-center items-center text-center px-4 pt-28 pb-16 sm:pt-32 sm:pb-20 w-full max-w-5xl mx-auto animate-fade-in space-y-6 sm:space-y-8">
+          <div className="min-h-[calc(100vh-80px)] flex flex-col justify-center items-center text-center px-4 pt-32 pb-16 sm:pt-36 sm:pb-20 w-full max-w-5xl mx-auto animate-fade-in space-y-8 sm:space-y-10">
 
-            <div className="space-y-4 sm:space-y-5 max-w-4xl mx-auto overflow-visible relative">
-              {/* Ambient heading glow */}
-              <div className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-emerald-400/20 blur-[120px] rounded-full pointer-events-none" />
-
-              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1.15] text-slate-900 dark:text-white font-display pt-2">
+            <div className="space-y-5 sm:space-y-6 max-w-4xl mx-auto overflow-visible relative">
+              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight sm:tracking-tighter leading-[1.15] font-display pt-2">
                 {lang === 'hi' ? (
                   <>
-                    <span className="inline-block text-slate-900 dark:text-white">मांग पर मशीनें।</span><br />
-                    <span className="bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-700 bg-clip-text text-transparent drop-shadow-sm inline-block">
+                    <span className="inline-block text-[#0B1E14] dark:text-[#EAEFEA]">मांग पर मशीनें।</span><br />
+                    <span className="text-[#1A4F32] dark:text-[#4ADE80] inline-block font-bold">
                       सीधे आपके खेत पर।
                     </span>
                   </>
                 ) : (
                   <>
-                    <span className="inline-block text-slate-900 dark:text-white">Machinery on Demand.</span><br />
-                    <span className="bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-700 bg-clip-text text-transparent drop-shadow-sm inline-block">
+                    <span className="inline-block text-[#0B1E14] dark:text-[#EAEFEA]">Machinery on Demand.</span><br />
+                    <span className="text-[#1A4F32] dark:text-[#4ADE80] inline-block font-bold">
                       Directly to Your Farm.
                     </span>
                   </>
                 )}
               </h1>
 
-              <p className="text-slate-600 dark:text-slate-300 max-w-2xl sm:max-w-3xl mx-auto text-lg sm:text-xl font-normal leading-relaxed">
+              <p className="text-[#4F6358] dark:text-[#9FB1A7] max-w-2xl sm:max-w-3xl mx-auto text-lg sm:text-xl font-light tracking-wide leading-relaxed">
                 {lang === 'hi'
                   ? 'ट्रैक्टर, हार्वेस्टर एवं अर्थमूवर की तत्काल 1-क्लिक बुकिंग। वास्तविक समय में अपने खेत तक लाइव जीपीएस ट्रैक करें।'
                   : 'Instant booking for tractors, harvesters and earthmovers. Track dispatches in real-time.'}
               </p>
             </div>
 
-            {/* CTA Action Button */}
+            {/* Tactile Dark CTA Button */}
             <div className="flex justify-center mx-auto pt-2">
               <button
                 onClick={() => {
@@ -845,29 +842,29 @@ export default function CreativeLoginPortal() {
                   setOtp('');
                   setError('');
                 }}
-                className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold px-8 py-4 sm:px-9 sm:py-4.5 rounded-2xl shadow-[0_10px_25px_-5px_rgba(16,185,129,0.4)] hover:shadow-[0_15px_30px_-5px_rgba(16,185,129,0.5)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 flex items-center justify-center gap-3 cursor-pointer group text-base sm:text-lg lg:text-xl font-bold"
+                className="bg-[#0B1E14] hover:bg-[#153424] dark:bg-[#EAEFEA] dark:hover:bg-white text-white dark:text-[#0B1E14] font-medium px-8 py-4 sm:px-9 sm:py-4.5 rounded-full shadow-[0_8px_30px_rgb(11,30,20,0.12)] hover:shadow-[0_8px_30px_rgb(11,30,20,0.2)] hover:-translate-y-1 active:translate-y-0 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] flex items-center justify-center gap-3 cursor-pointer group text-base sm:text-lg"
               >
                 <span>{lang === 'hi' ? 'मशीनरी बुक करें / साइन इन' : 'Book Machinery / Sign In'}</span>
-                <span className="text-xl sm:text-2xl transition-transform group-hover:translate-x-1.5">→</span>
+                <span className="text-xl transition-transform duration-300 group-hover:translate-x-1.5">→</span>
               </button>
             </div>
 
-            {/* Feature Badges */}
-            <div className="flex flex-wrap items-center justify-center gap-3 max-w-md sm:max-w-none mx-auto pt-2">
-              <span className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-emerald-900/10 dark:border-slate-800 px-5 py-2.5 rounded-2xl shadow-[0_2px_10px_-2px_rgba(0,0,0,0.05)] hover:border-emerald-400/40 hover:shadow-md transition-all text-slate-800 dark:text-slate-200 text-sm font-medium flex items-center gap-2">
-                <Tractor className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            {/* Minimal Inline Feature Badges */}
+            <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8 max-w-2xl mx-auto pt-4 text-[#4F6358] dark:text-[#9FB1A7] text-sm font-medium">
+              <div className="flex items-center gap-2">
+                <Tractor className="w-4 h-4 text-[#1A4F32] dark:text-[#4ADE80] shrink-0" />
                 <span>{lang === 'hi' ? 'सत्यापित कृषि उपकरण' : 'Verified Equipment'}</span>
-              </span>
+              </div>
 
-              <span className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-emerald-900/10 dark:border-slate-800 px-5 py-2.5 rounded-2xl shadow-[0_2px_10px_-2px_rgba(0,0,0,0.05)] hover:border-emerald-400/40 hover:shadow-md transition-all text-slate-800 dark:text-slate-200 text-sm font-medium flex items-center gap-2">
-                <Zap className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                <span>{lang === 'hi' ? 'त्वरित 1-क्लिक वाहन सेवा' : 'Instant Dispatch'}</span>
-              </span>
+              <div className="flex items-center gap-2">
+                <Zap className="w-4 h-4 text-[#1A4F32] dark:text-[#4ADE80] shrink-0" />
+                <span>{lang === 'hi' ? 'त्वरित 1-क्लिक सेवा' : 'Instant Dispatch'}</span>
+              </div>
 
-              <span className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-emerald-900/10 dark:border-slate-800 px-5 py-2.5 rounded-2xl shadow-[0_2px_10px_-2px_rgba(0,0,0,0.05)] hover:border-emerald-400/40 hover:shadow-md transition-all text-slate-800 dark:text-slate-200 text-sm font-medium flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                <span>{lang === 'hi' ? 'एग्रीस्टैक भूलेख सत्यापित' : 'AgriStack Verified'}</span>
-              </span>
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-[#1A4F32] dark:text-[#4ADE80] shrink-0" />
+                <span>{lang === 'hi' ? 'एग्रीस्टैक सत्यापित' : 'AgriStack Verified'}</span>
+              </div>
             </div>
           </div>
         )}
