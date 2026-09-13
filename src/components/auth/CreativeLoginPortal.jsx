@@ -2405,10 +2405,6 @@ export default function CreativeLoginPortal() {
           className="relative w-full py-20 sm:py-28 px-4 sm:px-6 lg:px-8 border-t border-[#0B1E14]/5 dark:border-white/5 transition-colors duration-300"
         >
           <div className="max-w-4xl mx-auto space-y-4 text-center mb-12 sm:mb-16">
-            <span className="bg-[#1A4F32]/10 dark:bg-[#4ADE80]/10 text-[#1A4F32] dark:text-[#4ADE80] border border-[#1A4F32]/20 dark:border-[#4ADE80]/20 text-xs px-4 py-1.5 rounded-full inline-flex items-center gap-1.5 font-bold uppercase tracking-wider">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>{lang === 'hi' ? 'अक्सर पूछे जाने वाले सवाल' : 'Frequently Asked Questions'}</span>
-            </span>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-[#0B1E14] dark:text-[#EAEFEA] leading-tight">
               {lang === 'hi' ? 'बुकिंग करने से पहले सब कुछ जानें' : 'Everything You Need to Know.'}
             </h2>
