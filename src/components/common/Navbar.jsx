@@ -44,6 +44,17 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
   const { savedLands } = useSavedLands();
   const { preBookings } = usePreBookings();
 
+  // Scroll state for seamless header blur
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 15);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   // Dropdown Menu State
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
@@ -100,32 +111,36 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-[#ECF5F0]/40 dark:bg-slate-950/40 backdrop-blur-md transition-colors duration-300">
-        <div className="max-w-7xl w-full mx-auto px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+      <header className={`sticky top-0 z-40 transition-all duration-500 ${
+        isScrolled 
+          ? 'backdrop-blur-md bg-[#FDFBF7]/85 dark:bg-[#080E0B]/85 border-b border-black/[0.04] dark:border-white/[0.05] py-2' 
+          : 'bg-transparent py-3'
+      }`}>
+        <div className="max-w-7xl w-full mx-auto px-5 sm:px-8 h-14 flex items-center justify-between gap-3">
           
           {/* Brand Logo - Returns to logged-in dashboard */}
           <div 
             onClick={handleLogoClick}
-            className="flex items-center gap-3 cursor-pointer group"
+            className="flex items-center gap-2.5 sm:gap-3 cursor-pointer group"
             title={currentUser ? "Go to Dashboard" : "Return to Home"}
           >
-            <img src="/images/logo.png" alt="KrishiSeva Logo" className="h-9 w-auto object-contain transition-transform duration-200 group-hover:scale-105 rounded-xl" />
+            <img src="/images/logo.png" alt="KrishiSeva Logo" className="h-8 sm:h-9 w-auto object-contain transition-transform duration-300 group-hover:scale-105 rounded-xl" />
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-extrabold text-xl tracking-tight text-slate-900 dark:text-white font-display">
+                <span className="font-bold text-xl tracking-tight text-[#0B1E14] dark:text-[#EAEFEA] font-display transition-colors group-hover:text-[#1A4F32] dark:group-hover:text-[#4ADE80]">
                   KrishiSeva
                 </span>
                 {lang === 'hi' ? (
-                  <span className="text-[10px] px-2 py-0.5 rounded-full font-bold hidden sm:inline-block bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60">
+                  <span className="text-[10px] px-2 py-0.5 rounded-full font-bold hidden sm:inline-block bg-[#1A4F32]/10 text-[#1A4F32] dark:bg-[#4ADE80]/15 dark:text-[#4ADE80]">
                     कृषिसेवा
                   </span>
                 ) : (
-                  <span className="text-[10px] px-2 py-0.5 rounded-full font-bold hidden sm:inline-block bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60">
+                  <span className="text-[10px] px-2 py-0.5 rounded-full font-bold hidden sm:inline-block bg-[#1A4F32]/10 text-[#1A4F32] dark:bg-[#4ADE80]/15 dark:text-[#4ADE80]">
                     AgriTech
                   </span>
                 )}
               </div>
-              <p className="text-[10px] font-medium text-slate-500 dark:text-slate-400 hidden md:block">
+              <p className="text-[10px] font-normal text-[#4F6358] dark:text-[#9FB1A7] hidden md:block tracking-wide">
                 {lang === 'hi' ? 'कॉल नहीं, केवल एक क्लिक • आधुनिक कृषि मशीनरी' : 'Not a Call, Just a Click • Precision Farm Machinery'}
               </p>
             </div>
@@ -159,23 +174,23 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
           )}
 
           {/* RIGHT CONTAINER: THEME, LANG & PROFILE MENU */}
-          <div className="flex items-center gap-2.5" ref={menuRef}>
+          <div className="flex items-center gap-2" ref={menuRef}>
             
             {/* Quick Theme Toggle Icon Button */}
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-xl bg-white/70 dark:bg-slate-900/80 backdrop-blur-sm border border-emerald-900/10 dark:border-slate-800 text-slate-800 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-900 transition-colors shadow-sm cursor-pointer"
+              className="p-2 rounded-full bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-[#0B1E14] dark:text-[#EAEFEA] transition-all duration-300 cursor-pointer"
               title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
             >
-              {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-600" />}
+              {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-[#1A4F32]" />}
             </button>
 
             {/* Quick Language Toggle Button */}
             <button
               onClick={toggleLanguage}
-              className="px-3.5 py-1.5 rounded-full border bg-white/70 dark:bg-slate-900/80 backdrop-blur-sm border-emerald-900/10 dark:border-slate-800 text-xs font-bold text-slate-800 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-900 transition-colors shadow-sm flex items-center gap-1.5 cursor-pointer"
+              className="px-3.5 py-1.5 rounded-full bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-xs font-semibold text-[#0B1E14] dark:text-[#EAEFEA] transition-all duration-300 flex items-center gap-1.5 cursor-pointer"
             >
-              <Globe className="w-3.5 h-3.5 text-emerald-500" />
+              <Globe className="w-3.5 h-3.5 text-[#1A4F32] dark:text-[#4ADE80]" />
               <span>{lang === 'hi' ? 'EN' : 'हिन्दी'}</span>
             </button>
 
@@ -183,7 +198,7 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
             {(!currentUser || !currentUser.isAuthenticated) ? (
               <button
                 onClick={onOpenAuthModal}
-                className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-all shadow-sm hover:shadow-emerald-500/20 active:scale-98 flex items-center gap-1.5 cursor-pointer"
+                className="px-4 py-2 rounded-full bg-[#0B1E14] hover:bg-[#153424] dark:bg-[#EAEFEA] dark:hover:bg-white text-white dark:text-[#0B1E14] font-medium text-xs tracking-wide transition-all shadow-[0_4px_14px_rgb(11,30,20,0.12)] hover:-translate-y-0.5 flex items-center gap-1.5 cursor-pointer"
               >
                 <LogIn className="w-3.5 h-3.5" />
                 <span>{lang === 'hi' ? 'लॉगिन करें' : 'Login'}</span>
@@ -192,55 +207,49 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
               /* Authenticated User Profile Pill Button */
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 hover:border-emerald-500/40 hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-all shadow-sm active:scale-98 cursor-pointer"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0B1E14]/[0.03] dark:bg-white/5 border border-black/[0.06] dark:border-white/[0.08] text-[#0B1E14] dark:text-[#EAEFEA] hover:bg-[#0B1E14]/[0.06] dark:hover:bg-white/10 transition-all duration-300 shadow-sm active:scale-98 cursor-pointer"
               >
-                <div className="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-extrabold text-xs border border-emerald-200 dark:border-emerald-800/60">
+                <div className="w-6 h-6 rounded-full bg-[#1A4F32]/10 dark:bg-[#4ADE80]/15 text-[#1A4F32] dark:text-[#4ADE80] flex items-center justify-center font-bold text-xs">
                   {currentUser?.name ? currentUser.name.charAt(0).toUpperCase() : 'U'}
                 </div>
                 <div className="text-left hidden sm:block">
-                  <span className="text-xs font-bold block leading-tight truncate max-w-[100px]">
+                  <span className="text-xs font-semibold block leading-tight truncate max-w-[100px]">
                     {currentUser?.name || (currentUser?.role === 'driver' ? 'Driver' : 'Farmer')}
                   </span>
-                  <span className="text-[10px] text-slate-500 dark:text-slate-400 capitalize block">
+                  <span className="text-[10px] text-[#4F6358] dark:text-[#9FB1A7] capitalize block font-light">
                     {currentUser?.role || 'User'}
                   </span>
                 </div>
-                <Menu className="w-4 h-4 text-slate-500 ml-0.5" />
+                <Menu className="w-3.5 h-3.5 text-[#4F6358] dark:text-[#9FB1A7] ml-0.5" />
               </button>
             )}
 
             {/* Dropdown Menu Modal */}
             {isMenuOpen && currentUser && (
-              <div className="absolute right-4 top-16 w-80 max-h-[85vh] overflow-y-auto rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-3.5 space-y-3 z-50 animate-scale-in">
+              <div className="absolute right-4 top-14 w-80 max-h-[85vh] overflow-y-auto rounded-3xl bg-[#FDFBF7]/95 dark:bg-[#080E0B]/95 backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] shadow-2xl p-4 space-y-3 z-50 animate-scale-in">
                 
                 {/* User Profile Header Card */}
-                <div className="p-3.5 rounded-2xl bg-gradient-to-br from-slate-50 to-emerald-50/40 dark:from-slate-800/80 dark:to-slate-800/40 border border-slate-200 dark:border-slate-700/70">
+                <div className="p-3.5 rounded-2xl bg-black/[0.02] dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.05]">
                   <div className="flex items-center gap-3">
-                    <div className={`w-11 h-11 rounded-2xl flex items-center justify-center font-black text-lg border shadow-sm ${
+                    <div className={`w-10 h-10 rounded-2xl flex items-center justify-center font-bold text-base border shadow-sm ${
                       currentUser?.role === 'driver'
-                        ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30'
+                        ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20'
                         : currentUser?.role === 'admin'
-                        ? 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/30'
-                        : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
+                        ? 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20'
+                        : 'bg-[#1A4F32]/10 text-[#1A4F32] dark:text-[#4ADE80] border-[#1A4F32]/20'
                     }`}>
                       {currentUser?.name ? currentUser.name.charAt(0).toUpperCase() : 'U'}
                     </div>
                     <div className="overflow-hidden flex-1">
                       <div className="flex items-center justify-between gap-1">
-                        <p className="text-sm font-extrabold text-slate-900 dark:text-white truncate">
+                        <p className="text-sm font-bold text-[#0B1E14] dark:text-[#EAEFEA] truncate">
                           {currentUser?.name || 'Krishi User'}
                         </p>
-                        <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${
-                          currentUser?.role === 'driver'
-                            ? 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300'
-                            : currentUser?.role === 'admin'
-                            ? 'bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300'
-                            : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
-                        }`}>
+                        <span className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full bg-black/5 dark:bg-white/5 text-[#4F6358] dark:text-[#9FB1A7]">
                           {currentUser?.role || 'User'}
                         </span>
                       </div>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5 font-medium">
+                      <p className="text-xs text-[#4F6358] dark:text-[#9FB1A7] truncate mt-0.5 font-light">
                         +91 {currentUser?.phone || ''}
                       </p>
                     </div>

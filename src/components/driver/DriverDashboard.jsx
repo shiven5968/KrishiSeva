@@ -221,50 +221,50 @@ export default function DriverDashboard() {
   };
 
   return (
-    <div className={`min-h-screen font-sans selection:bg-emerald-500 selection:text-stone-950 transition-colors duration-200 ${
-      isDark ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
+    <div className={`min-h-screen font-sans selection:bg-[#1A4F32] selection:text-white transition-colors duration-500 ${
+      isDark ? 'bg-[#080E0B] text-[#EAEFEA]' : 'bg-[#FDFBF7] text-[#0B1E14]'
     }`}>
       
       {/* ══════════════ MAIN WIDESCREEN WRAPPER (max-w-7xl) ══════════════ */}
-      <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 space-y-6 py-6 animate-fade-in">
+      <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 space-y-6 py-6 animate-fade-in-up">
         
         {/* ══════════════ 1. TOP DRIVER HEADER & STATUS BAR ══════════════ */}
-        <div className={`rounded-3xl p-5 sm:p-6 border shadow-2xl backdrop-blur-xl transition-all duration-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 ${
+        <div className={`rounded-3xl p-5 sm:p-6 border shadow-sm backdrop-blur-xl transition-all duration-300 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 ${
           isDark 
-            ? 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-black/60' 
-            : 'bg-white border-slate-200 shadow-slate-200/60'
+            ? 'bg-[#0D1611]/80 border-white/[0.08]' 
+            : 'bg-white/80 border-black/[0.06]'
         }`}>
           
           {/* Driver Identity Left Group */}
           <div className="flex items-center gap-4">
             <div className="relative">
-              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shadow-lg border ${
+              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shadow-sm border ${
                 isDark 
-                  ? 'bg-gradient-to-br from-emerald-950 via-stone-900 to-emerald-900/40 border-emerald-500/40 text-emerald-400 shadow-emerald-950/50' 
-                  : 'bg-gradient-to-br from-emerald-100 to-green-200 border-emerald-300 text-emerald-800 shadow-emerald-200'
+                  ? 'bg-[#1A4F32]/20 border-[#1A4F32]/40 text-[#4ADE80]' 
+                  : 'bg-[#1A4F32]/10 border-[#1A4F32]/20 text-[#1A4F32]'
               }`}>
                 {driverProfile?.vehicleType === 'harvester' ? '🌾' : driverProfile?.vehicleType === 'jcb' ? '🏗️' : '🚜'}
               </div>
               {isOnline && (
-                <span className="absolute -top-1 -right-1 flex h-4 w-4">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 border-2 border-stone-900"></span>
+                <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#1A4F32] dark:bg-[#4ADE80] opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-[#1A4F32] dark:bg-[#4ADE80]"></span>
                 </span>
               )}
             </div>
 
             <div className="space-y-1">
               <div className="flex items-center gap-2 flex-wrap">
-                <h1 className={`text-xl sm:text-2xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#0B1E14] dark:text-[#EAEFEA]">
                   {driverProfile?.fullName || 'Rameshwar Singh'}
                 </h1>
-                <span className="inline-flex items-center gap-1 text-[11px] font-black text-amber-300 bg-amber-950/80 px-2.5 py-0.5 rounded-full border border-amber-500/40 shadow-sm">
-                  <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+                <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#1A4F32] dark:text-[#4ADE80] bg-[#1A4F32]/10 dark:bg-[#4ADE80]/15 px-2.5 py-0.5 rounded-full">
+                  <ShieldCheck className="w-3.5 h-3.5" />
                   <span>{lang === 'hi' ? 'केवाईसी सत्यापित पार्टनर' : 'KYC Verified Partner'}</span>
                 </span>
               </div>
-              <p className={`text-xs font-bold ${isDark ? 'text-slate-500 dark:text-slate-400' : 'text-slate-500'}`}>
-                {driverProfile?.modelName || 'Mahindra 575 DI (50 HP)'} • <span className={`font-mono font-black ${isDark ? 'text-emerald-400' : 'text-emerald-700'}`}>{driverProfile?.vehicleNumber || 'UP-32-KR-7744'}</span>
+              <p className="text-xs text-[#4F6358] dark:text-[#9FB1A7] font-light">
+                {driverProfile?.modelName || 'Mahindra 575 DI (50 HP)'} • <span className="font-mono font-bold text-[#0B1E14] dark:text-[#EAEFEA]">{driverProfile?.vehicleNumber || 'UP-32-KR-7744'}</span>
               </p>
             </div>
           </div>
@@ -273,15 +273,13 @@ export default function DriverDashboard() {
           <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-between md:justify-end">
             
             {/* Minimalist Tab Switcher */}
-            <nav className={`flex items-center p-1 rounded-2xl border text-xs font-black shadow-sm ${
-              isDark ? 'bg-stone-950 border-slate-200 dark:border-slate-800' : 'bg-slate-100 border-slate-200'
-            }`}>
+            <nav className="flex items-center p-1 rounded-full border border-black/[0.06] dark:border-white/[0.08] text-xs font-semibold bg-black/[0.02] dark:bg-white/[0.03]">
               <button
                 onClick={() => setActiveTab('overview')}
-                className={`px-4 py-2 rounded-xl transition flex items-center gap-1.5 cursor-pointer ${
+                className={`px-4 py-2 rounded-full transition-all duration-300 flex items-center gap-1.5 cursor-pointer ${
                   activeTab === 'overview'
-                    ? 'bg-emerald-500 text-stone-950 shadow-md'
-                    : isDark ? 'text-slate-700 dark:text-slate-300 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-[#0B1E14] dark:bg-[#EAEFEA] text-white dark:text-[#0B1E14] shadow-sm'
+                    : 'text-[#4F6358] dark:text-[#9FB1A7] hover:text-[#0B1E14] dark:hover:text-[#EAEFEA]'
                 }`}
               >
                 <Radio className="w-3.5 h-3.5" />
@@ -290,10 +288,10 @@ export default function DriverDashboard() {
 
               <button
                 onClick={() => setActiveTab('passport')}
-                className={`px-4 py-2 rounded-xl transition flex items-center gap-1.5 cursor-pointer ${
+                className={`px-4 py-2 rounded-full transition-all duration-300 flex items-center gap-1.5 cursor-pointer ${
                   activeTab === 'passport'
-                    ? 'bg-emerald-500 text-stone-950 shadow-md'
-                    : isDark ? 'text-slate-700 dark:text-slate-300 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-[#0B1E14] dark:bg-[#EAEFEA] text-white dark:text-[#0B1E14] shadow-sm'
+                    : 'text-[#4F6358] dark:text-[#9FB1A7] hover:text-[#0B1E14] dark:hover:text-[#EAEFEA]'
                 }`}
               >
                 <CreditCard className="w-3.5 h-3.5" />
@@ -304,15 +302,13 @@ export default function DriverDashboard() {
             {/* High-Contrast Online/Offline Duty Toggle */}
             <button
               onClick={toggleDriverDuty}
-              className={`px-5 py-2.5 rounded-2xl font-black text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-lg active:scale-95 cursor-pointer ${
+              className={`px-5 py-2.5 rounded-full font-medium text-xs sm:text-sm flex items-center justify-center gap-2 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] shadow-[0_8px_30px_rgb(11,30,20,0.12)] hover:-translate-y-0.5 active:translate-y-0 cursor-pointer ${
                 isOnline
-                  ? 'bg-emerald-500 hover:bg-emerald-400 text-stone-950 shadow-emerald-500/25 ring-2 ring-emerald-400/50'
-                  : isDark
-                  ? 'bg-stone-800 hover:bg-stone-700 text-slate-700 dark:text-slate-300 border border-stone-700'
-                  : 'bg-slate-200 hover:bg-slate-300 text-slate-700 border border-slate-300'
+                  ? 'bg-[#0B1E14] hover:bg-[#153424] dark:bg-[#EAEFEA] dark:hover:bg-white text-white dark:text-[#0B1E14]'
+                  : 'bg-black/5 hover:bg-black/10 dark:bg-white/5 dark:hover:bg-white/10 text-[#4F6358] dark:text-[#9FB1A7]'
               }`}
             >
-              <Power className={`w-4 h-4 ${isOnline ? 'text-stone-950' : 'text-slate-500 dark:text-slate-400'}`} />
+              <Power className="w-4 h-4" />
               <span>{isOnline ? (lang === 'hi' ? '🟢 ऑन ड्यूटी (Online)' : '🟢 Online / On Duty') : (lang === 'hi' ? '⚪ ऑफ ड्यूटी (Offline)' : '⚪ Off Duty (Offline)')}</span>
             </button>
           </div>
@@ -320,8 +316,8 @@ export default function DriverDashboard() {
         </div>
 
         {/* ══════════════ 2. GPS TOP BANNER (DRIVER OPERATING RADAR - 320PX) ══════════════ */}
-        <div className={`rounded-3xl p-6 sm:p-7 border shadow-2xl space-y-4 transition-colors duration-200 ${
-          isDark ? 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-black/40' : 'bg-white border-slate-200 shadow-slate-200/50'
+        <div className={`rounded-3xl p-6 sm:p-7 border shadow-sm space-y-4 transition-colors duration-300 ${
+          isDark ? 'bg-[#0D1611]/80 border-white/[0.08]' : 'bg-white/80 border-black/[0.06]'
         }`}>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-3">

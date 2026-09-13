@@ -220,36 +220,36 @@ export default function FarmerLiveTracking() {
   ];
 
   return (
-    <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 space-y-6 py-6 animate-fade-in font-sans">
+    <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 space-y-6 py-6 animate-fade-in-up font-sans text-[#0B1E14] dark:text-[#EAEFEA]">
       
       {/* ══════════════ SECTION 1 (TOP): FULL-WIDTH RADAR MAP & SEARCH STATUS BANNER ══════════════ */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-2xl backdrop-blur-xl space-y-4">
+      <div className="bg-white/80 dark:bg-[#0D1611]/80 border border-black/[0.06] dark:border-white/[0.08] rounded-3xl p-5 sm:p-6 shadow-sm backdrop-blur-xl space-y-4">
         
         {/* Header Overlay & Top Telemetry Row */}
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-black/[0.06] dark:border-white/[0.08]">
           <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-2xl shadow-inner">
+            <div className="w-12 h-12 rounded-2xl bg-[#1A4F32]/10 dark:bg-[#4ADE80]/15 text-[#1A4F32] dark:text-[#4ADE80] flex items-center justify-center text-2xl">
               {isSearching ? (
-                <Radio className="w-6 h-6 text-emerald-400 animate-pulse" />
+                <Radio className="w-6 h-6 text-[#1A4F32] dark:text-[#4ADE80] animate-pulse" />
               ) : activeBooking.status === 'completed' ? (
                 '🎉'
               ) : (
-                <Tractor className="w-6 h-6 text-emerald-400" />
+                <Tractor className="w-6 h-6 text-[#1A4F32] dark:text-[#4ADE80]" />
               )}
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-lg sm:text-xl font-black text-white">
+                <h2 className="text-lg sm:text-xl font-bold text-[#0B1E14] dark:text-[#EAEFEA] tracking-tight">
                   {statusInfo.title}
                 </h2>
                 {isSearching && (
                   <span className="flex h-2.5 w-2.5 relative">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#1A4F32] dark:bg-[#4ADE80] opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#1A4F32] dark:bg-[#4ADE80]"></span>
                   </span>
                 )}
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+              <p className="text-xs text-[#4F6358] dark:text-[#9FB1A7] font-light mt-0.5 tracking-wide">
                 {statusInfo.subtitle}
               </p>
             </div>
@@ -258,23 +258,23 @@ export default function FarmerLiveTracking() {
           {/* Right Status Pill */}
           <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
             {isSearching ? (
-              <div className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-emerald-950/80 border border-emerald-500/40 text-emerald-400 text-xs font-black shadow-lg shadow-emerald-950/40 animate-pulse">
-                <Radio className="w-3.5 h-3.5 text-emerald-400 animate-spin" />
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#1A4F32]/10 text-[#1A4F32] dark:text-[#4ADE80] text-xs font-semibold">
+                <Radio className="w-3.5 h-3.5 animate-spin" />
                 <span>Searching: {searchSeconds}s</span>
               </div>
             ) : (
-              <div className="flex items-center gap-3 p-2.5 rounded-2xl bg-stone-900/90 border border-slate-200 dark:border-slate-800 text-xs font-black text-white">
-                <div className="flex items-center gap-1.5 text-emerald-400">
+              <div className="flex items-center gap-3 p-2.5 rounded-full bg-black/5 dark:bg-white/5 text-xs font-semibold text-[#0B1E14] dark:text-[#EAEFEA]">
+                <div className="flex items-center gap-1.5 text-[#1A4F32] dark:text-[#4ADE80]">
                   <Gauge className="w-3.5 h-3.5" />
                   <span>Speed: {currentSpeed} km/h</span>
                 </div>
-                <span className="text-stone-600">•</span>
-                <div className="flex items-center gap-1.5 text-amber-400">
+                <span className="text-[#4F6358]">•</span>
+                <div className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400">
                   <MapPin className="w-3.5 h-3.5" />
                   <span>Dist: {distanceKm} km</span>
                 </div>
-                <span className="text-stone-600">•</span>
-                <span className="text-emerald-300">
+                <span className="text-[#4F6358]">•</span>
+                <span className="text-[#1A4F32] dark:text-[#4ADE80]">
                   ETA: {liveEtaMins} Mins
                 </span>
               </div>
@@ -283,7 +283,7 @@ export default function FarmerLiveTracking() {
             {/* Cancel Button */}
             <button
               onClick={() => setIsCancelModalOpen(true)}
-              className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-red-950/40 text-slate-500 dark:text-slate-400 hover:text-red-400 border border-slate-200 dark:border-slate-800 hover:border-red-500/40 font-bold text-xs transition cursor-pointer active:scale-95"
+              className="px-4 py-2 rounded-full bg-black/5 hover:bg-red-500/10 text-[#4F6358] dark:text-[#9FB1A7] hover:text-red-500 font-medium text-xs transition-all duration-300 cursor-pointer active:scale-95"
             >
               {t('cancelBooking')}
             </button>
@@ -291,7 +291,7 @@ export default function FarmerLiveTracking() {
         </div>
 
         {/* Full-Width Interactive Radar Leaflet Map */}
-        <div className="w-full h-[360px] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 relative shadow-inner">
+        <div className="w-full h-[360px] rounded-2xl overflow-hidden border border-black/[0.06] dark:border-white/[0.08] relative shadow-inner">
           <LiveMap
             farmerLocation={activeBooking.farmerLocation}
             driverPos={driverCurrentPos}
@@ -303,8 +303,8 @@ export default function FarmerLiveTracking() {
           />
 
           {/* Map Bottom Floating Pill */}
-          <div className="absolute bottom-3 left-3 z-[1000] px-3.5 py-1.5 rounded-xl bg-stone-950/90 border border-slate-200 dark:border-slate-800 text-[11px] font-bold text-slate-700 dark:text-slate-300 backdrop-blur-md flex items-center gap-2 shadow-lg">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <div className="absolute bottom-3 left-3 z-[1000] px-3.5 py-1.5 rounded-full bg-[#FDFBF7]/90 dark:bg-[#080E0B]/90 border border-black/[0.06] dark:border-white/[0.08] text-[11px] font-medium text-[#0B1E14] dark:text-[#EAEFEA] backdrop-blur-md flex items-center gap-2 shadow-sm">
+            <span className="w-2 h-2 rounded-full bg-[#1A4F32] dark:bg-[#4ADE80] animate-pulse"></span>
             <span>
               {isSearching 
                 ? 'Live Radar: 5 km radius in Malihabad • 12 Operators broadcasting' 
@@ -316,7 +316,7 @@ export default function FarmerLiveTracking() {
       </div>
 
       {/* ══════════════ SECTION 2: DYNAMIC LIVE MATCHING TIMELINE & PROGRESSION ══════════════ */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-2xl backdrop-blur-xl">
+      <div className="bg-white/80 dark:bg-[#0D1611]/80 border border-black/[0.06] dark:border-white/[0.08] rounded-3xl p-5 sm:p-6 shadow-sm backdrop-blur-xl">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 relative">
           {progressSteps.map((stepItem, idx) => {
             const isDone = stepItem.status === 'done';

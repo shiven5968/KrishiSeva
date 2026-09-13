@@ -899,18 +899,18 @@ export default function CreativeLoginPortal() {
 
               {/* STEP 1: Phone Number Input & Send WhatsApp OTP */}
               {step === 'phone' && (
-                <div className="space-y-5 animate-fade-in">
+                <div className="space-y-5 animate-fade-in-up">
                   <div className="space-y-1">
-                    <h3 className={`text-2xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    <h3 className="text-2xl font-bold tracking-tight text-[#0B1E14] dark:text-[#EAEFEA]">
                       {lang === 'hi' ? 'शुरू करें' : 'Get Started'}
                     </h3>
-                    <p className={`text-xs font-medium ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+                    <p className="text-xs font-light text-[#4F6358] dark:text-[#9FB1A7] tracking-wide">
                       {lang === 'hi' ? 'व्हाट्सएप ओटीपी प्राप्त करने हेतु अपना मोबाइल नंबर दर्ज करें' : 'Enter your mobile number to receive your WhatsApp OTP'}
                     </p>
                   </div>
 
                   {error && (
-                    <div className="p-3.5 rounded-2xl bg-red-950/85 border border-red-800/60 text-red-300 text-xs font-bold text-center flex items-center justify-center gap-2 animate-fade-in">
+                    <div className="p-3.5 rounded-2xl bg-red-950/85 border border-red-800/60 text-red-300 text-xs font-semibold text-center flex items-center justify-center gap-2 animate-fade-in">
                       <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
                       <span>{error}</span>
                     </div>
@@ -918,19 +918,11 @@ export default function CreativeLoginPortal() {
 
                   <form onSubmit={handleSendWhatsAppOtp} className="space-y-4">
                     <div>
-                      <label className={`block text-xs font-bold uppercase tracking-wider mb-2 ${
-                        isDark ? 'text-stone-400' : 'text-slate-650'
-                      }`}>
+                      <label className="block text-xs font-semibold tracking-wide mb-2 text-[#0B1E14] dark:text-[#EAEFEA]">
                         {lang === 'hi' ? 'मोबाइल नंबर' : 'Enter Mobile Number'}
                       </label>
-                      <div className={`border p-3.5 flex items-center gap-3 transition-all rounded-2xl ${
-                        isDark 
-                          ? 'bg-slate-950 border-white/10 focus-within:border-emerald-500/60' 
-                          : 'bg-slate-50 border-slate-250 focus-within:border-emerald-500/60'
-                      }`}>
-                        <span className={`font-semibold text-xs flex items-center gap-1.5 pointer-events-none border-r pr-3 select-none ${
-                          isDark ? 'text-slate-350 border-slate-700' : 'text-slate-500 border-slate-300'
-                        }`}>
+                      <div className="border border-black/[0.08] dark:border-white/[0.1] p-3.5 flex items-center gap-3 transition-all rounded-2xl bg-black/[0.02] dark:bg-white/[0.03] focus-within:border-[#1A4F32] focus-within:ring-1 focus-within:ring-[#1A4F32]/20">
+                        <span className="font-semibold text-xs flex items-center gap-1.5 pointer-events-none border-r border-black/[0.08] dark:border-white/[0.1] pr-3 select-none text-[#4F6358] dark:text-[#9FB1A7]">
                           <span>IN</span>
                           <span>+91</span>
                         </span>
@@ -940,9 +932,7 @@ export default function CreativeLoginPortal() {
                           value={phone}
                           onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
                           placeholder="9236581609"
-                          className={`w-full bg-transparent focus:outline-none border-none p-0 focus:ring-0 ${
-                            isDark ? 'text-white placeholder:text-slate-605' : 'text-slate-900 placeholder:text-slate-400'
-                          }`}
+                          className="w-full bg-transparent focus:outline-none border-none p-0 focus:ring-0 text-[#0B1E14] dark:text-[#EAEFEA] placeholder:text-[#4F6358]/50 font-medium"
                           required
                           autoFocus
                         />
@@ -952,64 +942,61 @@ export default function CreativeLoginPortal() {
                     <button
                       type="submit"
                       disabled={isSendingOtp}
-                      className="w-full py-4 bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-black text-sm rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-50"
+                      className="w-full py-4 bg-[#0B1E14] hover:bg-[#153424] dark:bg-[#EAEFEA] dark:hover:bg-white text-white dark:text-[#0B1E14] font-medium text-sm rounded-full shadow-[0_8px_30px_rgb(11,30,20,0.12)] hover:shadow-[0_8px_30px_rgb(11,30,20,0.2)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] flex items-center justify-center gap-2 disabled:opacity-50 tracking-wide cursor-pointer"
                     >
                       {isSendingOtp ? (
                         <>
-                          <Clock className="w-5 h-5 animate-spin text-stone-950" />
+                          <Clock className="w-4 h-4 animate-spin" />
                           <span>{lang === 'hi' ? 'व्हाट्सएप ओटीपी भेजा जा रहा है...' : 'Sending WhatsApp OTP...'}</span>
                         </>
                       ) : (
                         <>
-                          <MessageSquare className="w-5 h-5 text-stone-950" />
-                          <span>{lang === 'hi' ? 'व्हाट्सएप द्वारा ओटीपी भेजें ->' : 'Send OTP via WhatsApp ->'}</span>
+                          <MessageSquare className="w-4 h-4" />
+                          <span>{lang === 'hi' ? 'व्हाट्सएप द्वारा ओटीपी भेजें →' : 'Send OTP via WhatsApp →'}</span>
                         </>
                       )}
                     </button>
                   </form>
 
                   {/* Minimal Security Text */}
-                  <div className={`flex items-center justify-center gap-2 text-[10px] pt-1 ${
-                    isDark ? 'text-stone-400' : 'text-slate-500'
-                  }`}>
-                    <Lock className="w-3 h-3 text-emerald-500" />
+                  <div className="flex items-center justify-center gap-2 text-[10px] pt-1 text-[#4F6358] dark:text-[#9FB1A7] font-light">
+                    <Lock className="w-3 h-3 text-[#1A4F32] dark:text-[#4ADE80]" />
                     <span>{lang === 'hi' ? '256-बिट सुरक्षित • 5 मिनट वैधता' : '256-Bit Secure • 5-min Validity'}</span>
                   </div>
                 </div>
               )}
 
-              {/* STEP 2: 6-Digit WhatsApp OTP Verification Screen */}
+              {/* STEP 2: 4-Digit WhatsApp OTP Verification Screen */}
               {step === 'otp' && (
-                <div className="space-y-5 animate-fade-in">
+                <div className="space-y-5 animate-fade-in-up">
                   <div className="text-center space-y-1.5">
-                    <div className="w-14 h-14 mx-auto rounded-2xl bg-emerald-950/80 border border-emerald-500/40 flex items-center justify-center mb-3 shadow-inner">
-                      <MessageSquare className="w-7 h-7 text-emerald-400" />
+                    <div className="w-12 h-12 mx-auto rounded-2xl bg-[#1A4F32]/10 dark:bg-[#4ADE80]/15 flex items-center justify-center mb-3">
+                      <MessageSquare className="w-6 h-6 text-[#1A4F32] dark:text-[#4ADE80]" />
                     </div>
-                    <h3 className={`text-2xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    <h3 className="text-2xl font-bold tracking-tight text-[#0B1E14] dark:text-[#EAEFEA]">
                       {lang === 'hi' ? '4-अंकीय ओटीपी दर्ज करें' : 'Enter 4-Digit OTP'}
                     </h3>
-                    <p className={`text-xs font-medium ${isDark ? 'text-stone-400' : 'text-slate-500'}`}>
+                    <p className="text-xs font-light text-[#4F6358] dark:text-[#9FB1A7] tracking-wide">
                       {lang === 'hi' ? `व्हाट्सएप (+91 ${phone}) पर भेजा गया सुरक्षा कोड` : `WhatsApp verification code sent to +91 ${phone}`}
                     </p>
                   </div>
 
                   {toastMessage && (
-                    <div className="p-3.5 rounded-2xl bg-emerald-950/90 border border-emerald-500/60 text-emerald-300 text-xs font-bold text-center flex items-center justify-center gap-2 animate-fade-in shadow-lg">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <div className="p-3.5 rounded-2xl bg-[#1A4F32]/10 border border-[#1A4F32]/30 text-[#1A4F32] dark:text-[#4ADE80] text-xs font-semibold text-center flex items-center justify-center gap-2 animate-fade-in">
+                      <CheckCircle2 className="w-4 h-4 text-[#1A4F32] dark:text-[#4ADE80] shrink-0" />
                       <span>{toastMessage}</span>
                     </div>
                   )}
 
                   {error && (
-                    <div className="p-3.5 rounded-2xl bg-red-950/85 border border-red-800/60 text-red-300 text-xs font-bold text-center flex items-center justify-center gap-2 animate-fade-in">
+                    <div className="p-3.5 rounded-2xl bg-red-950/85 border border-red-800/60 text-red-300 text-xs font-semibold text-center flex items-center justify-center gap-2 animate-fade-in">
                       <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
                       <span>{error}</span>
                     </div>
                   )}
 
-                  
                   <form onSubmit={handleVerifyOtp} className="space-y-4">
-                    <div className="flex items-center justify-center gap-1.5 py-1 px-3 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-semibold">
+                    <div className="flex items-center justify-center gap-1.5 py-1 px-3 rounded-full bg-black/5 dark:bg-white/5 text-[#4F6358] dark:text-[#9FB1A7] text-xs font-medium">
                       <span>{lang === 'hi' ? 'परीक्षण कोड: 1234 या 1111' : 'Test Code: 1234 or 1111'}</span>
                     </div>
                     <div>
@@ -1019,7 +1006,7 @@ export default function CreativeLoginPortal() {
                         value={otp}
                         onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
                         placeholder="••••"
-                        className="w-full py-4 text-center tracking-[0.6em] rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/60 font-black text-emerald-400 text-3xl outline-none transition-all duration-200 shadow-inner"
+                        className="w-full py-4 text-center tracking-[0.6em] rounded-2xl bg-black/[0.02] dark:bg-white/[0.03] border border-black/[0.08] dark:border-white/[0.1] focus:border-[#1A4F32] focus:ring-1 focus:ring-[#1A4F32]/20 font-bold text-[#0B1E14] dark:text-[#EAEFEA] text-3xl outline-none transition-all duration-200"
                         required
                         autoFocus
                       />
@@ -1027,9 +1014,9 @@ export default function CreativeLoginPortal() {
 
                     {/* Resend OTP with 60-Second Countdown Timer */}
                     <div className="flex items-center justify-between text-xs px-1">
-                      <span className="text-stone-400">
+                      <span className="text-[#4F6358] dark:text-[#9FB1A7] font-light">
                         {resendTimer > 0 ? (
-                          lang === 'hi' ? <span><b className="text-emerald-400 tabular-nums">{resendTimer}s</b> में पुनः भेजें</span> : <span>Resend in <b className="text-emerald-400 tabular-nums">{resendTimer}s</b></span>
+                          lang === 'hi' ? <span><b className="text-[#1A4F32] dark:text-[#4ADE80] tabular-nums font-semibold">{resendTimer}s</b> में पुनः भेजें</span> : <span>Resend in <b className="text-[#1A4F32] dark:text-[#4ADE80] tabular-nums font-semibold">{resendTimer}s</b></span>
                         ) : (
                           <span>{lang === 'hi' ? 'ओटीपी नहीं मिला?' : "Didn't get code?"}</span>
                         )}
@@ -1039,21 +1026,21 @@ export default function CreativeLoginPortal() {
                         type="button"
                         onClick={handleResendWhatsAppOtp}
                         disabled={resendTimer > 0 || isSendingOtp}
-                        className={`font-black transition-all duration-200 ${
+                        className={`font-semibold transition-all duration-200 ${
                           resendTimer > 0 || isSendingOtp
-                            ? 'text-stone-500 cursor-not-allowed' 
-                            : 'text-emerald-400 hover:text-emerald-350 underline underline-offset-2'
+                            ? 'text-[#4F6358]/50 cursor-not-allowed' 
+                            : 'text-[#1A4F32] dark:text-[#4ADE80] hover:underline underline-offset-2 cursor-pointer'
                         }`}
                       >
                         {lang === 'hi' ? 'व्हाट्सएप पर पुनः भेजें' : 'Resend via WhatsApp'}
                       </button>
                     </div>
 
-                    <div className="flex gap-2 pt-1">
+                    <div className="flex gap-2.5 pt-1">
                       <button
                         type="button"
                         onClick={() => { setStep('phone'); setOtp(''); setError(''); }}
-                        className="w-1/3 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 hover:bg-white/10 text-slate-350 font-bold text-xs transition-all duration-200 hover:border-emerald-500/40 hover:text-white"
+                        className="w-1/3 py-3.5 rounded-full bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-[#0B1E14] dark:text-[#EAEFEA] font-medium text-xs transition-all duration-300 cursor-pointer"
                       >
                         {lang === 'hi' ? 'नंबर बदलें' : 'Change Number'}
                       </button>
@@ -1061,16 +1048,16 @@ export default function CreativeLoginPortal() {
                       <button
                         type="submit"
                         disabled={isVerifyingOtp}
-                        className="w-2/3 py-4 bg-gradient-to-r from-emerald-500 to-emerald-400 hover:from-emerald-400 hover:to-emerald-300 text-slate-950 font-bold rounded-2xl shadow-[0_0_25px_rgba(16,185,129,0.3)] transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-50"
+                        className="w-2/3 py-3.5 bg-[#0B1E14] hover:bg-[#153424] dark:bg-[#EAEFEA] dark:hover:bg-white text-white dark:text-[#0B1E14] font-medium text-xs rounded-full shadow-[0_8px_30px_rgb(11,30,20,0.12)] hover:shadow-[0_8px_30px_rgb(11,30,20,0.2)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] flex items-center justify-center gap-2 tracking-wide cursor-pointer disabled:opacity-50"
                       >
                         {isVerifyingOtp ? (
                           <>
-                            <Clock className="w-4 h-4 animate-spin text-stone-950" />
+                            <Clock className="w-4 h-4 animate-spin" />
                             <span>{lang === 'hi' ? 'सत्यापित हो रहा है...' : 'Verifying...'}</span>
                           </>
                         ) : (
                           <>
-                            <ShieldCheck className="w-4 h-4 text-stone-950" />
+                            <ShieldCheck className="w-4 h-4" />
                             <span>{lang === 'hi' ? 'सत्यापित करें व लॉगिन करें' : 'Verify & Login'}</span>
                           </>
                         )}

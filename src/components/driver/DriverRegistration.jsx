@@ -74,19 +74,19 @@ export default function DriverRegistration() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
-      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-stone-200 shadow-xl space-y-6">
+      <div className="bg-white/80 dark:bg-[#0D1611]/80 backdrop-blur-md rounded-3xl p-6 sm:p-8 border border-black/[0.06] dark:border-white/[0.08] shadow-sm space-y-6">
         
         {/* Header */}
-        <div className="border-b border-stone-100 pb-5 space-y-1">
+        <div className="border-b border-black/[0.06] dark:border-white/[0.08] pb-5 space-y-2">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-black uppercase text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">
+            <span className="text-xs font-black uppercase text-[#1A4F32] dark:text-[#4ADE80] bg-[#1A4F32]/10 dark:bg-[#4ADE80]/10 px-3 py-1 rounded-full border border-[#1A4F32]/20">
               {lang === 'hi' ? 'ड्राइवर ऑनबोर्डिंग केवाईसी' : 'Driver Partner KYC Registration'}
             </span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-black text-stone-900">
+          <h2 className="text-2xl sm:text-3xl font-black text-[#0B1E14] dark:text-[#EAEFEA] tracking-tight">
             {t('driverOnboardingTitle')}
           </h2>
-          <p className="text-xs sm:text-sm text-stone-500 font-medium">
+          <p className="text-xs sm:text-sm text-[#4F6358] dark:text-[#9FB1A7] font-medium">
             {lang === 'hi' 
               ? 'अपनी मशीन पंजीकृत करें, ड्राइविंग लाइसेंस और नंबर प्लेट फोटो अपलोड कर एडमिन सत्यापन हेतु जमा करें।' 
               : 'Register your vehicle, attach documents & submit for instant Admin review.'}
@@ -263,7 +263,7 @@ export default function DriverRegistration() {
           {/* Submit Action Button */}
           <button
             type="submit"
-            className="w-full py-4 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black text-base shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 transition active:scale-98"
+            className="w-full py-4 rounded-full bg-[#0B1E14] hover:bg-[#153424] dark:bg-[#EAEFEA] dark:hover:bg-white text-white dark:text-[#0B1E14] font-black text-base shadow-[0_8px_30px_rgb(11,30,20,0.12)] flex items-center justify-center gap-2 hover:-translate-y-0.5 transition-all duration-300"
           >
             <span>{t('submitForVerification')}</span>
             <ArrowRight className="w-5 h-5" />

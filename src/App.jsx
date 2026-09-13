@@ -67,12 +67,19 @@ function MainContent() {
   if (activeRole === 'admin' || currentUser?.role === 'admin') {
     if (currentUser?.role === 'admin') {
       return (
-        <div className={`min-h-screen flex flex-col transition-colors duration-200 ${isDark ? 'bg-slate-950 text-slate-100' : 'bg-[#ECF5F0] text-slate-900'}`}>
+        <div className={`min-h-screen flex flex-col selection:bg-[#1A4F32] selection:text-white transition-colors duration-500 relative ${isDark ? 'bg-[#080E0B] text-[#EAEFEA]' : 'bg-[#FDFBF7] text-[#0B1E14]'}`}>
+          {/* Global Tactile Paper Grain Overlay */}
+          <div 
+            className="fixed inset-0 pointer-events-none z-50 opacity-[0.03] dark:opacity-[0.025] mix-blend-overlay"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
+            }}
+          />
           <Navbar 
             onOpenAuthModal={() => setIsAuthModalOpen(true)}
             onOpenSavedLandsModal={() => setIsSavedLandsModalOpen(true)}
           />
-          <main className="flex-1 pb-16">
+          <main className="flex-1 pb-16 animate-fade-in-up">
             <AdminPortal />
           </main>
         </div>
@@ -90,15 +97,23 @@ function MainContent() {
   const hasActiveBooking = activeBooking && ['searching', 'accepted', 'arrived', 'in_progress', 'completed'].includes(activeBooking.status);
 
   return (
-    <div className={`min-h-screen flex flex-col transition-colors duration-200 ${isDark ? 'bg-slate-950 text-slate-100' : 'bg-[#ECF5F0] text-slate-900'}`}>
+    <div className={`min-h-screen flex flex-col selection:bg-[#1A4F32] selection:text-white transition-colors duration-500 relative ${isDark ? 'bg-[#080E0B] text-[#EAEFEA]' : 'bg-[#FDFBF7] text-[#0B1E14]'}`}>
       
+      {/* Global Tactile Paper Grain Overlay */}
+      <div 
+        className="fixed inset-0 pointer-events-none z-50 opacity-[0.03] dark:opacity-[0.025] mix-blend-overlay"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
+        }}
+      />
+
       {/* Strict Role-Locked Navbar */}
       <Navbar 
         onOpenAuthModal={() => setIsAuthModalOpen(true)}
         onOpenSavedLandsModal={() => setIsSavedLandsModalOpen(true)}
       />
 
-      <main className="flex-1 pb-16">
+      <main className="flex-1 pb-16 animate-fade-in-up">
         
         {/* 1. STRICT FARMER VIEW: Locked to Farmer account */}
         {currentUser.role === 'farmer' && (

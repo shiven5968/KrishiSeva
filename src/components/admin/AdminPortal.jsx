@@ -325,26 +325,24 @@ export default function AdminPortal() {
   };
 
   return (
-    <div className={`min-h-screen font-sans selection:bg-emerald-500 selection:text-stone-950 transition-colors duration-200 ${
-      isDark ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
+    <div className={`min-h-screen font-sans selection:bg-[#1A4F32] selection:text-white transition-colors duration-500 ${
+      isDark ? 'bg-[#080E0B] text-[#EAEFEA]' : 'bg-[#FDFBF7] text-[#0B1E14]'
     }`}>
       
       {/* ══════════════ SUB-COMMAND TABS STRIP ══════════════ */}
-      <div className={`border-b py-3 px-4 sm:px-6 lg:px-8 transition-colors duration-200 ${
-        isDark ? 'bg-stone-900/40 border-slate-200 dark:border-slate-800/80' : 'bg-white/70 border-slate-200'
+      <div className={`border-b py-3 px-4 sm:px-6 lg:px-8 transition-colors duration-300 ${
+        isDark ? 'bg-[#080E0B]/80 border-white/[0.05]' : 'bg-[#FDFBF7]/80 border-black/[0.04]'
       }`}>
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
           
           {/* Navigation Pill Tabs */}
-          <nav className={`flex items-center p-1 rounded-2xl border text-xs font-black shadow-sm ${
-            isDark ? 'bg-stone-950 border-slate-200 dark:border-slate-800' : 'bg-slate-100 border-slate-200'
-          }`}>
+          <nav className="flex items-center p-1 rounded-full border border-black/[0.06] dark:border-white/[0.08] text-xs font-semibold bg-black/[0.02] dark:bg-white/[0.03]">
             <button
               onClick={() => setActiveTab('dashboard')}
-              className={`px-4 py-2 rounded-xl transition flex items-center gap-1.5 ${
+              className={`px-4 py-2 rounded-full transition-all duration-300 flex items-center gap-1.5 cursor-pointer ${
                 activeTab === 'dashboard'
-                  ? 'bg-emerald-500 text-stone-950 shadow-md'
-                  : isDark ? 'text-slate-700 dark:text-slate-300 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-[#0B1E14] dark:bg-[#EAEFEA] text-white dark:text-[#0B1E14] shadow-sm'
+                  : 'text-[#4F6358] dark:text-[#9FB1A7] hover:text-[#0B1E14] dark:hover:text-[#EAEFEA]'
               }`}
             >
               <Activity className="w-3.5 h-3.5" />
@@ -353,16 +351,16 @@ export default function AdminPortal() {
 
             <button
               onClick={() => setActiveTab('kyc')}
-              className={`px-4 py-2 rounded-xl transition flex items-center gap-1.5 relative ${
+              className={`px-4 py-2 rounded-full transition-all duration-300 flex items-center gap-1.5 relative cursor-pointer ${
                 activeTab === 'kyc'
-                  ? 'bg-emerald-500 text-stone-950 shadow-md'
-                  : isDark ? 'text-slate-700 dark:text-slate-300 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-[#0B1E14] dark:bg-[#EAEFEA] text-white dark:text-[#0B1E14] shadow-sm'
+                  : 'text-[#4F6358] dark:text-[#9FB1A7] hover:text-[#0B1E14] dark:hover:text-[#EAEFEA]'
               }`}
             >
               <ShieldCheck className="w-3.5 h-3.5" />
               <span>{lang === 'hi' ? 'केवाईसी ऑडिट' : 'KYC Queue'}</span>
               {pendingApplications.length > 0 && (
-                <span className="px-1.5 py-0.2 text-[9px] rounded-full bg-red-500 text-white font-black animate-pulse">
+                <span className="px-1.5 py-0.2 text-[9px] rounded-full bg-[#1A4F32] dark:bg-[#4ADE80] text-white dark:text-[#0B1E14] font-bold">
                   {pendingApplications.length}
                 </span>
               )}
@@ -370,10 +368,10 @@ export default function AdminPortal() {
 
             <button
               onClick={() => setActiveTab('directory')}
-              className={`px-4 py-2 rounded-xl transition flex items-center gap-1.5 ${
+              className={`px-4 py-2 rounded-full transition-all duration-300 flex items-center gap-1.5 cursor-pointer ${
                 activeTab === 'directory'
-                  ? 'bg-emerald-500 text-stone-950 shadow-md'
-                  : isDark ? 'text-slate-700 dark:text-slate-300 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-[#0B1E14] dark:bg-[#EAEFEA] text-white dark:text-[#0B1E14] shadow-sm'
+                  : 'text-[#4F6358] dark:text-[#9FB1A7] hover:text-[#0B1E14] dark:hover:text-[#EAEFEA]'
               }`}
             >
               <Users className="w-3.5 h-3.5" />
@@ -382,10 +380,10 @@ export default function AdminPortal() {
 
             <button
               onClick={() => setActiveTab('pricing')}
-              className={`px-4 py-2 rounded-xl transition flex items-center gap-1.5 ${
+              className={`px-4 py-2 rounded-full transition-all duration-300 flex items-center gap-1.5 cursor-pointer ${
                 activeTab === 'pricing'
-                  ? 'bg-emerald-500 text-stone-950 shadow-md'
-                  : isDark ? 'text-slate-700 dark:text-slate-300 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-[#0B1E14] dark:bg-[#EAEFEA] text-white dark:text-[#0B1E14] shadow-sm'
+                  : 'text-[#4F6358] dark:text-[#9FB1A7] hover:text-[#0B1E14] dark:hover:text-[#EAEFEA]'
               }`}
             >
               <Sliders className="w-3.5 h-3.5" />
@@ -395,10 +393,10 @@ export default function AdminPortal() {
 
           {/* Right Status Badge & Public App shortcut */}
           <div className="flex items-center gap-3">
-            <div className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl border text-[11px] font-bold ${
-              isDark ? 'bg-stone-950 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-600'
+            <div className={`hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-[11px] font-medium ${
+              isDark ? 'bg-white/[0.03] border-white/[0.08] text-[#9FB1A7]' : 'bg-black/[0.02] border-black/[0.06] text-[#4F6358]'
             }`}>
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-[#1A4F32] dark:bg-[#4ADE80] animate-pulse" />
               <span>Malihabad Node: Operational</span>
             </div>
 
@@ -407,9 +405,9 @@ export default function AdminPortal() {
                 window.location.hash = '';
                 setActiveRole('landing');
               }}
-              className="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-black text-xs shadow-sm transition flex items-center gap-1.5 active:scale-95"
+              className="px-4 py-2 rounded-full bg-[#0B1E14] hover:bg-[#153424] dark:bg-[#EAEFEA] dark:hover:bg-white text-white dark:text-[#0B1E14] font-medium text-xs shadow-sm transition-all duration-300 flex items-center gap-1.5 active:scale-95 cursor-pointer"
             >
-              <Home className="w-3.5 h-3.5 text-stone-950" />
+              <Home className="w-3.5 h-3.5" />
               <span>{lang === 'hi' ? 'मुख्य पृष्ठ' : 'Public App'}</span>
             </button>
           </div>

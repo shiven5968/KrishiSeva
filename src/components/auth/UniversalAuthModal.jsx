@@ -72,13 +72,13 @@ export default function UniversalAuthModal({ isOpen, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-stone-950/85 backdrop-blur-md animate-fade-in">
-      <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-stone-200 relative overflow-hidden">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-[#0B1E14]/75 backdrop-blur-md animate-fade-in">
+      <div className="bg-[#FDFBF7] dark:bg-[#0D1611] rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-[0_20px_50px_rgba(11,30,20,0.25)] border border-black/[0.08] dark:border-white/[0.08] relative overflow-hidden text-[#0B1E14] dark:text-[#EAEFEA]">
         
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 w-9 h-9 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 flex items-center justify-center transition"
+          className="absolute top-5 right-5 w-9 h-9 rounded-full bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 text-[#0B1E14] dark:text-[#EAEFEA] flex items-center justify-center transition"
         >
           <X className="w-5 h-5" />
         </button>
@@ -87,13 +87,13 @@ export default function UniversalAuthModal({ isOpen, onClose }) {
         {step === 'phone' && (
           <div className="space-y-6">
             <div className="text-center space-y-2">
-              <div className="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto shadow-inner">
-                <Phone className="w-7 h-7" />
+              <div className="w-14 h-14 rounded-2xl bg-[#1A4F32]/10 dark:bg-[#4ADE80]/10 text-[#1A4F32] dark:text-[#4ADE80] flex items-center justify-center mx-auto border border-[#1A4F32]/20">
+                <Phone className="w-6 h-6" />
               </div>
-              <h3 className="text-2xl font-black text-stone-900">
+              <h3 className="text-2xl font-black text-[#0B1E14] dark:text-[#EAEFEA] tracking-tight">
                 {lang === 'hi' ? 'मोबाइल नंबर से लॉगिन / साइनअप' : 'Universal Mobile Login'}
               </h3>
-              <p className="text-stone-500 text-xs sm:text-sm font-medium">
+              <p className="text-[#4F6358] dark:text-[#9FB1A7] text-xs sm:text-sm font-medium">
                 {lang === 'hi'
                   ? 'अपना 10 अंकों का मोबाइल नंबर दर्ज करें और तत्काल ओटीपी प्राप्त करें'
                   : 'Enter your 10-digit mobile number for instant OTP verification'}
@@ -101,18 +101,18 @@ export default function UniversalAuthModal({ isOpen, onClose }) {
             </div>
 
             {error && (
-              <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-bold text-center">
+              <div className="p-3 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-xs font-bold text-center">
                 {error}
               </div>
             )}
 
             <form onSubmit={handleSendOtp} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-bold text-[#4F6358] dark:text-[#9FB1A7] uppercase tracking-wider mb-1.5">
                   {t('enterMobile')}
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-500 font-black text-sm">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#4F6358] dark:text-[#9FB1A7] font-black text-sm">
                     🇮🇳 +91
                   </span>
                   <input
@@ -121,7 +121,7 @@ export default function UniversalAuthModal({ isOpen, onClose }) {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
                     placeholder="9876543210"
-                    className="w-full pl-20 pr-4 py-3.5 rounded-2xl border-2 border-stone-300 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 font-black text-stone-900 text-lg outline-none transition"
+                    className="w-full pl-20 pr-4 py-3.5 rounded-2xl border border-black/15 dark:border-white/15 bg-white/80 dark:bg-black/40 focus:border-[#1A4F32] dark:focus:border-[#4ADE80] focus:ring-4 focus:ring-[#1A4F32]/10 font-black text-[#0B1E14] dark:text-[#EAEFEA] text-lg outline-none transition shadow-sm"
                     required
                   />
                 </div>
@@ -129,7 +129,7 @@ export default function UniversalAuthModal({ isOpen, onClose }) {
 
               <button
                 type="submit"
-                className="w-full py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-base shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition active:scale-98"
+                className="w-full py-4 rounded-full bg-[#0B1E14] hover:bg-[#153424] dark:bg-[#EAEFEA] dark:hover:bg-white text-white dark:text-[#0B1E14] font-black text-base shadow-[0_8px_30px_rgb(11,30,20,0.12)] flex items-center justify-center gap-2 hover:-translate-y-0.5 transition-all duration-300"
               >
                 <span>{t('sendOtp')}</span>
                 <ArrowRight className="w-5 h-5" />
@@ -137,45 +137,45 @@ export default function UniversalAuthModal({ isOpen, onClose }) {
             </form>
 
             {/* Quick Demo Test Profiles for Fast Testing */}
-            <div className="pt-2 border-t border-stone-100 space-y-2">
-              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-extrabold uppercase tracking-wider block text-center">
+            <div className="pt-3 border-t border-black/[0.06] dark:border-white/[0.08] space-y-2">
+              <span className="text-[10px] text-[#4F6358] dark:text-[#9FB1A7] font-extrabold uppercase tracking-wider block text-center">
                 ⚡ 1-Click Fast Demo Login (डेमो प्रोफ़ाइल चुनें)
               </span>
               <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
                   onClick={() => { quickDemoLogin('farmer'); onClose(); }}
-                  className="p-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-left transition"
+                  className="p-3 rounded-2xl bg-white/70 dark:bg-white/[0.04] hover:bg-emerald-500/10 border border-black/[0.06] dark:border-white/[0.08] text-left transition hover:border-[#1A4F32]/30"
                 >
-                  <span className="text-xs font-black text-emerald-900 block">🌾 Existing Farmer</span>
-                  <span className="text-[10px] text-emerald-700">9876543210</span>
+                  <span className="text-xs font-black text-[#0B1E14] dark:text-[#EAEFEA] block">🌾 Farmer</span>
+                  <span className="text-[10px] text-[#4F6358] dark:text-[#9FB1A7]">9876543210</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => { quickDemoLogin('verified_driver'); onClose(); }}
-                  className="p-2.5 rounded-xl bg-blue-50 hover:bg-blue-100 border border-blue-200 text-left transition"
+                  className="p-3 rounded-2xl bg-white/70 dark:bg-white/[0.04] hover:bg-blue-500/10 border border-black/[0.06] dark:border-white/[0.08] text-left transition hover:border-blue-500/30"
                 >
-                  <span className="text-xs font-black text-blue-900 block">🚜 Verified Driver</span>
-                  <span className="text-[10px] text-blue-700">9876501234</span>
+                  <span className="text-xs font-black text-[#0B1E14] dark:text-[#EAEFEA] block">🚜 Driver</span>
+                  <span className="text-[10px] text-[#4F6358] dark:text-[#9FB1A7]">9876501234</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => { quickDemoLogin('pending_driver'); onClose(); }}
-                  className="p-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-left transition"
+                  className="p-3 rounded-2xl bg-white/70 dark:bg-white/[0.04] hover:bg-amber-500/10 border border-black/[0.06] dark:border-white/[0.08] text-left transition hover:border-amber-500/30"
                 >
-                  <span className="text-xs font-black text-amber-900 block">⏳ Pending Driver</span>
-                  <span className="text-[10px] text-amber-700">9811122233</span>
+                  <span className="text-xs font-black text-[#0B1E14] dark:text-[#EAEFEA] block">⏳ KYC Pending</span>
+                  <span className="text-[10px] text-[#4F6358] dark:text-[#9FB1A7]">9811122233</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => { quickDemoLogin('admin'); onClose(); }}
-                  className="p-2.5 rounded-xl bg-purple-50 hover:bg-purple-100 border border-purple-200 text-left transition"
+                  className="p-3 rounded-2xl bg-white/70 dark:bg-white/[0.04] hover:bg-purple-500/10 border border-black/[0.06] dark:border-white/[0.08] text-left transition hover:border-purple-500/30"
                 >
-                  <span className="text-xs font-black text-purple-900 block">🛡️ Super Admin</span>
-                  <span className="text-[10px] text-purple-700">9999999999</span>
+                  <span className="text-xs font-black text-[#0B1E14] dark:text-[#EAEFEA] block">🛡️ Admin</span>
+                  <span className="text-[10px] text-[#4F6358] dark:text-[#9FB1A7]">9999999999</span>
                 </button>
               </div>
             </div>
@@ -187,21 +187,19 @@ export default function UniversalAuthModal({ isOpen, onClose }) {
         {step === 'otp' && (
           <div className="space-y-6">
             <div className="text-center space-y-2">
-              <div className="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto shadow-inner">
-                <KeyRound className="w-7 h-7" />
+              <div className="w-14 h-14 rounded-2xl bg-[#1A4F32]/10 dark:bg-[#4ADE80]/10 text-[#1A4F32] dark:text-[#4ADE80] flex items-center justify-center mx-auto border border-[#1A4F32]/20">
+                <KeyRound className="w-6 h-6" />
               </div>
-              <h3 className="text-2xl font-black text-stone-900">
+              <h3 className="text-2xl font-black text-[#0B1E14] dark:text-[#EAEFEA] tracking-tight">
                 {lang === 'hi' ? 'ओटीपी सत्यापन' : 'Verify OTP Code'}
               </h3>
-              <p className="text-stone-500 text-xs sm:text-sm font-medium">
+              <p className="text-[#4F6358] dark:text-[#9FB1A7] text-xs sm:text-sm font-medium">
                 {lang === 'hi' ? `मोबाइल +91 ${phone} पर भेजा गया कोड दर्ज करें` : `Enter the 6-digit code sent to +91 ${phone}`}
               </p>
             </div>
 
-
-
             {error && (
-              <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-bold text-center">
+              <div className="p-3 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-xs font-bold text-center">
                 {error}
               </div>
             )}
@@ -214,23 +212,23 @@ export default function UniversalAuthModal({ isOpen, onClose }) {
                   value={otp}
                   onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
                   placeholder="••••••"
-                  className="w-full py-4 text-center tracking-[0.6em] rounded-2xl border-2 border-stone-300 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 font-black text-stone-900 text-3xl outline-none transition"
+                  className="w-full py-4 text-center tracking-[0.5em] rounded-2xl border border-black/15 dark:border-white/15 bg-white/80 dark:bg-black/40 focus:border-[#1A4F32] dark:focus:border-[#4ADE80] focus:ring-4 focus:ring-[#1A4F32]/10 font-black text-[#0B1E14] dark:text-[#EAEFEA] text-3xl outline-none transition shadow-sm"
                   required
                 />
               </div>
 
-              <div className="flex gap-2">
+              <div className="flex gap-2.5">
                 <button
                   type="button"
                   onClick={() => setStep('phone')}
-                  className="w-1/3 py-3.5 rounded-xl border border-stone-300 text-stone-700 font-bold text-sm hover:bg-stone-50"
+                  className="w-1/3 py-3.5 rounded-full border border-black/15 dark:border-white/15 text-[#0B1E14] dark:text-[#EAEFEA] font-bold text-sm hover:bg-black/5 dark:hover:bg-white/5 transition"
                 >
                   Back
                 </button>
 
                 <button
                   type="submit"
-                  className="w-2/3 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-base shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition active:scale-98"
+                  className="w-2/3 py-3.5 rounded-full bg-[#0B1E14] hover:bg-[#153424] dark:bg-[#EAEFEA] dark:hover:bg-white text-white dark:text-[#0B1E14] font-black text-base shadow-[0_8px_30px_rgb(11,30,20,0.12)] flex items-center justify-center gap-2 hover:-translate-y-0.5 transition-all duration-300"
                 >
                   <ShieldCheck className="w-5 h-5" />
                   <span>{t('verifyOtp')}</span>
@@ -244,19 +242,19 @@ export default function UniversalAuthModal({ isOpen, onClose }) {
         {step === 'role_select' && (
           <div className="space-y-6">
             <div className="text-center space-y-2">
-              <span className="text-xs font-black uppercase tracking-wider text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full border border-emerald-300">
+              <span className="text-xs font-black uppercase tracking-wider text-[#1A4F32] dark:text-[#4ADE80] bg-[#1A4F32]/10 dark:bg-[#4ADE80]/10 px-3.5 py-1 rounded-full border border-[#1A4F32]/20">
                 {lang === 'hi' ? 'स्वागत है! अपनी भूमिका चुनें' : 'Welcome! Select Your Account Role'}
               </span>
-              <h3 className="text-2xl font-black text-stone-900 mt-1">
+              <h3 className="text-2xl font-black text-[#0B1E14] dark:text-[#EAEFEA] tracking-tight mt-1">
                 {lang === 'hi' ? 'आप कृषि सेवा का उपयोग कैसे करना चाहते हैं?' : 'Are you a Farmer or a Machinery Driver?'}
               </h3>
-              <p className="text-stone-500 text-xs sm:text-sm font-medium">
+              <p className="text-[#4F6358] dark:text-[#9FB1A7] text-xs sm:text-sm font-medium">
                 {lang === 'hi' ? 'खेत के लिए मशीनरी बुक करें या अपनी मशीन लगाकर कमाई शुरू करें' : 'Choose whether you want to book equipment or provide equipment'}
               </p>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-stone-700 uppercase mb-1">
+              <label className="block text-xs font-bold text-[#4F6358] dark:text-[#9FB1A7] uppercase tracking-wider mb-1.5">
                 {t('fullName')} (Optional)
               </label>
               <input
@@ -264,7 +262,7 @@ export default function UniversalAuthModal({ isOpen, onClose }) {
                 placeholder="अपना नाम दर्ज करें"
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl border border-stone-300 font-bold text-stone-900 outline-none focus:border-emerald-500"
+                className="w-full px-4 py-3 rounded-2xl border border-black/15 dark:border-white/15 bg-white/80 dark:bg-black/40 font-bold text-[#0B1E14] dark:text-[#EAEFEA] outline-none focus:border-[#1A4F32] dark:focus:border-[#4ADE80] shadow-sm transition"
               />
             </div>
 
@@ -273,20 +271,20 @@ export default function UniversalAuthModal({ isOpen, onClose }) {
               {/* Option A: Farmer (Book Machinery) */}
               <div
                 onClick={() => handleRoleSelection('farmer')}
-                className="p-5 rounded-2xl border-2 border-emerald-500 bg-emerald-50/50 hover:bg-emerald-50 hover:border-emerald-600 cursor-pointer transition shadow-md group space-y-3"
+                className="p-5 rounded-3xl border border-[#1A4F32]/30 dark:border-[#4ADE80]/30 bg-[#1A4F32]/5 hover:bg-[#1A4F32]/10 cursor-pointer transition shadow-sm hover:shadow-md group space-y-3"
               >
-                <div className="w-12 h-12 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-md">
-                  <Tractor className="w-7 h-7" />
+                <div className="w-12 h-12 rounded-2xl bg-[#0B1E14] text-white flex items-center justify-center shadow-md">
+                  <Tractor className="w-6 h-6 text-[#4ADE80]" />
                 </div>
                 <div>
-                  <h4 className="font-black text-base text-stone-900">
+                  <h4 className="font-black text-base text-[#0B1E14] dark:text-[#EAEFEA]">
                     {lang === 'hi' ? 'मैं किसान हूँ (Farmer)' : 'I am a Farmer'}
                   </h4>
-                  <p className="text-xs text-stone-600 mt-1">
+                  <p className="text-xs text-[#4F6358] dark:text-[#9FB1A7] mt-1 leading-relaxed">
                     {lang === 'hi' ? 'खेत की जुताई, बुवाई, कटाई हेतु मशीनरी बुक करें।' : 'Book tractors, harvesters & earthmovers for your fields.'}
                   </p>
                 </div>
-                <button className="w-full py-2 rounded-xl bg-emerald-600 text-white font-black text-xs">
+                <button className="w-full py-2.5 rounded-full bg-[#0B1E14] hover:bg-[#153424] text-white font-bold text-xs shadow-sm transition">
                   {lang === 'hi' ? 'किसान के रूप में जारी रखें' : 'Continue as Farmer'}
                 </button>
               </div>
@@ -294,20 +292,20 @@ export default function UniversalAuthModal({ isOpen, onClose }) {
               {/* Option B: Driver (Provide Machinery) */}
               <div
                 onClick={() => handleRoleSelection('driver')}
-                className="p-5 rounded-2xl border-2 border-blue-500 bg-blue-50/50 hover:bg-blue-50 hover:border-blue-600 cursor-pointer transition shadow-md group space-y-3"
+                className="p-5 rounded-3xl border border-black/[0.08] dark:border-white/[0.08] bg-white/60 dark:bg-white/[0.03] hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer transition shadow-sm hover:shadow-md group space-y-3"
               >
-                <div className="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-md">
-                  <Truck className="w-7 h-7" />
+                <div className="w-12 h-12 rounded-2xl bg-[#1A4F32] text-white flex items-center justify-center shadow-md">
+                  <Truck className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h4 className="font-black text-base text-stone-900">
+                  <h4 className="font-black text-base text-[#0B1E14] dark:text-[#EAEFEA]">
                     {lang === 'hi' ? 'मैं ड्राइवर/मालिक हूँ (Driver)' : 'I am a Driver / Owner'}
                   </h4>
-                  <p className="text-xs text-stone-600 mt-1">
+                  <p className="text-xs text-[#4F6358] dark:text-[#9FB1A7] mt-1 leading-relaxed">
                     {lang === 'hi' ? 'केवाईसी दस्तावेज़ (DL/प्लेट) अपलोड कर बुकिंग पाएं।' : 'Upload DL & Plate to start receiving field ride requests.'}
                   </p>
                 </div>
-                <button className="w-full py-2 rounded-xl bg-blue-600 text-white font-black text-xs">
+                <button className="w-full py-2.5 rounded-full bg-[#1A4F32] hover:bg-[#153424] text-white font-bold text-xs shadow-sm transition">
                   {lang === 'hi' ? 'केवाईसी शुरू करें' : 'Start Driver KYC'}
                 </button>
               </div>
