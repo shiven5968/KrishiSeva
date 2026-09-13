@@ -50,8 +50,10 @@ import {
   PhoneCall,
   CheckCircle,
   HelpCircle,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Bug
 } from 'lucide-react';
+import AdminBugReportModal from './AdminBugReportModal';
 
 const REJECTION_REASON_PRESETS = [
   'Driving License photo is blurry or unreadable (ड्राइविंग लाइसेंस फ़ोटो धुंधली है)',
@@ -222,6 +224,7 @@ export default function AdminPortal() {
 
   const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' | 'kyc' | 'directory' | 'pricing'
   const [inspectingApp, setInspectingApp] = useState(null);
+  const [isBugReportModalOpen, setIsBugReportModalOpen] = useState(false);
 
   // Regional & Seasonal State
   const [activeZoneId, setActiveZoneId] = useState(selectedZoneId || 'up_purvanchal');
@@ -391,14 +394,24 @@ export default function AdminPortal() {
             </button>
           </nav>
 
-          {/* Right Status Badge & Public App shortcut */}
-          <div className="flex items-center gap-3">
-            <div className={`hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-[11px] font-medium ${
+          {/* Right Status Badge & Actions */}
+          <div className="flex items-center gap-2.5">
+            <div className={`hidden lg:flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-[11px] font-medium ${
               isDark ? 'bg-white/[0.03] border-white/[0.08] text-[#9FB1A7]' : 'bg-black/[0.02] border-black/[0.06] text-[#4F6358]'
             }`}>
               <span className="w-2 h-2 rounded-full bg-[#1A4F32] dark:bg-[#4ADE80] animate-pulse" />
-              <span>Malihabad Node: Operational</span>
+              <span>Malihabad Node: Live</span>
             </div>
+
+            {/* Direct Backend Issue Report Button */}
+            <button
+              onClick={() => setIsBugReportModalOpen(true)}
+              className="px-3.5 py-2 rounded-full border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 font-bold text-xs shadow-sm transition-all duration-300 flex items-center gap-1.5 active:scale-95 cursor-pointer"
+              title={lang === 'hi' ? 'बैकएंड टीम को समस्या रिपोर्ट करें' : 'Report Issue to Backend Team'}
+            >
+              <Bug className="w-3.5 h-3.5 text-red-500" />
+              <span>{lang === 'hi' ? 'समस्या रिपोर्ट करें' : 'Report Backend Issue'}</span>
+            </button>
 
             <button
               onClick={() => {
@@ -1550,6 +1563,12 @@ export default function AdminPortal() {
           </div>
         </div>
       )}
+
+      {/* Backend Bug & Issue Escalation Modal */}
+      <AdminBugReportModal
+        isOpen={isBugReportModalOpen}
+        onClose={() => setIsBugReportModalOpen(false)}
+      />
 
     </div>
   );

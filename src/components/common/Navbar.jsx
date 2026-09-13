@@ -10,6 +10,7 @@ import SavedLandsModal from '../farmer/SavedLandsModal';
 import PreBookingsModal from '../farmer/PreBookingsModal';
 import DeleteAccountModal from './DeleteAccountModal';
 import HelpSupportModal from './HelpSupportModal';
+import AdminBugReportModal from '../admin/AdminBugReportModal';
 import { 
   Tractor, 
   Globe, 
@@ -34,7 +35,8 @@ import {
   ArrowRightLeft,
   IndianRupee,
   FileCheck2,
-  Phone
+  Phone,
+  Bug
 } from 'lucide-react';
 
 export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
@@ -66,6 +68,7 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
   const [isPreBookingsModalOpen, setIsPreBookingsModalOpen] = useState(false);
   const [isDeleteAccountModalOpen, setIsDeleteAccountModalOpen] = useState(false);
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
+  const [isBugReportModalOpen, setIsBugReportModalOpen] = useState(false);
 
   // Close dropdown menu on outside click
   useEffect(() => {
@@ -469,6 +472,32 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
                   </div>
                 )}
 
+                {/* ADMIN BACKEND ISSUE ESCALATION */}
+                {currentUser?.role === 'admin' && (
+                  <div className="pt-2 border-t border-slate-200 dark:border-slate-800 space-y-1">
+                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider px-2 block">
+                      {lang === 'hi' ? 'डेवलपर व सिस्टम टूल्स' : 'DevOps & Backend Escalation'}
+                    </span>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        setIsBugReportModalOpen(true);
+                      }}
+                      className="w-full p-2.5 rounded-xl bg-red-50/50 hover:bg-red-50 dark:bg-red-950/20 dark:hover:bg-red-950/40 text-red-600 dark:text-red-400 border border-red-200/60 dark:border-red-900/40 flex items-center justify-between text-xs font-bold transition cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <Bug className="w-4 h-4 text-red-500" />
+                        <span>{lang === 'hi' ? 'बैकएंड टीम को समस्या रिपोर्ट करें' : 'Report Issue to Backend Team'}</span>
+                      </div>
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300">
+                        Dev Ops
+                      </span>
+                    </button>
+                  </div>
+                )}
+
                 {/* ACCOUNT & LOGOUT */}
                 <div className="pt-2 border-t border-slate-200 dark:border-slate-800 space-y-1">
                   <button
@@ -541,6 +570,11 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
       <DeleteAccountModal
         isOpen={isDeleteAccountModalOpen}
         onClose={() => setIsDeleteAccountModalOpen(false)}
+      />
+
+      <AdminBugReportModal
+        isOpen={isBugReportModalOpen}
+        onClose={() => setIsBugReportModalOpen(false)}
       />
     </>
   );
