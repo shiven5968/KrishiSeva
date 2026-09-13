@@ -40,8 +40,49 @@ import {
   Menu,
   X,
   Crosshair,
-  Navigation
+  Navigation,
+  Layers,
+  Activity,
+  Compass,
+  DollarSign,
+  Radio,
+  FileCheck,
+  TrendingUp,
+  Receipt
 } from 'lucide-react';
+
+const FAQS_DATA = [
+  {
+    qEn: 'How quickly will a tractor or harvester arrive at my field?',
+    qHi: 'मशीनरी मेरे खेत पर कितनी देर में पहुंचेगी?',
+    aEn: 'Our intelligent geospatial radar assigns the nearest Custom Hiring Center (CHC) driver within 3–5 km. On average, machinery arrives at your field in 15 to 30 minutes with live GPS tracking.',
+    aHi: 'हमारा जीपीएस राडार 3 से 5 किमी के दायरे में सबसे नजदीकी चालक को जोड़ता है। आमतौर पर 15 से 30 मिनट में मशीनरी आपके खेत पर पहुँच जाती है और आप उसे लाइव ट्रैक कर सकते हैं।'
+  },
+  {
+    qEn: 'I am a Batai (tenant) farmer without land papers. Can I still book?',
+    qHi: 'मैं बटाईदार किसान हूँ और मेरे पास जमीन के सरकारी कागज़ नहीं हैं। क्या मैं बुकिंग कर सकता हूँ?',
+    aEn: 'Yes! KrishiSeva offers a 1-Year Batai Pass. Simply provide the Khasra number and landowner phone number or upload a simple agreement once to enjoy unrestricted booking for 365 days.',
+    aHi: 'हाँ! कृषिसेवा 1-वर्षीय बटाईदार पास प्रदान करती है। केवल खसरा संख्या व खेत मालिक का नंबर दर्ज कर आप 365 दिनों के लिए निर्बाध रूप से मशीनरी बुक कर सकते हैं।'
+  },
+  {
+    qEn: 'How does payment work? Is advance payment required?',
+    qHi: 'भुगतान कैसे होता है? क्या पहले पैसे देने होते हैं?',
+    aEn: 'No full upfront payment needed. Your payment is held safely in automated escrow. Funds are only settled to the operator after field work is completed to your 100% satisfaction.',
+    aHi: 'पहले पूरे पैसे देने की आवश्यकता नहीं है। आपकी राशि सुरक्षित एस्क्रो में रहती है और कार्य पूर्ण व संतुष्ट होने के बाद ही चालक को जारी की जाती है। आप यूपीआई या नकद भुगतान कर सकते हैं।'
+  },
+  {
+    qEn: 'How are machinery rental rates calculated?',
+    qHi: 'मशीनरी के किराए की दरें कैसे तय होती हैं?',
+    aEn: 'Rates are dynamically governed by our 28-state agro-economic engine, incorporating regional fuel index, crop season demand, and soil type (e.g. baseline ₹1,300/bigha in UP). Zero broker commission.',
+    aHi: 'दरें हमारे 28-राज्य मूल्य निर्धारण इंजन द्वारा तय होती हैं, जो क्षेत्रीय डीजल दर व फसल सत्र पर आधारित होती हैं (उदा. यूपी में ₹1,300/बीघा)। कोई बिचौलिया कमीशन नहीं।'
+  },
+  {
+    qEn: 'Can I schedule machinery in advance for harvesting season?',
+    qHi: 'क्या मैं कटाई के समय के लिए पहले से अग्रिम बुकिंग कर सकता हूँ?',
+    aEn: 'Yes, you can schedule combine harvesters and tractors up to 30 days in advance with guaranteed machine reservation and preferred time slot allocation.',
+    aHi: 'हाँ, आप 30 दिन पहले तक कंबाइन हार्वेस्टर और ट्रैक्टरों की अग्रिम बुकिंग कर सकते हैं और कटाई के दिन मशीन की उपलब्धता सुनिश्चित कर सकते हैं।'
+  }
+];
 
 export default function CreativeLoginPortal() {
   const { lang, toggleLanguage, localize } = useLanguage();
@@ -108,6 +149,7 @@ export default function CreativeLoginPortal() {
   const faqRef = useRef(null);
   const [faqVisible, setFaqVisible] = useState(false);
   const [openFaqIndex, setOpenFaqIndex] = useState(null);
+  const [activeFlowStep, setActiveFlowStep] = useState(1);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -866,6 +908,389 @@ export default function CreativeLoginPortal() {
                 <span>{lang === 'hi' ? 'एग्रीस्टैक सत्यापित' : 'AgriStack Verified'}</span>
               </div>
             </div>
+
+            {/* ═══════════════════════════════════════════════════════════════
+                SECTION 1: "THE FLOW" (Interactive Split-Screen Steps)
+                ═══════════════════════════════════════════════════════════════ */}
+            <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32">
+              <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-start">
+                
+                {/* Left Side: Sticky Editorial Heading */}
+                <div className="w-full lg:w-5/12 lg:sticky lg:top-28 text-left space-y-6">
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wide uppercase bg-[#1A4F32]/10 dark:bg-[#4ADE80]/10 text-[#1A4F32] dark:text-[#4ADE80] border border-[#1A4F32]/20 dark:border-[#4ADE80]/20">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>{lang === 'hi' ? 'सरल एवं पारदर्शी प्रक्रिया' : 'The Seamless Flow'}</span>
+                  </div>
+
+                  <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#0B1E14] dark:text-[#EAEFEA] tracking-tight leading-[1.12]">
+                    {lang === 'hi' 
+                      ? 'ऑर्डर से सीधे खेत तक, मिनटों में।' 
+                      : 'From request to field in minutes.'}
+                  </h2>
+
+                  <p className="text-base text-[#4F6358] dark:text-[#9FB1A7] leading-relaxed max-w-md">
+                    {lang === 'hi'
+                      ? 'बिचौलियों की लंबी बातचीत को अलविदा कहें। आधुनिक जीपीएस तकनीक और सरकारी एग्रीस्टैक सत्यापन के साथ सिर्फ 3 आसान चरणों में मशीनरी पाएं।'
+                      : 'Eliminate middlemen phone calls and price gouging. Book verified tractors, harvesters, and implements with precision radar tracking.'}
+                  </p>
+
+                  {/* Interactive Step Switcher Pills */}
+                  <div className="flex items-center gap-3 pt-2">
+                    {[1, 2, 3].map((num) => (
+                      <button
+                        key={num}
+                        type="button"
+                        onClick={() => setActiveFlowStep(num)}
+                        className={`px-4 py-2 rounded-full text-xs font-bold transition-all duration-300 flex items-center gap-2 cursor-pointer ${
+                          activeFlowStep === num
+                            ? 'bg-[#0B1E14] dark:bg-[#EAEFEA] text-white dark:text-[#0B1E14] shadow-md shadow-[#0B1E14]/10'
+                            : 'bg-white/80 dark:bg-slate-900/80 text-[#4F6358] dark:text-[#9FB1A7] border border-[#0B1E14]/10 dark:border-white/10 hover:border-[#1A4F32]'
+                        }`}
+                      >
+                        <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                        <span>{lang === 'hi' ? `चरण 0${num}` : `Step 0${num}`}</span>
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="pt-4">
+                    <button
+                      onClick={() => {
+                        setPortalView('login');
+                        setStep('phone');
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="inline-flex items-center gap-2.5 text-sm font-bold text-[#1A4F32] dark:text-[#4ADE80] hover:underline cursor-pointer group"
+                    >
+                      <span>{lang === 'hi' ? 'अभी बुकिंग शुरू करें' : 'Get started now'}</span>
+                      <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Right Side: 3 Distinct Step Cards */}
+                <div className="w-full lg:w-7/12 space-y-10 sm:space-y-12">
+                  
+                  {/* STEP 1: Pin Your Plot */}
+                  <div 
+                    onClick={() => setActiveFlowStep(1)}
+                    className={`rounded-3xl p-6 sm:p-8 bg-white/70 dark:bg-[#0B1E14]/60 backdrop-blur-xl border transition-all duration-500 cursor-pointer shadow-[0_20px_40px_rgba(11,30,20,0.06)] dark:shadow-[0_20px_40px_rgba(0,0,0,0.3)] ${
+                      activeFlowStep === 1 
+                        ? 'border-[#1A4F32] ring-2 ring-[#1A4F32]/20 dark:ring-[#4ADE80]/20' 
+                        : 'border-[#0B1E14]/10 dark:border-white/10 hover:border-[#1A4F32]/40 opacity-90'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-4 mb-4">
+                      <span className="text-xs font-black tracking-wider uppercase text-[#1A4F32] dark:text-[#4ADE80] bg-[#1A4F32]/10 dark:bg-[#4ADE80]/10 px-3 py-1 rounded-full">
+                        {lang === 'hi' ? 'चरण 01' : 'Step 01'}
+                      </span>
+                      <span className="text-xs text-[#4F6358] dark:text-[#9FB1A7] flex items-center gap-1.5 font-medium">
+                        <MapPin className="w-3.5 h-3.5 text-[#1A4F32] dark:text-[#4ADE80]" />
+                        {lang === 'hi' ? 'भू-नक्शा व बटाईदार पास' : 'Geo-Fencing & Batai Pass'}
+                      </span>
+                    </div>
+
+                    <h3 className="text-2xl font-bold text-[#0B1E14] dark:text-[#EAEFEA] tracking-tight mb-2 text-left">
+                      {lang === 'hi' ? 'खेत चिन्हित करें (Pin Your Plot)' : 'Pin Your Plot.'}
+                    </h3>
+                    <p className="text-sm text-[#4F6358] dark:text-[#9FB1A7] text-left leading-relaxed mb-6">
+                      {lang === 'hi'
+                        ? 'खसरा संख्या दर्ज करें अथवा 1-वर्षीय बटाई पास के जरिए बिना कागजी झंझट के अपने खेत की सीमा तय करें। हमारा जीपीएस सिस्टम सटीक एकड़ गणना करता है।'
+                        : 'Select your land boundary via Bhulekh sync or activate your 1-Year Batai Pass for instant tenant validation. GPS calculates precise acreage automatically.'}
+                    </p>
+
+                    {/* Step 1 Visual Mockup */}
+                    <div className="rounded-2xl bg-gradient-to-br from-[#F4F1EA] to-[#E9E4D8] dark:from-[#112318] dark:to-[#08120B] p-5 border border-[#0B1E14]/10 dark:border-white/5 relative overflow-hidden">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-left">
+                        <div className="space-y-1">
+                          <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#1A4F32] dark:text-[#4ADE80] bg-white/80 dark:bg-black/40 px-2.5 py-1 rounded-lg">
+                            <LandPlot className="w-3.5 h-3.5" />
+                            <span>Khasra #402/1A • 3.2 Bigha</span>
+                          </div>
+                          <p className="text-xs text-[#4F6358] dark:text-[#9FB1A7] font-medium">
+                            {lang === 'hi' ? 'सत्यापित भू-क्षेत्र • गेहूँ बुवाई' : 'Verified Field Perimeter • Wheat Sowing'}
+                          </p>
+                        </div>
+                        <span className="text-xs font-bold bg-[#1A4F32] text-white px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-sm">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-300" />
+                          <span>{lang === 'hi' ? 'बटाई पास सक्रिय' : 'Batai Pass Active'}</span>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* STEP 2: Live Radar Match */}
+                  <div 
+                    onClick={() => setActiveFlowStep(2)}
+                    className={`rounded-3xl p-6 sm:p-8 bg-white/70 dark:bg-[#0B1E14]/60 backdrop-blur-xl border transition-all duration-500 cursor-pointer shadow-[0_20px_40px_rgba(11,30,20,0.06)] dark:shadow-[0_20px_40px_rgba(0,0,0,0.3)] ${
+                      activeFlowStep === 2 
+                        ? 'border-[#1A4F32] ring-2 ring-[#1A4F32]/20 dark:ring-[#4ADE80]/20' 
+                        : 'border-[#0B1E14]/10 dark:border-white/10 hover:border-[#1A4F32]/40 opacity-90'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-4 mb-4">
+                      <span className="text-xs font-black tracking-wider uppercase text-[#1A4F32] dark:text-[#4ADE80] bg-[#1A4F32]/10 dark:bg-[#4ADE80]/10 px-3 py-1 rounded-full">
+                        {lang === 'hi' ? 'चरण 02' : 'Step 02'}
+                      </span>
+                      <span className="text-xs text-[#4F6358] dark:text-[#9FB1A7] flex items-center gap-1.5 font-medium">
+                        <Radio className="w-3.5 h-3.5 text-[#1A4F32] dark:text-[#4ADE80] animate-pulse" />
+                        {lang === 'hi' ? '3-5 किमी लाइव राडार' : '3–5 km Live Radar'}
+                      </span>
+                    </div>
+
+                    <h3 className="text-2xl font-bold text-[#0B1E14] dark:text-[#EAEFEA] tracking-tight mb-2 text-left">
+                      {lang === 'hi' ? 'लाइव राडार व नजदीकी चालक' : 'Live Radar Match.'}
+                    </h3>
+                    <p className="text-sm text-[#4F6358] dark:text-[#9FB1A7] text-left leading-relaxed mb-6">
+                      {lang === 'hi'
+                        ? 'हमारा एल्गोरिदम 5 किमी के भीतर उपलब्ध कस्टम हायरिंग सेंटर (CHC) के अनुभवी चालकों को खोजकर 15-20 मिनट में खेत पर रवाना करता है।'
+                        : 'Our intelligent dispatcher connects the nearest certified CHC operator within 3–5 km. Fixed fair-trade rates with zero surge markups.'}
+                    </p>
+
+                    {/* Step 2 Visual Mockup */}
+                    <div className="rounded-2xl bg-gradient-to-br from-[#F4F1EA] to-[#E9E4D8] dark:from-[#112318] dark:to-[#08120B] p-5 border border-[#0B1E14]/10 dark:border-white/5 relative overflow-hidden">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-left">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
+                            <span className="text-xs font-bold text-[#0B1E14] dark:text-[#EAEFEA]">
+                              Mahindra 575 DI (50 HP) + Rotavator
+                            </span>
+                          </div>
+                          <p className="text-xs text-[#4F6358] dark:text-[#9FB1A7]">
+                            {lang === 'hi' ? 'चालक: रमेश कुमार • दूरी: 1.8 किमी • समय: 12 मिनट' : 'Driver: Ramesh Kumar • Distance: 1.8 km • ETA: 12 mins'}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-xs font-black text-[#1A4F32] dark:text-[#4ADE80] bg-white/80 dark:bg-black/40 px-3 py-1.5 rounded-xl inline-block">
+                            ₹1,300 / Bigha
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* STEP 3: Harvest & Settle */}
+                  <div 
+                    onClick={() => setActiveFlowStep(3)}
+                    className={`rounded-3xl p-6 sm:p-8 bg-white/70 dark:bg-[#0B1E14]/60 backdrop-blur-xl border transition-all duration-500 cursor-pointer shadow-[0_20px_40px_rgba(11,30,20,0.06)] dark:shadow-[0_20px_40px_rgba(0,0,0,0.3)] ${
+                      activeFlowStep === 3 
+                        ? 'border-[#1A4F32] ring-2 ring-[#1A4F32]/20 dark:ring-[#4ADE80]/20' 
+                        : 'border-[#0B1E14]/10 dark:border-white/10 hover:border-[#1A4F32]/40 opacity-90'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-4 mb-4">
+                      <span className="text-xs font-black tracking-wider uppercase text-[#1A4F32] dark:text-[#4ADE80] bg-[#1A4F32]/10 dark:bg-[#4ADE80]/10 px-3 py-1 rounded-full">
+                        {lang === 'hi' ? 'चरण 03' : 'Step 03'}
+                      </span>
+                      <span className="text-xs text-[#4F6358] dark:text-[#9FB1A7] flex items-center gap-1.5 font-medium">
+                        <Receipt className="w-3.5 h-3.5 text-[#1A4F32] dark:text-[#4ADE80]" />
+                        {lang === 'hi' ? 'सुरक्षित एस्क्रो भुगतान' : 'Escrow Protection'}
+                      </span>
+                    </div>
+
+                    <h3 className="text-2xl font-bold text-[#0B1E14] dark:text-[#EAEFEA] tracking-tight mb-2 text-left">
+                      {lang === 'hi' ? 'कार्य पूर्ण एवं सुरक्षित भुगतान' : 'Harvest & Settle.'}
+                    </h3>
+                    <p className="text-sm text-[#4F6358] dark:text-[#9FB1A7] text-left leading-relaxed mb-6">
+                      {lang === 'hi'
+                        ? 'खेत में काम पूरा होने और आपकी 100% संतुष्टि के बाद ही भुगतान चालक को जारी होता है। तत्काल यूपीआई या नकद पावती रसीद प्राप्त करें।'
+                        : 'Payment is securely held in automated escrow until the tractor work is completed and verified by you. Instant IMPS settlement with digital receipt.'}
+                    </p>
+
+                    {/* Step 3 Visual Mockup */}
+                    <div className="rounded-2xl bg-gradient-to-br from-[#F4F1EA] to-[#E9E4D8] dark:from-[#112318] dark:to-[#08120B] p-5 border border-[#0B1E14]/10 dark:border-white/5 relative overflow-hidden">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-left">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                            <span className="text-xs font-bold text-[#0B1E14] dark:text-[#EAEFEA]">
+                              {lang === 'hi' ? 'कार्य संतुष्टि पुष्टि • ओटीपी #5821' : 'Job Verified • OTP #5821 Approved'}
+                            </span>
+                          </div>
+                          <p className="text-xs text-[#4F6358] dark:text-[#9FB1A7]">
+                            {lang === 'hi' ? '3.2 बीघा जुताई पूर्ण • डिजिटल रसीद जारी' : '3.2 Bigha Tillage Done • Digital Tax Receipt Generated'}
+                          </p>
+                        </div>
+                        <span className="text-xs font-bold bg-emerald-600 text-white px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-sm">
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          <span>{lang === 'hi' ? '₹4,160 भुगतान सुरक्षित' : '₹4,160 Settled via IMPS'}</span>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </section>
+
+            {/* ═══════════════════════════════════════════════════════════════
+                SECTION 2: "THE ECOSYSTEM" (Premium Bento Grid)
+                ═══════════════════════════════════════════════════════════════ */}
+            <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 border-t border-[#0B1E14]/5 dark:border-white/5">
+              
+              {/* Section Heading */}
+              <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wide uppercase bg-[#1A4F32]/10 dark:bg-[#4ADE80]/10 text-[#1A4F32] dark:text-[#4ADE80] border border-[#1A4F32]/20 dark:border-[#4ADE80]/20">
+                  <Activity className="w-3.5 h-3.5" />
+                  <span>{lang === 'hi' ? 'कृषिसेवा इकोसिस्टम' : 'The KrishiSeva Ecosystem'}</span>
+                </div>
+                <h2 className="text-3xl sm:text-5xl font-black text-[#0B1E14] dark:text-[#EAEFEA] tracking-tight leading-[1.15]">
+                  {lang === 'hi' 
+                    ? 'भारतीय खेतों के लिए विशेष निर्मित।' 
+                    : 'Engineered for Bharat’s Fields.'}
+                </h2>
+                <p className="text-base text-[#4F6358] dark:text-[#9FB1A7] leading-relaxed">
+                  {lang === 'hi'
+                    ? 'पारदर्शिता, सुरक्षा और आधुनिक तकनीक का एक संपूर्ण नेटवर्क — जो हर किसान को सशक्त बनाता है।'
+                    : 'A unified infrastructure built on transparency, escrow security, and deep-tech agricultural logistics.'}
+                </p>
+              </div>
+
+              {/* Bento Box Asymmetrical Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 text-left">
+                
+                {/* Bento Card 1: 1-Year Batai Pass (Large 2-col Hero Card) */}
+                <div className="md:col-span-2 lg:col-span-2 rounded-[2rem] bg-[#0B1E14] text-white p-8 sm:p-10 relative overflow-hidden flex flex-col justify-between group hover:scale-[1.015] transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] shadow-[0_20px_40px_rgba(11,30,20,0.15)]">
+                  {/* Subtle Texture Glow */}
+                  <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+                  
+                  <div className="relative z-10 space-y-4">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-white/10 text-emerald-400 border border-white/10">
+                      <FileCheck className="w-3.5 h-3.5" />
+                      <span>{lang === 'hi' ? '1-वर्षीय बटाईदार सुरक्षा पास' : '1-Year Batai Pass Standard'}</span>
+                    </div>
+                    <h3 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+                      {lang === 'hi' 
+                        ? 'बिना खतौनी भी आसान बुकिंग' 
+                        : 'Democratizing Machinery for 80M+ Tenant Farmers.'}
+                    </h3>
+                    <p className="text-sm text-stone-300 max-w-lg leading-relaxed font-light">
+                      {lang === 'hi'
+                        ? 'बटाईदार किसान बिना पैतृक खतौनी के सिर्फ एक बार 1-वर्षीय पास बनवाकर पूरे 365 दिन बिना रुकावट ट्रैक्टर व हार्वेस्टर बुक कर सकते हैं।'
+                        : 'Tenant farmers can book high-capacity machinery frictionlessly for an entire agricultural year with zero paper friction or landowner disputes.'}
+                    </p>
+                  </div>
+
+                  <div className="relative z-10 pt-8 mt-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-4">
+                    <span className="text-xs text-stone-400 flex items-center gap-1.5 font-medium">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                      {lang === 'hi' ? '365 दिन असीमित बुकिंग सुविधा' : '365-Day Validity • Instant Verification'}
+                    </span>
+                    <span className="text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-3 py-1 rounded-lg">
+                      AgriStack & CSC Synced
+                    </span>
+                  </div>
+                </div>
+
+                {/* Bento Card 2: Live Fleet Radar (1-col Square) */}
+                <div className="md:col-span-1 lg:col-span-1 rounded-[2rem] bg-white/70 dark:bg-[#0B1E14]/70 backdrop-blur-xl border border-[#0B1E14]/10 dark:border-white/10 p-8 flex flex-col justify-between hover:scale-[1.02] transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] shadow-sm hover:shadow-md">
+                  <div className="space-y-4">
+                    <div className="w-12 h-12 rounded-2xl bg-[#1A4F32]/10 dark:bg-[#4ADE80]/10 flex items-center justify-center text-[#1A4F32] dark:text-[#4ADE80]">
+                      <Radio className="w-6 h-6 animate-pulse" />
+                    </div>
+                    <h3 className="text-xl font-bold text-[#0B1E14] dark:text-[#EAEFEA] tracking-tight">
+                      {lang === 'hi' ? 'लाइव फ्लीट राडार' : 'Live Fleet Radar'}
+                    </h3>
+                    <p className="text-xs text-[#4F6358] dark:text-[#9FB1A7] leading-relaxed">
+                      {lang === 'hi'
+                        ? '3-5 किमी के दायरे में निकटतम ट्रैक्टर चालक का 15 मिनट में आगमन।'
+                        : 'Proximity matching with sub-minute GPS dispatch across all nearby CHCs.'}
+                    </p>
+                  </div>
+
+                  <div className="pt-4 flex items-center justify-between border-t border-[#0B1E14]/5 dark:border-white/5">
+                    <span className="text-xs font-bold text-[#1A4F32] dark:text-[#4ADE80]">
+                      {lang === 'hi' ? 'औसत आगमन: 15 मिनट' : 'Avg ETA: 15 Mins'}
+                    </span>
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+                  </div>
+                </div>
+
+                {/* Bento Card 3: Fair-Trade Pricing (1-col Square) */}
+                <div className="md:col-span-1 lg:col-span-1 rounded-[2rem] bg-white/70 dark:bg-[#0B1E14]/70 backdrop-blur-xl border border-[#0B1E14]/10 dark:border-white/10 p-8 flex flex-col justify-between hover:scale-[1.02] transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] shadow-sm hover:shadow-md">
+                  <div className="space-y-4">
+                    <div className="w-12 h-12 rounded-2xl bg-[#1A4F32]/10 dark:bg-[#4ADE80]/10 flex items-center justify-center text-[#1A4F32] dark:text-[#4ADE80]">
+                      <TrendingUp className="w-6 h-6" />
+                    </div>
+                    <h3 className="text-xl font-bold text-[#0B1E14] dark:text-[#EAEFEA] tracking-tight">
+                      {lang === 'hi' ? '28 राज्यों में पारदर्शी दरें' : 'Fair-Trade Pricing'}
+                    </h3>
+                    <p className="text-xs text-[#4F6358] dark:text-[#9FB1A7] leading-relaxed">
+                      {lang === 'hi'
+                        ? 'डीजल सूचकांक व फसल चक्र अनुसार स्वचालित दरें। शून्य बिचौलिया कटौती।'
+                        : 'Algorithmic pricing based on regional fuel index and seasonal demand.'}
+                    </p>
+                  </div>
+
+                  <div className="pt-4 border-t border-[#0B1E14]/5 dark:border-white/5">
+                    <span className="text-xs font-black tracking-wider text-[#0B1E14] dark:text-[#EAEFEA] bg-[#0B1E14]/5 dark:bg-white/5 px-2.5 py-1 rounded-md">
+                      0% Broker Margin
+                    </span>
+                  </div>
+                </div>
+
+                {/* Bento Card 4: Escrow Settlements (2-col Horizontal) */}
+                <div className="md:col-span-2 lg:col-span-2 rounded-[2rem] bg-white/70 dark:bg-[#0B1E14]/70 backdrop-blur-xl border border-[#0B1E14]/10 dark:border-white/10 p-8 flex flex-col justify-between hover:scale-[1.015] transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] shadow-sm hover:shadow-md">
+                  <div className="space-y-3">
+                    <div className="inline-flex items-center gap-2 text-xs font-bold text-[#1A4F32] dark:text-[#4ADE80]">
+                      <CreditCard className="w-4 h-4" />
+                      <span>{lang === 'hi' ? 'सुरक्षित लेन-देन' : 'Instant Escrow Infrastructure'}</span>
+                    </div>
+                    <h3 className="text-2xl font-bold text-[#0B1E14] dark:text-[#EAEFEA] tracking-tight">
+                      {lang === 'hi' ? 'ऑटोमेटेड IMPS एवं UPI एस्क्रो भुगतान' : 'Automated IMPS & UPI Escrow Settlements'}
+                    </h3>
+                    <p className="text-sm text-[#4F6358] dark:text-[#9FB1A7] leading-relaxed">
+                      {lang === 'hi'
+                        ? 'किसान और मशीन चालक दोनों के पैसे 100% सुरक्षित। कार्य संतोषजनक होने पर ही डिजिटल ओटीपी से चालक के खाते में सीधी राशि जारी।'
+                        : 'Funds are securely locked in institutional escrow and disbursed directly to the operator’s bank account via IMPS/UPI only after digital job sign-off.'}
+                    </p>
+                  </div>
+
+                  <div className="pt-6 mt-4 border-t border-[#0B1E14]/5 dark:border-white/5 flex flex-wrap items-center gap-4 text-xs font-semibold text-[#4F6358] dark:text-[#9FB1A7]">
+                    <span className="flex items-center gap-1.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                      {lang === 'hi' ? 'शून्य अग्रिम जोखिम' : 'Zero Upfront Risk'}
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                      {lang === 'hi' ? 'त्वरित बैंक सेटलमेंट' : 'Direct-to-Bank Payouts'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Bento Card 5: Bhulekh & Sarathi Integrated (2-col Horizontal) */}
+                <div className="md:col-span-2 lg:col-span-2 rounded-[2rem] bg-white/70 dark:bg-[#0B1E14]/70 backdrop-blur-xl border border-[#0B1E14]/10 dark:border-white/10 p-8 flex flex-col justify-between hover:scale-[1.015] transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] shadow-sm hover:shadow-md">
+                  <div className="space-y-3">
+                    <div className="inline-flex items-center gap-2 text-xs font-bold text-[#1A4F32] dark:text-[#4ADE80]">
+                      <ShieldCheck className="w-4 h-4" />
+                      <span>{lang === 'hi' ? 'सरकारी पोर्टल सत्यापन' : 'Government Cloud Integration'}</span>
+                    </div>
+                    <h3 className="text-2xl font-bold text-[#0B1E14] dark:text-[#EAEFEA] tracking-tight">
+                      {lang === 'hi' ? 'भूलेख एवं सारथी वाहन पोर्टल से एकीकृत' : 'Govt Bhulekh & Sarathi Integrated'}
+                    </h3>
+                    <p className="text-sm text-[#4F6358] dark:text-[#9FB1A7] leading-relaxed">
+                      {lang === 'hi'
+                        ? 'सभी चालकों के ड्राइविंग लाइसेंस, वाहन फिटनेस और जमीन के भू-नक्शे सरकारी डेटाबेस से लाइव जांचे जाते हैं।'
+                        : 'Direct real-time API integrations with state Bhulekh portals and MoRTH Sarathi registry guarantee 100% genuine machinery and operators.'}
+                    </p>
+                  </div>
+
+                  <div className="pt-6 mt-4 border-t border-[#0B1E14]/5 dark:border-white/5 flex flex-wrap items-center gap-4 text-xs font-semibold text-[#4F6358] dark:text-[#9FB1A7]">
+                    <span className="flex items-center gap-1.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                      {lang === 'hi' ? 'डीएल एवं वाहन फिटनेस जांच' : 'DL & Fitness Verified'}
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                      {lang === 'hi' ? 'एग्रीस्टैक आईडी सिंक' : 'AgriStack ID Synced'}
+                    </span>
+                  </div>
+                </div>
+
+              </div>
+            </section>
+
           </div>
         )}
 
@@ -2021,56 +2446,61 @@ export default function CreativeLoginPortal() {
       </main>
 
       {/* ═══════════ FARMER FAQ SECTION (Landing View Only) ═══════════ */}
-      <section 
-          className="relative w-full py-20 px-4 sm:px-6 lg:px-8 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950 transition-colors duration-300"
+      {portalView === 'landing' && (
+        <section 
+          ref={faqRef}
+          className="relative w-full py-20 sm:py-28 px-4 sm:px-6 lg:px-8 border-t border-[#0B1E14]/5 dark:border-white/5 transition-colors duration-300"
         >
-          <div className="max-w-4xl mx-auto space-y-4 text-center mb-12">
-            <span className="bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 text-xs px-4 py-1.5 rounded-full inline-flex items-center gap-1.5 font-bold shadow-sm">
-              <Sparkles className="w-3.5 h-3.5 text-emerald-500" />
+          <div className="max-w-4xl mx-auto space-y-4 text-center mb-12 sm:mb-16">
+            <span className="bg-[#1A4F32]/10 dark:bg-[#4ADE80]/10 text-[#1A4F32] dark:text-[#4ADE80] border border-[#1A4F32]/20 dark:border-[#4ADE80]/20 text-xs px-4 py-1.5 rounded-full inline-flex items-center gap-1.5 font-bold uppercase tracking-wider">
+              <Sparkles className="w-3.5 h-3.5" />
               <span>{lang === 'hi' ? 'अक्सर पूछे जाने वाले सवाल' : 'Frequently Asked Questions'}</span>
             </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white font-display">
-              {lang === 'hi' ? 'बुकिंग करने से पहले सब कुछ जानें' : 'Everything You Should Know Before Booking'}
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-[#0B1E14] dark:text-[#EAEFEA] leading-tight">
+              {lang === 'hi' ? 'बुकिंग करने से पहले सब कुछ जानें' : 'Everything You Need to Know.'}
             </h2>
-            <p className="text-sm sm:text-base max-w-2xl mx-auto text-slate-600 dark:text-slate-400">
+            <p className="text-sm sm:text-base max-w-2xl mx-auto text-[#4F6358] dark:text-[#9FB1A7] leading-relaxed">
               {lang === 'hi' 
-                ? 'सत्यापित ट्रैक्टरों और हार्वेस्टरों को 100% भरोसे के साथ बुक करने में आपकी सहायता के लिए स्पष्ट उत्तर।' 
+                ? 'सत्यापित ट्रैक्टरों और हार्वेस्टरों को 100% भरोसे और पारदर्शी दरों के साथ बुक करने के लिए स्पष्ट उत्तर।' 
                 : 'Clear, transparent answers to help you book tractors and harvesters with 100% confidence.'}
             </p>
           </div>
 
-          <div className="max-w-3xl mx-auto space-y-3.5">
-            {faqs.map((faq, index) => {
+          <div className="max-w-3xl mx-auto space-y-4 text-left">
+            {FAQS_DATA.map((faq, index) => {
               const isOpen = openFaqIndex === index;
+              const question = lang === 'hi' ? faq.qHi : faq.qEn;
+              const answer = lang === 'hi' ? faq.aHi : faq.aEn;
+
               return (
                 <div
                   key={index}
                   onClick={() => setOpenFaqIndex(isOpen ? null : index)}
-                  className={`rounded-2xl border transition-all duration-200 cursor-pointer p-5 sm:p-6 shadow-sm ${
+                  className={`rounded-2xl border transition-all duration-300 cursor-pointer p-6 shadow-sm backdrop-blur-xl ${
                     isOpen 
-                      ? 'bg-white dark:bg-slate-900 border-l-4 border-l-emerald-500 border-emerald-500/40 shadow-md' 
-                      : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-emerald-500/40 hover:shadow-md'
+                      ? 'bg-white dark:bg-[#0B1E14] border-[#1A4F32] dark:border-[#4ADE80] shadow-md ring-1 ring-[#1A4F32]/20 dark:ring-[#4ADE80]/20' 
+                      : 'bg-white/70 dark:bg-[#0B1E14]/70 border-[#0B1E14]/10 dark:border-white/10 hover:border-[#1A4F32]/50'
                   }`}
                 >
                   <div className="flex justify-between items-center gap-4">
-                    <span className={`font-bold text-sm sm:text-base ${
-                      isOpen ? 'text-emerald-600 dark:text-emerald-400 font-extrabold' : 'text-slate-900 dark:text-white'
+                    <span className={`font-bold text-base sm:text-lg tracking-tight ${
+                      isOpen ? 'text-[#1A4F32] dark:text-[#4ADE80]' : 'text-[#0B1E14] dark:text-[#EAEFEA]'
                     }`}>
-                      {faq.q}
+                      {question}
                     </span>
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-200 ${
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-transform duration-300 ${
                       isOpen 
-                        ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 rotate-180' 
-                        : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                        ? 'bg-[#1A4F32]/10 dark:bg-[#4ADE80]/10 text-[#1A4F32] dark:text-[#4ADE80] rotate-180' 
+                        : 'bg-[#0B1E14]/5 dark:bg-white/5 text-[#4F6358] dark:text-[#9FB1A7]'
                     }`}>
                       <ChevronDown className="w-4 h-4" />
                     </div>
                   </div>
                   
                   {isOpen && (
-                    <div className="mt-3.5 pt-3.5 border-t border-slate-100 dark:border-slate-800/80 animate-fade-in">
-                      <p className="text-xs sm:text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                        {faq.a}
+                    <div className="mt-4 pt-4 border-t border-[#0B1E14]/5 dark:border-white/5 animate-fade-in">
+                      <p className="text-sm leading-relaxed text-[#4F6358] dark:text-[#9FB1A7]">
+                        {answer}
                       </p>
                     </div>
                   )}
@@ -2079,6 +2509,7 @@ export default function CreativeLoginPortal() {
             })}
           </div>
         </section>
+      )}
 
       {/* ═══════════ MINIMALIST FOOTER ═══════════ */}
       <footer className={`relative z-10 border-t px-6 py-4 transition-colors duration-200 ${
