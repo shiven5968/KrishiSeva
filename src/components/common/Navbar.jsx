@@ -85,24 +85,15 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
     };
   }, [isMenuOpen]);
 
-  // Clicking Logo returns user to their authenticated home dashboard
+  // Clicking Logo takes user directly to the login page
   const handleLogoClick = () => {
     setIsMenuOpen(false);
     if (currentUser && currentUser.isAuthenticated) {
-      if (currentUser.role === 'admin') {
-        window.location.hash = '#admin';
-        setActiveRole('admin');
-      } else if (currentUser.role === 'driver') {
-        window.location.hash = '#driver';
-        setActiveRole('driver');
-      } else {
-        window.location.hash = '#farmer';
-        setActiveRole('farmer');
-      }
-      return;
+      logout();
     }
     window.location.hash = '';
     setActiveRole('landing');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleConfirmLogout = () => {
@@ -121,11 +112,11 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
       }`}>
         <div className="max-w-7xl w-full mx-auto px-5 sm:px-8 h-14 flex items-center justify-between gap-3">
           
-          {/* Brand Logo - Returns to logged-in dashboard */}
+          {/* Brand Logo - Returns to Login / Landing Portal */}
           <div 
             onClick={handleLogoClick}
             className="flex items-center gap-2.5 sm:gap-3 cursor-pointer group"
-            title={currentUser ? "Go to Dashboard" : "Return to Home"}
+            title="Go to Login Page"
           >
             <img src="/images/logo.png" alt="KrishiSeva Logo" className="h-8 sm:h-9 w-auto object-contain transition-transform duration-300 group-hover:scale-105 rounded-xl" />
             <div>

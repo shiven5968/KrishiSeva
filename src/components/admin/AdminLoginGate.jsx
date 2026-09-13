@@ -56,11 +56,14 @@ export default function AdminLoginGate({ onAdminLoginSuccess }) {
       {/* Top Navbar Back & Tools */}
       <div className="w-full max-w-5xl flex items-center justify-between relative z-10">
         <button
-          onClick={() => setActiveRole('farmer')}
+          onClick={() => {
+            window.location.hash = '';
+            setActiveRole('landing');
+          }}
           className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black/5 dark:bg-white/5 border border-black/[0.06] dark:border-white/[0.08] text-[#0B1E14] dark:text-[#EAEFEA] hover:bg-black/10 dark:hover:bg-white/10 text-xs font-semibold transition-all duration-300 group cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          <span>{lang === 'hi' ? '← मुख्य पोर्टल पर लौटें' : '← Back to App'}</span>
+          <span>{lang === 'hi' ? '← लॉगिन पोर्टल पर लौटें' : '← Back to Login'}</span>
         </button>
 
         <div className="flex items-center gap-2">
