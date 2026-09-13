@@ -917,11 +917,6 @@ export default function CreativeLoginPortal() {
                 
                 {/* Left Side: Sticky Editorial Heading */}
                 <div className="w-full lg:w-5/12 lg:sticky lg:top-28 text-left space-y-6">
-                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wide uppercase bg-[#1A4F32]/10 dark:bg-[#4ADE80]/10 text-[#1A4F32] dark:text-[#4ADE80] border border-[#1A4F32]/20 dark:border-[#4ADE80]/20">
-                    <Sparkles className="w-3.5 h-3.5" />
-                    <span>{lang === 'hi' ? 'सरल एवं पारदर्शी प्रक्रिया' : 'The Seamless Flow'}</span>
-                  </div>
-
                   <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#0B1E14] dark:text-[#EAEFEA] tracking-tight leading-[1.12]">
                     {lang === 'hi' 
                       ? 'ऑर्डर से सीधे खेत तक, मिनटों में।' 
@@ -1131,10 +1126,6 @@ export default function CreativeLoginPortal() {
               
               {/* Section Heading */}
               <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wide uppercase bg-[#1A4F32]/10 dark:bg-[#4ADE80]/10 text-[#1A4F32] dark:text-[#4ADE80] border border-[#1A4F32]/20 dark:border-[#4ADE80]/20">
-                  <Activity className="w-3.5 h-3.5" />
-                  <span>{lang === 'hi' ? 'कृषिसेवा इकोसिस्टम' : 'The KrishiSeva Ecosystem'}</span>
-                </div>
                 <h2 className="text-3xl sm:text-5xl font-black text-[#0B1E14] dark:text-[#EAEFEA] tracking-tight leading-[1.15]">
                   {lang === 'hi' 
                     ? 'भारतीय खेतों के लिए विशेष निर्मित।' 
