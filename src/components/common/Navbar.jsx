@@ -414,60 +414,62 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
                   </div>
                 )}
 
-                {/* HELP & SUPPORT SECTION (FOR EVERYONE) */}
-                <div className="pt-2 border-t border-slate-200 dark:border-slate-800 space-y-1">
-                  <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider px-2 block">
-                    {lang === 'hi' ? 'सहायता एवं सेटिंग्स' : 'Support & Settings'}
-                  </span>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                      setIsHelpModalOpen(true);
-                    }}
-                    className="w-full p-2.5 rounded-xl border border-transparent hover:border-slate-200 dark:hover:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center justify-between text-xs font-semibold text-slate-700 dark:text-slate-200 transition cursor-pointer"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <Headphones className="w-4 h-4 text-emerald-500" />
-                      <span>{lang === 'hi' ? 'किसान हेल्पलाइन (24x7)' : '24x7 Help & Helpline'}</span>
-                    </div>
-                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
-                      Toll Free
+                {/* HELP & SUPPORT SECTION (FOR FARMER & DRIVER ONLY) */}
+                {currentUser?.role !== 'admin' && (
+                  <div className="pt-2 border-t border-slate-200 dark:border-slate-800 space-y-1">
+                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider px-2 block">
+                      {lang === 'hi' ? 'सहायता एवं सेटिंग्स' : 'Support & Settings'}
                     </span>
-                  </button>
-
-                  <div className="grid grid-cols-2 gap-1.5 pt-1">
-                    <button
-                      type="button"
-                      onClick={toggleLanguage}
-                      className="p-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold flex items-center justify-center gap-1.5 hover:border-emerald-500/40 transition cursor-pointer"
-                    >
-                      <Globe className="w-3.5 h-3.5 text-emerald-500" />
-                      <span>{lang === 'hi' ? 'English' : 'हिन्दी'}</span>
-                    </button>
 
                     <button
                       type="button"
-                      onClick={toggleTheme}
-                      className="p-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold flex items-center justify-center gap-1.5 hover:border-emerald-500/40 transition cursor-pointer"
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        setIsHelpModalOpen(true);
+                      }}
+                      className="w-full p-2.5 rounded-xl border border-transparent hover:border-slate-200 dark:hover:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center justify-between text-xs font-semibold text-slate-700 dark:text-slate-200 transition cursor-pointer"
                     >
-                      {isDark ? (
-                        <>
-                          <Sun className="w-3.5 h-3.5 text-amber-400" />
-                          <span>Light</span>
-                        </>
-                      ) : (
-                        <>
-                          <Moon className="w-3.5 h-3.5 text-indigo-600" />
-                          <span>Dark</span>
-                        </>
-                      )}
+                      <div className="flex items-center gap-2.5">
+                        <Headphones className="w-4 h-4 text-emerald-500" />
+                        <span>{lang === 'hi' ? 'किसान हेल्पलाइन (24x7)' : '24x7 Help & Helpline'}</span>
+                      </div>
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
+                        Toll Free
+                      </span>
                     </button>
+
+                    <div className="grid grid-cols-2 gap-1.5 pt-1">
+                      <button
+                        type="button"
+                        onClick={toggleLanguage}
+                        className="p-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold flex items-center justify-center gap-1.5 hover:border-emerald-500/40 transition cursor-pointer"
+                      >
+                        <Globe className="w-3.5 h-3.5 text-emerald-500" />
+                        <span>{lang === 'hi' ? 'English' : 'हिन्दी'}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={toggleTheme}
+                        className="p-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold flex items-center justify-center gap-1.5 hover:border-emerald-500/40 transition cursor-pointer"
+                      >
+                        {isDark ? (
+                          <>
+                            <Sun className="w-3.5 h-3.5 text-amber-400" />
+                            <span>Light</span>
+                          </>
+                        ) : (
+                          <>
+                            <Moon className="w-3.5 h-3.5 text-indigo-600" />
+                            <span>Dark</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
                   </div>
-                </div>
+                )}
 
-                {/* ACCOUNT & LOGOUT (DANGER ZONE - FOR EVERYONE) */}
+                {/* ACCOUNT & LOGOUT */}
                 <div className="pt-2 border-t border-slate-200 dark:border-slate-800 space-y-1">
                   <button
                     type="button"
@@ -483,19 +485,21 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
                     </div>
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                      setIsDeleteAccountModalOpen(true);
-                    }}
-                    className="w-full p-2.5 rounded-xl hover:bg-red-50 dark:hover:bg-red-950/40 text-red-500 flex items-center justify-between text-xs font-semibold transition cursor-pointer"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <Trash2 className="w-4 h-4 text-red-500" />
-                      <span>{lang === 'hi' ? 'खाता स्थायी रूप से हटाएं' : 'Delete Account Permanently'}</span>
-                    </div>
-                  </button>
+                  {currentUser?.role !== 'admin' && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        setIsDeleteAccountModalOpen(true);
+                      }}
+                      className="w-full p-2.5 rounded-xl hover:bg-red-50 dark:hover:bg-red-950/40 text-red-500 flex items-center justify-between text-xs font-semibold transition cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <Trash2 className="w-4 h-4 text-red-500" />
+                        <span>{lang === 'hi' ? 'खाता स्थायी रूप से हटाएं' : 'Delete Account Permanently'}</span>
+                      </div>
+                    </button>
+                  )}
                 </div>
 
               </div>
