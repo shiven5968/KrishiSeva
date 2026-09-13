@@ -67,15 +67,6 @@ export default function AdminLoginGate({ onAdminLoginSuccess }) {
         </button>
 
         <div className="flex items-center gap-2">
-          {/* Dark / Light Toggle */}
-          <button
-            onClick={toggleTheme}
-            className="p-2 rounded-full bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-[#0B1E14] dark:text-[#EAEFEA] text-xs font-semibold transition-all duration-300 cursor-pointer"
-            title="Toggle theme"
-          >
-            {isDark ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5 text-[#1A4F32]" />}
-          </button>
-
           {/* Language Switcher */}
           <button
             onClick={toggleLanguage}

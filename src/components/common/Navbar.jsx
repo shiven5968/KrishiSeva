@@ -167,18 +167,9 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
             </div>
           )}
 
-          {/* RIGHT CONTAINER: THEME, LANG & PROFILE MENU */}
+          {/* RIGHT CONTAINER: LANG & PROFILE MENU */}
           <div className="flex items-center gap-2" ref={menuRef}>
             
-            {/* Quick Theme Toggle Icon Button */}
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-full bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-[#0B1E14] dark:text-[#EAEFEA] transition-all duration-300 cursor-pointer"
-              title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
-            >
-              {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-[#1A4F32]" />}
-            </button>
-
             {/* Quick Language Toggle Button */}
             <button
               onClick={toggleLanguage}
@@ -432,32 +423,14 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
                       </span>
                     </button>
 
-                    <div className="grid grid-cols-2 gap-1.5 pt-1">
+                    <div className="pt-1">
                       <button
                         type="button"
                         onClick={toggleLanguage}
-                        className="p-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold flex items-center justify-center gap-1.5 hover:border-emerald-500/40 transition cursor-pointer"
+                        className="w-full p-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold flex items-center justify-center gap-1.5 hover:border-emerald-500/40 transition cursor-pointer"
                       >
                         <Globe className="w-3.5 h-3.5 text-emerald-500" />
                         <span>{lang === 'hi' ? 'English' : 'हिन्दी'}</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={toggleTheme}
-                        className="p-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold flex items-center justify-center gap-1.5 hover:border-emerald-500/40 transition cursor-pointer"
-                      >
-                        {isDark ? (
-                          <>
-                            <Sun className="w-3.5 h-3.5 text-amber-400" />
-                            <span>Light</span>
-                          </>
-                        ) : (
-                          <>
-                            <Moon className="w-3.5 h-3.5 text-indigo-600" />
-                            <span>Dark</span>
-                          </>
-                        )}
                       </button>
                     </div>
                   </div>

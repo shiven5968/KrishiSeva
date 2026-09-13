@@ -748,25 +748,6 @@ export default function CreativeLoginPortal() {
               <span>{lang === 'hi' ? 'एडमिन लॉगिन' : 'Admin Login'}</span>
             </button>
 
-            {/* Dark / Light Theme Switcher */}
-            <button
-              onClick={toggleTheme}
-              className="text-[#0B1E14] dark:text-[#EAEFEA] hover:text-[#1A4F32] dark:hover:text-[#4ADE80] hover:bg-[#1A4F32]/5 dark:hover:bg-white/5 transition-all duration-300 text-sm font-medium px-4 py-2 rounded-full active:scale-95 flex items-center gap-2 cursor-pointer"
-              title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-            >
-              {isDark ? (
-                <>
-                  <Sun className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Light</span>
-                </>
-              ) : (
-                <>
-                  <Moon className="w-3.5 h-3.5 text-[#1A4F32]" />
-                  <span>Dark</span>
-                </>
-              )}
-            </button>
-
             {/* Language Switcher */}
             <button
               onClick={toggleLanguage}
@@ -811,32 +792,13 @@ export default function CreativeLoginPortal() {
                 <span className="text-[#1A4F32] dark:text-[#4ADE80] font-bold">→</span>
               </button>
 
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  onClick={() => toggleTheme()}
-                  className="text-xs font-semibold px-3 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 text-[#0B1E14] dark:text-[#EAEFEA] flex items-center justify-center gap-1.5 cursor-pointer"
-                >
-                  {isDark ? (
-                    <>
-                      <Sun className="w-3.5 h-3.5 text-amber-400" />
-                      <span>Light</span>
-                    </>
-                  ) : (
-                    <>
-                      <Moon className="w-3.5 h-3.5 text-[#1A4F32]" />
-                      <span>Dark</span>
-                    </>
-                  )}
-                </button>
-
-                <button
-                  onClick={() => toggleLanguage()}
-                  className="text-xs font-semibold px-3 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 text-[#0B1E14] dark:text-[#EAEFEA] flex items-center justify-center gap-1.5 cursor-pointer"
-                >
-                  <Globe className="w-3.5 h-3.5 text-[#1A4F32] dark:text-[#4ADE80]" />
-                  <span>{lang === 'hi' ? 'English' : 'हिंदी'}</span>
-                </button>
-              </div>
+              <button
+                onClick={() => toggleLanguage()}
+                className="w-full text-xs font-semibold px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 text-[#0B1E14] dark:text-[#EAEFEA] flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <Globe className="w-3.5 h-3.5 text-[#1A4F32] dark:text-[#4ADE80]" />
+                <span>{lang === 'hi' ? 'English' : 'हिंदी'}</span>
+              </button>
             </div>
           </div>
         )}
