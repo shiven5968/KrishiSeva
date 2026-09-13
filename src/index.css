@@ -14,19 +14,80 @@
   html.lang-hi,
   [lang="hi"],
   .lang-hi {
-    font-family: 'Noto Sans Devanagari', 'Poppins', 'Mukta', system-ui, -apple-system, sans-serif;
+    font-size: 106%; /* Gracefully scales entire site typography by ~6% in Hindi */
+    font-family: 'Noto Sans Devanagari', 'Mukta', 'Poppins', system-ui, -apple-system, sans-serif;
+    letter-spacing: 0.01em;
+    line-height: 1.6;
+  }
+
+  html.lang-hi body {
+    font-family: 'Noto Sans Devanagari', 'Mukta', 'Poppins', system-ui, -apple-system, sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  /* Specific typography boosts for Hindi UI elements */
+  html.lang-hi .text-xs,
+  [lang="hi"] .text-xs,
+  html.lang-hi .text-\[10px\],
+  html.lang-hi .text-\[11px\],
+  html.lang-hi .text-\[12px\] {
+    font-size: 0.85rem !important; /* ~14px */
+    line-height: 1.4 !important;
+  }
+
+  html.lang-hi .text-sm,
+  [lang="hi"] .text-sm {
+    font-size: 0.975rem !important; /* ~16px */
+    line-height: 1.55 !important;
+  }
+
+  html.lang-hi .text-base,
+  [lang="hi"] .text-base {
+    font-size: 1.1rem !important; /* ~18px */
+    line-height: 1.65 !important;
+  }
+
+  html.lang-hi .text-lg,
+  [lang="hi"] .text-lg {
+    font-size: 1.225rem !important;
+    line-height: 1.5 !important;
+  }
+
+  html.lang-hi .text-xl,
+  [lang="hi"] .text-xl {
+    font-size: 1.35rem !important;
+    line-height: 1.45 !important;
+  }
+
+  html.lang-hi .text-2xl,
+  [lang="hi"] .text-2xl {
+    font-size: 1.65rem !important;
+    line-height: 1.35 !important;
+  }
+
+  html.lang-hi .text-3xl,
+  [lang="hi"] .text-3xl {
+    font-size: 2.1rem !important;
+    line-height: 1.25 !important;
   }
 
   html.lang-hi .font-display,
-  [lang="hi"] .font-display {
-    font-family: 'Noto Sans Devanagari', 'Poppins', 'Mukta', sans-serif;
-  }
-
+  [lang="hi"] .font-display,
   html.lang-hi h1, 
   html.lang-hi h2, 
   html.lang-hi h3, 
   html.lang-hi h4 {
     font-family: 'Noto Sans Devanagari', 'Poppins', 'Mukta', sans-serif;
+    letter-spacing: -0.01em;
+  }
+
+  html.lang-hi p,
+  html.lang-hi span,
+  html.lang-hi button,
+  html.lang-hi label,
+  html.lang-hi input {
+    font-family: 'Noto Sans Devanagari', 'Mukta', 'Poppins', sans-serif;
   }
 
   /* Smooth transitions */
