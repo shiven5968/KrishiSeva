@@ -1543,41 +1543,37 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
       </div>
 
       {/* ═══════════════ SECTION 5: Full-Width Estimated Price, Bargain & Wide Bottom Action Bar ═══════════════ */}
-      <div className={`rounded-3xl p-6 sm:p-8 shadow-2xl border transition-colors duration-200 text-white ${
-        isDark 
-          ? 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-black/40' 
-          : 'bg-gradient-to-br from-slate-900 via-stone-900 to-emerald-950 border border-emerald-500/40 shadow-xl'
-      }`}>
+      <div className="rounded-3xl p-6 sm:p-8 bg-white/90 backdrop-blur-xl border border-[#0B1E14]/5 shadow-[0_-20px_40px_rgba(11,30,20,0.06)] transition-all duration-300 text-[#0B1E14]">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
           
           {/* Left Side (col-span-6): Price & Bargain Controls */}
           <div className="lg:col-span-6 space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+            <div className="flex items-center justify-between pb-4 border-b border-[#0B1E14]/10">
               <div>
-                <span className="text-xs text-emerald-400 font-black uppercase tracking-wider flex items-center gap-1.5">
-                  <Calculator className="w-4 h-4" />
+                <span className="text-xs text-[#4F6358] font-bold tracking-widest uppercase flex items-center gap-1.5">
+                  <Calculator className="w-4 h-4 text-[#1A4F32]" />
                   <span>{customBargainPrice && customBargainPrice !== fareResult.total ? (lang === 'hi' ? 'आपका प्रस्तावित किराया' : 'Your Counter Offer') : t('estimatedPrice')}</span>
                 </span>
-                <div className="flex items-baseline gap-3 mt-1.5">
-                  <span className="text-4xl sm:text-5xl font-black text-white tracking-tight">
+                <div className="flex items-baseline flex-wrap gap-2.5 mt-1.5">
+                  <span className="text-4xl sm:text-5xl font-black text-[#0B1E14] tracking-tight">
                     ₹{(customBargainPrice !== null && customBargainPrice > 0) ? customBargainPrice : fareResult.total}
                   </span>
                   {customBargainPrice && customBargainPrice !== fareResult.total && (
-                    <span className="text-sm font-bold text-slate-500 dark:text-slate-400 line-through">
+                    <span className="text-sm font-bold text-[#4F6358]/70 line-through">
                       ₹{fareResult.total}
                     </span>
                   )}
-                  <span className="text-xs text-emerald-400 font-semibold">
+                  <span className="text-xs text-[#1A4F32] font-medium">
                     ({selectedCategoryId === 'truck' ? `₹500 Base + (${effectiveDistanceKm} km × ₹50)` : fareResult.breakdownText})
                   </span>
                 </div>
               </div>
 
               <div className="text-right">
-                <span className="text-xs font-black px-3 py-1 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/40">
+                <span className="text-xs font-semibold px-3 py-1 rounded-full bg-[#1A4F32]/10 text-[#1A4F32] border border-[#1A4F32]/15 inline-block">
                   {selectedCategoryId === 'truck' ? (lang === 'hi' ? 'ट्रक / ट्रॉली' : 'Truck Logistics') : t(currentCategory.nameKey)}
                 </span>
-                <p className="text-[11px] text-slate-700 dark:text-slate-300 mt-1 font-medium">
+                <p className="text-xs text-[#4F6358] mt-1 font-medium">
                   {selectedCategoryId === 'truck' 
                     ? `+ ${lang === 'hi' ? currentCargo.nameHi : currentCargo.nameEn}` 
                     : `+ ${t(currentAttachment?.nameKey)}`}
@@ -1586,22 +1582,22 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
             </div>
 
             {/* Quick Bargain Offer Bar */}
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-bold text-amber-300 mr-1 flex items-center gap-1">
+            <div className="flex flex-wrap items-center gap-2 pt-1">
+              <span className="text-xs font-medium text-[#0B1E14] mr-1 flex items-center gap-1.5">
                 <span>🤝</span>
                 <span>{lang === 'hi' ? 'मोलभाव:' : 'Bargain:'}</span>
               </span>
               <button
                 type="button"
                 onClick={() => setCustomBargainPrice(Math.max(100, (customBargainPrice || fareResult.total) - 100))}
-                className="px-3.5 py-1.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-slate-800 dark:text-slate-200 text-xs font-black border border-stone-700 transition active:scale-95"
+                className="border border-[#0B1E14]/15 text-[#0B1E14] bg-transparent hover:bg-[#0B1E14]/5 hover:border-[#0B1E14]/30 transition-all rounded-full px-4 py-1.5 font-medium text-xs active:scale-95 cursor-pointer"
               >
                 -₹100
               </button>
               <button
                 type="button"
                 onClick={() => setCustomBargainPrice(Math.max(100, (customBargainPrice || fareResult.total) - 200))}
-                className="px-3.5 py-1.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-slate-800 dark:text-slate-200 text-xs font-black border border-stone-700 transition active:scale-95"
+                className="border border-[#0B1E14]/15 text-[#0B1E14] bg-transparent hover:bg-[#0B1E14]/5 hover:border-[#0B1E14]/30 transition-all rounded-full px-4 py-1.5 font-medium text-xs active:scale-95 cursor-pointer"
               >
                 -₹200
               </button>
@@ -1609,13 +1605,13 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
                 <button
                   type="button"
                   onClick={() => setCustomBargainPrice(null)}
-                  className="px-3 py-1.5 rounded-xl bg-red-950/70 hover:bg-red-900 text-red-300 text-xs font-bold border border-red-800 transition active:scale-95"
+                  className="border border-rose-200 text-rose-700 bg-rose-50/60 hover:bg-rose-100 hover:border-rose-300 transition-all rounded-full px-3.5 py-1.5 font-medium text-xs active:scale-95 cursor-pointer"
                 >
                   ↺ {lang === 'hi' ? 'रीसेट' : 'Reset'}
                 </button>
               )}
               {customBargainPrice && customBargainPrice !== fareResult.total && (
-                <span className="text-xs text-emerald-400 font-bold ml-1">
+                <span className="text-xs text-[#1A4F32] font-semibold bg-[#1A4F32]/10 border border-[#1A4F32]/20 px-3 py-1 rounded-full ml-1">
                   ✓ {lang === 'hi' ? `₹${fareResult.total - Number(customBargainPrice)} छूट` : `₹${fareResult.total - Number(customBargainPrice)} Off`}
                 </span>
               )}
@@ -1628,7 +1624,7 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
             <button
               type="button"
               onClick={handleConfirmBooking}
-              className="w-full py-5 bg-[#0B1E14] hover:bg-[#153424] dark:bg-[#EAEFEA] dark:hover:bg-white text-white dark:text-[#0B1E14] font-medium text-lg sm:text-xl rounded-full shadow-[0_8px_30px_rgb(11,30,20,0.12)] hover:shadow-[0_8px_30px_rgb(11,30,20,0.2)] hover:-translate-y-1 active:translate-y-0 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] cursor-pointer flex items-center justify-center gap-3 tracking-wide"
+              className="w-full py-4.5 sm:py-5 bg-[#0B1E14] hover:bg-[#153424] text-white rounded-full font-medium text-base sm:text-lg tracking-wide shadow-[0_8px_20px_rgb(11,30,20,0.12)] hover:shadow-[0_8px_25px_rgb(11,30,20,0.2)] hover:-translate-y-1 active:translate-y-0 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] cursor-pointer flex items-center justify-center gap-3"
             >
               <span>
                 {bookingTimingMode === 'schedule'
@@ -1637,8 +1633,8 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
               </span>
             </button>
 
-            <div className="flex items-center justify-between text-xs text-[#4F6358] dark:text-[#9FB1A7] px-2 font-light">
-              <span>{lang === 'hi' ? 'खेत पर सीधा आगमन:' : 'Direct Farm Arrival:'} <b className="text-[#1A4F32] dark:text-[#4ADE80] font-semibold">~35-60 Mins</b></span>
+            <div className="flex items-center justify-between text-xs text-[#4F6358] px-2 font-medium">
+              <span>{lang === 'hi' ? 'खेत पर सीधा आगमन:' : 'Direct Farm Arrival:'} <b className="text-[#1A4F32] font-semibold">~35-60 Mins</b></span>
               <span>{lang === 'hi' ? '100% सत्यापित चालक व यंत्र' : '100% Verified Fleet & Drivers'}</span>
             </div>
           </div>
