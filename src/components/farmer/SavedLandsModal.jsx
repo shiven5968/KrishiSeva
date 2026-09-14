@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import L from 'leaflet';
 import { useLanguage } from '../../context/LanguageContext';
 import { useSavedLands } from '../../context/SavedLandsContext';
@@ -463,26 +464,31 @@ export default function SavedLandsModal({ isOpen, onClose }) {
     setIsAddingNew(false);
   };
 
-  return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-stone-950/80 backdrop-blur-md animate-fade-in">
-      <div className="bg-white rounded-3xl max-w-3xl w-full p-6 sm:p-8 shadow-2xl border border-stone-200 relative max-h-[90vh] overflow-y-auto space-y-6">
+  if (!isOpen) return null;
+
+  const modalContent = (
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 sm:p-6 bg-[#0B1E14]/65 backdrop-blur-md animate-fade-in">
+      <div 
+        onClick={(e) => e.stopPropagation()}
+        className="bg-[#FDFBF7] rounded-[2rem] max-w-3xl w-full p-6 sm:p-8 shadow-[0_25px_60px_rgba(11,30,20,0.25)] border border-[#0B1E14]/10 relative max-h-[90vh] overflow-y-auto space-y-6 text-[#0B1E14]"
+      >
         
         {/* Modal Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-stone-100">
+        <div className="flex items-center justify-between pb-4 border-b border-[#0B1E14]/10">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center shadow-inner text-2xl shrink-0">
+            <div className="w-12 h-12 rounded-2xl bg-[#1A4F32]/10 text-[#1A4F32] flex items-center justify-center text-2xl shrink-0 border border-[#1A4F32]/15">
               🌾
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-xl font-black text-stone-900">
+                <h3 className="text-xl sm:text-2xl font-black text-[#0B1E14] tracking-tight">
                   {lang === 'hi' ? 'मेरे सहेजे गए खेत' : 'My Saved Farmlands'}
                 </h3>
-                <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
+                <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#1A4F32]/10 text-[#1A4F32] border border-[#1A4F32]/20">
                   {lang === 'hi' ? 'भूलेख इंटीग्रेटेड' : 'Govt Bhulekh Integrated'}
                 </span>
               </div>
-              <p className="text-stone-500 text-xs font-semibold mt-0.5">
+              <p className="text-[#4F6358] text-xs font-medium mt-0.5">
                 {lang === 'hi' ? 'भूलेख/खसरा संख्या से सरकारी रिकॉर्ड स्वतः लोड करें या जीपीएस मैप से खेत का दायरा बनाएं' : 'Fetch verified land records via UP Bhulekh Khasra No. or mark on GPS satellite map'}
               </p>
             </div>
@@ -490,7 +496,7 @@ export default function SavedLandsModal({ isOpen, onClose }) {
 
           <button
             onClick={onClose}
-            className="w-9 h-9 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 flex items-center justify-center transition shrink-0"
+            className="w-10 h-10 rounded-full bg-black/5 hover:bg-black/10 text-[#0B1E14] flex items-center justify-center transition shrink-0 cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -500,35 +506,35 @@ export default function SavedLandsModal({ isOpen, onClose }) {
         {!isAddingNew ? (
           <button
             onClick={() => setIsAddingNew(true)}
-            className="w-full py-4 rounded-2xl border-2 border-dashed border-emerald-500 bg-emerald-50/60 hover:bg-emerald-100/60 text-emerald-800 font-black text-xs sm:text-sm flex items-center justify-center gap-2 transition active:scale-98 shadow-sm"
+            className="w-full py-4 rounded-2xl border-2 border-dashed border-[#1A4F32]/30 bg-[#1A4F32]/5 hover:bg-[#1A4F32]/10 text-[#1A4F32] font-bold text-xs sm:text-sm flex items-center justify-center gap-2.5 transition active:scale-[0.99] shadow-sm cursor-pointer"
           >
-            <Plus className="w-4 h-4 text-emerald-700" />
+            <Plus className="w-4 h-4 text-[#1A4F32]" />
             <span>{lang === 'hi' ? 'नया खेत जोड़ें (भूलेख / जीपीएस)' : 'Add New Land (Bhulekh / GPS)'}</span>
           </button>
         ) : (
-          <div className="p-5 rounded-3xl border-2 border-emerald-500 bg-emerald-50/30 space-y-5 shadow-sm">
+          <div className="p-6 rounded-3xl border border-[#0B1E14]/10 bg-white shadow-sm space-y-5">
             
             {/* Mode Switcher Tabs */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-emerald-200">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-[#0B1E14]/10">
               <div>
-                <h4 className="font-black text-sm text-stone-900 flex items-center gap-1.5">
+                <h4 className="font-bold text-sm text-[#0B1E14] flex items-center gap-1.5">
                   <span>📍</span>
                   <span>{lang === 'hi' ? 'खेत सत्यापन व जोड़ें' : 'Add & Verify Farmland'}</span>
                 </h4>
-                <p className="text-[11px] text-stone-500 font-medium">
+                <p className="text-[11px] text-[#4F6358] font-medium">
                   {lang === 'hi' ? 'सरकारी खसरा संख्या से स्वतः लाएं या मैन्युअल दायरा मार्क करें' : 'Select mode to fetch government registry or draw boundary manually'}
                 </p>
               </div>
 
               {/* Mode Toggle Pills */}
-              <div className="flex items-center gap-1 bg-stone-200/80 p-1 rounded-2xl">
+              <div className="flex items-center gap-1.5 bg-black/5 p-1 rounded-2xl">
                 <button
                   type="button"
                   onClick={() => setEntryMode('bhulekh')}
-                  className={`px-3 py-1.5 rounded-xl font-black text-xs transition flex items-center gap-1.5 ${
+                  className={`px-3.5 py-1.5 rounded-xl font-bold text-xs transition flex items-center gap-1.5 cursor-pointer ${
                     entryMode === 'bhulekh'
-                      ? 'bg-emerald-600 text-white shadow-md'
-                      : 'text-stone-700 hover:text-stone-900'
+                      ? 'bg-[#0B1E14] text-white shadow-sm'
+                      : 'text-[#4F6358] hover:text-[#0B1E14]'
                   }`}
                 >
                   <Landmark className="w-3.5 h-3.5" />
@@ -538,10 +544,10 @@ export default function SavedLandsModal({ isOpen, onClose }) {
                 <button
                   type="button"
                   onClick={() => setEntryMode('manual')}
-                  className={`px-3 py-1.5 rounded-xl font-black text-xs transition flex items-center gap-1.5 ${
+                  className={`px-3.5 py-1.5 rounded-xl font-bold text-xs transition flex items-center gap-1.5 cursor-pointer ${
                     entryMode === 'manual'
-                      ? 'bg-emerald-600 text-white shadow-md'
-                      : 'text-stone-700 hover:text-stone-900'
+                      ? 'bg-[#0B1E14] text-white shadow-sm'
+                      : 'text-[#4F6358] hover:text-[#0B1E14]'
                   }`}
                 >
                   <Edit3 className="w-3.5 h-3.5" />
@@ -555,9 +561,9 @@ export default function SavedLandsModal({ isOpen, onClose }) {
               <div className="space-y-4">
                 
                 {/* Government Bhulekh Search Inputs Card */}
-                <div className="p-4 rounded-2xl bg-white border border-emerald-300 shadow-sm space-y-3">
-                  <div className="flex items-center gap-2 text-xs font-black text-emerald-900">
-                    <Building2 className="w-4 h-4 text-emerald-700" />
+                <div className="p-4 rounded-2xl bg-[#FDFBF7] border border-[#0B1E14]/10 space-y-3">
+                  <div className="flex items-center gap-2 text-xs font-bold text-[#1A4F32]">
+                    <Building2 className="w-4 h-4 text-[#1A4F32]" />
                     <span>{lang === 'hi' ? 'उत्तर प्रदेश राजस्व परिषद (भूलेख सत्यापन):' : 'UP Bhulekh / AgriStack Land Verification:'}</span>
                   </div>
 
@@ -566,13 +572,13 @@ export default function SavedLandsModal({ isOpen, onClose }) {
                       
                       {/* District */}
                       <div>
-                        <label className="block text-[10px] font-black text-stone-600 uppercase mb-1">
+                        <label className="block text-[10px] font-bold text-[#4F6358] uppercase mb-1">
                           {lang === 'hi' ? 'जिला *' : 'District *'}
                         </label>
                         <select
                           value={bhulekhQuery.district}
                           onChange={(e) => handleDistrictChange(e.target.value)}
-                          className="w-full px-2.5 py-2 rounded-xl border border-stone-300 font-bold text-xs bg-white text-stone-900 outline-none focus:border-emerald-500"
+                          className="w-full px-2.5 py-2 rounded-xl border border-[#0B1E14]/15 font-semibold text-xs bg-white text-[#0B1E14] outline-none focus:border-[#1A4F32]"
                         >
                           {UP_DISTRICTS.map(d => (
                             <option key={d.id} value={d.id}>
@@ -584,13 +590,13 @@ export default function SavedLandsModal({ isOpen, onClose }) {
 
                       {/* Tehsil */}
                       <div>
-                        <label className="block text-[10px] font-black text-stone-600 uppercase mb-1">
+                        <label className="block text-[10px] font-bold text-[#4F6358] uppercase mb-1">
                           {lang === 'hi' ? 'तहसील *' : 'Tehsil *'}
                         </label>
                         <select
                           value={bhulekhQuery.tehsil}
                           onChange={(e) => setBhulekhQuery({ ...bhulekhQuery, tehsil: e.target.value })}
-                          className="w-full px-2.5 py-2 rounded-xl border border-stone-300 font-bold text-xs bg-white text-stone-900 outline-none focus:border-emerald-500"
+                          className="w-full px-2.5 py-2 rounded-xl border border-[#0B1E14]/15 font-semibold text-xs bg-white text-[#0B1E14] outline-none focus:border-[#1A4F32]"
                         >
                           {activeDistrictObj.tehsils.map(t => (
                             <option key={t} value={t}>{t}</option>
@@ -600,7 +606,7 @@ export default function SavedLandsModal({ isOpen, onClose }) {
 
                       {/* Village / Gram */}
                       <div>
-                        <label className="block text-[10px] font-black text-stone-600 uppercase mb-1">
+                        <label className="block text-[10px] font-bold text-[#4F6358] uppercase mb-1">
                           {lang === 'hi' ? 'ग्राम *' : 'Village *'}
                         </label>
                         <input
@@ -609,13 +615,13 @@ export default function SavedLandsModal({ isOpen, onClose }) {
                           placeholder={lang === 'hi' ? 'उदा. रामपुर / मलिहाबाद' : 'e.g. Rampur / Malihabad'}
                           value={bhulekhQuery.village}
                           onChange={(e) => setBhulekhQuery({ ...bhulekhQuery, village: e.target.value })}
-                          className="w-full px-2.5 py-2 rounded-xl border border-stone-300 font-bold text-xs bg-white text-stone-900 outline-none focus:border-emerald-500"
+                          className="w-full px-2.5 py-2 rounded-xl border border-[#0B1E14]/15 font-semibold text-xs bg-white text-[#0B1E14] outline-none focus:border-[#1A4F32]"
                         />
                       </div>
 
                       {/* Khasra / Gata Number */}
                       <div>
-                        <label className="block text-[10px] font-black text-emerald-800 uppercase mb-1">
+                        <label className="block text-[10px] font-bold text-[#1A4F32] uppercase mb-1">
                           {lang === 'hi' ? 'खसरा / गाटा संख्या *' : 'Khasra / Gata No. *'}
                         </label>
                         <input
@@ -624,21 +630,21 @@ export default function SavedLandsModal({ isOpen, onClose }) {
                           placeholder={lang === 'hi' ? 'उदा. 142 या 74' : 'e.g. 142 or 74'}
                           value={bhulekhQuery.khasraNumber}
                           onChange={(e) => setBhulekhQuery({ ...bhulekhQuery, khasraNumber: e.target.value })}
-                          className="w-full px-2.5 py-2 rounded-xl border-2 border-emerald-500 font-black text-xs bg-emerald-50 text-emerald-950 outline-none focus:ring-2 focus:ring-emerald-200"
+                          className="w-full px-2.5 py-2 rounded-xl border-2 border-[#1A4F32] font-black text-xs bg-[#1A4F32]/5 text-[#0B1E14] outline-none focus:ring-2 focus:ring-[#1A4F32]/20"
                         />
                       </div>
 
                     </div>
 
                     <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-1">
-                      <span className="text-[11px] text-stone-500 font-semibold">
+                      <span className="text-[11px] text-[#4F6358] font-medium">
                         💡 {lang === 'hi' ? 'त्वरित परीक्षण खसरा संख्या: 142, 74, 215, 58' : 'Quick Demo Khasra Numbers: 142, 74, 215, 58'}
                       </span>
 
                       <button
                         type="submit"
                         disabled={isSearchingBhulekh}
-                        className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs shadow-md transition active:scale-95 flex items-center justify-center gap-1.5"
+                        className="w-full sm:w-auto px-5 py-2.5 rounded-full bg-[#0B1E14] hover:bg-[#153424] text-white font-medium text-xs shadow-sm transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
                       >
                         <Search className={`w-3.5 h-3.5 ${isSearchingBhulekh ? 'animate-spin' : ''}`} />
                         <span>{isSearchingBhulekh ? (lang === 'hi' ? 'रिकॉर्ड खोज रहे हैं...' : 'Searching...') : (lang === 'hi' ? '🔍 खसरा विवरण लाएं' : '🔍 Fetch Land Records')}</span>
@@ -657,7 +663,7 @@ export default function SavedLandsModal({ isOpen, onClose }) {
                     <button
                       type="button"
                       onClick={() => setEntryMode('manual')}
-                      className="px-3 py-1 bg-amber-200 hover:bg-amber-300 text-amber-950 font-black text-[11px] rounded-lg shrink-0"
+                      className="px-3 py-1 bg-amber-200 hover:bg-amber-300 text-amber-950 font-bold text-[11px] rounded-lg shrink-0 cursor-pointer"
                     >
                       {lang === 'hi' ? 'मैन्युअल दर्ज करें →' : 'Enter Manually →'}
                     </button>
@@ -666,17 +672,17 @@ export default function SavedLandsModal({ isOpen, onClose }) {
 
                 {/* Verified Government Record Display Card */}
                 {bhulekhResult && (
-                  <div className="p-5 rounded-2xl bg-emerald-950 text-white border-2 border-emerald-500 shadow-xl space-y-4 animate-fade-in">
+                  <div className="p-5 rounded-2xl bg-[#0B1E14] text-white border border-[#1A4F32]/40 shadow-xl space-y-4 animate-fade-in">
                     
                     {/* Header */}
-                    <div className="flex items-center justify-between border-b border-emerald-800/80 pb-3">
+                    <div className="flex items-center justify-between border-b border-white/10 pb-3">
                       <div className="flex items-center gap-2.5">
                         <ShieldCheck className="w-6 h-6 text-emerald-400" />
                         <div>
-                          <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 bg-emerald-900 px-2 py-0.5 rounded-full border border-emerald-700">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 bg-white/10 px-2.5 py-0.5 rounded-full">
                             {lang === 'hi' ? 'उत्तर प्रदेश भूलेख सत्यापित' : 'UP Bhulekh Government Verified'}
                           </span>
-                          <h5 className="font-black text-base text-white mt-0.5">
+                          <h5 className="font-bold text-base text-white mt-1">
                             {lang === 'hi' ? `भूस्वामी: ${bhulekhResult.ownerName}` : `Land Owner: ${bhulekhResult.ownerName}`}
                           </h5>
                         </div>
@@ -691,23 +697,23 @@ export default function SavedLandsModal({ isOpen, onClose }) {
                     {/* Metadata Grid with Automated Hectare to Bigha Conversion */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                       
-                      <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900/90 border border-emerald-800/60">
-                        <span className="text-[10px] text-slate-500 dark:text-slate-400 block">{lang === 'hi' ? 'गाटा संख्या' : 'Gata / Khasra No.'}</span>
-                        <span className="font-black text-emerald-300 text-sm">#{bhulekhResult.khasraNumber}</span>
+                      <div className="p-2.5 rounded-xl bg-white/5 border border-white/10">
+                        <span className="text-[10px] text-stone-400 block">{lang === 'hi' ? 'गाटा संख्या' : 'Gata / Khasra No.'}</span>
+                        <span className="font-bold text-emerald-300 text-sm">#{bhulekhResult.khasraNumber}</span>
                       </div>
 
-                      <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900/90 border border-emerald-800/60">
-                        <span className="text-[10px] text-slate-500 dark:text-slate-400 block">{lang === 'hi' ? 'खतौनी संख्या' : 'Khata No.'}</span>
-                        <span className="font-black text-white text-sm">{bhulekhResult.khataNumber}</span>
+                      <div className="p-2.5 rounded-xl bg-white/5 border border-white/10">
+                        <span className="text-[10px] text-stone-400 block">{lang === 'hi' ? 'खतौनी संख्या' : 'Khata No.'}</span>
+                        <span className="font-bold text-white text-sm">{bhulekhResult.khataNumber}</span>
                       </div>
 
-                      <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900/90 border border-emerald-800/60">
-                        <span className="text-[10px] text-slate-500 dark:text-slate-400 block">{lang === 'hi' ? 'क्षेत्रफल (हेक्टेयर)' : 'Area (Hectare)'}</span>
-                        <span className="font-black text-amber-300 text-sm">{bhulekhResult.areaHectare} Hec</span>
+                      <div className="p-2.5 rounded-xl bg-white/5 border border-white/10">
+                        <span className="text-[10px] text-stone-400 block">{lang === 'hi' ? 'क्षेत्रफल (हेक्टेयर)' : 'Area (Hectare)'}</span>
+                        <span className="font-bold text-amber-300 text-sm">{bhulekhResult.areaHectare} Hec</span>
                       </div>
 
                       {/* PROGRAMMATIC CONVERSION TO BIGHA */}
-                      <div className="p-2.5 rounded-xl bg-emerald-900/90 border border-emerald-400 text-emerald-100">
+                      <div className="p-2.5 rounded-xl bg-emerald-900/60 border border-emerald-500/50 text-emerald-100">
                         <span className="text-[10px] text-emerald-300 font-bold block">{lang === 'hi' ? 'स्वचालित बीघा' : 'Calculated Bigha'}</span>
                         <span className="font-black text-white text-base">{bhulekhResult.areaBigha} {lang === 'hi' ? 'बीघा' : 'Bigha'}</span>
                       </div>
@@ -715,7 +721,7 @@ export default function SavedLandsModal({ isOpen, onClose }) {
                     </div>
 
                     {/* Formula Explanation Callout */}
-                    <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-[11px] text-slate-700 dark:text-slate-300 flex items-center justify-between gap-2">
+                    <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-[11px] text-stone-300 flex items-center justify-between gap-2">
                       <div className="flex items-center gap-1.5">
                         <Calculator className="w-3.5 h-3.5 text-emerald-400" />
                         <span>{lang === 'hi' ? `रूपांतरण: ${bhulekhResult.areaHectare} हेक्टेयर × 3.95 = ${bhulekhResult.areaBigha} पक्का बीघा` : `Conversion: ${bhulekhResult.areaHectare} Hectares × 3.95 = ${bhulekhResult.areaBigha} Bigha`}</span>
@@ -732,12 +738,12 @@ export default function SavedLandsModal({ isOpen, onClose }) {
             {/* TAB 2: MANUAL ENTRY / GPS DRAWING MAP */}
             {entryMode === 'manual' && (
               <div className="space-y-4">
-                <div className="p-3 rounded-2xl bg-blue-50 border border-blue-200 text-blue-950 text-xs font-semibold flex items-center justify-between">
-                  <span>{lang === 'hi' ? '🗺️ सैटेलाइट मैप पर अपने खेत के कोने छूकर दायरा बनाएं' : '🗺️ Tap 4 corners on satellite map to draw boundary'}</span>
+                <div className="p-3 rounded-2xl bg-[#1A4F32]/10 border border-[#1A4F32]/20 text-[#0B1E14] text-xs font-medium flex items-center justify-between">
+                  <span>{lang === 'hi' ? '🗺️ सैटेलाइट मैप पर अपने खेत के कोने छूकर दायरा बनाएं' : '🗺️ Tap corners on satellite map to draw boundary'}</span>
                   <button
                     type="button"
                     onClick={() => setEntryMode('bhulekh')}
-                    className="text-emerald-700 hover:text-emerald-900 font-black underline ml-2 shrink-0"
+                    className="text-[#1A4F32] hover:underline font-bold ml-2 shrink-0 cursor-pointer"
                   >
                     {lang === 'hi' ? '← भूलेख से लाएं' : '← Fetch via Bhulekh'}
                   </button>
@@ -751,11 +757,11 @@ export default function SavedLandsModal({ isOpen, onClose }) {
             )}
 
             {/* Farmland Confirmation & Save Form (Applies to both modes) */}
-            <form onSubmit={handleSaveLand} className="space-y-4 pt-2 border-t border-emerald-200">
+            <form onSubmit={handleSaveLand} className="space-y-4 pt-3 border-t border-[#0B1E14]/10">
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] font-bold text-stone-700 uppercase mb-1">
+                  <label className="block text-[11px] font-bold text-[#4F6358] uppercase mb-1">
                     {lang === 'hi' ? 'खेत का नाम *' : 'Field Name *'}
                   </label>
                   <input
@@ -764,16 +770,16 @@ export default function SavedLandsModal({ isOpen, onClose }) {
                     placeholder={lang === 'hi' ? 'उदा. उत्तर वाला खेत' : 'e.g. North Plot'}
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 font-bold text-xs text-stone-900 bg-white outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#0B1E14]/15 font-semibold text-xs text-[#0B1E14] bg-[#FDFBF7] outline-none focus:border-[#1A4F32]"
                   />
                 </div>
 
                 <div>
                   <div className="flex justify-between items-center mb-1">
-                    <label className="block text-[11px] font-bold text-stone-700 uppercase">
+                    <label className="block text-[11px] font-bold text-[#4F6358] uppercase">
                       {lang === 'hi' ? 'खेत का आकार *' : 'Field Area Size *'}
                     </label>
-                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+                    <span className="text-[10px] font-bold text-[#1A4F32] bg-[#1A4F32]/10 px-2 py-0.5 rounded-full">
                       {lang === 'hi' ? 'सभी इकाइयाँ' : 'Any Unit Supported'}
                     </span>
                   </div>
@@ -785,7 +791,7 @@ export default function SavedLandsModal({ isOpen, onClose }) {
                       required
                       value={formData.bigha}
                       onChange={(e) => setFormData({ ...formData, bigha: parseFloat(e.target.value) || 1 })}
-                      className="flex-1 px-3.5 py-2.5 rounded-xl border border-stone-300 font-black text-xs text-emerald-800 bg-emerald-50/80 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
+                      className="flex-1 px-3.5 py-2.5 rounded-xl border border-[#0B1E14]/15 font-black text-xs text-[#1A4F32] bg-[#1A4F32]/5 outline-none focus:border-[#1A4F32]"
                     />
                     <select
                       value={formData.unit || 'bigha'}
@@ -793,7 +799,7 @@ export default function SavedLandsModal({ isOpen, onClose }) {
                         const newUnit = e.target.value;
                         setFormData(prev => ({ ...prev, unit: newUnit }));
                       }}
-                      className="px-2.5 py-2.5 rounded-xl border border-stone-300 font-bold text-xs bg-white text-stone-800 outline-none focus:border-emerald-500"
+                      className="px-2.5 py-2.5 rounded-xl border border-[#0B1E14]/15 font-semibold text-xs bg-white text-[#0B1E14] outline-none focus:border-[#1A4F32]"
                     >
                       <option value="bigha">{lang === 'hi' ? 'बीघा' : 'Bigha'}</option>
                       <option value="acre">{lang === 'hi' ? 'एकड़' : 'Acre'}</option>
@@ -807,7 +813,7 @@ export default function SavedLandsModal({ isOpen, onClose }) {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] font-bold text-stone-700 uppercase mb-1">
+                  <label className="block text-[11px] font-bold text-[#4F6358] uppercase mb-1">
                     {lang === 'hi' ? 'मुख्य फसल / कार्य' : 'Crop / Operation Type'}
                   </label>
                   <input
@@ -815,12 +821,12 @@ export default function SavedLandsModal({ isOpen, onClose }) {
                     placeholder={lang === 'hi' ? 'उदा. गेहूँ / धान' : 'e.g. Wheat / Paddy'}
                     value={formData.cropType}
                     onChange={(e) => setFormData({ ...formData, cropType: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 font-bold text-xs text-stone-900 bg-white outline-none focus:border-emerald-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#0B1E14]/15 font-semibold text-xs text-[#0B1E14] bg-[#FDFBF7] outline-none focus:border-[#1A4F32]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-stone-700 uppercase mb-1">
+                  <label className="block text-[11px] font-bold text-[#4F6358] uppercase mb-1">
                     {lang === 'hi' ? 'स्थान / पता' : 'Location / Address'}
                   </label>
                   <input
@@ -828,7 +834,7 @@ export default function SavedLandsModal({ isOpen, onClose }) {
                     placeholder={lang === 'hi' ? 'उदा. ग्राम रामपुर, मलिहाबाद' : 'e.g. Gram Rampur, Malihabad'}
                     value={formData.address}
                     onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 font-bold text-xs text-stone-900 bg-white outline-none focus:border-emerald-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#0B1E14]/15 font-semibold text-xs text-[#0B1E14] bg-[#FDFBF7] outline-none focus:border-[#1A4F32]"
                   />
                 </div>
               </div>
@@ -837,16 +843,16 @@ export default function SavedLandsModal({ isOpen, onClose }) {
                 <button
                   type="button"
                   onClick={() => setIsAddingNew(false)}
-                  className="px-4 py-2.5 rounded-xl bg-stone-200 hover:bg-stone-300 text-stone-800 font-bold text-xs transition"
+                  className="px-5 py-2.5 rounded-full border border-[#0B1E14]/15 bg-black/5 hover:bg-black/10 text-[#0B1E14] font-medium text-xs transition cursor-pointer"
                 >
                   {lang === 'hi' ? 'रद्द करें' : 'Cancel'}
                 </button>
 
                 <button
                   type="submit"
-                  className="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs sm:text-sm shadow-lg shadow-emerald-600/30 transition active:scale-98 flex items-center gap-2"
+                  className="px-6 py-2.5 rounded-full bg-[#0B1E14] hover:bg-[#153424] text-white font-medium text-xs sm:text-sm shadow-md transition active:scale-95 flex items-center gap-2 cursor-pointer"
                 >
-                  <CheckCircle2 className="w-4 h-4" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                   <span>{lang === 'hi' ? 'सत्यापित खेत सहेजें' : 'Save Verified Farmland'}</span>
                 </button>
               </div>
@@ -858,7 +864,7 @@ export default function SavedLandsModal({ isOpen, onClose }) {
 
         {/* List of Saved Lands */}
         <div className="space-y-3">
-          <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+          <span className="text-xs font-bold uppercase tracking-wider text-[#4F6358]">
             {lang === 'hi' ? 'सहेजे गए खेत सूची' : 'Your Farmlands Portfolio'} ({savedLands.length})
           </span>
 
@@ -868,27 +874,27 @@ export default function SavedLandsModal({ isOpen, onClose }) {
               return (
                 <div
                   key={land.id}
-                  className={`p-4 rounded-2xl border-2 transition flex items-center justify-between gap-3 ${
+                  className={`p-4.5 rounded-2xl border transition flex items-center justify-between gap-3 ${
                     isSelected
-                      ? 'border-emerald-600 bg-emerald-50/70 shadow-md ring-2 ring-emerald-600/20'
-                      : 'border-stone-200 bg-stone-50/70 hover:bg-stone-100/70'
+                      ? 'border-[#1A4F32] bg-[#1A4F32]/5 shadow-sm ring-1 ring-[#1A4F32]/20'
+                      : 'border-[#0B1E14]/10 bg-white hover:border-[#1A4F32]/40'
                   }`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <span className="text-2xl">{land.icon || '🌾'}</span>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <h4 className="font-extrabold text-sm text-stone-900 truncate">
+                        <h4 className="font-bold text-sm text-[#0B1E14] truncate">
                           {localize(land.name)}
                         </h4>
                         {isSelected && (
-                          <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-600 text-white shrink-0">
+                          <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#1A4F32] text-white shrink-0">
                             {lang === 'hi' ? 'सक्रिय खेत' : 'Active Field'}
                           </span>
                         )}
                         {land.isGovtVerified && (
-                          <span className="text-[9px] font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300 shrink-0 flex items-center gap-1">
-                            <ShieldCheck className="w-3 h-3 text-emerald-700" />
+                          <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#1A4F32]/10 text-[#1A4F32] border border-[#1A4F32]/20 shrink-0 flex items-center gap-1">
+                            <ShieldCheck className="w-3 h-3 text-[#1A4F32]" />
                             <span>{lang === 'hi' ? 'भूलेख सत्यापित' : 'UP Bhulekh Verified'}</span>
                           </span>
                         )}
@@ -898,17 +904,17 @@ export default function SavedLandsModal({ isOpen, onClose }) {
                           </span>
                         )}
                       </div>
-                      <p className="text-[11px] text-stone-500 truncate mt-0.5">
+                      <p className="text-[11px] text-[#4F6358] truncate mt-0.5 font-medium">
                         📍 {localize(land.address)}
                       </p>
-                      <div className="mt-1 flex items-center gap-3 text-[11px] font-bold text-stone-700">
-                        <span className="text-emerald-700 font-black">{land.bigha} {lang === 'hi' ? 'बीघा' : 'Bigha'}</span>
+                      <div className="mt-1 flex items-center gap-3 text-[11px] font-bold text-[#0B1E14]">
+                        <span className="text-[#1A4F32] font-black">{land.bigha} {lang === 'hi' ? 'बीघा' : 'Bigha'}</span>
                         <span>•</span>
                         <span>{localize(land.cropType)}</span>
                         {land.areaHectare && (
                           <>
                             <span>•</span>
-                            <span className="text-stone-500">{land.areaHectare} Hec</span>
+                            <span className="text-[#4F6358]">{land.areaHectare} Hec</span>
                           </>
                         )}
                       </div>
@@ -918,10 +924,10 @@ export default function SavedLandsModal({ isOpen, onClose }) {
                   <div className="flex items-center gap-2 shrink-0">
                     <button
                       onClick={() => { setSelectedLandId(land.id); onClose(); }}
-                      className={`px-3.5 py-1.5 rounded-xl font-black text-xs transition active:scale-95 ${
+                      className={`px-4 py-1.5 rounded-full font-medium text-xs transition active:scale-95 cursor-pointer ${
                         isSelected 
-                          ? 'bg-emerald-600 text-white shadow-sm' 
-                          : 'bg-white text-stone-800 border border-stone-300 hover:bg-stone-100'
+                          ? 'bg-[#1A4F32] text-white shadow-sm' 
+                          : 'bg-black/5 text-[#0B1E14] hover:bg-black/10'
                       }`}
                     >
                       {isSelected ? (lang === 'hi' ? '✓ चयनित' : '✓ Selected') : (lang === 'hi' ? 'चुनें' : 'Select')}
@@ -930,7 +936,7 @@ export default function SavedLandsModal({ isOpen, onClose }) {
                     {savedLands.length > 1 && (
                       <button
                         onClick={() => deleteLand(land.id)}
-                        className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-red-600 hover:bg-red-50 transition"
+                        className="p-2 rounded-xl text-stone-400 hover:text-red-600 hover:bg-red-50 transition cursor-pointer"
                         title="Delete Land"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -946,4 +952,7 @@ export default function SavedLandsModal({ isOpen, onClose }) {
       </div>
     </div>
   );
+
+  return typeof document !== 'undefined' ? createPortal(modalContent, document.body) : null;
 }
+

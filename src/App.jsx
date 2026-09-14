@@ -121,7 +121,10 @@ function MainContent() {
             {hasActiveBooking ? (
               <FarmerLiveTracking />
             ) : (
-              <FarmerBookingView onOpenAuthModal={() => setIsAuthModalOpen(true)} />
+              <FarmerBookingView 
+                onOpenAuthModal={() => setIsAuthModalOpen(true)} 
+                onOpenSavedLandsModal={() => setIsSavedLandsModalOpen(true)}
+              />
             )}
           </>
         )}

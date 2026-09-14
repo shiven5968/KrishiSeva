@@ -239,7 +239,7 @@ const getUnitIcon = (unitId, isSelected) => {
   }
 };
 
-export default function FarmerBookingView({ onOpenAuthModal }) {
+export default function FarmerBookingView({ onOpenAuthModal, onOpenSavedLandsModal }) {
   const { lang, t, localize } = useLanguage();
   const { isDark } = useTheme();
   const { currentUser } = useAuth();
@@ -649,8 +649,11 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
 
               <button
                 type="button"
-                onClick={() => setIsSavedLandsModalOpen(true)}
-                className="text-xs font-bold px-3 py-1.5 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 transition flex items-center gap-1 active:scale-95 cursor-pointer"
+                onClick={() => {
+                  if (onOpenSavedLandsModal) onOpenSavedLandsModal();
+                  setIsSavedLandsModalOpen(true);
+                }}
+                className="text-xs font-bold px-3 py-1.5 rounded-full bg-[#1A4F32]/10 hover:bg-[#1A4F32]/20 text-[#1A4F32] dark:text-[#4ADE80] border border-[#1A4F32]/20 transition flex items-center gap-1 active:scale-95 cursor-pointer"
               >
                 <span>+ {lang === 'hi' ? 'खेत बदलें / जोड़ें' : 'Switch / Add Plot'}</span>
               </button>
@@ -658,8 +661,11 @@ export default function FarmerBookingView({ onOpenAuthModal }) {
           ) : (
             <button
               type="button"
-              onClick={() => setIsSavedLandsModalOpen(true)}
-              className="text-xs font-bold px-3 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 transition flex items-center gap-1.5 active:scale-95 cursor-pointer"
+              onClick={() => {
+                if (onOpenSavedLandsModal) onOpenSavedLandsModal();
+                setIsSavedLandsModalOpen(true);
+              }}
+              className="text-xs font-bold px-3.5 py-2 rounded-full bg-[#1A4F32]/10 hover:bg-[#1A4F32]/20 text-[#1A4F32] dark:text-[#4ADE80] border border-[#1A4F32]/20 transition flex items-center gap-1.5 active:scale-95 cursor-pointer"
             >
               <LandPlot className="w-3.5 h-3.5" />
               <span>{lang === 'hi' ? 'खेत बदलें / जोड़ें' : 'Switch / Add Plot'}</span>
