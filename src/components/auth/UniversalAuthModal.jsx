@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
+import { sendRealWhatsAppOtp } from '../../utils/smsGateway';
 import { 
   Phone, 
   ShieldCheck, 
@@ -26,7 +27,7 @@ export default function UniversalAuthModal({ isOpen, onClose }) {
     quickDemoLogin
   } = useAuth();
 
-  const [phone, setPhone] = useState('9876543210');
+  const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
   const [step, setStep] = useState('phone'); // 'phone' | 'otp' | 'role_select'
   const [error, setError] = useState('');
@@ -34,17 +35,19 @@ export default function UniversalAuthModal({ isOpen, onClose }) {
 
   if (!isOpen) return null;
 
-  const handleSendOtp = (e) => {
+  const handleSendOtp = async (e) => {
     e.preventDefault();
-    if (phone.length < 10) {
+    const cleanPhone = phone.replace(/\D/g, '').slice(-10);
+    if (cleanPhone.length < 10) {
       setError(lang === 'hi' ? 'कृपया 10 अंकों का मान्य मोबाइल नंबर दर्ज करें' : 'Please enter a valid 10-digit mobile number');
       return;
     }
     setError('');
-    const result = requestOtp(phone);
+    const result = requestOtp(cleanPhone);
     if (result.success) {
-      setOtp(result.code);
+      setOtp('');
       setStep('otp');
+      sendRealWhatsAppOtp(cleanPhone, result.code, lang).catch(() => {});
     } else {
       setError(result.error);
     }
@@ -194,7 +197,7 @@ export default function UniversalAuthModal({ isOpen, onClose }) {
                 {lang === 'hi' ? 'ओटीपी सत्यापन' : 'Verify OTP Code'}
               </h3>
               <p className="text-[#4F6358] dark:text-[#9FB1A7] text-xs sm:text-sm font-medium">
-                {lang === 'hi' ? `मोबाइल +91 ${phone} पर भेजा गया कोड दर्ज करें` : `Enter the 6-digit code sent to +91 ${phone}`}
+                {lang === 'hi' ? `मोबाइल +91 ${phone} पर भेजा गया 4-अंकीय कोड दर्ज करें` : `Enter the 4-digit code sent to +91 ${phone}`}
               </p>
             </div>
 
@@ -208,10 +211,10 @@ export default function UniversalAuthModal({ isOpen, onClose }) {
               <div>
                 <input
                   type="text"
-                  maxLength="6"
+                  maxLength="4"
                   value={otp}
                   onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-                  placeholder="••••••"
+                  placeholder="••••"
                   className="w-full py-4 text-center tracking-[0.5em] rounded-2xl border border-black/15 dark:border-white/15 bg-white/80 dark:bg-black/40 focus:border-[#1A4F32] dark:focus:border-[#4ADE80] focus:ring-4 focus:ring-[#1A4F32]/10 font-black text-[#0B1E14] dark:text-[#EAEFEA] text-3xl outline-none transition shadow-sm"
                   required
                 />

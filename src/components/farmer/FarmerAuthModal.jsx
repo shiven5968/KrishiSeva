@@ -1,30 +1,33 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
+import { sendRealWhatsAppOtp } from '../../utils/smsGateway';
 import { Phone, ShieldCheck, ArrowRight, RefreshCw, KeyRound } from 'lucide-react';
 
 export default function FarmerAuthModal({ isOpen, onClose }) {
   const { lang, t } = useLanguage();
   const { requestOtp, verifyOtp, generatedOtp } = useAuth();
 
-  const [phone, setPhone] = useState('9876543210');
+  const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
   const [step, setStep] = useState('phone'); // 'phone' | 'otp'
   const [error, setError] = useState('');
 
   if (!isOpen) return null;
 
-  const handleSendOtp = (e) => {
+  const handleSendOtp = async (e) => {
     e.preventDefault();
-    if (phone.length < 10) {
+    const cleanPhone = phone.replace(/\D/g, '').slice(-10);
+    if (cleanPhone.length < 10) {
       setError(lang === 'hi' ? 'कृपया 10 अंकों का मान्य मोबाइल नंबर दर्ज करें' : 'Please enter a valid 10-digit mobile number');
       return;
     }
     setError('');
-    const result = requestOtp(phone);
+    const result = requestOtp(cleanPhone);
     if (result.success) {
-      setOtp(result.code); // Pre-fill for convenience in demo
+      setOtp('');
       setStep('otp');
+      sendRealWhatsAppOtp(cleanPhone, result.code, lang).catch(() => {});
     } else {
       setError(result.error);
     }
@@ -37,7 +40,7 @@ export default function FarmerAuthModal({ isOpen, onClose }) {
       setError('');
       onClose();
     } else {
-      setError(result.error || (lang === 'hi' ? 'गलत ओटीपी। कृपया पुनः प्रयास करें' : 'Invalid OTP. Try entering 123456 or the generated code.'));
+      setError(result.error || (lang === 'hi' ? 'गलत ओटीपी। कृपया पुनः प्रयास करें' : 'Invalid OTP. Please check the code.'));
     }
   };
 
@@ -112,10 +115,10 @@ export default function FarmerAuthModal({ isOpen, onClose }) {
 
               <input
                 type="text"
-                maxLength="6"
+                maxLength="4"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-                placeholder="6-digit OTP"
+                placeholder="••••"
                 className="w-full py-3.5 text-center tracking-[0.5em] rounded-xl border-2 border-stone-300 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 font-black text-stone-900 text-2xl outline-none transition"
                 required
               />

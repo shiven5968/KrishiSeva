@@ -1,11 +1,11 @@
 // Live WhatsApp Telephony Gateway for KrishiSeva
-// Provider: UltraMsg WhatsApp Business Gateway (Instance #189366)
+// Provider: UltraMsg WhatsApp Business Gateway (Instance #191614)
 
 export const ULTRAMSG_CONFIG = {
-  INSTANCE_ID: 'instance189366',
-  TOKEN: 'sn81kdn2krygh3eg',
-  ENDPOINT: 'https://api.ultramsg.com/instance189366/messages/chat',
-  RESEND_ENDPOINT: 'https://api.ultramsg.com/instance189366/messages/resendByStatus'
+  INSTANCE_ID: 'instance191614',
+  TOKEN: 'g2ohdgy9do3n1tj8',
+  ENDPOINT: 'https://api.ultramsg.com/instance191614/messages/chat',
+  RESEND_ENDPOINT: 'https://api.ultramsg.com/instance191614/messages/resendByStatus'
 };
 
 // ─────────────────────────────────────────────────────────────

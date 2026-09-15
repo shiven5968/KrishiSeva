@@ -1374,9 +1374,6 @@ export default function CreativeLoginPortal() {
                   )}
 
                   <form onSubmit={handleVerifyOtp} className="space-y-4">
-                    <div className="flex items-center justify-center gap-1.5 py-1 px-3 rounded-full bg-black/5 dark:bg-white/5 text-[#4F6358] dark:text-[#9FB1A7] text-xs font-medium">
-                      <span>{lang === 'hi' ? 'परीक्षण कोड: 1234 या 1111' : 'Test Code: 1234 or 1111'}</span>
-                    </div>
                     <div>
                       <input
                         type="text"
