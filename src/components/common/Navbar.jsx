@@ -128,7 +128,7 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
             className="flex items-center gap-2.5 sm:gap-3 cursor-pointer group"
             title="KrishiSeva Home"
           >
-            <img src="/images/logo.png" alt="KrishiSeva Logo" className="h-8 sm:h-9 w-auto object-contain transition-transform duration-300 group-hover:scale-105 rounded-xl" />
+            <img src="/images/logo.png" alt="KrishiSeva Logo" className="h-9 sm:h-10 w-9 sm:w-10 object-cover transition-transform duration-300 group-hover:scale-105 rounded-full shadow-sm" />
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-bold text-xl tracking-tight text-[#0B1E14] dark:text-[#EAEFEA] font-display transition-colors group-hover:text-[#1A4F32] dark:group-hover:text-[#4ADE80]">
