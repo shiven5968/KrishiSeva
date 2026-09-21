@@ -85,14 +85,24 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
     };
   }, [isMenuOpen]);
 
-  // Clicking Logo takes user directly to the login page
+  // Clicking Logo navigates user to homepage without logging out
   const handleLogoClick = () => {
     setIsMenuOpen(false);
     if (currentUser && currentUser.isAuthenticated) {
-      logout();
+      if (currentUser.role === 'farmer') {
+        window.location.hash = '#farmer';
+        setActiveRole('farmer');
+      } else if (currentUser.role === 'driver') {
+        window.location.hash = '#driver';
+        setActiveRole('driver');
+      } else if (currentUser.role === 'admin') {
+        window.location.hash = '#admin';
+        setActiveRole('admin');
+      }
+    } else {
+      window.location.hash = '';
+      setActiveRole('landing');
     }
-    window.location.hash = '';
-    setActiveRole('landing');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -112,11 +122,11 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
       }`}>
         <div className="max-w-7xl w-full mx-auto px-5 sm:px-8 h-14 flex items-center justify-between gap-3">
           
-          {/* Brand Logo - Returns to Login / Landing Portal */}
+          {/* Brand Logo - Returns to Home without Logging Out */}
           <div 
             onClick={handleLogoClick}
             className="flex items-center gap-2.5 sm:gap-3 cursor-pointer group"
-            title="Go to Login Page"
+            title="KrishiSeva Home"
           >
             <img src="/images/logo.png" alt="KrishiSeva Logo" className="h-8 sm:h-9 w-auto object-contain transition-transform duration-300 group-hover:scale-105 rounded-xl" />
             <div>
