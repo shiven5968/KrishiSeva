@@ -729,7 +729,7 @@ export default function CreativeLoginPortal() {
             }}
             className="shrink-0 flex items-center gap-2.5 sm:gap-3 cursor-pointer group select-none"
           >
-            <KrishiSevaLogo className="h-8 sm:h-9 w-auto transition-transform duration-300 group-hover:scale-105 shrink-0 drop-shadow-sm" />
+            <KrishiSevaLogo className="h-9 w-9 sm:h-10 sm:w-10 transition-transform duration-300 group-hover:scale-105 shrink-0" />
             <span className="text-xl font-bold tracking-tight text-[#0B1E14] dark:text-[#EAEFEA] font-display transition-colors group-hover:text-[#1A4F32] dark:group-hover:text-[#4ADE80] whitespace-nowrap">
               KrishiSeva
             </span>
