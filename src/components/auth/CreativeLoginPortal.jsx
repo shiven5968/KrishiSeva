@@ -721,19 +721,26 @@ export default function CreativeLoginPortal() {
           : 'bg-transparent py-5'
       }`}>
         <div className="mx-auto max-w-7xl px-5 sm:px-8 flex items-center justify-between">
-          {/* Brand Logo & Name */}
-          <div 
-            onClick={() => {
-              setPortalView('landing');
-              setIsMobileMenuOpen(false);
+          {/* Brand Logo & Name - Draggable Link */}
+          <a 
+            href="/"
+            onClick={(e) => {
+              // Allow standard new tab behavior (ctrl/cmd + click, middle click, etc.)
+              if (!e.ctrlKey && !e.metaKey && !e.shiftKey && !e.altKey && e.button === 0) {
+                e.preventDefault();
+                setPortalView('landing');
+                setIsMobileMenuOpen(false);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }
             }}
-            className="shrink-0 flex items-center gap-2.5 sm:gap-3 cursor-pointer group select-none"
+            className="shrink-0 flex items-center gap-2.5 sm:gap-3 cursor-pointer group select-none no-underline text-inherit"
+            title="KrishiSeva Home"
           >
             <KrishiSevaLogo className="h-10 w-10 sm:h-12 sm:w-12 transition-transform duration-300 group-hover:scale-105 shrink-0" />
             <span className="text-xl sm:text-2xl font-bold tracking-tight text-[#0B1E14] dark:text-[#EAEFEA] font-display transition-colors group-hover:text-[#1A4F32] dark:group-hover:text-[#4ADE80] whitespace-nowrap">
               KrishiSeva
             </span>
-          </div>
+          </a>
 
           {/* Actions & Controls (Desktop) - Minimal Text Links with Soft Hover */}
           <div className="hidden md:flex items-center gap-1 sm:gap-2">

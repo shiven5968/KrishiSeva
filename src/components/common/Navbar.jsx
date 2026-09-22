@@ -86,25 +86,28 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
     };
   }, [isMenuOpen]);
 
-  // Clicking Logo navigates user to homepage without logging out
-  const handleLogoClick = () => {
-    setIsMenuOpen(false);
-    if (currentUser && currentUser.isAuthenticated) {
-      if (currentUser.role === 'farmer') {
-        window.location.hash = '#farmer';
-        setActiveRole('farmer');
-      } else if (currentUser.role === 'driver') {
-        window.location.hash = '#driver';
-        setActiveRole('driver');
-      } else if (currentUser.role === 'admin') {
-        window.location.hash = '#admin';
-        setActiveRole('admin');
+  // Clicking Logo navigates user to homepage without logging out (supports drag & drop / open in new tab)
+  const handleLogoClick = (e) => {
+    if (!e || (!e.ctrlKey && !e.metaKey && !e.shiftKey && !e.altKey && e.button === 0)) {
+      if (e && e.preventDefault) e.preventDefault();
+      setIsMenuOpen(false);
+      if (currentUser && currentUser.isAuthenticated) {
+        if (currentUser.role === 'farmer') {
+          window.location.hash = '#farmer';
+          setActiveRole('farmer');
+        } else if (currentUser.role === 'driver') {
+          window.location.hash = '#driver';
+          setActiveRole('driver');
+        } else if (currentUser.role === 'admin') {
+          window.location.hash = '#admin';
+          setActiveRole('admin');
+        }
+      } else {
+        window.location.hash = '';
+        setActiveRole('landing');
       }
-    } else {
-      window.location.hash = '';
-      setActiveRole('landing');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleConfirmLogout = () => {
@@ -123,10 +126,11 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
       }`}>
         <div className="max-w-7xl w-full mx-auto px-5 sm:px-8 h-14 flex items-center justify-between gap-3">
           
-          {/* Brand Logo - Returns to Home without Logging Out */}
-          <div 
+          {/* Brand Logo - Draggable Link & Returns to Home without Logging Out */}
+          <a 
+            href="/"
             onClick={handleLogoClick}
-            className="flex items-center gap-2.5 sm:gap-3 cursor-pointer group"
+            className="flex items-center gap-2.5 sm:gap-3 cursor-pointer group no-underline text-inherit"
             title="KrishiSeva Home"
           >
             <KrishiSevaLogo className="h-10 w-10 sm:h-12 sm:w-12 transition-transform duration-300 group-hover:scale-105 shrink-0" />
@@ -149,7 +153,7 @@ export default function Navbar({ onOpenAuthModal, onOpenSavedLandsModal }) {
                 {lang === 'hi' ? 'कॉल नहीं, केवल एक क्लिक • आधुनिक कृषि मशीनरी' : 'Not a Call, Just a Click • Precision Farm Machinery'}
               </p>
             </div>
-          </div>
+          </a>
 
           {/* DRIVER ON-DUTY INDICATOR (IF DRIVER) */}
           {currentUser && currentUser.role === 'driver' && (
