@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { sendRealWhatsAppOtp } from '../../utils/smsGateway';
 import { verifyAgriStackFarmer } from '../../services/bhulekhLandService';
 import { audioHelper } from '../../utils/audioHelper';
+import KrishiSevaLogo from '../common/KrishiSevaLogo';
 import { 
   Phone,
   LogIn, 
@@ -728,11 +729,7 @@ export default function CreativeLoginPortal() {
             }}
             className="shrink-0 flex items-center gap-2.5 sm:gap-3 cursor-pointer group select-none"
           >
-            <img 
-              src="/images/logo.png" 
-              alt="KrishiSeva Logo" 
-              className="h-9 sm:h-10 w-9 sm:w-10 object-cover transition-transform duration-300 group-hover:scale-105 rounded-full shadow-sm shrink-0" 
-            />
+            <KrishiSevaLogo className="h-8 sm:h-9 w-auto transition-transform duration-300 group-hover:scale-105 shrink-0 drop-shadow-sm" />
             <span className="text-xl font-bold tracking-tight text-[#0B1E14] dark:text-[#EAEFEA] font-display transition-colors group-hover:text-[#1A4F32] dark:group-hover:text-[#4ADE80] whitespace-nowrap">
               KrishiSeva
             </span>
