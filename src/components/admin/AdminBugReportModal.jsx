@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
 import { 
@@ -125,7 +126,7 @@ export default function AdminBugReportModal({ isOpen, onClose }) {
     return () => window.removeEventListener('paste', handlePaste);
   }, [isOpen, activeTab]);
 
-  if (!isOpen) return null;
+  if (!isOpen || typeof document === 'undefined') return null;
 
   const handleFileUpload = (e) => {
     const file = e.target.files?.[0];
@@ -209,9 +210,15 @@ export default function AdminBugReportModal({ isOpen, onClose }) {
     }, 600);
   };
 
-  return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-[#0B1E14]/75 backdrop-blur-md animate-fade-in">
-      <div className="bg-[#FDFBF7] dark:bg-[#0D1611] rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-[0_20px_50px_rgba(11,30,20,0.25)] border border-black/[0.08] dark:border-white/[0.08] relative max-h-[90vh] overflow-y-auto space-y-5 text-[#0B1E14] dark:text-[#EAEFEA]">
+  return createPortal(
+    <div 
+      onClick={onClose}
+      className="fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-6 bg-black/75 backdrop-blur-md animate-fade-in overflow-y-auto"
+    >
+      <div 
+        onClick={(e) => e.stopPropagation()}
+        className="bg-[#FDFBF7] dark:bg-[#0D1611] rounded-3xl max-w-2xl w-full p-5 sm:p-8 shadow-[0_20px_50px_rgba(11,30,20,0.3)] border border-black/[0.08] dark:border-white/[0.08] relative my-auto max-h-[88vh] overflow-y-auto space-y-5 text-[#0B1E14] dark:text-[#EAEFEA]"
+      >
         
         {/* Close Button */}
         <button
@@ -554,6 +561,7 @@ export default function AdminBugReportModal({ isOpen, onClose }) {
         )}
 
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

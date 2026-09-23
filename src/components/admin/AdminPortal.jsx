@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
@@ -1469,11 +1470,17 @@ export default function AdminPortal() {
       )}
 
       {/* ══════════════ DEDICATED REJECTION REASON MODAL ══════════════ */}
-      {rejectingApp && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in">
-          <div className={`rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border-2 border-red-500/40 space-y-6 ${
-            isDark ? 'bg-stone-900 text-white' : 'bg-white text-slate-900'
-          }`}>
+      {rejectingApp && typeof document !== 'undefined' && createPortal(
+        <div 
+          onClick={() => setRejectingApp(null)}
+          className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in overflow-y-auto"
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            className={`rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border-2 border-red-500/40 space-y-6 my-auto ${
+              isDark ? 'bg-stone-900 text-white' : 'bg-white text-slate-900'
+            }`}
+          >
             
             <div className="flex items-start justify-between border-b border-slate-200 dark:border-slate-800/40 pb-4">
               <div className="flex items-center gap-3">
@@ -1561,7 +1568,8 @@ export default function AdminPortal() {
             </form>
 
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Backend Bug & Issue Escalation Modal */}

@@ -79,7 +79,7 @@ function MainContent() {
             onOpenAuthModal={() => setIsAuthModalOpen(true)}
             onOpenSavedLandsModal={() => setIsSavedLandsModalOpen(true)}
           />
-          <main className="flex-1 pb-16 animate-fade-in-up">
+          <main className="flex-1 pb-16 animate-fade-in">
             <AdminPortal />
           </main>
         </div>
@@ -113,7 +113,7 @@ function MainContent() {
         onOpenSavedLandsModal={() => setIsSavedLandsModalOpen(true)}
       />
 
-      <main className="flex-1 pb-16 animate-fade-in-up">
+      <main className="flex-1 pb-16 animate-fade-in">
         
         {/* 1. STRICT FARMER VIEW: Locked to Farmer account */}
         {currentUser.role === 'farmer' && (
