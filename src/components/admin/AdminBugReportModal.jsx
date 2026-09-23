@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import html2canvas from 'html2canvas';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
 import { 
@@ -20,7 +21,10 @@ import {
   ExternalLink,
   ClipboardCheck,
   Clock,
-  Check
+  Check,
+  Scan,
+  Monitor,
+  Image as ImageIcon
 } from 'lucide-react';
 
 const ISSUE_CATEGORIES = [
@@ -79,6 +83,7 @@ export default function AdminBugReportModal({ isOpen, onClose }) {
   const [stepsToReproduce, setStepsToReproduce] = useState('');
   const [screenshot, setScreenshot] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCapturing, setIsCapturing] = useState(false);
   const [submittedTicket, setSubmittedTicket] = useState(null);
   const [ticketsList, setTicketsList] = useState([]);
   const [pasteNotice, setPasteNotice] = useState(false);
@@ -139,13 +144,47 @@ export default function AdminBugReportModal({ isOpen, onClose }) {
     }
   };
 
+  // 1-Click Instant In-Page Snapshot (0 Browser popups / No screen share dialog)
+  const handleInstantSnapshot = async () => {
+    try {
+      setIsCapturing(true);
+      // Wait for modal to hide from DOM
+      await new Promise(r => setTimeout(r, 150));
+
+      const canvas = await html2canvas(document.body, {
+        scale: Math.min(window.devicePixelRatio || 1, 2),
+        logging: false,
+        useCORS: true,
+        allowTaint: true,
+        ignoreElements: (element) => element.classList?.contains('admin-bug-modal-root')
+      });
+
+      const dataUrl = canvas.toDataURL('image/png');
+      setScreenshot(dataUrl);
+    } catch (err) {
+      console.warn('html2canvas snapshot failed:', err);
+    } finally {
+      setIsCapturing(false);
+    }
+  };
+
+  // Browser Screen / Window Capture (Hides modal during capture so modal is never in the screenshot)
   const handleCaptureScreen = async () => {
     try {
       if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
-        const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+        setIsCapturing(true);
+        await new Promise(r => setTimeout(r, 100));
+
+        const stream = await navigator.mediaDevices.getDisplayMedia({ 
+          video: { displaySurface: 'browser' },
+          preferCurrentTab: true,
+          selfBrowserSurface: 'include'
+        });
+
         const video = document.createElement('video');
         video.srcObject = stream;
         await video.play();
+        await new Promise(r => setTimeout(r, 200));
 
         const canvas = document.createElement('canvas');
         canvas.width = video.videoWidth;
@@ -161,6 +200,8 @@ export default function AdminBugReportModal({ isOpen, onClose }) {
       }
     } catch {
       // User canceled screen share or permission denied
+    } finally {
+      setIsCapturing(false);
     }
   };
 
@@ -210,10 +251,20 @@ export default function AdminBugReportModal({ isOpen, onClose }) {
     }, 600);
   };
 
+  if (isCapturing) {
+    return createPortal(
+      <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[999999] bg-[#0B1E14] text-white px-5 py-2.5 rounded-full text-xs font-bold shadow-2xl flex items-center gap-2.5 border border-emerald-500/30 animate-pulse">
+        <Scan className="w-4 h-4 text-emerald-400 animate-spin" />
+        <span>{lang === 'hi' ? 'पोर्टल स्क्रीनशॉट लिया जा रहा है...' : 'Capturing portal snapshot...'}</span>
+      </div>,
+      document.body
+    );
+  }
+
   return createPortal(
     <div 
       onClick={onClose}
-      className="fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-6 bg-black/75 backdrop-blur-md animate-fade-in overflow-y-auto"
+      className="admin-bug-modal-root fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-6 bg-black/75 backdrop-blur-md animate-fade-in overflow-y-auto"
     >
       <div 
         onClick={(e) => e.stopPropagation()}
@@ -426,36 +477,63 @@ export default function AdminBugReportModal({ isOpen, onClose }) {
                       </div>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                      {/* Upload File Box */}
+                    <div className="space-y-2.5">
+                      {/* Primary Action: 1-Click Instant Page Snapshot */}
                       <div
-                        onClick={() => fileInputRef.current?.click()}
-                        className="border-2 border-dashed border-black/15 dark:border-white/15 hover:border-red-500/50 rounded-2xl p-4 text-center cursor-pointer transition bg-white/50 dark:bg-white/[0.02] flex flex-col items-center justify-center group"
+                        onClick={handleInstantSnapshot}
+                        className="w-full border-2 border-emerald-500/30 hover:border-emerald-500 bg-emerald-500/5 dark:bg-emerald-500/10 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/15 rounded-2xl p-3.5 text-left cursor-pointer transition flex items-center justify-between group active:scale-[0.99]"
                       >
-                        <input
-                          ref={fileInputRef}
-                          type="file"
-                          accept="image/*"
-                          onChange={handleFileUpload}
-                          className="hidden"
-                        />
-                        <Upload className="w-6 h-6 text-[#4F6358] group-hover:text-red-500 transition mb-1.5" />
-                        <span className="text-xs font-bold text-[#0B1E14] dark:text-[#EAEFEA]">
-                          {lang === 'hi' ? 'स्क्रीनशॉट फ़ाइल चुनें' : 'Upload Image File'}
-                        </span>
-                        <span className="text-[10px] text-[#4F6358] dark:text-[#9FB1A7] mt-0.5">PNG, JPG, WebP up to 10MB</span>
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition">
+                            <Scan className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-xs font-black text-[#0B1E14] dark:text-[#EAEFEA]">
+                                {lang === 'hi' ? '1-क्लिक ऑटो स्क्रीनशॉट (अनुशंसित)' : '1-Click Auto Page Snapshot (Recommended)'}
+                              </span>
+                              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-700 dark:text-emerald-300">
+                                Instant
+                              </span>
+                            </div>
+                            <p className="text-[10px] text-[#4F6358] dark:text-[#9FB1A7]">
+                              {lang === 'hi' ? 'बिना किसी ब्राउज़र पॉपअप के मौजूदा पोर्टल का सीधा स्क्रीनशॉट लेता है' : 'Instantly captures current portal state with zero browser popups or prompts'}
+                            </p>
+                          </div>
+                        </div>
+                        <Camera className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 group-hover:translate-x-0.5 transition" />
                       </div>
 
-                      {/* Screen Capture Box */}
-                      <div
-                        onClick={handleCaptureScreen}
-                        className="border-2 border-dashed border-black/15 dark:border-white/15 hover:border-red-500/50 rounded-2xl p-4 text-center cursor-pointer transition bg-white/50 dark:bg-white/[0.02] flex flex-col items-center justify-center group"
-                      >
-                        <Camera className="w-6 h-6 text-[#4F6358] group-hover:text-red-500 transition mb-1.5" />
-                        <span className="text-xs font-bold text-[#0B1E14] dark:text-[#EAEFEA]">
-                          {lang === 'hi' ? 'वर्तमान स्क्रीन कैप्चर करें' : 'Capture Screen / Window'}
-                        </span>
-                        <span className="text-[10px] text-[#4F6358] dark:text-[#9FB1A7] mt-0.5">Auto-capture active browser tab</span>
+                      {/* Secondary Options Grid */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {/* Upload File Box */}
+                        <div
+                          onClick={() => fileInputRef.current?.click()}
+                          className="border border-black/15 dark:border-white/15 hover:border-black/30 dark:hover:border-white/30 rounded-xl p-3 text-center cursor-pointer transition bg-white/50 dark:bg-white/[0.02] flex items-center justify-center gap-2 group active:scale-98"
+                        >
+                          <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFileUpload}
+                            className="hidden"
+                          />
+                          <Upload className="w-4 h-4 text-[#4F6358] group-hover:text-red-500 transition" />
+                          <span className="text-xs font-bold text-[#0B1E14] dark:text-[#EAEFEA]">
+                            {lang === 'hi' ? 'फ़ाइल अपलोड करें' : 'Upload Image File'}
+                          </span>
+                        </div>
+
+                        {/* Screen / Window Capture Box */}
+                        <div
+                          onClick={handleCaptureScreen}
+                          className="border border-black/15 dark:border-white/15 hover:border-black/30 dark:hover:border-white/30 rounded-xl p-3 text-center cursor-pointer transition bg-white/50 dark:bg-white/[0.02] flex items-center justify-center gap-2 group active:scale-98"
+                        >
+                          <Monitor className="w-4 h-4 text-[#4F6358] group-hover:text-blue-500 transition" />
+                          <span className="text-xs font-bold text-[#0B1E14] dark:text-[#EAEFEA]">
+                            {lang === 'hi' ? 'संपूर्ण विंडो / स्क्रीन' : 'Capture Display / Window'}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   )}
