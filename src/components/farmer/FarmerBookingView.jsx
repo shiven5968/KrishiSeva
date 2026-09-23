@@ -367,18 +367,30 @@ export default function FarmerBookingView({ onOpenAuthModal, onOpenSavedLandsMod
 
   // Auto-fill quantity and location when Saved Land changes
   useEffect(() => {
-    if (selectedLand && (selectedCategoryId === 'tractor' || selectedCategoryId === 'harvester')) {
-      if (selectedUnit === 'bigha') {
-        setQuantityInput(selectedLand.bigha);
-        setQuantityText(String(selectedLand.bigha));
-      } else if (selectedUnit === 'acre') {
-        const acreVal = Math.round((selectedLand.bigha / 1.61) * 10) / 10;
-        setQuantityInput(acreVal);
-        setQuantityText(String(acreVal));
-      } else if (selectedUnit === 'hectare') {
-        const hecVal = Math.round((selectedLand.bigha / 3.95) * 100) / 100;
-        setQuantityInput(hecVal);
-        setQuantityText(String(hecVal));
+    if (selectedLand) {
+      if (selectedLand.lat && selectedLand.lng) {
+        resolveAndSetLocation({
+          lat: selectedLand.lat,
+          lng: selectedLand.lng,
+          address: selectedLand.address || selectedLand.name
+        });
+      } else if (selectedLand.address) {
+        resolveAndSetLocation(selectedLand.address);
+      }
+
+      if (selectedCategoryId === 'tractor' || selectedCategoryId === 'harvester') {
+        if (selectedUnit === 'bigha') {
+          setQuantityInput(selectedLand.bigha);
+          setQuantityText(String(selectedLand.bigha));
+        } else if (selectedUnit === 'acre') {
+          const acreVal = Math.round((selectedLand.bigha / 1.61) * 10) / 10;
+          setQuantityInput(acreVal);
+          setQuantityText(String(acreVal));
+        } else if (selectedUnit === 'hectare') {
+          const hecVal = Math.round((selectedLand.bigha / 3.95) * 100) / 100;
+          setQuantityInput(hecVal);
+          setQuantityText(String(hecVal));
+        }
       }
     }
   }, [selectedLandId, selectedLand, selectedCategoryId]);
@@ -1570,7 +1582,7 @@ export default function FarmerBookingView({ onOpenAuthModal, onOpenSavedLandsMod
                     </span>
                   )}
                   <span className="text-xs text-[#1A4F32] font-medium">
-                    ({selectedCategoryId === 'truck' ? `₹500 Base + (${effectiveDistanceKm} km × ₹50)` : fareResult.breakdownText})
+                    ({selectedCategoryId === 'truck' ? `₹${rates.truck?.baseLoadingCharge || 500} Base + (${effectiveDistanceKm} km × ₹${rates.truck?.ratePerKm || 50})` : fareResult.breakdownText})
                   </span>
                 </div>
               </div>
@@ -1596,16 +1608,23 @@ export default function FarmerBookingView({ onOpenAuthModal, onOpenSavedLandsMod
               <button
                 type="button"
                 onClick={() => setCustomBargainPrice(Math.max(100, (customBargainPrice || fareResult.total) - 100))}
-                className="border border-[#0B1E14]/15 text-[#0B1E14] bg-transparent hover:bg-[#0B1E14]/5 hover:border-[#0B1E14]/30 transition-all rounded-full px-4 py-1.5 font-medium text-xs active:scale-95 cursor-pointer"
+                className="border border-[#0B1E14]/15 text-[#0B1E14] bg-transparent hover:bg-[#0B1E14]/5 hover:border-[#0B1E14]/30 transition-all rounded-full px-3.5 py-1.5 font-medium text-xs active:scale-95 cursor-pointer"
               >
                 -₹100
               </button>
               <button
                 type="button"
-                onClick={() => setCustomBargainPrice(Math.max(100, (customBargainPrice || fareResult.total) - 200))}
-                className="border border-[#0B1E14]/15 text-[#0B1E14] bg-transparent hover:bg-[#0B1E14]/5 hover:border-[#0B1E14]/30 transition-all rounded-full px-4 py-1.5 font-medium text-xs active:scale-95 cursor-pointer"
+                onClick={() => setCustomBargainPrice(Math.max(100, (customBargainPrice || fareResult.total) - 250))}
+                className="border border-[#0B1E14]/15 text-[#0B1E14] bg-transparent hover:bg-[#0B1E14]/5 hover:border-[#0B1E14]/30 transition-all rounded-full px-3.5 py-1.5 font-medium text-xs active:scale-95 cursor-pointer"
               >
-                -₹200
+                -₹250
+              </button>
+              <button
+                type="button"
+                onClick={() => setCustomBargainPrice(Math.max(100, (customBargainPrice || fareResult.total) - 500))}
+                className="border border-[#0B1E14]/15 text-[#0B1E14] bg-transparent hover:bg-[#0B1E14]/5 hover:border-[#0B1E14]/30 transition-all rounded-full px-3.5 py-1.5 font-medium text-xs active:scale-95 cursor-pointer"
+              >
+                -₹500
               </button>
               {customBargainPrice && customBargainPrice !== fareResult.total && (
                 <button
