@@ -123,10 +123,13 @@ export default function CreativeLoginPortal() {
 
   // Tenant / Batai Farmer Verification States
   const [farmerVerificationType, setFarmerVerificationType] = useState('landowner'); // 'landowner' | 'tenant'
-  const [tenantKhasra, setTenantKhasra] = useState('');
+  const [tenantKhasra, setTenantKhasra] = useState('142/1');
   const [tenantLandSize, setTenantLandSize] = useState('3.5');
-  const [tenantLandownerPhone, setTenantLandownerPhone] = useState('');
+  const [tenantLandownerPhone, setTenantLandownerPhone] = useState('9876543210');
   const [isOwnerLinkSent, setIsOwnerLinkSent] = useState(false);
+  const [isOwnerApproved, setIsOwnerApproved] = useState(false);
+  const [isSimulateOwnerModalOpen, setIsSimulateOwnerModalOpen] = useState(false);
+  const [isSimulatingApproval, setIsSimulatingApproval] = useState(false);
   const [tenantAgreementDoc, setTenantAgreementDoc] = useState(null);
   const [isGeoTagging, setIsGeoTagging] = useState(false);
   const [geoTaggedCoords, setGeoTaggedCoords] = useState(null);
@@ -411,11 +414,27 @@ export default function CreativeLoginPortal() {
     }
     setError('');
     setIsOwnerLinkSent(true);
-    setToastMessage(lang === 'hi' 
-      ? `✅ जमीन मालिक (+91 ${cleanOwnerPhone}) को सहमति लिंक भेज दिया गया है!` 
-      : `✅ WhatsApp consent request dispatched to Landowner (+91 ${cleanOwnerPhone})!`);
+    setToastMessage("Link sent to owner via WhatsApp.");
     audioHelper.playOtpChime();
-    setTimeout(() => setToastMessage(''), 4000);
+
+    // Immediately trigger "Simulate Landowner Device" modal overlay for live demo
+    setTimeout(() => {
+      setIsSimulateOwnerModalOpen(true);
+    }, 400);
+  };
+
+  const handleSimulateOwnerApproval = () => {
+    setIsSimulatingApproval(true);
+    setTimeout(() => {
+      setIsSimulatingApproval(false);
+      setIsOwnerApproved(true);
+      setIsSimulateOwnerModalOpen(false);
+      audioHelper.playBookingConfirmed();
+      setToastMessage(lang === 'hi' 
+        ? `✅ जमीन मालिक द्वारा खसरा #${tenantKhasra || '142/1'} सत्यापित! 1-वर्ष पास सक्रिय।` 
+        : `✅ Landowner approved via eKYC! Khasra #${tenantKhasra || '142/1'} locked.`);
+      setTimeout(() => setToastMessage(''), 5000);
+    }, 1200);
   };
 
   const handleGeoTagField = () => {
@@ -464,6 +483,12 @@ export default function CreativeLoginPortal() {
 
   const handleCompleteTenantRegistration = (e) => {
     e?.preventDefault();
+    if (!isOwnerApproved) {
+      setError(lang === 'hi' 
+        ? '⚠️ जमीन मालिक की ई-केवाईसी सहमति आवश्यक है: कृपया पहले मालिक को लिंक भेजकर सहमति प्राप्त करें।' 
+        : '⚠️ Landowner eKYC approval required: Please send approval link and complete owner verification first.');
+      return;
+    }
     if (!tenantKhasra.trim()) {
       setError(lang === 'hi' ? 'कृपया खसरा / प्लॉट संख्या दर्ज करें' : 'Please enter Khasra / Plot Number');
       return;
@@ -482,15 +507,27 @@ export default function CreativeLoginPortal() {
     const expiry = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000);
     const passToken = `BATAI-PASS-${cleanKhasra}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
 
+    // Predefined high-precision GPS polygon for authorized Batai field
+    const lockedPolygonCoords = [
+      { lat: 26.9180, lng: 80.7065 },
+      { lat: 26.9182, lng: 80.7090 },
+      { lat: 26.9155, lng: 80.7088 },
+      { lat: 26.9153, lng: 80.7062 }
+    ];
+
     const tenantPlot = {
       id: `land_tenant_${Date.now()}`,
-      name: `बटाई खेत #${cleanKhasra} (${parsedSize} बीघा)`,
+      name: `बटाई खेत #${cleanKhasra} (${parsedSize} बीघा - अधिकृत)`,
       khasraNumber: cleanKhasra,
       bigha: parsedSize,
       cropType: 'Wheat / गेहूँ (Batai Crop)',
       soilType: lang === 'hi' ? 'दोमट मिट्टी (Loamy Soil)' : 'Loamy Soil',
       ownershipType: 'tenant_batai',
+      isPlotLocked: true,
+      polygonCoords: lockedPolygonCoords,
+      landownerName: 'Ramesh Chandra Sharma (भूस्वामी)',
       landownerPhone: cleanOwnerPhone,
+      landownerAadhaarMasked: 'XXXX-XXXX-8921',
       lat: geoTaggedCoords?.lat || 26.9168,
       lng: geoTaggedCoords?.lng || 80.7075,
       isGovtVerified: true,
@@ -506,6 +543,7 @@ export default function CreativeLoginPortal() {
       tehsil: 'Malihabad',
       farmerType: 'tenant_batai',
       isTenantFarmer: true,
+      isPlotLocked: true,
       isAgriStackVerified: true,
       farmerId: `BATAI-UPFR-${Math.floor(10000 + Math.random() * 90000)}`,
       linkedLands: [tenantPlot],
@@ -513,19 +551,25 @@ export default function CreativeLoginPortal() {
         active: true,
         khasraNumber: cleanKhasra,
         bigha: parsedSize,
+        isPlotLocked: true,
+        lockedCoordinates: lockedPolygonCoords,
+        landownerName: 'Ramesh Chandra Sharma',
+        landownerPhone: cleanOwnerPhone,
+        landownerAadhaarMasked: 'XXXX-XXXX-8921',
         expiryDate: expiry.toISOString(),
         issuedDate: now.toISOString(),
         token: passToken,
-        landownerPhone: cleanOwnerPhone,
         geoTaggedCoords: geoTaggedCoords || { lat: 26.9168, lng: 80.7075 }
       },
       tenantDetails: {
         khasraNumber: cleanKhasra,
         landSizeBigha: parsedSize,
         landownerPhone: cleanOwnerPhone,
-        isOwnerLinkSent: isOwnerLinkSent || true,
+        isOwnerLinkSent: true,
+        isOwnerApproved: true,
         agreementUploaded: !!tenantAgreementDoc,
         geoTaggedCoords: geoTaggedCoords || { lat: 26.9168, lng: 80.7075 },
+        lockedPolygonCoords: lockedPolygonCoords,
         passToken: passToken,
         validUntil: expiry.toISOString()
       }
@@ -1947,6 +1991,37 @@ export default function CreativeLoginPortal() {
                             </button>
                           </div>
 
+                          {/* Landowner eKYC Approval Status Banner */}
+                          {isOwnerApproved ? (
+                            <div className="p-3.5 rounded-2xl bg-emerald-950/80 border border-emerald-500/60 text-emerald-300 text-xs font-bold flex items-center justify-between animate-fade-in shadow-md">
+                              <div className="flex items-center gap-2">
+                                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                                <span>
+                                  {lang === 'hi' 
+                                    ? `जमीन मालिक द्वारा आधार ई-केवाईसी सत्यापित (खसरा #${tenantKhasra || '142/1'} स्वीकृत)` 
+                                    : `Landowner Approved via Aadhaar eKYC (Khasra #${tenantKhasra || '142/1'} Authorized)`}
+                                </span>
+                              </div>
+                              <span className="text-[10px] font-black px-2 py-0.5 rounded-md bg-emerald-500 text-stone-950 shrink-0">
+                                1-Year Pass ✓
+                              </span>
+                            </div>
+                          ) : (
+                            <div className="p-3.5 rounded-2xl bg-amber-950/40 border border-amber-500/40 text-amber-300 text-xs font-bold flex items-start gap-2.5 animate-fade-in">
+                              <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                              <div className="space-y-0.5">
+                                <span className="block font-black uppercase text-[10px] tracking-wider text-amber-400">
+                                  {lang === 'hi' ? 'मालिक की ई-केवाईसी सहमति अनिवार्य' : 'Landowner Approval Mandatory'}
+                                </span>
+                                <span className="text-[11px] font-medium text-amber-200/90 block">
+                                  {lang === 'hi'
+                                    ? 'कृपया ऊपर "मालिक को सहमति लिंक भेजें" पर क्लिक करके सत्यापन पूरा कराएं।'
+                                    : 'Please click "Send Approval Link to Owner" above to trigger verification.'}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+
                           {/* Action Buttons */}
                           <div className="flex gap-2.5 pt-2">
                             <button
@@ -1961,10 +2036,25 @@ export default function CreativeLoginPortal() {
 
                             <button
                               type="submit"
-                              className="w-2/3 py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-stone-950 font-black text-xs sm:text-sm shadow-xl shadow-emerald-500/20 transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98] hover:translate-y-[-1px] cursor-pointer"
+                              disabled={!isOwnerApproved}
+                              className={`w-2/3 py-4 rounded-2xl font-black text-xs sm:text-sm transition-all duration-300 flex items-center justify-center gap-2 ${
+                                isOwnerApproved
+                                  ? 'bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-stone-950 shadow-xl shadow-emerald-500/20 active:scale-[0.98] hover:translate-y-[-1px] cursor-pointer'
+                                  : 'bg-stone-800/80 border border-stone-700 text-stone-500 cursor-not-allowed opacity-60'
+                              }`}
+                              title={!isOwnerApproved ? 'Awaiting Landowner Approval via WhatsApp eKYC' : 'Complete Registration'}
                             >
-                              <CheckCircle2 className="w-4 h-4 text-stone-950" />
-                              <span>{lang === 'hi' ? 'बटाईदार सत्यापन पूरा करें →' : 'Complete Tenant Verification →'}</span>
+                              {isOwnerApproved ? (
+                                <>
+                                  <CheckCircle2 className="w-4 h-4 text-stone-950" />
+                                  <span>{lang === 'hi' ? 'बटाईदार सत्यापन पूरा करें →' : 'Complete Tenant Verification →'}</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Lock className="w-4 h-4 text-stone-500" />
+                                  <span>{lang === 'hi' ? 'मालिक की सहमति की प्रतीक्षा है' : 'Awaiting Owner Approval'}</span>
+                                </>
+                              )}
                             </button>
                           </div>
 
@@ -2471,6 +2561,129 @@ export default function CreativeLoginPortal() {
           <span>© 2026 KrishiSeva • Precision Farm Fleet Network</span>
         </div>
       </footer>
+
+      {/* ══════════════════════════════════════════════════════════════════ */}
+      {/* SIMULATE LANDOWNER DEVICE MODAL OVERLAY (Aadhaar eKYC & Bhulekh) */}
+      {/* ══════════════════════════════════════════════════════════════════ */}
+      {isSimulateOwnerModalOpen && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 bg-stone-950/85 backdrop-blur-md animate-fade-in">
+          <div className="bg-stone-900 border-2 border-emerald-500/50 rounded-3xl max-w-lg w-full p-5 sm:p-6 text-white space-y-4 shadow-2xl relative overflow-hidden">
+            
+            {/* Top Device Header / Notification Bar */}
+            <div className="flex items-center justify-between pb-3 border-b border-stone-800">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-sm">
+                  📱
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-500/40 uppercase tracking-wider">
+                      Simulate Landowner Device
+                    </span>
+                  </div>
+                  <h4 className="text-sm font-black text-white mt-0.5">
+                    WhatsApp Consent • Kisan eKYC Portal
+                  </h4>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsSimulateOwnerModalOpen(false)}
+                className="w-7 h-7 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-400 hover:text-white flex items-center justify-center text-xs cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* WhatsApp Incoming Request Message Bubble */}
+            <div className="p-3.5 rounded-2xl bg-emerald-950/40 border border-emerald-500/30 space-y-2">
+              <div className="flex items-center justify-between text-[11px] text-emerald-400 font-bold">
+                <span className="flex items-center gap-1.5">
+                  <span>💬</span>
+                  <span>WhatsApp Message from KrishiSeva AgriStack</span>
+                </span>
+                <span className="text-[10px] text-stone-400">Just now</span>
+              </div>
+              <p className="text-xs text-stone-200 leading-relaxed">
+                नमस्ते <b>रमेश चंद्र शर्मा जी</b>! कृषक <b>{userName.trim() || `Kisan (${phone})`}</b> ने आपके खेत <b>खसरा #{tenantKhasra || '142/1'} ({tenantLandSize || '3.5'} बीघा)</b> पर 1-वर्षीय बटाई पास व मशीनरी बुकिंग हेतु सहमति का अनुरोध भेजा है।
+              </p>
+            </div>
+
+            {/* Landowner Aadhaar e-KYC & Bhulekh Ownership Card */}
+            <div className="p-4 rounded-2xl bg-stone-950 border border-stone-800 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="w-5 h-5 text-emerald-400" />
+                  <span className="text-xs font-black uppercase tracking-wider text-white">
+                    Aadhaar eKYC & Bhu-Lekh Verification
+                  </span>
+                </div>
+                <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-blue-950 text-blue-300 border border-blue-500/40">
+                  UPFR Registry Verified
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2.5 text-xs">
+                <div className="p-2.5 rounded-xl bg-stone-900/90 border border-stone-800">
+                  <span className="text-[10px] text-stone-400 block">भूमि स्वामी (Landowner)</span>
+                  <b className="text-white text-xs">रमेश चंद्र शर्मा (Ramesh C. Sharma)</b>
+                </div>
+                <div className="p-2.5 rounded-xl bg-stone-900/90 border border-stone-800">
+                  <span className="text-[10px] text-stone-400 block">आधार संख्या (Aadhaar)</span>
+                  <b className="font-mono text-emerald-400 text-xs">XXXX-XXXX-8921 (UIDAI ✓)</b>
+                </div>
+                <div className="p-2.5 rounded-xl bg-stone-900/90 border border-stone-800">
+                  <span className="text-[10px] text-stone-400 block">खसरा / गाटा संख्या</span>
+                  <b className="font-mono text-amber-400 text-xs">खसरा #{tenantKhasra || '142/1'} (3.5 बीघा)</b>
+                </div>
+                <div className="p-2.5 rounded-xl bg-stone-900/90 border border-stone-800">
+                  <span className="text-[10px] text-stone-400 block">राजस्व अभिलेख स्थिति</span>
+                  <b className="text-emerald-400 text-[11px]">स्वामित्व पुष्ट (Revenue Confirmed ✓)</b>
+                </div>
+              </div>
+
+              {/* Predefined GPS Boundary Preview */}
+              <div className="p-2.5 rounded-xl bg-stone-900/70 border border-stone-800 flex items-center justify-between text-xs">
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-emerald-400" />
+                  <span className="text-[11px] text-stone-300">
+                    अधिकृत खेत जीपीएस परिधि: <b>26.9168°N, 80.7075°E</b>
+                  </span>
+                </div>
+                <span className="text-[10px] font-bold text-emerald-400">Locked Boundary</span>
+              </div>
+            </div>
+
+            {/* Simulated Landowner Approval Action Button */}
+            <div className="space-y-2 pt-1">
+              <button
+                type="button"
+                onClick={handleSimulateOwnerApproval}
+                disabled={isSimulatingApproval}
+                className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-stone-950 font-black text-sm shadow-xl shadow-emerald-500/20 transition-all flex items-center justify-center gap-2 active:scale-[0.98] cursor-pointer"
+              >
+                {isSimulatingApproval ? (
+                  <>
+                    <Clock className="w-4 h-4 animate-spin text-stone-950" />
+                    <span>आधार बायोमेट्रिक व भूलेख सत्यापन जारी है...</span>
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 className="w-5 h-5 text-stone-950 stroke-[2.5]" />
+                    <span>I Approve & Verify via eKYC (सहमति व ई-केवाईसी प्रदान करें)</span>
+                  </>
+                )}
+              </button>
+
+              <p className="text-[10px] text-center text-stone-400">
+                स्वीकृति देने पर बटाईदार को केवल इस विशिष्ट खसरा (#{tenantKhasra || '142/1'}) के लिए 1-वर्षीय मशीनरी बुकिंग की अनुमति मिलेगी।
+              </p>
+            </div>
+
+          </div>
+        </div>
+      )}
 
     </div>
   );

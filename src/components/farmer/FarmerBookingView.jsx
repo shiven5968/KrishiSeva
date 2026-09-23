@@ -645,30 +645,27 @@ export default function FarmerBookingView({ onOpenAuthModal, onOpenSavedLandsMod
         <div className="flex flex-wrap items-center gap-2.5">
           {currentUser?.bataiPass?.active || selectedLand?.ownershipType === 'tenant_batai' ? (
             <div className="flex flex-wrap items-center gap-2">
-              <span className={`text-xs font-bold px-3 py-1.5 rounded-full inline-flex items-center gap-2 border shadow-sm ${
+              <span className={`text-xs font-bold px-3.5 py-1.5 rounded-full inline-flex items-center gap-2 border shadow-sm ${
                 isDark 
                   ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300' 
                   : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-900'
               }`}>
-                <span>🌾</span>
+                <span>🔒</span>
                 <span>
                   {lang === 'hi'
-                    ? `सक्रिय बटाई खेत #${currentUser?.bataiPass?.khasraNumber || selectedLand?.khasraNumber || '142/1'} • 1-वर्ष सत्यापित पास (वैध: ${currentUser?.bataiPass?.expiryDate ? new Date(currentUser.bataiPass.expiryDate).toLocaleDateString('hi-IN', { month: 'short', year: 'numeric' }) : 'Sep 2027'})`
-                    : `Active Batai Plot #${currentUser?.bataiPass?.khasraNumber || selectedLand?.khasraNumber || '142/1'} • 1-Year Verified Pass (Valid till ${currentUser?.bataiPass?.expiryDate ? new Date(currentUser.bataiPass.expiryDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'Sep 2027'})`}
+                    ? `अधिकृत बटाई खेत #${currentUser?.bataiPass?.khasraNumber || selectedLand?.khasraNumber || '142/1'} • 1-वर्ष पास (सख्त जीपीएस लॉक)`
+                    : `Authorized Batai Plot #${currentUser?.bataiPass?.khasraNumber || selectedLand?.khasraNumber || '142/1'} • 1-Year Pass (Strict Plot Lock)`}
                 </span>
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               </span>
 
-              <button
-                type="button"
-                onClick={() => {
-                  if (onOpenSavedLandsModal) onOpenSavedLandsModal();
-                  setIsSavedLandsModalOpen(true);
-                }}
-                className="text-xs font-bold px-3 py-1.5 rounded-full bg-[#1A4F32]/10 hover:bg-[#1A4F32]/20 text-[#1A4F32] dark:text-[#4ADE80] border border-[#1A4F32]/20 transition flex items-center gap-1 active:scale-95 cursor-pointer"
-              >
-                <span>+ {lang === 'hi' ? 'खेत बदलें / जोड़ें' : 'Switch / Add Plot'}</span>
-              </button>
+              <span className={`text-xs font-bold px-3 py-1.5 rounded-full border shadow-sm ${
+                isDark 
+                  ? 'bg-emerald-950/60 border-emerald-500/30 text-emerald-300' 
+                  : 'bg-emerald-50 border-emerald-200 text-emerald-800'
+              }`}>
+                <span>{lang === 'hi' ? 'भूमि स्वामी: रमेश चंद्र शर्मा (सत्यापित ✓)' : 'Landowner: Ramesh C. Sharma (Approved ✓)'}</span>
+              </span>
             </div>
           ) : (
             <button
@@ -923,7 +920,11 @@ export default function FarmerBookingView({ onOpenAuthModal, onOpenSavedLandsMod
           farmerLocation={{
             lat: activeLocation?.lat || selectedLand?.lat || DEFAULT_FARM_LOCATION.lat,
             lng: activeLocation?.lng || selectedLand?.lng || DEFAULT_FARM_LOCATION.lng,
-            bigha: selectedLand?.bigha || quantityInput || 4.5
+            bigha: selectedLand?.bigha || quantityInput || 4.5,
+            isPlotLocked: !!(currentUser?.bataiPass?.active || currentUser?.isTenantFarmer || selectedLand?.ownershipType === 'tenant_batai'),
+            ownershipType: selectedLand?.ownershipType || (currentUser?.isTenantFarmer ? 'tenant_batai' : 'self'),
+            khasraNumber: currentUser?.bataiPass?.khasraNumber || selectedLand?.khasraNumber || '142/1',
+            polygonCoords: selectedLand?.polygonCoords || currentUser?.bataiPass?.lockedCoordinates || null
           }}
           activeVehicleType={selectedCategoryId}
           showNearbyDrivers={true}

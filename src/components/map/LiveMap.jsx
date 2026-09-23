@@ -268,24 +268,45 @@ export default function LiveMap({
 
     // 2. FARMER VIEW: Show Farmer Field Boundary & All Nearby Active Drivers!
     if (farmerLocation) {
+      const isTenantLocked = farmerLocation.isPlotLocked || farmerLocation.ownershipType === 'tenant_batai' || farmerLocation.isTenantPlot;
+
       // Draw Khet (Farmland Polygon boundary)
       const khetPolygonCoords = (farmerLocation.polygonCoords && farmerLocation.polygonCoords.length >= 3)
         ? farmerLocation.polygonCoords
         : generateFarmPlotPolygon(farmerLocation.lat, farmerLocation.lng, farmerLocation.bigha || farmerLocation.areaBigha || 3.0);
 
-      L.polygon(khetPolygonCoords, {
-        color: '#10b981',
-        weight: 2,
-        fillColor: '#34d399',
-        fillOpacity: activeLayerType === 'satellite' ? 0.35 : 0.18,
-        dashArray: '4, 4'
-      }).addTo(newLayerGroup).bindPopup('<b>खेत सीमा (Farm Boundary)</b><br>GPS Cultivation Zone');
+      const polygon = L.polygon(khetPolygonCoords, {
+        color: isTenantLocked ? '#059669' : '#10b981',
+        weight: isTenantLocked ? 3.5 : 2,
+        fillColor: isTenantLocked ? '#10b981' : '#34d399',
+        fillOpacity: activeLayerType === 'satellite' ? 0.45 : 0.25,
+        dashArray: isTenantLocked ? '6, 4' : '4, 4'
+      }).addTo(newLayerGroup).bindPopup(
+        isTenantLocked
+          ? `<b>🔒 अधिकृत बटाई खेत (Authorized Khasra #${farmerLocation.khasraNumber || '142/1'})</b><br>1-Year Pass • Strict GPS Lock Active`
+          : '<b>खेत सीमा (Farm Boundary)</b><br>GPS Cultivation Zone'
+      );
 
       // Add Farmer Pin
-      const farmerIcon = createCustomIcon('🌾', 'आपका खेत', '#059669');
+      const farmerIcon = createCustomIcon(
+        isTenantLocked ? '🔒' : '🌾', 
+        isTenantLocked ? `बटाई #${farmerLocation.khasraNumber || '142/1'} (Locked)` : 'आपका खेत', 
+        '#059669', 
+        isTenantLocked
+      );
       L.marker([farmerLocation.lat, farmerLocation.lng], { icon: farmerIcon })
         .addTo(newLayerGroup)
-        .bindPopup('<b>आपका खेत (Farm Location)</b><br>GPS Locked');
+        .bindPopup(
+          isTenantLocked 
+            ? `<b>🔒 अधिकृत बटाई खेत #${farmerLocation.khasraNumber || '142/1'}</b><br>Landowner: Ramesh Chandra Sharma<br>Strict GPS Lock Active` 
+            : '<b>आपका खेत (Farm Location)</b><br>GPS Locked'
+        );
+
+      if (isTenantLocked && mapInstanceRef.current) {
+        try {
+          mapInstanceRef.current.fitBounds(polygon.getBounds(), { padding: [35, 35], maxZoom: 17 });
+        } catch (e) {}
+      }
     }
 
     // 3. SHOW NEARBY DRIVERS ACROSS THE FLEET ON FARMER VIEW
@@ -387,22 +408,31 @@ export default function LiveMap({
       />
 
       {/* Floating Modern Micro-Controls (Top Right & Bottom Left) */}
-      <div className="absolute top-3 right-3 z-[400] flex items-center gap-1.5 bg-stone-900/85 backdrop-blur-md p-1 rounded-xl border border-stone-700/80 shadow-md">
-        <button
-          onClick={toggleMapLayer}
-          className="px-2.5 py-1 rounded-lg text-[10px] font-black text-stone-200 hover:text-white hover:bg-stone-800 transition flex items-center gap-1"
-          title="Toggle Road vs Satellite Map"
-        >
-          <Layers className="w-3 h-3 text-emerald-400" />
-          <span>{activeLayerType === 'standard' ? 'Satellite' : 'Road'}</span>
-        </button>
+      <div className="absolute top-3 right-3 z-[400] flex items-center gap-2">
+        {farmerLocation?.isPlotLocked && (
+          <div className="px-2.5 py-1 rounded-xl bg-emerald-950/90 text-emerald-300 border border-emerald-500/50 shadow-md text-[10px] font-black flex items-center gap-1.5 backdrop-blur-md">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span>🔒 BATAI PLOT #{farmerLocation.khasraNumber || '142/1'} LOCKED</span>
+          </div>
+        )}
+
+        <div className="flex items-center gap-1.5 bg-stone-900/85 backdrop-blur-md p-1 rounded-xl border border-stone-700/80 shadow-md">
+          <button
+            onClick={toggleMapLayer}
+            className="px-2.5 py-1 rounded-lg text-[10px] font-black text-stone-200 hover:text-white hover:bg-stone-800 transition flex items-center gap-1 cursor-pointer"
+            title="Toggle Road vs Satellite Map"
+          >
+            <Layers className="w-3 h-3 text-emerald-400" />
+            <span>{activeLayerType === 'standard' ? 'Satellite' : 'Road'}</span>
+          </button>
+        </div>
       </div>
 
       <div className="absolute bottom-3 left-3 z-[400] flex items-center gap-1.5">
         <button
           onClick={handleDetectLiveGPS}
           disabled={isLocating}
-          className="px-2.5 py-1 rounded-xl bg-stone-900/90 hover:bg-stone-800 text-stone-200 text-[10px] font-black border border-stone-700 backdrop-blur-md shadow-md flex items-center gap-1 transition active:scale-95"
+          className="px-2.5 py-1 rounded-xl bg-stone-900/90 hover:bg-stone-800 text-stone-200 text-[10px] font-black border border-stone-700 backdrop-blur-md shadow-md flex items-center gap-1 transition active:scale-95 cursor-pointer"
           title="Detect device GPS location"
         >
           <Crosshair className={`w-3 h-3 text-emerald-400 ${isLocating ? 'animate-spin' : ''}`} />

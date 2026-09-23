@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import L from 'leaflet';
 import { useLanguage } from '../../context/LanguageContext';
 import { useSavedLands } from '../../context/SavedLandsContext';
+import { useAuth } from '../../context/AuthContext';
 import { 
   DEFAULT_FARM_LOCATION, 
   calculatePolygonAreaBighas, 
@@ -334,8 +335,10 @@ function KhetBoundaryDrawer({ onBoundaryCalculated, initialLocation }) {
 
 export default function SavedLandsModal({ isOpen, onClose }) {
   const { lang, localize } = useLanguage();
+  const { currentUser } = useAuth();
   const { savedLands, selectedLandId, setSelectedLandId, addLand, deleteLand } = useSavedLands();
 
+  const isTenant = !!(currentUser?.isTenantFarmer || currentUser?.bataiPass?.active);
   const [isAddingNew, setIsAddingNew] = useState(false);
   
   // Entry Mode: 'bhulekh' (Govt Land Verification) vs 'manual' (Manual / GPS Drawing)
@@ -502,17 +505,35 @@ export default function SavedLandsModal({ isOpen, onClose }) {
           </button>
         </div>
 
-        {/* Add New Land Button / Form */}
-        {!isAddingNew ? (
-          <button
-            onClick={() => setIsAddingNew(true)}
-            className="w-full py-4 rounded-2xl border-2 border-dashed border-[#1A4F32]/30 bg-[#1A4F32]/5 hover:bg-[#1A4F32]/10 text-[#1A4F32] font-bold text-xs sm:text-sm flex items-center justify-center gap-2.5 transition active:scale-[0.99] shadow-sm cursor-pointer"
-          >
-            <Plus className="w-4 h-4 text-[#1A4F32]" />
-            <span>{lang === 'hi' ? 'नया खेत जोड़ें (भूलेख / जीपीएस)' : 'Add New Land (Bhulekh / GPS)'}</span>
-          </button>
+        {/* Tenant Farmer Locked Plot Alert */}
+        {isTenant ? (
+          <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-start gap-3">
+            <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-600 flex items-center justify-center shrink-0 text-base">
+              🔒
+            </div>
+            <div>
+              <h5 className="font-bold text-xs text-amber-900">
+                {lang === 'hi' ? 'बटाईदार (Tenant Farmer) - खसरा लॉक सक्रिय' : 'Tenant Farmer (Batai) - Plot Locked'}
+              </h5>
+              <p className="text-[11px] text-amber-800/90 font-medium mt-0.5">
+                {lang === 'hi'
+                  ? 'भूस्वामी सत्यापन (eKYC) के अनुसार आपका खाता केवल अधिकृत खसरा #142/1 (मलिहाबाद) से लॉक है। नया खेत जोड़ना प्रतिबंधित है।'
+                  : 'As per verified Landowner eKYC, booking is strictly restricted to authorized Khasra #142/1 (Malihabad). Additional plot registration is restricted.'}
+              </p>
+            </div>
+          </div>
         ) : (
-          <div className="p-6 rounded-3xl border border-[#0B1E14]/10 bg-white shadow-sm space-y-5">
+          /* Add New Land Button / Form */
+          !isAddingNew ? (
+            <button
+              onClick={() => setIsAddingNew(true)}
+              className="w-full py-4 rounded-2xl border-2 border-dashed border-[#1A4F32]/30 bg-[#1A4F32]/5 hover:bg-[#1A4F32]/10 text-[#1A4F32] font-bold text-xs sm:text-sm flex items-center justify-center gap-2.5 transition active:scale-[0.99] shadow-sm cursor-pointer"
+            >
+              <Plus className="w-4 h-4 text-[#1A4F32]" />
+              <span>{lang === 'hi' ? 'नया खेत जोड़ें (भूलेख / जीपीएस)' : 'Add New Land (Bhulekh / GPS)'}</span>
+            </button>
+          ) : (
+            <div className="p-6 rounded-3xl border border-[#0B1E14]/10 bg-white shadow-sm space-y-5">
             
             {/* Mode Switcher Tabs */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-[#0B1E14]/10">
@@ -860,7 +881,7 @@ export default function SavedLandsModal({ isOpen, onClose }) {
             </form>
 
           </div>
-        )}
+        ))}
 
         {/* List of Saved Lands */}
         <div className="space-y-3">
