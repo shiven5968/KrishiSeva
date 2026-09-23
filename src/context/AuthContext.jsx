@@ -546,15 +546,26 @@ export function AuthProvider({ children }) {
     audioHelper.playBookingConfirmed();
   };
 
-  // Register Driver KYC
+  // Register Driver KYC & Machinery Profile
   const registerDriverKyc = (formData) => {
     const updated = {
       ...driverProfile,
       ...formData,
-      verificationStatus: 'pending',
+      isDriverOnboarded: true,
+      verificationStatus: formData.verificationStatus || 'verified',
+      status: formData.status || 'online',
       rejectionReason: ''
     };
     setDriverProfile(updated);
+
+    if (currentUser) {
+      setCurrentUser(prev => ({
+        ...prev,
+        isDriverOnboarded: true,
+        ...formData
+      }));
+    }
+
     audioHelper.playBookingConfirmed();
     return updated;
   };

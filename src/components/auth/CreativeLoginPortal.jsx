@@ -2269,6 +2269,29 @@ export default function CreativeLoginPortal() {
                     </div>
                   )}
 
+                  {/* Read-Only Verified Profile Banner */}
+                  <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm shrink-0">
+                        👤
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-black uppercase text-emerald-400 block tracking-wider">
+                          {lang === 'hi' ? 'सत्यापित ऑपरेटर प्रोफाइल' : 'Verified Operator Profile'}
+                        </span>
+                        <div className="flex items-center gap-1.5">
+                          <b className={`text-xs ${isDark ? 'text-white' : 'text-slate-900'}`}>{userName.trim() || 'Driver Partner'}</b>
+                          <span className="text-stone-500">•</span>
+                          <span className="text-[11px] font-mono text-emerald-400 font-bold">+91 {phone}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <span className="text-[10px] font-black px-2 py-0.5 rounded-md bg-emerald-500 text-stone-950 flex items-center gap-1">
+                      <Check className="w-3 h-3 stroke-[3]" />
+                      <span>{lang === 'hi' ? 'सत्यापित' : 'Verified'}</span>
+                    </span>
+                  </div>
+
                   <form onSubmit={handleProceedToKycUploads} className="space-y-3.5">
                     <div>
                       <label className={`block text-[11px] font-bold uppercase tracking-wider mb-1 ${

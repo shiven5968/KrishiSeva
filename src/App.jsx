@@ -132,11 +132,11 @@ function MainContent() {
         {/* 2. STRICT DRIVER VIEW: Locked to Driver account */}
         {currentUser.role === 'driver' && (
           <>
-            {driverProfile.verificationStatus === 'unregistered' && <DriverRegistration />}
-            {(driverProfile.verificationStatus === 'pending' || driverProfile.verificationStatus === 'rejected') && (
+            {(!currentUser.isDriverOnboarded && driverProfile.verificationStatus === 'unregistered') && <DriverRegistration />}
+            {(!currentUser.isDriverOnboarded && (driverProfile.verificationStatus === 'pending' || driverProfile.verificationStatus === 'rejected')) && (
               <DriverPendingScreen />
             )}
-            {driverProfile.verificationStatus === 'verified' && <DriverDashboard />}
+            {(currentUser.isDriverOnboarded || driverProfile.verificationStatus === 'verified') && <DriverDashboard />}
           </>
         )}
 
