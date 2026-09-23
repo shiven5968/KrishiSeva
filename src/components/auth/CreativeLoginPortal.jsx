@@ -120,6 +120,12 @@ export default function CreativeLoginPortal() {
   const [aadhaarStep, setAadhaarStep] = useState('input'); // 'input' | 'result'
   const [isVerifyingAgriStack, setIsVerifyingAgriStack] = useState(false);
   const [agriStackResult, setAgriStackResult] = useState(null);
+  const [isAgriStackOtpModalOpen, setIsAgriStackOtpModalOpen] = useState(false);
+  const [agriStackOtp, setAgriStackOtp] = useState('');
+  const [isVerifyingAgriStackOtp, setIsVerifyingAgriStackOtp] = useState(false);
+  const [agriStackOtpError, setAgriStackOtpError] = useState('');
+  const [pendingAgriStackRecord, setPendingAgriStackRecord] = useState(null);
+  const [agriStackSuccessToast, setAgriStackSuccessToast] = useState('');
 
   // Tenant / Batai Farmer Verification States
   const [farmerVerificationType, setFarmerVerificationType] = useState('landowner'); // 'landowner' | 'tenant'
@@ -337,7 +343,7 @@ export default function CreativeLoginPortal() {
   };
 
   // ─────────────────────────────────────────────────────────────
-  // 4A. Farmer: AgriStack Aadhaar Verification
+  // 4A. Farmer: AgriStack Aadhaar Verification (Step 1: Open OTP Modal)
   // ─────────────────────────────────────────────────────────────
   const handleVerifyAadhaar = async (e) => {
     e?.preventDefault();
@@ -361,12 +367,82 @@ export default function CreativeLoginPortal() {
         return;
       }
 
-      setAgriStackResult(check);
-      setAadhaarStep('result');
-      audioHelper.playBookingConfirmed();
+      // Record found in AgriStack - Open Simulated OTP Verification Modal
+      setPendingAgriStackRecord(check);
+      setAgriStackOtp('');
+      setAgriStackOtpError('');
+      setIsAgriStackOtpModalOpen(true);
     } catch (err) {
       setIsVerifyingAgriStack(false);
       setError(lang === 'hi' ? 'रजिस्ट्री सर्वर से संपर्क नहीं हो सका।' : 'Could not connect to registry server.');
+    }
+  };
+
+  // 4A-1. AgriStack OTP Verification (Gated Land Fetching)
+  const handleVerifyAgriStackOtp = async (e) => {
+    e?.preventDefault();
+    const cleanOtp = agriStackOtp.trim();
+
+    if (!cleanOtp) {
+      setAgriStackOtpError(lang === 'hi' ? 'कृपया 6-अंकीय ओटीपी दर्ज करें' : 'Please enter the 6-digit OTP');
+      return;
+    }
+
+    if (cleanOtp !== '123456') {
+      setAgriStackOtpError(
+        lang === 'hi' 
+          ? '❌ अमान्य ओटीपी! कृपया सही 6-अंकीय ओटीपी (123456) दर्ज करें।' 
+          : '❌ Invalid OTP! Please enter correct 6-digit OTP (123456).'
+      );
+      return;
+    }
+
+    setIsVerifyingAgriStackOtp(true);
+    setAgriStackOtpError('');
+
+    await new Promise(resolve => setTimeout(resolve, 600));
+    setIsVerifyingAgriStackOtp(false);
+
+    if (pendingAgriStackRecord) {
+      setAgriStackResult(pendingAgriStackRecord);
+      setIsAgriStackOtpModalOpen(false);
+      setAadhaarStep('result');
+      setAgriStackSuccessToast(
+        lang === 'hi' 
+          ? 'Identity & Land Ownership Verified via AgriStack (पहचान एवं भू-स्वामित्व सत्यापित)' 
+          : 'Identity & Land Ownership Verified via AgriStack'
+      );
+
+      // Auto-save verified lands into localStorage for SavedLandsContext
+      if (pendingAgriStackRecord.farmerProfile?.linkedLands) {
+        try {
+          const existingSaved = localStorage.getItem('krishi_saved_lands');
+          const parsed = existingSaved ? JSON.parse(existingSaved) : [];
+          const userPhone = phone || '9876543210';
+          const newLands = pendingAgriStackRecord.farmerProfile.linkedLands.map(l => ({
+            id: l.id || `land_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
+            userPhone: userPhone,
+            name: l.name || 'खेत (My Field)',
+            bigha: Number(l.bigha) || 1,
+            cropType: l.cropType || 'Wheat / गेहूँ',
+            address: `${l.village || 'Gram'}, ${l.tehsil || 'Tehsil'}`,
+            lat: Number(l.lat) || 26.9168,
+            lng: Number(l.lng) || 80.7075,
+            soilType: l.soilType || 'Alluvial Loam (दोमट मिट्टी)',
+            icon: '🌾',
+            isGovtVerified: true,
+            khasraNumber: l.khasraNumber || null,
+            areaHectare: l.hectare ? Number(l.hectare) : null,
+            ulpin: l.ulpin || `UP-LKO-${l.khasraNumber}-01`
+          }));
+          const filteredOld = parsed.filter(pl => pl.userPhone !== userPhone);
+          localStorage.setItem('krishi_saved_lands', JSON.stringify([...newLands, ...filteredOld]));
+        } catch (err) {
+          console.error('Failed to sync land cache', err);
+        }
+      }
+
+      audioHelper.playBookingConfirmed();
     }
   };
 
@@ -1691,26 +1767,40 @@ export default function CreativeLoginPortal() {
                             <div className="grid grid-cols-1 gap-1.5">
                               <button
                                 type="button"
-                                onClick={() => setAadhaarNumber('5544 3322 1100')}
-                                className="p-2.5 rounded-xl bg-emerald-950/30 hover:bg-emerald-950/60 border border-emerald-800/50 hover:border-emerald-500 text-left transition-all duration-200 flex items-center justify-between group cursor-pointer"
+                                onClick={() => {
+                                  setAadhaarNumber('5544 3322 1100');
+                                  setError('');
+                                }}
+                                className={`p-2.5 rounded-xl border text-left transition-all duration-200 flex items-center justify-between group cursor-pointer ${
+                                  aadhaarNumber.replace(/\D/g, '') === '554433221100'
+                                    ? 'bg-emerald-950/70 border-emerald-400 ring-1 ring-emerald-400/40'
+                                    : 'bg-emerald-950/30 hover:bg-emerald-950/60 border-emerald-800/50 hover:border-emerald-500'
+                                }`}
                               >
                                 <div>
-                                  <span className="text-xs font-black text-emerald-300 block">{lang === 'hi' ? '5544 3322 1100 (डेमो आधार 1)' : '5544 3322 1100 (Demo Aadhaar 1)'}</span>
-                                  <span className="text-[10px] text-stone-400">{lang === 'hi' ? 'गाटा #142 (3.0 बीघा)' : 'Gata #142 (3.0 Bigha)'}</span>
+                                  <span className="text-xs font-black text-emerald-300 block">{lang === 'hi' ? '5544 3322 1100 (डेमो प्रोफाइल 1)' : '5544 3322 1100 (Demo Profile 1)'}</span>
+                                  <span className="text-[10px] text-stone-400">{lang === 'hi' ? 'बलराम सिंह • गाटा #142 (3.0 बीघा)' : 'Balram Singh • Gata #142 (3.0 Bigha)'}</span>
                                 </div>
-                                <span className="text-[10px] font-bold text-emerald-400 px-2 py-0.5 rounded-lg bg-emerald-900/50 group-hover:bg-emerald-900/80">{lang === 'hi' ? 'पंजीकृत ✓' : 'Registered ✓'}</span>
+                                <span className="text-[10px] font-bold text-emerald-400 px-2 py-0.5 rounded-lg bg-emerald-900/50 group-hover:bg-emerald-900/80">{lang === 'hi' ? 'चुनें' : 'Select'}</span>
                               </button>
 
                               <button
                                 type="button"
-                                onClick={() => setAadhaarNumber('8899 4433 2211')}
-                                className="p-2.5 rounded-xl bg-teal-950/30 hover:bg-teal-950/60 border border-teal-800/50 hover:border-teal-500 text-left transition-all duration-200 flex items-center justify-between group cursor-pointer"
+                                onClick={() => {
+                                  setAadhaarNumber('8899 4433 2211');
+                                  setError('');
+                                }}
+                                className={`p-2.5 rounded-xl border text-left transition-all duration-200 flex items-center justify-between group cursor-pointer ${
+                                  aadhaarNumber.replace(/\D/g, '') === '889944332211'
+                                    ? 'bg-teal-950/70 border-teal-400 ring-1 ring-teal-400/40'
+                                    : 'bg-teal-950/30 hover:bg-teal-950/60 border-teal-800/50 hover:border-teal-500'
+                                }`}
                               >
                                 <div>
-                                  <span className="text-xs font-black text-teal-300 block">{lang === 'hi' ? '8899 4433 2211 (डेमो आधार 2)' : '8899 4433 2211 (Demo Aadhaar 2)'}</span>
-                                  <span className="text-[10px] text-stone-400">{lang === 'hi' ? 'गाटा #215 (6.0 बीघा)' : 'Gata #215 (6.0 Bigha)'}</span>
+                                  <span className="text-xs font-black text-teal-300 block">{lang === 'hi' ? '8899 4433 2211 (डेमो प्रोफाइल 2)' : '8899 4433 2211 (Demo Profile 2)'}</span>
+                                  <span className="text-[10px] text-stone-400">{lang === 'hi' ? 'रामेश्वर दयाल • गाटा #215 (6.0 बीघा)' : 'Rameshwar Dayal • Gata #215 (6.0 Bigha)'}</span>
                                 </div>
-                                <span className="text-[10px] font-bold text-teal-400 px-2 py-0.5 rounded-lg bg-teal-900/50 group-hover:bg-teal-900/80">{lang === 'hi' ? 'पंजीकृत ✓' : 'Registered ✓'}</span>
+                                <span className="text-[10px] font-bold text-teal-400 px-2 py-0.5 rounded-lg bg-teal-900/50 group-hover:bg-teal-900/80">{lang === 'hi' ? 'चुनें' : 'Select'}</span>
                               </button>
                             </div>
                           </div>
@@ -2068,6 +2158,13 @@ export default function CreativeLoginPortal() {
                   {aadhaarStep === 'result' && agriStackResult && (
                     <div className="space-y-4 animate-fade-in">
                       
+                      {agriStackSuccessToast && (
+                        <div className="p-3.5 rounded-2xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-xs font-bold flex items-center justify-center gap-2 animate-fade-in shadow-md">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                          <span>{agriStackSuccessToast}</span>
+                        </div>
+                      )}
+
                       <div className="p-5 rounded-3xl bg-gradient-to-br from-stone-900 via-stone-950 to-stone-900 border-2 border-emerald-500/60 shadow-xl shadow-emerald-500/10 space-y-3 text-white relative overflow-hidden">
                         
                         <div className="relative">
@@ -2680,6 +2777,165 @@ export default function CreativeLoginPortal() {
                 स्वीकृति देने पर बटाईदार को केवल इस विशिष्ट खसरा (#{tenantKhasra || '142/1'}) के लिए 1-वर्षीय मशीनरी बुकिंग की अनुमति मिलेगी।
               </p>
             </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* ══════════ AGRISTACK / UPFR eKYC OTP VERIFICATION MODAL ══════════ */}
+      {isAgriStackOtpModalOpen && pendingAgriStackRecord && (
+        <div className="fixed inset-0 z-[100000] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            className="bg-[#101F16] border-2 border-emerald-500/50 rounded-[2rem] max-w-lg w-full p-6 sm:p-7 shadow-[0_25px_60px_rgba(0,0,0,0.85)] text-white space-y-5 relative animate-scale-up"
+          >
+            {/* Top Header */}
+            <div className="flex items-center justify-between pb-3 border-b border-emerald-500/20">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+                  <Building2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-base sm:text-lg font-black tracking-tight text-white flex items-center gap-2">
+                    <span>{lang === 'hi' ? 'AgriStack / UPFR ई-केवाईसी सत्यापन' : 'AgriStack / UPFR eKYC Verification'}</span>
+                  </h4>
+                  <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block">
+                    {lang === 'hi' ? 'डिजिटल भारत किसान रजिस्ट्री (Govt of UP)' : 'Digital India Farmer Registry (Govt of UP)'}
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsAgriStackOtpModalOpen(false);
+                  setAgriStackOtp('');
+                  setAgriStackOtpError('');
+                }}
+                className="w-8 h-8 rounded-full bg-stone-900 hover:bg-stone-800 text-stone-400 hover:text-white flex items-center justify-center transition cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Confirmation text indicating OTP sent to linked mobile */}
+            <div className="p-3.5 rounded-2xl bg-emerald-950/40 border border-emerald-500/30 space-y-2">
+              <div className="flex items-center justify-between text-[11px] text-emerald-400 font-bold">
+                <span className="flex items-center gap-1.5">
+                  <MessageSquare className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>{lang === 'hi' ? 'UIDAI / AgriStack अधिकृत संदेश' : 'AgriStack UIDAI eKYC Gateway'}</span>
+                </span>
+                <span className="text-[10px] text-stone-400">Security PIN</span>
+              </div>
+              <p className="text-xs text-stone-200 font-medium leading-relaxed">
+                {lang === 'hi'
+                  ? `6-अंकीय प्रमाणीकरण कोड (OTP) इस रिकॉर्ड से जुड़े मोबाइल नंबर (******${phone ? phone.slice(-4) : '9876'}) पर भेज दिया गया है।`
+                  : `6-Digit OTP sent to mobile linked with this record ending in ******${phone ? phone.slice(-4) : '9876'}.`}
+              </p>
+            </div>
+
+            {/* Registered AgriStack Profile Summary */}
+            <div className="p-3.5 rounded-2xl bg-stone-950 border border-stone-800 space-y-2.5 text-xs">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold uppercase text-stone-400">{lang === 'hi' ? 'पंजीकृत किसान विवरण' : 'Registry Profile Details'}</span>
+                <span className="text-[10px] font-bold text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded-md border border-emerald-500/30">
+                  {pendingAgriStackRecord.farmerProfile?.farmerId || 'UPFR-2026'}
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="p-2 rounded-xl bg-stone-900/80 border border-stone-800">
+                  <span className="text-[10px] text-stone-400 block">{lang === 'hi' ? 'कृषक नाम' : 'Farmer Name'}</span>
+                  <b className="text-white text-xs block truncate">{pendingAgriStackRecord.farmerProfile?.kisanCardName}</b>
+                </div>
+                <div className="p-2 rounded-xl bg-stone-900/80 border border-stone-800">
+                  <span className="text-[10px] text-stone-400 block">{lang === 'hi' ? 'संबद्ध खसरा' : 'Linked Khasra Plot'}</span>
+                  <b className="text-emerald-400 text-xs block truncate">
+                    {pendingAgriStackRecord.farmerProfile?.linkedLands?.[0]
+                      ? `गाटा #${pendingAgriStackRecord.farmerProfile.linkedLands[0].khasraNumber} (${pendingAgriStackRecord.farmerProfile.linkedLands[0].bigha} बीघा)`
+                      : 'गाटा #142 (3.0 बीघा)'}
+                  </b>
+                </div>
+              </div>
+            </div>
+
+            {/* OTP Input Form */}
+            <form onSubmit={handleVerifyAgriStackOtp} className="space-y-4">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-stone-300 uppercase tracking-wider">
+                    {lang === 'hi' ? '6-अंकीय ओटीपी (PIN) दर्ज करें *' : 'Enter 6-Digit OTP *'}
+                  </label>
+                  
+                  {/* Quick-Fill Helper Button */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAgriStackOtp('123456');
+                      setAgriStackOtpError('');
+                    }}
+                    className="text-[11px] font-black text-amber-400 hover:text-amber-300 bg-amber-950/60 hover:bg-amber-900/70 border border-amber-500/40 px-2.5 py-1 rounded-lg transition active:scale-95 cursor-pointer flex items-center gap-1"
+                  >
+                    <Zap className="w-3 h-3 text-amber-400" />
+                    <span>{lang === 'hi' ? 'Use Demo OTP: 123456' : 'Use Demo OTP: 123456'}</span>
+                  </button>
+                </div>
+
+                <div className="relative">
+                  <input
+                    type="text"
+                    maxLength={6}
+                    value={agriStackOtp}
+                    onChange={(e) => {
+                      setAgriStackOtp(e.target.value.replace(/\D/g, ''));
+                      setAgriStackOtpError('');
+                    }}
+                    placeholder="123456"
+                    className="w-full py-3.5 px-4 rounded-2xl bg-stone-950 border border-emerald-500/40 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20 text-center font-mono text-2xl font-black tracking-[0.4em] text-white outline-none transition"
+                    autoFocus
+                  />
+                </div>
+              </div>
+
+              {/* OTP Error Banner */}
+              {agriStackOtpError && (
+                <div className="p-3 rounded-xl bg-red-950/80 border border-red-700/60 text-red-200 text-xs font-bold flex items-center gap-2 animate-fade-in">
+                  <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
+                  <span>{agriStackOtpError}</span>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex gap-2.5 pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsAgriStackOtpModalOpen(false);
+                    setAgriStackOtp('');
+                    setAgriStackOtpError('');
+                  }}
+                  className="w-1/3 py-3.5 rounded-2xl border border-stone-700 hover:bg-stone-900 text-stone-300 font-bold text-xs transition cursor-pointer"
+                >
+                  {lang === 'hi' ? 'रद्द करें' : 'Cancel'}
+                </button>
+
+                <button
+                  type="submit"
+                  disabled={isVerifyingAgriStackOtp}
+                  className="w-2/3 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-stone-950 font-black text-xs sm:text-sm shadow-xl shadow-emerald-500/20 transition-all flex items-center justify-center gap-2 active:scale-[0.98] cursor-pointer"
+                >
+                  {isVerifyingAgriStackOtp ? (
+                    <>
+                      <Clock className="w-4 h-4 animate-spin text-stone-950" />
+                      <span>{lang === 'hi' ? 'सत्यापन हो रहा है...' : 'Verifying OTP...'}</span>
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2 className="w-4 h-4 text-stone-950 stroke-[2.5]" />
+                      <span>{lang === 'hi' ? 'ओटीपी सत्यापित करें व खेत जोड़ें' : 'Verify OTP & Link Lands'}</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
 
           </div>
         </div>
