@@ -6,6 +6,12 @@ import { sendRealWhatsAppOtp } from '../../utils/smsGateway';
 import { verifyAgriStackFarmer } from '../../services/bhulekhLandService';
 import { audioHelper } from '../../utils/audioHelper';
 import KrishiSevaLogo from '../common/KrishiSevaLogo';
+import Footer from '../common/Footer';
+import PrivacyPolicyModal from '../common/PrivacyPolicyModal';
+import ContactUsModal from '../common/ContactUsModal';
+import TermsModal from '../common/TermsModal';
+import { updatePageSEO } from '../../utils/seoHelper';
+import { trackPageView } from '../../services/analytics';
 import { 
   Phone,
   LogIn, 
@@ -160,6 +166,17 @@ export default function CreativeLoginPortal() {
   const [faqVisible, setFaqVisible] = useState(false);
   const [openFaqIndex, setOpenFaqIndex] = useState(null);
   const [activeFlowStep, setActiveFlowStep] = useState(1);
+
+  // Compliance & Support Modals (SEO / Launch Checklist Item 19 & 20)
+  const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
+
+  // SEO & Analytics dynamic tracking (Checklist Items 4, 5, 7, 17)
+  useEffect(() => {
+    updatePageSEO('landing');
+    trackPageView(window.location.pathname || '/', 'KrishiSeva - Precision Farm Fleet Ecosystem');
+  }, [portalView]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -872,6 +889,15 @@ export default function CreativeLoginPortal() {
               <span>{lang === 'hi' ? 'एडमिन लॉगिन' : 'Admin Login'}</span>
             </button>
 
+            {/* Contact & Support Button */}
+            <button
+              onClick={() => setIsContactModalOpen(true)}
+              className="text-[#0B1E14] dark:text-[#EAEFEA] hover:text-[#1A4F32] dark:hover:text-[#4ADE80] hover:bg-[#1A4F32]/5 dark:hover:bg-white/5 transition-all duration-300 text-sm font-medium px-4 py-2 rounded-full active:scale-95 flex items-center gap-2 cursor-pointer"
+            >
+              <Phone className="w-3.5 h-3.5 text-[#1A4F32] dark:text-[#4ADE80]" />
+              <span>{lang === 'hi' ? 'संपर्क करें' : 'Contact Us'}</span>
+            </button>
+
             {/* Language Switcher */}
             <button
               onClick={toggleLanguage}
@@ -914,6 +940,20 @@ export default function CreativeLoginPortal() {
                   <span>{lang === 'hi' ? 'एडमिन लॉगिन' : 'Admin Login'}</span>
                 </span>
                 <span className="text-[#1A4F32] dark:text-[#4ADE80] font-bold">→</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setIsContactModalOpen(true);
+                  setIsMobileMenuOpen(false);
+                }}
+                className="w-full text-xs font-semibold px-4 py-3 rounded-xl bg-[#1A4F32]/10 dark:bg-[#4ADE80]/10 text-[#1A4F32] dark:text-[#4ADE80] flex items-center justify-between cursor-pointer"
+              >
+                <span className="flex items-center gap-2">
+                  <Phone className="w-4 h-4" />
+                  <span>{lang === 'hi' ? '24/7 किसान सहायता व संपर्क' : '24/7 Helpline & Contact'}</span>
+                </span>
+                <span className="font-bold">→</span>
               </button>
 
               <button
@@ -2427,7 +2467,7 @@ export default function CreativeLoginPortal() {
                       </span>
                       {dlPhoto ? (
                         <div className="relative border border-emerald-500/30 rounded-2xl overflow-hidden bg-black/60 p-2 flex items-center justify-between gap-3 animate-fade-in">
-                          <img src={dlPhoto} className="w-16 h-12 object-cover rounded-xl border border-stone-800" />
+                          <img src={dlPhoto} alt={`Driving License ${driverDlNumber || 'Document'}`} loading="lazy" decoding="async" className="w-16 h-12 object-cover rounded-xl border border-stone-800" />
                           <div className="flex-1 min-w-0">
                             <span className="text-xs font-bold block truncate">DL_{driverDlNumber}.jpg</span>
                             <span className="text-[10px] text-emerald-400 font-bold flex items-center gap-1">✓ Ready</span>
@@ -2460,7 +2500,7 @@ export default function CreativeLoginPortal() {
                       </span>
                       {vehiclePhoto ? (
                         <div className="relative border border-emerald-500/30 rounded-2xl overflow-hidden bg-black/60 p-2 flex items-center justify-between gap-3 animate-fade-in">
-                          <img src={vehiclePhoto} className="w-16 h-12 object-cover rounded-xl border border-stone-800" />
+                          <img src={vehiclePhoto} alt={`Vehicle Registration Plate ${driverVehicleNumber || 'Plate'}`} loading="lazy" decoding="async" className="w-16 h-12 object-cover rounded-xl border border-stone-800" />
                           <div className="flex-1 min-w-0">
                             <span className="text-xs font-bold block truncate">RC_{driverVehicleNumber}.jpg</span>
                             <span className="text-[10px] text-emerald-400 font-bold flex items-center gap-1">✓ Ready</span>
@@ -2517,7 +2557,7 @@ export default function CreativeLoginPortal() {
                           )}
 
                           {faceAuthStatus === 'success' && faceImage && (
-                            <img src={faceImage} className="w-full h-full object-cover animate-fade-in" />
+                            <img src={faceImage} alt="Biometric Face Authentication Preview" loading="lazy" decoding="async" className="w-full h-full object-cover animate-fade-in" />
                           )}
                         </div>
 
@@ -2671,16 +2711,26 @@ export default function CreativeLoginPortal() {
         </section>
       )}
 
-      {/* ═══════════ MINIMALIST FOOTER ═══════════ */}
-      <footer className={`relative z-10 border-t px-6 py-4 transition-colors duration-200 ${
-        isDark 
-          ? 'border-stone-800/80 bg-slate-950 text-stone-400' 
-          : 'border-slate-200 bg-white/40 backdrop-blur-md text-slate-505'
-      }`}>
-        <div className="max-w-7xl mx-auto flex items-center justify-center text-center text-xs">
-          <span>© 2026 KrishiSeva • Precision Farm Fleet Network</span>
-        </div>
-      </footer>
+      {/* ═══════════ PRODUCTION LAUNCH-READY FOOTER (Item 16: Internal Links) ═══════════ */}
+      <Footer 
+        onOpenPrivacy={() => setIsPrivacyModalOpen(true)}
+        onOpenContact={() => setIsContactModalOpen(true)}
+        onOpenTerms={() => setIsTermsModalOpen(true)}
+      />
+
+      {/* Compliance & Interactive Support Modals (Items 19 & 20) */}
+      <PrivacyPolicyModal 
+        isOpen={isPrivacyModalOpen} 
+        onClose={() => setIsPrivacyModalOpen(false)} 
+      />
+      <ContactUsModal 
+        isOpen={isContactModalOpen} 
+        onClose={() => setIsContactModalOpen(false)} 
+      />
+      <TermsModal 
+        isOpen={isTermsModalOpen} 
+        onClose={() => setIsTermsModalOpen(false)} 
+      />
 
       {/* ══════════════════════════════════════════════════════════════════ */}
       {/* SIMULATE LANDOWNER DEVICE MODAL OVERLAY (Aadhaar eKYC & Bhulekh) */}

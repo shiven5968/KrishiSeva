@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <!-- Homepage / Landing -->
+  <url>
+    <loc>https://krishiseva.in/</loc>
+    <lastmod>2026-11-09</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://krishiseva.in/images/krishiseva-og-banner.png</image:loc>
+      <image:title>KrishiSeva On-Demand Agricultural Machinery</image:title>
+      <image:caption>Precision farm fleet and tractor booking radar</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Farmer Machinery Booking Cockpit -->
+  <url>
+    <loc>https://krishiseva.in/#farmer</loc>
+    <lastmod>2026-11-09</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.95</priority>
+  </url>
+
+  <!-- Driver Partner & CHC Fleet Onboarding -->
+  <url>
+    <loc>https://krishiseva.in/#driver</loc>
+    <lastmod>2026-11-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.90</priority>
+  </url>
+
+  <!-- Working Contact Form & Kisan Helpline -->
+  <url>
+    <loc>https://krishiseva.in/#contact</loc>
+    <lastmod>2026-11-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.80</priority>
+  </url>
+
+  <!-- Privacy Policy (DPDP Act 2023 Compliant) -->
+  <url>
+    <loc>https://krishiseva.in/#privacy</loc>
+    <lastmod>2026-11-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.60</priority>
+  </url>
+
+  <!-- Terms of Service & AgriStack Registry Usage -->
+  <url>
+    <loc>https://krishiseva.in/#terms</loc>
+    <lastmod>2026-11-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.50</priority>
+  </url>
+</urlset>

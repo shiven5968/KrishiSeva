@@ -1,0 +1,14 @@
+# 301 Redirects & Single Page Application Routing Rules
+/home              /                 301!
+/book              /#farmer          301!
+/tractor           /#farmer          301!
+/harvester         /#farmer          301!
+/driver-register   /#driver          301!
+/fleet             /#driver          301!
+/contact-us        /#contact         301!
+/support           /#contact         301!
+/privacy-policy    /#privacy         301!
+/terms-of-service  /#terms           301!
+
+# Fallback SPA rewrite for client-side routing
+/*                 /index.html       200

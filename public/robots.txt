@@ -1,0 +1,22 @@
+# robots.txt for KrishiSeva (कृषि सेवा) - India's Precision Agricultural Machinery Network
+# https://krishiseva.in
+
+User-agent: *
+Allow: /
+Allow: /#farmer
+Allow: /#driver
+Allow: /#contact
+Allow: /#privacy
+Allow: /#terms
+Allow: /images/
+Allow: /sitemap.xml
+
+# Disallow internal admin & telemetry routes from public indexing
+Disallow: /admin
+Disallow: /#admin
+Disallow: /api/
+Disallow: /private/
+
+# Host and Sitemap specification
+Host: https://krishiseva.in
+Sitemap: https://krishiseva.in/sitemap.xml

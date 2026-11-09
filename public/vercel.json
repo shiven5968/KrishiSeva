@@ -1,0 +1,34 @@
+{
+  "redirects": [
+    { "source": "/home", "destination": "/", "permanent": true },
+    { "source": "/book", "destination": "/#farmer", "permanent": true },
+    { "source": "/tractor", "destination": "/#farmer", "permanent": true },
+    { "source": "/harvester", "destination": "/#farmer", "permanent": true },
+    { "source": "/driver-register", "destination": "/#driver", "permanent": true },
+    { "source": "/fleet", "destination": "/#driver", "permanent": true },
+    { "source": "/contact-us", "destination": "/#contact", "permanent": true },
+    { "source": "/support", "destination": "/#contact", "permanent": true },
+    { "source": "/privacy-policy", "destination": "/#privacy", "permanent": true },
+    { "source": "/terms-of-service", "destination": "/#terms", "permanent": true }
+  ],
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
+        { "key": "X-XSS-Protection", "value": "1; mode=block" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+      ]
+    },
+    {
+      "source": "/images/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    }
+  ]
+}
