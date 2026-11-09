@@ -166,7 +166,7 @@ export default function Footer({ onOpenPrivacy, onOpenContact, onOpenTerms }) {
                   rel="noopener noreferrer"
                   className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex items-center gap-1"
                 >
-                  <span>🗺️ XML Sitemap</span>
+                  <span>🗺️ {lang === 'hi' ? 'कृषि नेटवर्क निर्देशिका' : 'Fleet Directory'}</span>
                   <ArrowUpRight className="w-3 h-3 opacity-60" />
                 </a>
               </li>
@@ -185,7 +185,7 @@ export default function Footer({ onOpenPrivacy, onOpenContact, onOpenTerms }) {
                   onClick={() => onOpenContact && onOpenContact()}
                   className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors text-left flex items-center gap-1.5 cursor-pointer"
                 >
-                  <span>✉️ {lang === 'hi' ? 'हमसे संपर्क करें (Form)' : 'Working Contact Form'}</span>
+                  <span>✉️ {lang === 'hi' ? '24/7 सहायता व संपर्क' : 'Contact Support'}</span>
                 </button>
               </li>
               <li>
@@ -226,10 +226,10 @@ export default function Footer({ onOpenPrivacy, onOpenContact, onOpenTerms }) {
             <span>© 2026 KrishiSeva Technologies India Pvt. Ltd. All rights reserved.</span>
           </div>
 
-          <div className="flex items-center gap-4 text-[11px]">
-            <a href="/robots.txt" target="_blank" rel="noopener noreferrer" className="hover:underline">robots.txt</a>
+          <div className="flex flex-wrap items-center gap-3 text-[11px]">
+            <span>DPDP Act 2023 Compliant</span>
             <span>•</span>
-            <a href="/sitemap.xml" target="_blank" rel="noopener noreferrer" className="hover:underline">sitemap.xml</a>
+            <span>Govt. AgriStack Verified</span>
             <span>•</span>
             <span>Made with <Heart className="w-3 h-3 text-red-500 inline fill-red-500" /> for Indian Kisans</span>
           </div>
