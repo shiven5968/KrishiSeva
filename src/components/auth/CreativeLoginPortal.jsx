@@ -14,6 +14,7 @@ import { updatePageSEO } from '../../utils/seoHelper';
 import { trackPageView } from '../../services/analytics';
 import { 
   Phone,
+  Scale,
   LogIn, 
   ShieldCheck, 
   ArrowRight,
@@ -894,8 +895,8 @@ export default function CreativeLoginPortal() {
               onClick={() => setIsContactModalOpen(true)}
               className="text-[#0B1E14] dark:text-[#EAEFEA] hover:text-[#1A4F32] dark:hover:text-[#4ADE80] hover:bg-[#1A4F32]/5 dark:hover:bg-white/5 transition-all duration-300 text-sm font-medium px-4 py-2 rounded-full active:scale-95 flex items-center gap-2 cursor-pointer"
             >
-              <Phone className="w-3.5 h-3.5 text-[#1A4F32] dark:text-[#4ADE80]" />
-              <span>{lang === 'hi' ? 'संपर्क करें' : 'Contact Us'}</span>
+              <Scale className="w-3.5 h-3.5 text-[#1A4F32] dark:text-[#4ADE80]" />
+              <span>{lang === 'hi' ? 'विधिक सहायता' : 'Legal & Support'}</span>
             </button>
 
             {/* Language Switcher */}

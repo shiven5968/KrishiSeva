@@ -176,7 +176,7 @@ export default function Footer({ onOpenPrivacy, onOpenContact, onOpenTerms }) {
           {/* Column 4: Contact & Legal (Internal Links) */}
           <div className="space-y-3.5">
             <h4 className="text-xs font-black uppercase tracking-wider text-[#0B1E14] dark:text-white">
-              {lang === 'hi' ? 'सहयोग व नीतियां' : 'Help & Legal'}
+              {lang === 'hi' ? 'विधिक एवं सहायता केंद्र' : 'Help & Legal'}
             </h4>
             <ul className="space-y-2.5 text-xs font-semibold text-[#4F6358] dark:text-[#CBD5E1]">
               <li>
@@ -185,7 +185,7 @@ export default function Footer({ onOpenPrivacy, onOpenContact, onOpenTerms }) {
                   onClick={() => onOpenContact && onOpenContact()}
                   className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors text-left flex items-center gap-1.5 cursor-pointer"
                 >
-                  <span>✉️ {lang === 'hi' ? '24/7 सहायता व संपर्क' : 'Contact Support'}</span>
+                  <span>{lang === 'hi' ? 'विधिक शिकायत एवं सहायता डेस्क' : 'Grievance & Support Desk'}</span>
                 </button>
               </li>
               <li>
@@ -194,7 +194,7 @@ export default function Footer({ onOpenPrivacy, onOpenContact, onOpenTerms }) {
                   onClick={() => onOpenPrivacy && onOpenPrivacy()}
                   className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors text-left flex items-center gap-1.5 cursor-pointer"
                 >
-                  <span>🔒 {lang === 'hi' ? 'गोपनीयता नीति (DPDP)' : 'Privacy Policy'}</span>
+                  <span>{lang === 'hi' ? 'गोपनीयता नीति (DPDP 2023)' : 'Privacy Policy (DPDP Act)'}</span>
                 </button>
               </li>
               <li>
@@ -203,7 +203,7 @@ export default function Footer({ onOpenPrivacy, onOpenContact, onOpenTerms }) {
                   onClick={() => onOpenTerms && onOpenTerms()}
                   className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors text-left flex items-center gap-1.5 cursor-pointer"
                 >
-                  <span>📜 {lang === 'hi' ? 'नियम व शर्तें' : 'Terms of Service'}</span>
+                  <span>{lang === 'hi' ? 'सेवा की शर्तें व किराया अनुबंध' : 'Terms of Service & Rental'}</span>
                 </button>
               </li>
               <li>
