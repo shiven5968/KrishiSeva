@@ -153,7 +153,7 @@ export default function PrivacyPolicyModal({ isOpen, onClose }) {
               <p><strong>Name:</strong> Rajesh Verma (Data Protection Officer)</p>
               <p><strong>Address:</strong> KrishiSeva AgriTech Hub, Gomti Nagar, Lucknow, UP - 226010</p>
               <p><strong>Email:</strong> grievance@krishiseva.in | privacy@krishiseva.in</p>
-              <p><strong>Helpline:</strong> 1800-572-8899 (Mon–Sat, 9:00 AM – 6:00 PM)</p>
+              <p><strong>Helpline:</strong> +91 92365 81606 (Mon–Sat, 9:00 AM – 6:00 PM)</p>
             </div>
           </div>
 

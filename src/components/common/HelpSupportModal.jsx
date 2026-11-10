@@ -97,7 +97,7 @@ export default function HelpSupportModal({ isOpen, onClose }) {
                   WhatsApp Support
                 </span>
                 <h4 className="font-extrabold text-sm text-slate-900 dark:text-white flex items-center gap-1.5 pt-1">
-                  <span>+91 98765 43210</span>
+                  <span>+91 92365 81606</span>
                 </h4>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
                   {lang === 'hi' 
@@ -106,7 +106,7 @@ export default function HelpSupportModal({ isOpen, onClose }) {
                 </p>
               </div>
               <a
-                href="https://wa.me/919876543210?text=KrishiSeva%20Help%20Request"
+                href="https://wa.me/919236581606?text=KrishiSeva%20Help%20Request"
                 target="_blank"
                 rel="noreferrer"
                 className="px-3.5 py-2 rounded-xl bg-green-600 hover:bg-green-500 text-white font-bold text-xs shadow-md shadow-green-600/20 flex items-center gap-1.5 shrink-0 active:scale-95 transition"

@@ -43,7 +43,7 @@ export const ROUTE_SEO_CONFIG = {
   },
   contact: {
     title: 'Contact Us & 24x7 Kisan CHC Helpline | KrishiSeva',
-    description: 'Get in touch with KrishiSeva support for machinery bookings, CHC onboarding, technical assistance, or call toll-free 1800-KRISHI.',
+    description: 'Get in touch with KrishiSeva support for machinery bookings, CHC onboarding, technical assistance, or call +91 92365 81606.',
     canonical: 'https://krishiseva.in/#contact',
     ogImage: 'https://krishiseva.in/images/krishiseva-og-banner.png',
     breadcrumbs: [

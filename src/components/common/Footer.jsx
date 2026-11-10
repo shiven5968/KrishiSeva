@@ -208,11 +208,11 @@ export default function Footer({ onOpenPrivacy, onOpenContact, onOpenTerms }) {
               </li>
               <li>
                 <a 
-                  href="tel:18005728899"
+                  href="tel:+919236581606"
                   className="text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-1.5 hover:underline"
                 >
                   <PhoneCall className="w-3.5 h-3.5" />
-                  <span>1800-572-8899</span>
+                  <span>+91 92365 81606</span>
                 </a>
               </li>
             </ul>

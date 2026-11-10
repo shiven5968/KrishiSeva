@@ -178,7 +178,7 @@ export default function ContactUsModal({ isOpen, onClose }) {
           {/* Direct Help Quick Bar */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             <a 
-              href="tel:18005728899"
+              href="tel:+919236581606"
               className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center gap-3 text-inherit no-underline hover:bg-emerald-500/15 transition cursor-pointer"
             >
               <div className="w-9 h-9 rounded-xl bg-emerald-500 text-stone-950 flex items-center justify-center shrink-0">
@@ -186,14 +186,14 @@ export default function ContactUsModal({ isOpen, onClose }) {
               </div>
               <div>
                 <span className="text-[10px] font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-400 block">
-                  {lang === 'hi' ? 'टोल-फ्री किसान हेल्पलाइन' : 'Toll-Free Helpline'}
+                  {lang === 'hi' ? 'किसान हेल्पलाइन' : 'Direct Helpline'}
                 </span>
-                <span className="font-extrabold text-xs text-[#0B1E14] dark:text-white">1800-572-8899</span>
+                <span className="font-extrabold text-xs text-[#0B1E14] dark:text-white">+91 92365 81606</span>
               </div>
             </a>
 
             <a 
-              href="https://wa.me/919876501234?text=Namaste%20KrishiSeva%20Help%20Desk"
+              href="https://wa.me/919236581606?text=Namaste%20KrishiSeva%20Help%20Desk"
               target="_blank"
               rel="noopener noreferrer"
               className="p-3 rounded-2xl bg-teal-500/10 border border-teal-500/30 flex items-center gap-3 text-inherit no-underline hover:bg-teal-500/15 transition cursor-pointer"
@@ -205,7 +205,7 @@ export default function ContactUsModal({ isOpen, onClose }) {
                 <span className="text-[10px] font-black uppercase tracking-wider text-teal-700 dark:text-teal-400 block">
                   {lang === 'hi' ? 'व्हाट्सएप त्वरित चैट' : 'WhatsApp Live Chat'}
                 </span>
-                <span className="font-extrabold text-xs text-[#0B1E14] dark:text-white">+91 98765-01234</span>
+                <span className="font-extrabold text-xs text-[#0B1E14] dark:text-white">+91 92365 81606</span>
               </div>
             </a>
           </div>

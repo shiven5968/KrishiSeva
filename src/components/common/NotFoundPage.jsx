@@ -89,11 +89,11 @@ export default function NotFoundPage({ onNavigateHome }) {
           </button>
 
           <a
-            href="tel:18005728899"
+            href="tel:+919236581606"
             className="w-full sm:w-auto px-6 py-3.5 rounded-2xl border border-black/10 dark:border-white/10 hover:bg-black/5 dark:hover:bg-white/5 font-bold text-sm flex items-center justify-center gap-2 transition cursor-pointer text-inherit no-underline"
           >
             <PhoneCall className="w-4 h-4 text-emerald-500" />
-            <span>{lang === 'hi' ? 'हेल्पलाइन: 1800-572-8899' : 'Helpline: 1800-572-8899'}</span>
+            <span>{lang === 'hi' ? 'हेल्पलाइन: +91 92365 81606' : 'Helpline: +91 92365 81606'}</span>
           </a>
         </div>
       </div>
